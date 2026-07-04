@@ -1,0 +1,17 @@
+{
+  "name": "KADAI POS",
+  "short_name": "KADAI",
+  "description": "Aplikasi Point of Sale untuk UMKM",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FEFCE8",
+  "theme_color": "#FF6B35",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

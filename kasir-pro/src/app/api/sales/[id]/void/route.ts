@@ -1,0 +1,107 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { voidSaleSchema } from "@/lib/validators/sale";
+import { restoreFIFODeductions } from "@/lib/fifo";
+import { logActivity } from "@/lib/activity-logger";
+import {
+  FINANCE_SYSTEM_CATEGORY_KEYS,
+  getSystemFinanceCategoryId,
+} from "@/lib/finance";
+import { getSessionUserFromRequest } from "@/lib/session";
+import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+
+// POST /api/sales/[id]/void — Void a sale and restore stock
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+      return NextResponse.json(
+        { error: "Hanya admin yang dapat melakukan void transaksi" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { reason } = voidSaleSchema.parse(body);
+
+    const sale = await prisma.sale.findUnique({
+      where: { id },
+      include: {
+        items: {
+          include: { batchAllocations: true },
+        },
+      },
+    });
+
+    if (!sale) {
+      return NextResponse.json({ error: "Transaksi tidak ditemukan" }, { status: 404 });
+    }
+
+    if (sale.isVoided) {
+      return NextResponse.json({ error: "Transaksi sudah di-void" }, { status: 400 });
+    }
+
+    // Restore stock in transaction
+    await prisma.$transaction(async (tx) => {
+      // Mark sale as voided
+      const voidedSale = await tx.sale.update({
+        where: { id },
+        data: {
+          isVoided: true,
+          voidedAt: new Date(),
+          voidReason: reason,
+        },
+      });
+
+      const saleVoidCategoryId = await getSystemFinanceCategoryId(
+        tx,
+        FINANCE_SYSTEM_CATEGORY_KEYS.SALE_VOID_OUTFLOW
+      );
+
+      await tx.financeEntry.create({
+        data: {
+          amount: voidedSale.totalAmount,
+          direction: "OUT",
+          source: "SALE_VOID",
+          title: `Void ${sale.invoiceNumber}`,
+          notes: reason,
+          entryDate: voidedSale.voidedAt ?? new Date(),
+          categoryId: saleVoidCategoryId,
+          createdByUserId: sessionUser.id,
+          saleId: id,
+        },
+      });
+
+      // Restore batch quantities
+      const allocations = sale.items.flatMap((item) =>
+        item.batchAllocations.map((alloc) => ({
+          productBatchId: alloc.productBatchId,
+          quantity: alloc.quantity,
+        }))
+      );
+
+      await restoreFIFODeductions(tx, allocations);
+    });
+
+    await logActivity({
+      userId: sessionUser.id,
+      action: "SALE_VOIDED",
+      entity: "Sale",
+      entityId: id,
+      details: { invoiceNumber: sale.invoiceNumber, reason },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("POST /api/sales/[id]/void error:", error);
+    return NextResponse.json({ error: "Gagal void transaksi" }, { status: 500 });
+  }
+}

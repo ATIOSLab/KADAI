@@ -1,0 +1,384 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUM DEFINITIONS
+// ============================================================
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  CASHIER
+}
+
+enum PaymentType {
+  CASH
+  BANK_TRANSFER
+  QRIS
+  E_WALLET
+}
+
+enum AdjustmentReason {
+  DAMAGED
+  LOST
+  EXPIRED
+  STOCK_OPNAME
+  OTHER
+}
+
+enum ActionType {
+  // Sale actions
+  SALE_CREATED
+  SALE_VOIDED
+  // Product actions
+  PRODUCT_CREATED
+  PRODUCT_UPDATED
+  PRODUCT_DELETED
+  // Batch/Restock actions
+  BATCH_CREATED
+  // Stock actions
+  STOCK_ADJUSTED
+  // User actions
+  USER_LOGIN
+  USER_LOGOUT
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  // Finance actions
+  FINANCE_ENTRY_CREATED
+  FINANCE_ENTRY_UPDATED
+  FINANCE_ENTRY_ARCHIVED
+  FINANCE_CATEGORY_CREATED
+  FINANCE_CATEGORY_UPDATED
+  FINANCE_CATEGORY_DEACTIVATED
+}
+
+enum FinanceDirection {
+  IN
+  OUT
+}
+
+enum FinanceSource {
+  MANUAL
+  SALE
+  SALE_VOID
+  RESTOCK
+}
+
+// ============================================================
+// CORE ENTITIES
+// ============================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          UserRole  @default(CASHIER)
+  avatar        String?
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  sales            Sale[]
+  activityLogs     ActivityLog[]
+  stockAdjustments StockAdjustment[]
+  financeEntries   FinanceEntry[]
+
+  @@map("users")
+}
+
+model Store {
+  id            String   @id @default(cuid())
+  name          String
+  address       String?
+  phone         String?
+  email         String?
+  logo          String?
+  taxRate       Decimal  @default(0) @db.Decimal(5, 2)
+  taxInclusive  Boolean  @default(true)
+  defaultMarkup Decimal  @default(30) @db.Decimal(5, 2)
+  currency      String   @default("IDR")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("stores")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  color       String?
+  icon        String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@map("categories")
+}
+
+model Unit {
+  id             String   @id @default(cuid())
+  name           String
+  normalizedName String   @unique
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([name])
+  @@index([isActive])
+  @@map("units")
+}
+
+model Supplier {
+  id        String    @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  batches ProductBatch[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id                String    @id @default(cuid())
+  name              String
+  sku               String    @unique
+  barcode           String?   @unique
+  description       String?
+  unit              String    @default("pcs")
+  image             String?
+  lowStockThreshold Int       @default(10)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id])
+  batches          ProductBatch[]
+  saleItems        SaleItem[]
+  stockAdjustments StockAdjustment[]
+
+  @@index([categoryId])
+  @@index([name])
+  @@map("products")
+}
+
+// ============================================================
+// BATCH-BASED INVENTORY (FIFO CORE)
+// ============================================================
+
+model ProductBatch {
+  id           String    @id @default(cuid())
+  batchNumber  String    @unique
+  quantity     Int
+  remainingQty Int
+  costPrice    Decimal   @db.Decimal(15, 2)
+  sellingPrice Decimal   @db.Decimal(15, 2)
+  purchaseDate DateTime  @default(now())
+  expiryDate   DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  productId       String
+  product         Product        @relation(fields: [productId], references: [id])
+  supplierId      String?
+  supplier        Supplier?      @relation(fields: [supplierId], references: [id])
+  saleItemBatches SaleItemBatch[]
+  financeEntries  FinanceEntry[]
+
+  @@index([productId, remainingQty])
+  @@index([productId, purchaseDate])
+  @@map("product_batches")
+}
+
+// ============================================================
+// SALES & TRANSACTIONS
+// ============================================================
+
+model Sale {
+  id             String      @id @default(cuid())
+  invoiceNumber  String      @unique
+  subtotal       Decimal     @db.Decimal(15, 2)
+  discountAmount Decimal     @default(0) @db.Decimal(15, 2)
+  taxAmount      Decimal     @default(0) @db.Decimal(15, 2)
+  totalAmount    Decimal     @db.Decimal(15, 2)
+  totalCost      Decimal     @db.Decimal(15, 2)
+  grossProfit    Decimal     @db.Decimal(15, 2)
+  paymentType    PaymentType
+  paymentRef     String?
+  customerName   String?
+  notes          String?
+  isVoided       Boolean     @default(false)
+  voidedAt       DateTime?
+  voidReason     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  cashierId String
+  cashier   User       @relation(fields: [cashierId], references: [id])
+  items     SaleItem[]
+  financeEntries FinanceEntry[]
+
+  @@index([cashierId])
+  @@index([createdAt])
+  @@index([invoiceNumber])
+  @@map("sales")
+}
+
+model SaleItem {
+  id             String    @id @default(cuid())
+  quantity       Int
+  unitPrice      Decimal   @db.Decimal(15, 2)
+  totalPrice     Decimal   @db.Decimal(15, 2)
+  totalCost      Decimal   @db.Decimal(15, 2)
+  discountAmount Decimal   @default(0) @db.Decimal(15, 2)
+  createdAt      DateTime  @default(now())
+
+  // Relations
+  saleId           String
+  sale             Sale            @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product         @relation(fields: [productId], references: [id])
+  batchAllocations SaleItemBatch[]
+
+  @@index([saleId])
+  @@index([productId])
+  @@map("sale_items")
+}
+
+model SaleItemBatch {
+  id           String   @id @default(cuid())
+  quantity     Int
+  costPrice    Decimal  @db.Decimal(15, 2)
+  sellingPrice Decimal  @db.Decimal(15, 2)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  saleItemId     String
+  saleItem       SaleItem     @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  productBatchId String
+  productBatch   ProductBatch @relation(fields: [productBatchId], references: [id])
+
+  @@index([saleItemId])
+  @@index([productBatchId])
+  @@map("sale_item_batches")
+}
+
+// ============================================================
+// STOCK ADJUSTMENT
+// ============================================================
+
+model StockAdjustment {
+  id             String           @id @default(cuid())
+  quantityChange Int
+  reason         AdjustmentReason
+  notes          String?
+  createdAt      DateTime         @default(now())
+
+  // Relations
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+  @@map("stock_adjustments")
+}
+
+// ============================================================
+// AUDIT TRAIL
+// ============================================================
+
+model ActivityLog {
+  id        String     @id @default(cuid())
+  action    ActionType
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime   @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@map("activity_logs")
+}
+
+model FinanceCategory {
+  id         String           @id @default(cuid())
+  name       String
+  direction  FinanceDirection
+  isSystem   Boolean          @default(false)
+  systemKey  String?          @unique
+  isActive   Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  entries FinanceEntry[]
+
+  @@unique([name, direction])
+  @@index([direction, isActive])
+  @@map("finance_categories")
+}
+
+model FinanceEntry {
+  id              String           @id @default(cuid())
+  amount          Decimal          @db.Decimal(15, 2)
+  direction       FinanceDirection
+  source          FinanceSource
+  title           String
+  notes           String?
+  entryDate       DateTime
+  isArchived      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  categoryId      String
+  category        FinanceCategory  @relation(fields: [categoryId], references: [id])
+  createdByUserId String?
+  createdByUser   User?            @relation(fields: [createdByUserId], references: [id])
+  saleId          String?
+  sale            Sale?            @relation(fields: [saleId], references: [id])
+  productBatchId  String?
+  productBatch    ProductBatch?    @relation(fields: [productBatchId], references: [id])
+
+  @@index([entryDate])
+  @@index([direction, entryDate])
+  @@index([source, entryDate])
+  @@index([categoryId, entryDate])
+  @@index([createdByUserId])
+  @@index([saleId])
+  @@index([productBatchId])
+  @@index([isArchived, entryDate])
+  @@map("finance_entries")
+}

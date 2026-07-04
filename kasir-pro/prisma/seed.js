@@ -1,0 +1,223 @@
+const bcrypt = require("bcryptjs");
+const { PrismaClient, FinanceDirection, UserRole } = require("@prisma/client");
+
+const prisma = new PrismaClient();
+
+const DEFAULT_UNITS = [
+  { name: "pcs", normalizedName: "pcs" },
+  { name: "kg", normalizedName: "kg" },
+  { name: "botol", normalizedName: "botol" },
+  { name: "box", normalizedName: "box" },
+  { name: "karung", normalizedName: "karung" },
+  { name: "kotak", normalizedName: "kotak" },
+];
+
+const DEFAULT_FINANCE_CATEGORIES = [
+  {
+    name: "Penjualan",
+    direction: FinanceDirection.IN,
+    isSystem: true,
+    systemKey: "SALE_INCOME",
+  },
+  {
+    name: "Pembatalan Penjualan",
+    direction: FinanceDirection.OUT,
+    isSystem: true,
+    systemKey: "SALE_VOID_OUTFLOW",
+  },
+  {
+    name: "Pembelian Stok",
+    direction: FinanceDirection.OUT,
+    isSystem: true,
+    systemKey: "RESTOCK_EXPENSE",
+  },
+  {
+    name: "Modal Masuk",
+    direction: FinanceDirection.IN,
+    isSystem: false,
+    systemKey: null,
+  },
+  {
+    name: "Pendapatan Lain",
+    direction: FinanceDirection.IN,
+    isSystem: false,
+    systemKey: null,
+  },
+  {
+    name: "Biaya Operasional",
+    direction: FinanceDirection.OUT,
+    isSystem: false,
+    systemKey: null,
+  },
+  {
+    name: "Pengeluaran Lain",
+    direction: FinanceDirection.OUT,
+    isSystem: false,
+    systemKey: null,
+  },
+];
+
+function getAdminSeedConfig() {
+  return {
+    name: process.env.ADMIN_NAME || "Admin Kadai",
+    email: process.env.ADMIN_EMAIL || "admin@kadai.com",
+    password: process.env.ADMIN_PASSWORD || "admin123",
+    role: UserRole.ADMIN,
+  };
+}
+
+async function ensureStore() {
+  const existingStore = await prisma.store.findFirst({
+    select: { id: true },
+  });
+
+  if (existingStore) {
+    return existingStore.id;
+  }
+
+  const store = await prisma.store.create({
+    data: {
+      name: process.env.STORE_NAME || "KADAI",
+      address: process.env.STORE_ADDRESS || null,
+      phone: process.env.STORE_PHONE || null,
+      email: process.env.STORE_EMAIL || null,
+      taxRate: 0,
+      taxInclusive: true,
+      defaultMarkup: 30,
+      currency: "IDR",
+    },
+    select: { id: true },
+  });
+
+  return store.id;
+}
+
+async function ensureUnits() {
+  await prisma.unit.createMany({
+    data: DEFAULT_UNITS,
+    skipDuplicates: true,
+  });
+}
+
+async function ensureFinanceCategories() {
+  for (const category of DEFAULT_FINANCE_CATEGORIES) {
+    if (category.systemKey) {
+      await prisma.financeCategory.upsert({
+        where: { systemKey: category.systemKey },
+        update: {
+          name: category.name,
+          direction: category.direction,
+          isSystem: true,
+          isActive: true,
+        },
+        create: {
+          name: category.name,
+          direction: category.direction,
+          isSystem: true,
+          systemKey: category.systemKey,
+          isActive: true,
+        },
+      });
+      continue;
+    }
+
+    const existing = await prisma.financeCategory.findFirst({
+      where: {
+        name: category.name,
+        direction: category.direction,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existing) {
+      await prisma.financeCategory.update({
+        where: { id: existing.id },
+        data: { isActive: true },
+      });
+      continue;
+    }
+
+    await prisma.financeCategory.create({
+      data: {
+        name: category.name,
+        direction: category.direction,
+        isSystem: false,
+        isActive: true,
+      },
+    });
+  }
+}
+
+async function ensureAdminUser() {
+  const admin = getAdminSeedConfig();
+  const existingUser = await prisma.user.findUnique({
+    where: { email: admin.email },
+    select: {
+      id: true,
+      passwordHash: true,
+    },
+  });
+
+  if (existingUser) {
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        name: admin.name,
+        role: admin.role,
+        isActive: true,
+      },
+    });
+
+    return {
+      created: false,
+      email: admin.email,
+      password: admin.password,
+    };
+  }
+
+  const passwordHash = await bcrypt.hash(admin.password, 12);
+
+  await prisma.user.create({
+    data: {
+      name: admin.name,
+      email: admin.email,
+      passwordHash,
+      role: admin.role,
+      isActive: true,
+    },
+  });
+
+  return {
+    created: true,
+    email: admin.email,
+    password: admin.password,
+  };
+}
+
+async function main() {
+  console.log("Menjalankan seed minimal untuk deployment...");
+
+  await ensureStore();
+  await ensureUnits();
+  await ensureFinanceCategories();
+  const admin = await ensureAdminUser();
+
+  console.log("Seed selesai.");
+  console.log(`Admin: ${admin.email}`);
+  if (admin.created) {
+    console.log(`Password awal: ${admin.password}`);
+  } else {
+    console.log("User admin sudah ada. Password lama dipertahankan.");
+  }
+}
+
+main()
+  .catch((error) => {
+    console.error("Seed error:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

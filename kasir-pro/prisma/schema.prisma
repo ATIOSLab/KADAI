@@ -71,6 +71,22 @@ enum FinanceSource {
   RESTOCK
 }
 
+enum BotBusinessDayMode {
+  CLOSING_CUTOFF
+}
+
+enum BotJobType {
+  TELEGRAM_MESSAGE
+  DAILY_SUMMARY
+}
+
+enum BotJobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 // ============================================================
 // CORE ENTITIES
 // ============================================================
@@ -111,6 +127,58 @@ model Store {
   updatedAt     DateTime @updatedAt
 
   @@map("stores")
+}
+
+model BotSettings {
+  id               String             @id @default(cuid())
+  enabled          Boolean            @default(false)
+  timezone         String             @default("Asia/Jakarta")
+  closingTimeLocal String             @default("22:00")
+  summaryEnabled   Boolean            @default(false)
+  openaiModel      String             @default("gpt-5.5")
+  openaiApiKeyEncrypted String?
+  telegramBotTokenEncrypted String?
+  businessDayMode  BotBusinessDayMode @default(CLOSING_CUTOFF)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@map("bot_settings")
+}
+
+model TelegramChatBinding {
+  id                String   @id @default(cuid())
+  telegramChatId    String   @unique
+  chatType          String
+  title             String?
+  username          String?
+  isAuthorized      Boolean  @default(false)
+  canReceiveSummary Boolean  @default(false)
+  lastSeenAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([isAuthorized])
+  @@index([canReceiveSummary])
+  @@map("telegram_chat_bindings")
+}
+
+model BotJob {
+  id           String       @id @default(cuid())
+  type         BotJobType
+  status       BotJobStatus @default(PENDING)
+  payload      Json
+  attemptCount Int          @default(0)
+  nextRetryAt  DateTime     @default(now())
+  lockedAt     DateTime?
+  errorMessage String?
+  dedupeKey    String?      @unique
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([status, nextRetryAt])
+  @@index([type, status])
+  @@index([lockedAt])
+  @@map("bot_jobs")
 }
 
 model Category {

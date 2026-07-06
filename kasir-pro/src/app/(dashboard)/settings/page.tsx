@@ -24,6 +24,7 @@ import {
   Settings,
   Store,
   Users,
+  Bot,
   Plus,
   Loader2,
   Edit,
@@ -39,7 +40,6 @@ interface StoreData {
   address: string | null;
   phone: string | null;
   taxRate: number;
-  receiptFooter: string | null;
 }
 
 interface UserData {
@@ -52,6 +52,28 @@ interface UserData {
   createdAt: string;
 }
 
+interface BotSettingsData {
+  id: string;
+  enabled: boolean;
+  timezone: string;
+  closingTimeLocal: string;
+  summaryEnabled: boolean;
+  businessDayMode: "CLOSING_CUTOFF";
+  hasOpenAiApiKey: boolean;
+  hasTelegramBotToken: boolean;
+}
+
+interface TelegramChatBindingData {
+  id: string;
+  telegramChatId: string;
+  chatType: string;
+  title: string | null;
+  username: string | null;
+  isAuthorized: boolean;
+  canReceiveSummary: boolean;
+  lastSeenAt: string | null;
+}
+
 export default function SettingsPage() {
   // Store state
   const [loadingStore, setLoadingStore] = useState(true);
@@ -61,8 +83,26 @@ export default function SettingsPage() {
     address: "",
     phone: "",
     taxRate: 0,
-    receiptFooter: "",
   });
+
+  const [loadingBot, setLoadingBot] = useState(true);
+  const [savingBot, setSavingBot] = useState(false);
+  const [botForm, setBotForm] = useState({
+    enabled: false,
+    timezone: "Asia/Jakarta",
+    closingTimeLocal: "22:00",
+    summaryEnabled: false,
+    businessDayMode: "CLOSING_CUTOFF" as const,
+  });
+  const [botSecrets, setBotSecrets] = useState({
+    openaiApiKey: "",
+    telegramBotToken: "",
+  });
+  const [botSecretStatus, setBotSecretStatus] = useState({
+    hasOpenAiApiKey: false,
+    hasTelegramBotToken: false,
+  });
+  const [botChats, setBotChats] = useState<TelegramChatBindingData[]>([]);
 
   // Users state
   const [users, setUsers] = useState<UserData[]>([]);
@@ -96,12 +136,45 @@ export default function SettingsPage() {
         address: res.data.address || "",
         phone: res.data.phone || "",
         taxRate: res.data.taxRate || 0,
-        receiptFooter: res.data.receiptFooter || "",
       });
     } catch {
       toast.error("Gagal memuat konfigurasi toko");
     } finally {
       setLoadingStore(false);
+    }
+  }, []);
+
+  const fetchBot = useCallback(async () => {
+    setLoadingBot(true);
+    try {
+      const res = await apiFetch<{
+        data: {
+          settings: BotSettingsData;
+          chats: TelegramChatBindingData[];
+        };
+      }>("/api/settings/bot");
+      setBotForm({
+        enabled: res.data.settings.enabled,
+        timezone: res.data.settings.timezone,
+        closingTimeLocal: res.data.settings.closingTimeLocal,
+        summaryEnabled: res.data.settings.summaryEnabled,
+        businessDayMode: res.data.settings.businessDayMode,
+      });
+      setBotSecretStatus({
+        hasOpenAiApiKey: res.data.settings.hasOpenAiApiKey,
+        hasTelegramBotToken: res.data.settings.hasTelegramBotToken,
+      });
+      setBotSecrets({
+        openaiApiKey: "",
+        telegramBotToken: "",
+      });
+      setBotChats(res.data.chats);
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : "Gagal memuat pengaturan bot";
+      toast.error(message);
+    } finally {
+      setLoadingBot(false);
     }
   }, []);
 
@@ -125,9 +198,10 @@ export default function SettingsPage() {
   useEffect(() => {
     queueMicrotask(() => {
       void fetchStore();
+      void fetchBot();
       void fetchUsers();
     });
-  }, [fetchStore, fetchUsers]);
+  }, [fetchBot, fetchStore, fetchUsers]);
 
   // ── Save Store ──
   const handleSaveStore = async () => {
@@ -140,7 +214,6 @@ export default function SettingsPage() {
           address: storeForm.address || null,
           phone: storeForm.phone || null,
           taxRate: storeForm.taxRate,
-          receiptFooter: storeForm.receiptFooter || null,
         },
       });
       toast.success("Konfigurasi toko berhasil disimpan!");
@@ -152,6 +225,63 @@ export default function SettingsPage() {
     } finally {
       setSavingStore(false);
     }
+  };
+
+  const handleSaveBot = async () => {
+    setSavingBot(true);
+    try {
+      const response = await apiFetch<{
+        success: boolean;
+        warning?: string | null;
+      }>("/api/settings/bot", {
+        method: "PUT",
+        body: {
+          ...botForm,
+          openaiApiKey: botSecrets.openaiApiKey,
+          telegramBotToken: botSecrets.telegramBotToken,
+          chats: botChats.map((chat) => ({
+            id: chat.id,
+            isAuthorized: chat.isAuthorized,
+            canReceiveSummary: chat.canReceiveSummary,
+          })),
+        },
+      });
+      toast.success("Pengaturan bot berhasil disimpan!");
+      if (response.warning) {
+        toast.warning(response.warning);
+      }
+      void fetchBot();
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : "Gagal menyimpan pengaturan bot";
+      toast.error(message);
+    } finally {
+      setSavingBot(false);
+    }
+  };
+
+  const handleToggleChatAuthorization = (chatId: string) => {
+    setBotChats((currentChats) =>
+      currentChats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              isAuthorized: !chat.isAuthorized,
+              canReceiveSummary: chat.isAuthorized ? false : chat.canReceiveSummary,
+            }
+          : chat
+      )
+    );
+  };
+
+  const handleSelectSummaryChat = (chatId: string) => {
+    setBotChats((currentChats) =>
+      currentChats.map((chat) => ({
+        ...chat,
+        canReceiveSummary: chat.id === chatId ? !chat.canReceiveSummary : false,
+        isAuthorized: chat.id === chatId ? true : chat.isAuthorized,
+      }))
+    );
   };
 
   // ── Open Add User Dialog ──
@@ -276,7 +406,7 @@ export default function SettingsPage() {
     <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
       <PageHeader
         title="Pengaturan"
-        description="Kelola konfigurasi toko dan pengguna"
+        description="Kelola konfigurasi toko, bot, dan pengguna"
         icon={Settings}
       />
 
@@ -345,19 +475,6 @@ export default function SettingsPage() {
                     }
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Footer Struk</Label>
-                  <Input
-                    placeholder="Terima kasih telah berbelanja!"
-                    value={storeForm.receiptFooter}
-                    onChange={(e) =>
-                      setStoreForm({
-                        ...storeForm,
-                        receiptFooter: e.target.value,
-                      })
-                    }
-                  />
-                </div>
               </div>
               <Button onClick={handleSaveStore} disabled={savingStore}>
                 {savingStore ? (
@@ -368,6 +485,269 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-1" /> Simpan Perubahan
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bot className="w-5 h-5" /> Telegram Sales Bot
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {loadingBot ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Status Bot</Label>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-black bg-bg-main px-4 py-3">
+                    <div>
+                      <p className="font-bold">
+                        {botForm.enabled ? "Aktif" : "Nonaktif"}
+                      </p>
+                      <p className="text-sm text-text-muted">
+                        Saat aktif, bot merespons pertanyaan penjualan dari chat yang diotorisasi.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={botForm.enabled}
+                      onClick={() =>
+                        setBotForm((current) => ({
+                          ...current,
+                          enabled: !current.enabled,
+                        }))
+                      }
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full border-2 border-black transition-all ${
+                        botForm.enabled
+                          ? "bg-accent-success"
+                          : "bg-accent-danger"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-[2px_2px_0px_#1A1A1A] transition-all ${
+                          botForm.enabled ? "left-9" : "left-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Summary Closing Harian</Label>
+                  <div className="flex items-center justify-between rounded-2xl border-2 border-black bg-bg-main px-4 py-3">
+                    <div>
+                      <p className="font-bold">
+                        {botForm.summaryEnabled ? "Aktif" : "Nonaktif"}
+                      </p>
+                      <p className="text-sm text-text-muted">
+                        Executive summary dikirim satu kali tiap business day selesai.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={botForm.summaryEnabled}
+                      onClick={() =>
+                        setBotForm((current) => ({
+                          ...current,
+                          summaryEnabled: !current.summaryEnabled,
+                        }))
+                      }
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full border-2 border-black transition-all ${
+                        botForm.summaryEnabled
+                          ? "bg-accent-success"
+                          : "bg-accent-danger"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-[2px_2px_0px_#1A1A1A] transition-all ${
+                          botForm.summaryEnabled ? "left-9" : "left-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Timezone</Label>
+                  <Input
+                    value={botForm.timezone}
+                    onChange={(event) =>
+                      setBotForm((current) => ({
+                        ...current,
+                        timezone: event.target.value,
+                      }))
+                    }
+                    placeholder="Asia/Jakarta"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Jam Closing</Label>
+                  <Input
+                    value={botForm.closingTimeLocal}
+                    onChange={(event) =>
+                      setBotForm((current) => ({
+                        ...current,
+                        closingTimeLocal: event.target.value,
+                      }))
+                    }
+                    placeholder="22:00"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <Label>OpenAI API Key</Label>
+                    <Badge
+                      variant={
+                        botSecretStatus.hasOpenAiApiKey ? "success" : "outline"
+                      }
+                    >
+                      {botSecretStatus.hasOpenAiApiKey ? "Tersimpan" : "Belum ada"}
+                    </Badge>
+                  </div>
+                  <Input
+                    type="password"
+                    value={botSecrets.openaiApiKey}
+                    onChange={(event) =>
+                      setBotSecrets((current) => ({
+                        ...current,
+                        openaiApiKey: event.target.value,
+                      }))
+                    }
+                    placeholder="Isi hanya jika ingin menambah/mengganti API key"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <Label>Telegram Bot Token</Label>
+                    <Badge
+                      variant={
+                        botSecretStatus.hasTelegramBotToken
+                          ? "success"
+                          : "outline"
+                      }
+                    >
+                      {botSecretStatus.hasTelegramBotToken
+                        ? "Tersimpan"
+                        : "Belum ada"}
+                    </Badge>
+                  </div>
+                  <Input
+                    type="password"
+                    value={botSecrets.telegramBotToken}
+                    onChange={(event) =>
+                      setBotSecrets((current) => ({
+                        ...current,
+                        telegramBotToken: event.target.value,
+                      }))
+                    }
+                    placeholder="Isi hanya jika ingin menambah/mengganti bot token"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border-2 border-black bg-bg-card p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-black">Chat Telegram Terdeteksi</p>
+                    <p className="text-sm text-text-muted">
+                      Chat muncul di sini setelah mengirim `/start` ke bot.
+                    </p>
+                  </div>
+                  <Badge variant="outline">{botChats.length} chat</Badge>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {botChats.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border-default p-4 text-sm text-text-muted">
+                      Belum ada chat yang terdeteksi.
+                    </div>
+                  ) : (
+                    botChats.map((chat) => (
+                      <div
+                        key={chat.id}
+                        className="rounded-xl border-2 border-black bg-bg-main p-4"
+                      >
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-bold">
+                                {chat.title || chat.username || chat.telegramChatId}
+                              </p>
+                              <Badge
+                                variant={chat.isAuthorized ? "success" : "warning"}
+                              >
+                                {chat.isAuthorized ? "Diotorisasi" : "Kandidat"}
+                              </Badge>
+                              {chat.canReceiveSummary ? (
+                                <Badge variant="secondary">Penerima Summary</Badge>
+                              ) : null}
+                            </div>
+                            <p className="text-sm text-text-muted">
+                              {chat.chatType} • ID {chat.telegramChatId}
+                              {chat.username ? ` • @${chat.username}` : ""}
+                            </p>
+                            <p className="text-xs text-text-muted">
+                              Terakhir terlihat:{" "}
+                              {chat.lastSeenAt
+                                ? new Date(chat.lastSeenAt).toLocaleString("id-ID")
+                                : "-"}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                              variant={chat.isAuthorized ? "outline" : "success"}
+                              size="sm"
+                              onClick={() => handleToggleChatAuthorization(chat.id)}
+                            >
+                              {chat.isAuthorized ? "Cabut Akses" : "Otorisasi"}
+                            </Button>
+                            <Button
+                              variant={chat.canReceiveSummary ? "secondary" : "outline"}
+                              size="sm"
+                              disabled={!chat.isAuthorized}
+                              onClick={() => handleSelectSummaryChat(chat.id)}
+                            >
+                              {chat.canReceiveSummary
+                                ? "Batalkan Summary"
+                                : "Jadikan Chat Summary"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <Button onClick={handleSaveBot} disabled={savingBot}>
+                {savingBot ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-1" /> Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-1" /> Simpan Pengaturan Bot
                   </>
                 )}
               </Button>

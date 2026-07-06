@@ -123,7 +123,7 @@ export default function LoginPage() {
             </Button>
 
             {/* Demo credentials hint */}
-            <div className="p-3 rounded-lg bg-accent-secondary/10 neo-border-thin border-accent-secondary">
+            {/* <div className="p-3 rounded-lg bg-accent-secondary/10 neo-border-thin border-accent-secondary">
               <p className="text-xs font-bold text-accent-secondary mb-1">
                 Demo Credentials:
               </p>
@@ -132,7 +132,7 @@ export default function LoginPage() {
                 <br />
                 Password: admin123
               </p>
-            </div>
+            </div> */}
           </form>
         </CardContent>
       </Card>

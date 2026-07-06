@@ -19,4 +19,9 @@ if [ "${RUN_SEED_ON_START:-false}" = "true" ]; then
   npm run db:seed
 fi
 
+if [ -n "${TELEGRAM_WEBHOOK_SECRET:-}" ] && [ -n "${APP_BASE_URL:-}" ]; then
+  echo "Syncing Telegram webhook..."
+  npm run bot:webhook:sync || echo "Telegram webhook sync skipped/failed; app will continue."
+fi
+
 exec npm run start -- --hostname 0.0.0.0 --port "${PORT:-3000}"

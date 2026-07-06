@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 
 const paymentMethods = [
   { id: "CASH", label: "Tunai", icon: Banknote, color: "bg-accent-success" },
@@ -48,6 +48,10 @@ interface CheckoutDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function sanitizeAmountInput(value: string) {
+  return value.replace(/\D/g, "");
+}
+
 export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const items = useCart((state) => state.items);
   const getGrandTotal = useCart((state) => state.getGrandTotal);
@@ -66,7 +70,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const grandTotal = getGrandTotal();
   const changeAmount =
     paymentType === "CASH" && cashAmount
-      ? parseFloat(cashAmount) - grandTotal
+      ? Number(cashAmount) - grandTotal
       : 0;
 
   const handleCheckout = async () => {
@@ -203,10 +207,13 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               <div className="space-y-2">
                 <Label>Jumlah Uang Diterima</Label>
                 <Input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   placeholder="Masukkan jumlah uang..."
-                  value={cashAmount}
-                  onChange={(event) => setCashAmount(event.target.value)}
+                  value={cashAmount ? formatNumber(cashAmount) : ""}
+                  onChange={(event) =>
+                    setCashAmount(sanitizeAmountInput(event.target.value))
+                  }
                 />
                 {cashAmount && changeAmount >= 0 && (
                   <p className="text-sm font-bold text-accent-success">

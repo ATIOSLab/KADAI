@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 
+node ./docker/wait-for-db.cjs
+
 echo "Applying Prisma schema..."
 
 if [ "${RESET_DB_ON_START:-false}" = "true" ]; then

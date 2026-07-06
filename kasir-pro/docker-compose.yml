@@ -37,6 +37,8 @@ services:
       - "3000"
     volumes:
       - product_uploads:/app/public/uploads
+    networks:
+      - dokploy-network
 
   bot-worker:
     build:
@@ -68,6 +70,12 @@ services:
       DB_WAIT_DELAY_MS: ${DB_WAIT_DELAY_MS:-2000}
     volumes:
       - product_uploads:/app/public/uploads
+    networks:
+      - dokploy-network
 
 volumes:
   product_uploads:
+
+networks:
+  dokploy-network:
+    external: true

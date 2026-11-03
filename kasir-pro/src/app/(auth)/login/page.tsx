@@ -48,29 +48,29 @@ export default function LoginPage() {
     <div className="w-full max-w-md animate-slide-up">
       {/* Logo */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 mx-auto rounded-2xl gradient-primary neo-border neo-shadow flex items-center justify-center mb-4">
-          <ShoppingCart className="w-8 h-8 text-white" />
+        <div className="size-14 mx-auto rounded-2xl bg-slate-900 text-white shadow-sm flex items-center justify-center mb-4">
+          <ShoppingCart className="size-7 text-amber-400" />
         </div>
-        <h1 className="text-3xl font-black tracking-tight">KADAI</h1>
-        <p className="text-text-muted font-medium mt-1">
-          Masuk ke akun Anda untuk melanjutkan
+        <h1 className="text-3xl font-black tracking-tight text-slate-950">KADAI</h1>
+        <p className="text-slate-600 font-medium text-xs mt-1">
+          Masuk ke akun kasir & dashboard bisnis Anda
         </p>
       </div>
 
       {/* Login Form */}
-      <Card>
-        <CardHeader>
-          <div className="text-center">
-            <h2 className="text-xl font-extrabold">Selamat Datang!</h2>
-            <p className="text-sm text-text-muted font-medium">
-              Masukkan email dan password Anda
+      <Card className="border border-border shadow-sm bg-card rounded-2xl">
+        <CardHeader className="pb-4">
+          <div className="text-center space-y-1">
+            <h2 className="text-xl font-bold text-slate-950">Selamat Datang</h2>
+            <p className="text-xs text-muted-foreground">
+              Masukkan kredensial akun terdaftar
             </p>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 rounded-lg bg-accent-danger/10 neo-border-thin border-accent-danger text-accent-danger text-sm font-bold animate-shake">
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-destructive text-xs font-bold">
                 {error}
               </div>
             )}

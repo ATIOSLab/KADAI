@@ -10,12 +10,12 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "KADAI - Point of Sale",
+  title: "KADAI - Enterprise POS & ERP System",
   description:
-    "Aplikasi POS fullstack untuk UMKM dan retail kecil-menengah dengan inventory berbasis batch FIFO.",
-  keywords: ["POS", "kasir", "point of sale", "inventory", "FIFO", "UMKM"],
+    "Platform Operasi Bisnis Terpadu: Point of Sale (POS), Manajemen Persediaan FIFO, Resep BOM Kuliner, dan Kepatuhan Akuntansi SAK EMKM.",
+  keywords: ["POS", "kasir", "point of sale", "inventory", "FIFO", "BOM", "KDS", "SAK EMKM", "enterprise"],
   manifest: "/manifest.json",
-  themeColor: "#FF6B35",
+  themeColor: "#0F172A",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

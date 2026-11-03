@@ -8,6 +8,9 @@ import {
   Settings,
   ShoppingCart,
   Warehouse,
+  ChefHat,
+  QrCode,
+  Scale,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
@@ -69,6 +72,22 @@ export const navigationSections: NavigationSection[] = [
         icon: Warehouse,
         roles: ["ADMIN", "MANAGER", "CASHIER"],
       },
+      {
+        href: "/tables",
+        label: "Meja & QR Order",
+        shortLabel: "Meja",
+        description: "Kelola meja kafe/resto dan QR Code self-order.",
+        icon: QrCode,
+        roles: ["ADMIN", "MANAGER"],
+      },
+      {
+        href: "/kds",
+        label: "Layar Dapur (KDS)",
+        shortLabel: "Dapur",
+        description: "Kitchen & Bar Display pesanan aktif real-time.",
+        icon: ChefHat,
+        roles: ["ADMIN", "MANAGER", "CASHIER"],
+      },
     ],
   },
   {
@@ -96,6 +115,14 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Keuangan",
         description: "Pantau arus kas, modal, pengeluaran, dan saldo bisnis.",
         icon: CircleDollarSign,
+        roles: ["ADMIN", "MANAGER"],
+      },
+      {
+        href: "/finance/tax",
+        label: "Pajak & SAK EMKM",
+        shortLabel: "Pajak",
+        description: "Rekapitulasi perpajakan PPN, PB1, dan PPh Final 0.5% PP 55/2022.",
+        icon: Scale,
         roles: ["ADMIN", "MANAGER"],
       },
     ],
@@ -156,6 +183,18 @@ const pageMetaMap: Record<string, PageMeta> = {
     section: "Operasional",
     eyebrow: "Warehouse",
   },
+  "/tables": {
+    title: "Meja & QR Code",
+    description: "Atur meja kafe/restoran dan cetak QR Code self-order pelanggan.",
+    section: "Operasional",
+    eyebrow: "Dining",
+  },
+  "/kds": {
+    title: "Kitchen Display System",
+    description: "Layar monitor pesanan aktif untuk dapur dan bar secara real-time.",
+    section: "Operasional",
+    eyebrow: "Kitchen",
+  },
   "/sales": {
     title: "Penjualan",
     description: "Review transaksi, invoice, metode pembayaran, dan performa kasir.",
@@ -173,6 +212,12 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Lihat arus kas bisnis, saldo, pemasukan, dan pengeluaran dalam satu ledger.",
     section: "Analitik",
     eyebrow: "Cashflow",
+  },
+  "/finance/tax": {
+    title: "Pajak & SAK EMKM",
+    description: "Rekapitulasi perpajakan PPN, PB1, dan PPh Final 0.5% PP 55/2022.",
+    section: "Analitik",
+    eyebrow: "Tax Compliance",
   },
   "/activity-log": {
     title: "Activity Log",

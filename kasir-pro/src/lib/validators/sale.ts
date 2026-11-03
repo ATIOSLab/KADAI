@@ -12,6 +12,8 @@ export const cartItemSchema = z.object({
 export const checkoutSchema = z.object({
   items: z.array(cartItemSchema).min(1, "Keranjang tidak boleh kosong"),
   paymentType: z.enum(["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET"]),
+  orderType: z.enum(["DINE_IN", "TAKEAWAY", "DELIVERY"]).default("DINE_IN"),
+  tableId: z.string().optional().nullable(),
   paymentRef: z.string().optional().nullable(),
   customerName: z.string().optional().nullable(),
   discountAmount: z.number().min(0).default(0),

@@ -151,19 +151,61 @@ export async function POST(request: NextRequest) {
       });
       const invoiceNumber = generateInvoiceNumber(todaySalesCount + 1);
 
-      // 3. Calculate totals
+      // 3. Store tax & service charge settings
+      const store = await tx.store.findFirst();
+      const serviceRate = Number(store?.serviceChargeRate || 0);
+      const taxRate = Number(store?.taxRate || 0);
+      const taxInclusive = store?.taxInclusive ?? false;
+      const enableRounding = store?.enableRounding ?? true;
+
+      // 4. Calculate totals
       const transactionDiscount = new Decimal(data.discountAmount || 0);
       const discountAmount = itemDiscountTotal.add(transactionDiscount);
-      const totalAmount = subtotal.sub(discountAmount);
-      const grossProfit = totalAmount.sub(totalCost);
+      const netSubtotal = subtotal.sub(discountAmount);
 
-      // 4. Create sale record
+      let serviceCharge = new Decimal(0);
+      if (serviceRate > 0) {
+        serviceCharge = netSubtotal.mul(serviceRate).div(100);
+      }
+
+      const taxableBase = netSubtotal.add(serviceCharge);
+      let taxAmount = new Decimal(0);
+      let preRoundingTotal = new Decimal(0);
+
+      if (taxRate > 0) {
+        if (taxInclusive) {
+          const dpp = taxableBase.div(1 + taxRate / 100);
+          taxAmount = taxableBase.sub(dpp);
+          preRoundingTotal = taxableBase;
+        } else {
+          taxAmount = taxableBase.mul(taxRate).div(100);
+          preRoundingTotal = taxableBase.add(taxAmount);
+        }
+      } else {
+        preRoundingTotal = taxableBase;
+      }
+
+      let roundingAmount = new Decimal(0);
+      let totalAmount = preRoundingTotal;
+      if (enableRounding) {
+        const rounded = Math.round(Number(preRoundingTotal) / 100) * 100;
+        roundingAmount = new Decimal(rounded).sub(preRoundingTotal);
+        totalAmount = new Decimal(rounded);
+      }
+
+      const grossProfit = netSubtotal.sub(totalCost);
+
+      // 5. Create sale record
       const sale = await tx.sale.create({
         data: {
           invoiceNumber,
+          orderType: data.orderType || "DINE_IN",
+          tableId: data.tableId || null,
           subtotal,
           discountAmount,
-          taxAmount: 0,
+          serviceCharge,
+          taxAmount,
+          roundingAmount,
           totalAmount,
           totalCost,
           grossProfit,
@@ -194,13 +236,70 @@ export async function POST(request: NextRequest) {
         include: {
           items: {
             include: {
-              product: { select: { id: true, name: true, sku: true, unit: true } },
+              product: { select: { id: true, name: true, sku: true, unit: true, station: true } },
               batchAllocations: true,
             },
           },
           cashier: { select: { id: true, name: true } },
+          table: true,
         },
       });
+
+      // 6. Update table occupancy if dine-in
+      if (data.tableId) {
+        await tx.restaurantTable.update({
+          where: { id: data.tableId },
+          data: { isOccupied: true },
+        });
+      }
+
+      // 7. Route to Kitchen Display System (KDS)
+      const kitchenItems = sale.items.filter(
+        (i: any) => i.product.station === "KITCHEN" || i.product.station === "GENERAL"
+      );
+      const barItems = sale.items.filter((i: any) => i.product.station === "BAR");
+
+      if (kitchenItems.length > 0) {
+        await tx.kDSOrder.create({
+          data: {
+            saleId: sale.id,
+            station: "KITCHEN",
+            status: "QUEUED",
+            tableNo: sale.table?.tableNo || null,
+            orderType: data.orderType || "DINE_IN",
+            notes: data.notes || null,
+            itemsJson: kitchenItems.map((k: any) => ({
+              productId: k.productId,
+              name: k.product.name,
+              quantity: k.quantity,
+              unit: k.product.unit,
+              station: k.product.station,
+              notes: null,
+            })),
+          },
+        });
+      }
+
+      if (barItems.length > 0) {
+        await tx.kDSOrder.create({
+          data: {
+            saleId: sale.id,
+            station: "BAR",
+            status: "QUEUED",
+            tableNo: sale.table?.tableNo || null,
+            orderType: data.orderType || "DINE_IN",
+            notes: data.notes || null,
+            itemsJson: barItems.map((b: any) => ({
+              productId: b.productId,
+              name: b.product.name,
+              quantity: b.quantity,
+              unit: b.product.unit,
+              station: b.product.station,
+              notes: null,
+            })),
+          },
+        });
+      }
 
       const saleCategoryId = await getSystemFinanceCategoryId(
         tx,

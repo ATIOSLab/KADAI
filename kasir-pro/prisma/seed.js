@@ -77,12 +77,17 @@ async function ensureStore() {
 
   const store = await prisma.store.create({
     data: {
-      name: process.env.STORE_NAME || "KADAI",
-      address: process.env.STORE_ADDRESS || null,
-      phone: process.env.STORE_PHONE || null,
-      email: process.env.STORE_EMAIL || null,
-      taxRate: 0,
-      taxInclusive: true,
+      name: process.env.STORE_NAME || "KADAI Indonesia",
+      businessType: "FNB_CAFE",
+      tier: "PRO_BUSINESS",
+      address: process.env.STORE_ADDRESS || "Jl. Sudirman No. 45, Jakarta Pusat",
+      phone: process.env.STORE_PHONE || "08127634091",
+      email: process.env.STORE_EMAIL || "halo@kadai.netkrida.cloud",
+      taxType: "PB1_10",
+      taxRate: 10,
+      taxInclusive: false,
+      serviceChargeRate: 5,
+      enableRounding: true,
       defaultMarkup: 30,
       currency: "IDR",
     },
@@ -90,6 +95,24 @@ async function ensureStore() {
   });
 
   return store.id;
+}
+
+async function ensureTables() {
+  const defaultTables = [
+    { tableNo: "Meja 01", section: "Lantai 1", capacity: 4, qrToken: "table-01" },
+    { tableNo: "Meja 02", section: "Lantai 1", capacity: 2, qrToken: "table-02" },
+    { tableNo: "Meja 03", section: "Lantai 1", capacity: 4, qrToken: "table-03" },
+    { tableNo: "Meja 04", section: "Outdoor", capacity: 6, qrToken: "table-04" },
+    { tableNo: "Meja VIP", section: "VIP Room", capacity: 8, qrToken: "table-vip" },
+  ];
+
+  for (const t of defaultTables) {
+    await prisma.restaurantTable.upsert({
+      where: { tableNo: t.tableNo },
+      update: { section: t.section, capacity: t.capacity },
+      create: t,
+    });
+  }
 }
 
 async function ensureUnits() {
@@ -202,6 +225,7 @@ async function main() {
   await ensureStore();
   await ensureUnits();
   await ensureFinanceCategories();
+  await ensureTables();
   const admin = await ensureAdminUser();
 
   console.log("Seed selesai.");

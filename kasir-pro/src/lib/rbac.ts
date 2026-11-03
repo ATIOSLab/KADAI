@@ -25,6 +25,8 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/inventory", roles: ALL_AUTHENTICATED_ROLES },
   { path: "/sales", roles: ALL_AUTHENTICATED_ROLES },
   { path: "/pos", roles: ADMIN_CASHIER_ROLES },
+  { path: "/tables", roles: ADMIN_MANAGER_ROLES },
+  { path: "/kds", roles: ALL_AUTHENTICATED_ROLES },
 ];
 
 type SessionPayload = {

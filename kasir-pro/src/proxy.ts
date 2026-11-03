@@ -5,13 +5,27 @@ import {
   parseSessionCookie,
 } from "@/lib/rbac";
 
-const publicPaths = ["/login", "/api/auth/login", "/api/auth/logout"];
+const publicPaths = [
+  "/login",
+  "/register",
+  "/pricing",
+  "/order",
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/api/auth/register",
+  "/api/order",
+];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Allow landing page
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
   // Allow public paths
-  if (publicPaths.some((p) => pathname.startsWith(p))) {
+  if (publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     return NextResponse.next();
   }
 

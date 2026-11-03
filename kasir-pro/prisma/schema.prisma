@@ -8,13 +8,64 @@ datasource db {
 }
 
 // ============================================================
-// ENUM DEFINITIONS
+// ENUM DEFINITIONS (INDONESIAN POS & MULTI-VERTICAL SAAS)
 // ============================================================
 
 enum UserRole {
   ADMIN
   MANAGER
   CASHIER
+}
+
+enum BusinessType {
+  RETAIL
+  FNB_CAFE
+  FNB_RESTAURANT
+  FNB_WARUNG
+  SERVICE
+}
+
+enum SubscriptionTier {
+  FREE
+  STARTER
+  PRO_BUSINESS
+  ENTERPRISE
+}
+
+enum ProductType {
+  FINISHED_GOOD // Barang Jadi (Ritel langsung jual)
+  RAW_MATERIAL  // Bahan Baku Mentah (Bahan resep F&B)
+  MANUFACTURED  // Produk Jadi Ber-Resep / BOM (Dimsum, Kopi)
+  SERVICE       // Jasa / Layanan non-fisik
+}
+
+enum StationType {
+  KITCHEN
+  BAR
+  DESSERT
+  GENERAL
+}
+
+enum TaxType {
+  NONE
+  PPN_11 // PPN 11%
+  PPN_12 // PPN 12%
+  PB1_10 // Pajak Restoran / Pajak Daerah 10%
+  CUSTOM
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum KDSStatus {
+  QUEUED
+  COOKING
+  READY
+  SERVED
+  CANCELED
 }
 
 enum PaymentType {
@@ -44,6 +95,13 @@ enum ActionType {
   BATCH_CREATED
   // Stock actions
   STOCK_ADJUSTED
+  // Table actions
+  TABLE_CREATED
+  TABLE_UPDATED
+  TABLE_DELETED
+  // Recipe & KDS
+  RECIPE_UPDATED
+  KDS_STATUS_CHANGED
   // User actions
   USER_LOGIN
   USER_LOGOUT
@@ -113,18 +171,23 @@ model User {
 }
 
 model Store {
-  id            String   @id @default(cuid())
-  name          String
-  address       String?
-  phone         String?
-  email         String?
-  logo          String?
-  taxRate       Decimal  @default(0) @db.Decimal(5, 2)
-  taxInclusive  Boolean  @default(true)
-  defaultMarkup Decimal  @default(30) @db.Decimal(5, 2)
-  currency      String   @default("IDR")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String           @id @default(cuid())
+  name              String
+  businessType      BusinessType     @default(FNB_CAFE)
+  tier              SubscriptionTier @default(PRO_BUSINESS)
+  address           String?
+  phone             String?
+  email             String?
+  logo              String?
+  taxType           TaxType          @default(PB1_10)
+  taxRate           Decimal          @default(10) @db.Decimal(5, 2)
+  taxInclusive      Boolean          @default(false)
+  serviceChargeRate Decimal          @default(5) @db.Decimal(5, 2)
+  enableRounding    Boolean          @default(true)
+  defaultMarkup     Decimal          @default(30) @db.Decimal(5, 2)
+  currency          String           @default("IDR")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@map("stores")
 }
@@ -227,28 +290,47 @@ model Supplier {
 }
 
 model Product {
-  id                String    @id @default(cuid())
+  id                String       @id @default(cuid())
   name              String
-  sku               String    @unique
-  barcode           String?   @unique
+  sku               String       @unique
+  barcode           String?      @unique
   description       String?
-  unit              String    @default("pcs")
+  productType       ProductType  @default(FINISHED_GOOD)
+  station           StationType  @default(GENERAL)
+  unit              String       @default("pcs")
   image             String?
-  lowStockThreshold Int       @default(10)
-  isActive          Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  lowStockThreshold Int          @default(10)
+  isActive          Boolean      @default(true)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   // Relations
-  categoryId       String
-  category         Category          @relation(fields: [categoryId], references: [id])
-  batches          ProductBatch[]
-  saleItems        SaleItem[]
-  stockAdjustments StockAdjustment[]
+  categoryId          String
+  category            Category          @relation(fields: [categoryId], references: [id])
+  batches             ProductBatch[]
+  saleItems           SaleItem[]
+  stockAdjustments    StockAdjustment[]
+  recipesAsParent     RecipeItem[]      @relation("ParentRecipe")
+  recipesAsIngredient RecipeItem[]      @relation("IngredientRecipe")
 
   @@index([categoryId])
   @@index([name])
   @@map("products")
+}
+
+model RecipeItem {
+  id              String   @id @default(cuid())
+  parentProductId String
+  parentProduct   Product  @relation("ParentRecipe", fields: [parentProductId], references: [id], onDelete: Cascade)
+  ingredientId    String
+  ingredient      Product  @relation("IngredientRecipe", fields: [ingredientId], references: [id], onDelete: Cascade)
+  quantityNeeded  Decimal  @db.Decimal(12, 4)
+  unit            String   @default("gram")
+  wastagePercent  Decimal  @default(0) @db.Decimal(5, 2)
+  createdAt       DateTime @default(now())
+
+  @@unique([parentProductId, ingredientId])
+  @@map("recipe_items")
 }
 
 // ============================================================
@@ -282,33 +364,58 @@ model ProductBatch {
 }
 
 // ============================================================
+// MEJA RESTORAN & KAFE (TABLE MANAGEMENT)
+// ============================================================
+
+model RestaurantTable {
+  id         String   @id @default(cuid())
+  tableNo    String   @unique
+  section    String   @default("Utama")
+  capacity   Int      @default(4)
+  qrToken    String   @unique @default(cuid())
+  isOccupied Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sales      Sale[]
+
+  @@map("restaurant_tables")
+}
+
+// ============================================================
 // SALES & TRANSACTIONS
 // ============================================================
 
 model Sale {
-  id             String      @id @default(cuid())
-  invoiceNumber  String      @unique
-  subtotal       Decimal     @db.Decimal(15, 2)
-  discountAmount Decimal     @default(0) @db.Decimal(15, 2)
-  taxAmount      Decimal     @default(0) @db.Decimal(15, 2)
-  totalAmount    Decimal     @db.Decimal(15, 2)
-  totalCost      Decimal     @db.Decimal(15, 2)
-  grossProfit    Decimal     @db.Decimal(15, 2)
+  id             String           @id @default(cuid())
+  invoiceNumber  String           @unique
+  orderType      OrderType        @default(DINE_IN)
+  tableId        String?
+  table          RestaurantTable? @relation(fields: [tableId], references: [id])
+  subtotal       Decimal          @db.Decimal(15, 2)
+  discountAmount Decimal          @default(0) @db.Decimal(15, 2)
+  serviceCharge  Decimal          @default(0) @db.Decimal(15, 2)
+  taxAmount      Decimal          @default(0) @db.Decimal(15, 2)
+  roundingAmount Decimal          @default(0) @db.Decimal(8, 2)
+  totalAmount    Decimal          @db.Decimal(15, 2)
+  totalCost      Decimal          @db.Decimal(15, 2)
+  grossProfit    Decimal          @db.Decimal(15, 2)
   paymentType    PaymentType
   paymentRef     String?
   customerName   String?
   notes          String?
-  isVoided       Boolean     @default(false)
+  isVoided       Boolean          @default(false)
   voidedAt       DateTime?
   voidReason     String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   // Relations
-  cashierId String
-  cashier   User       @relation(fields: [cashierId], references: [id])
-  items     SaleItem[]
+  cashierId      String
+  cashier        User             @relation(fields: [cashierId], references: [id])
+  items          SaleItem[]
   financeEntries FinanceEntry[]
+  kdsOrders      KDSOrder[]
 
   @@index([cashierId])
   @@index([createdAt])
@@ -323,6 +430,7 @@ model SaleItem {
   totalPrice     Decimal   @db.Decimal(15, 2)
   totalCost      Decimal   @db.Decimal(15, 2)
   discountAmount Decimal   @default(0) @db.Decimal(15, 2)
+  notes          String?
   createdAt      DateTime  @default(now())
 
   // Relations
@@ -353,6 +461,29 @@ model SaleItemBatch {
   @@index([saleItemId])
   @@index([productBatchId])
   @@map("sale_item_batches")
+}
+
+// ============================================================
+// KITCHEN DISPLAY SYSTEM (KDS)
+// ============================================================
+
+model KDSOrder {
+  id        String      @id @default(cuid())
+  saleId    String
+  sale      Sale        @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  station   StationType @default(KITCHEN)
+  status    KDSStatus   @default(QUEUED)
+  itemsJson Json
+  notes     String?
+  tableNo   String?
+  orderType OrderType   @default(DINE_IN)
+  queuedAt  DateTime    @default(now())
+  startedAt DateTime?
+  readyAt   DateTime?
+  servedAt  DateTime?
+
+  @@index([station, status])
+  @@map("kds_orders")
 }
 
 // ============================================================

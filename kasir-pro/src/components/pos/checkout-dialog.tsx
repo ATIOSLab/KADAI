@@ -59,6 +59,9 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const bumpCatalogVersion = useCart((state) => state.bumpCatalogVersion);
 
   const [paymentType, setPaymentType] = useState("CASH");
+  const [orderType, setOrderType] = useState<"DINE_IN" | "TAKEAWAY">("DINE_IN");
+  const [tableId, setTableId] = useState<string>("");
+  const [tablesList, setTablesList] = useState<Array<{ id: string; tableNo: string; section: string }>>([]);
   const [paymentRef, setPaymentRef] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [cashAmount, setCashAmount] = useState("");
@@ -66,6 +69,15 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
+
+  useState(() => {
+    fetch("/api/tables")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.data) setTablesList(data.data);
+      })
+      .catch(() => {});
+  });
 
   const grandTotal = getGrandTotal();
   const changeAmount =
@@ -90,6 +102,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
             discountAmount: item.discountAmount,
             selectedBatchId: item.selectedBatchId,
           })),
+          orderType,
+          tableId: orderType === "DINE_IN" && tableId ? tableId : null,
           paymentType,
           paymentRef: paymentRef || null,
           customerName: customerName || null,
@@ -170,6 +184,50 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               {formatCurrency(grandTotal)}
             </p>
           </div>
+
+          <div className="space-y-2">
+            <Label className="font-bold text-xs">Tipe Pesanan</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setOrderType("DINE_IN")}
+                className={cn(
+                  "p-2 rounded-lg neo-border-thin font-bold text-xs text-center transition-all",
+                  orderType === "DINE_IN" ? "neo-border neo-shadow-sm bg-accent-primary text-white" : "hover:bg-bg-main"
+                )}
+              >
+                🍽️ Makan di Tempat (Dine In)
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderType("TAKEAWAY")}
+                className={cn(
+                  "p-2 rounded-lg neo-border-thin font-bold text-xs text-center transition-all",
+                  orderType === "TAKEAWAY" ? "neo-border neo-shadow-sm bg-accent-primary text-white" : "hover:bg-bg-main"
+                )}
+              >
+                🥡 Bawa Pulang (Takeaway)
+              </button>
+            </div>
+          </div>
+
+          {orderType === "DINE_IN" && tablesList.length > 0 && (
+            <div className="space-y-1">
+              <Label className="font-bold text-xs">Pilih Meja</Label>
+              <select
+                value={tableId}
+                onChange={(e: any) => setTableId(e.target.value)}
+                className="w-full h-10 px-3 rounded-lg neo-border bg-card text-xs font-bold"
+              >
+                <option value="">-- Pilih Meja Pelanggan --</option>
+                {tablesList.map((t: any) => (
+                  <option key={t.id} value={t.id}>
+                    {t.tableNo} ({t.section})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Metode Pembayaran</Label>

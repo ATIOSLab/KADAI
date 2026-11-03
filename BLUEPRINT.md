@@ -3,7 +3,9 @@
 
 > **Official Repository:** `ATIOSLab/KADAI`  
 > **Architecture Status:** Active Specification (v2.0.0 Enterprise)  
-> **Master Blueprint:** See full specifications in [`DOCS/KADAI_ENTERPRISE_BLUEPRINT.md`](./DOCS/KADAI_ENTERPRISE_BLUEPRINT.md)
+> **Master Blueprints:**
+> 1. Master System & POS Architecture: [`DOCS/KADAI_ENTERPRISE_BLUEPRINT.md`](./DOCS/KADAI_ENTERPRISE_BLUEPRINT.md)
+> 2. Commercial SaaS RBAC & Access Control: [`DOCS/KADAI_SAAS_RBAC_BLUEPRINT.md`](./DOCS/KADAI_SAAS_RBAC_BLUEPRINT.md)
 
 ---
 

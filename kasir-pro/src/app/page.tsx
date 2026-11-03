@@ -26,43 +26,45 @@ export default async function HomePage() {
   const dashboardPath = sessionUser ? getDefaultPathForRole(sessionUser.role) : null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden w-full">
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border shadow-sm px-6 py-3.5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
-              <Store className="size-5" />
+      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border shadow-xs px-4 sm:px-6 py-2.5 sm:py-3 w-full">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          {/* Brand */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-slate-900 text-white shadow-xs">
+              <Store className="size-4 text-primary" />
             </span>
             <div>
-              <span className="text-xl font-bold tracking-tight block text-slate-950">KADAI</span>
-              <span className="text-[10px] text-muted-foreground font-mono font-bold tracking-widest uppercase block -mt-1">
+              <span className="text-lg sm:text-xl font-bold tracking-tight block text-slate-950 leading-none">KADAI</span>
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground font-mono font-bold tracking-wider uppercase block mt-0.5">
                 Enterprise POS & ERP
               </span>
             </div>
           </div>
 
+          {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
-            <a href="#fitur" className="hover:text-primary transition-colors">Fitur Solusi</a>
-            <a href="#multi-vertikal" className="hover:text-primary transition-colors">Ritel & F&B</a>
+            <a href="#multi-vertikal" className="hover:text-primary transition-colors">Solusi Industri</a>
             <a href="#standar-keuangan" className="hover:text-primary transition-colors">Pajak & SAK EMKM</a>
             <a href="#harga" className="hover:text-primary transition-colors">Paket Langganan</a>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {dashboardPath ? (
-              <Button asChild className="font-semibold text-xs shadow-sm">
+              <Button asChild size="sm" className="font-bold text-xs shadow-xs h-8 sm:h-9 px-3 sm:px-4 rounded-lg">
                 <Link href={dashboardPath}>
-                  Buka Dashboard <ArrowRight className="size-3.5 ml-1.5" />
+                  Dashboard <ArrowRight className="size-3.5 ml-1 hidden sm:inline" />
                 </Link>
               </Button>
             ) : (
               <>
-                <Button asChild variant="outline" className="font-semibold text-xs border-slate-300">
-                  <Link href="/login">Masuk Kasir</Link>
+                <Button asChild variant="ghost" size="sm" className="font-semibold text-xs h-8 sm:h-9 px-2.5 sm:px-3 text-slate-700 hover:text-slate-900">
+                  <Link href="/login">Masuk</Link>
                 </Button>
-                <Button asChild className="font-semibold text-xs shadow-sm">
-                  <Link href="/register">Daftar Akun Baru</Link>
+                <Button asChild size="sm" className="font-bold text-xs shadow-xs h-8 sm:h-9 px-3 sm:px-4 rounded-lg">
+                  <Link href="/register">Daftar Akun</Link>
                 </Button>
               </>
             )}
@@ -71,46 +73,51 @@ export default async function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-24 px-6 border-b border-border bg-gradient-to-b from-card via-card to-background">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-xs font-semibold shadow-sm">
-            <Sparkles className="size-3.5 text-primary" />
-            <span>Platform Operasi Bisnis & Point of Sale Terintegrasi</span>
+      <section className="relative overflow-hidden py-10 sm:py-20 px-4 sm:px-6 border-b border-border bg-gradient-to-b from-card via-card to-background w-full">
+        <div className="max-w-3xl mx-auto text-center space-y-4 sm:space-y-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-[11px] sm:text-xs font-semibold shadow-xs max-w-full">
+            <Sparkles className="size-3.5 text-primary shrink-0" />
+            <span className="truncate">Sistem Operasi Bisnis & POS Indonesia</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] text-slate-950">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight sm:leading-tight text-slate-950 px-1 text-balance">
             Kelola Penjualan, Rantai Pasok, dan Akuntansi dengan Akurasi Enterprise.
           </h1>
 
-          <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            KADAI menyatukan terminal transaksi kasir cepat, manajemen persediaan FIFO multi-batch, formula resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak resmi PPN 11% dan PBJT/PB1 10%.
+          <p className="text-xs sm:text-sm md:text-base text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed px-2 text-balance">
+            KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak resmi PPN 11% & PBJT/PB1 10%.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-            <Button asChild size="lg" className="w-full sm:w-auto font-bold text-sm px-8 h-12 shadow-sm rounded-lg">
-              <Link href="/register">
-                Mulai Uji Coba Gratis 14 Hari <ArrowRight className="size-4 ml-2" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2 px-2 max-w-sm sm:max-w-none mx-auto w-full">
+            <Button asChild size="lg" className="w-full sm:w-auto font-bold text-xs sm:text-sm h-11 sm:h-12 px-6 shadow-sm rounded-xl">
+              <Link href="/register" className="flex items-center justify-center gap-2">
+                <span>Mulai Uji Coba Gratis 14 Hari</span>
+                <ArrowRight className="size-4 shrink-0" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-lg border-slate-300">
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-xs sm:text-sm h-11 sm:h-12 px-6 rounded-xl border-slate-300">
               <Link href="/login">Masuk ke Toko Anda</Link>
             </Button>
           </div>
 
-          {/* Trust Metrics Pill Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-slate-600">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-              <CheckCircle2 className="size-3.5 text-emerald-600" /> Kepatuhan Standar SAK EMKM RI
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-              <CheckCircle2 className="size-3.5 text-emerald-600" /> Otomatisasi Pajak PPN & PBJT
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-              <CheckCircle2 className="size-3.5 text-emerald-600" /> Self-Order QR & Layar Dapur KDS
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-              <CheckCircle2 className="size-3.5 text-emerald-600" /> Otorisasi Keamanan Multi-Role RBAC
-            </span>
+          {/* Value Props - Responsive Card Grid (Equal Heights, No Staircase Widows!) */}
+          <div className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 max-w-xl mx-auto text-left w-full">
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+              <span className="text-xs font-semibold text-slate-700">Kepatuhan Standar SAK EMKM RI</span>
+            </div>
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+              <span className="text-xs font-semibold text-slate-700">Otomatisasi Pajak PPN & PBJT</span>
+            </div>
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+              <span className="text-xs font-semibold text-slate-700">Self-Order QR & Layar Dapur KDS</span>
+            </div>
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+              <span className="text-xs font-semibold text-slate-700">Otorisasi Keamanan Multi-Role RBAC</span>
+            </div>
           </div>
         </div>
       </section>

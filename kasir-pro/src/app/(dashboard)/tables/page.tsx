@@ -181,7 +181,7 @@ export default function TablesPage() {
                     <span className="text-xs font-semibold text-muted-foreground">{t.section}</span>
                   </div>
                   <Badge
-                    variant={t.isOccupied ? "destructive" : "secondary"}
+                    variant={t.isOccupied ? "danger" : "secondary"}
                     className="font-bold neo-border"
                   >
                     {t.isOccupied ? "Terisi" : "Tersedia"}

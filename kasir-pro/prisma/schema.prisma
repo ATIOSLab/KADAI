@@ -293,6 +293,46 @@ model Supplier {
   @@map("suppliers")
 }
 
+model Customer {
+  id            String    @id @default(cuid())
+  name          String
+  phone         String?   @unique
+  email         String?
+  address       String?
+  memberTier    String    @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM
+  loyaltyPoints Int       @default(0)
+  totalSpent    Decimal   @default(0) @db.Decimal(15, 2)
+  visitCount    Int       @default(0)
+  lastVisitAt   DateTime?
+  notes         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sales Sale[]
+
+  @@index([name])
+  @@index([phone])
+  @@map("customers")
+}
+
+model Outlet {
+  id                String   @id @default(cuid())
+  name              String
+  code              String   @unique
+  address           String?
+  phone             String?
+  isMain            Boolean  @default(false)
+  taxType           TaxType  @default(PB1_10)
+  taxRate           Decimal  @default(10) @db.Decimal(5, 2)
+  serviceChargeRate Decimal  @default(5) @db.Decimal(5, 2)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("outlets")
+}
+
 model Product {
   id                String       @id @default(cuid())
   name              String
@@ -406,6 +446,8 @@ model Sale {
   grossProfit    Decimal          @db.Decimal(15, 2)
   paymentType    PaymentType
   paymentRef     String?
+  customerId     String?
+  customer       Customer?        @relation(fields: [customerId], references: [id])
   customerName   String?
   notes          String?
   isVoided       Boolean          @default(false)

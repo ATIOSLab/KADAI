@@ -25,23 +25,29 @@ export default async function HomePage() {
   const dashboardPath = sessionUser ? getDefaultPathForRole(sessionUser.role) : null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+      {/* Tor-Inspired Top Mission Strip Banner */}
+      <div className="bg-emerald-50 border-b border-emerald-200/60 text-emerald-950 py-2 px-4 text-center text-xs font-semibold flex items-center justify-center gap-2">
+        <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span>KADAI SaaS 2.1 Live: Bebas Biaya Setup • Mendukung SAK EMKM RI & Pajak PB1 Restoran 10% • Coba Gratis 14 Hari</span>
+      </div>
+
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border neo-shadow-sm px-6 py-3.5">
+      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border shadow-sm px-6 py-3.5">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground neo-border neo-shadow-sm">
-              <Store className="size-5" />
+            <span className="flex size-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
+              <Store className="size-5 text-amber-400" />
             </span>
             <div>
-              <span className="text-xl font-black tracking-tight block">KADAI</span>
-              <span className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase block -mt-1">
+              <span className="text-xl font-heading font-black tracking-tight block">KADAI</span>
+              <span className="text-[10px] text-muted-foreground font-mono font-bold tracking-widest uppercase block -mt-1">
                 Enterprise POS & SaaS
               </span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-6 text-xs font-bold">
+          <div className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-600">
             <a href="#fitur" className="hover:text-primary transition-colors">Fitur Unggulan</a>
             <a href="#fnb-ritel" className="hover:text-primary transition-colors">Multi-Vertikal</a>
             <a href="#pajak-keuangan" className="hover:text-primary transition-colors">Pajak & SAK EMKM</a>
@@ -50,17 +56,17 @@ export default async function HomePage() {
 
           <div className="flex items-center gap-2.5">
             {dashboardPath ? (
-              <Button asChild className="neo-border neo-shadow font-black bg-primary text-primary-foreground text-xs">
+              <Button asChild className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-heading font-bold text-xs shadow-sm rounded-lg transition-transform active:scale-95">
                 <Link href={dashboardPath}>
                   Buka Dashboard <ArrowRight className="size-3.5 ml-1.5" />
                 </Link>
               </Button>
             ) : (
               <>
-                <Button asChild variant="outline" className="neo-border font-bold text-xs">
+                <Button asChild variant="outline" className="font-bold text-xs rounded-lg border-slate-300">
                   <Link href="/login">Masuk Kasir</Link>
                 </Button>
-                <Button asChild className="neo-border neo-shadow font-black bg-primary text-primary-foreground text-xs">
+                <Button asChild className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-heading font-bold text-xs shadow-sm rounded-lg transition-transform active:scale-95">
                   <Link href="/register">Daftar Gratis</Link>
                 </Button>
               </>
@@ -72,45 +78,43 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 md:py-24 px-6 border-b border-border bg-gradient-to-b from-card via-card to-background">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 neo-shadow-sm">
-            <Sparkles className="size-4 text-primary" />
-            <span className="text-xs font-bold text-primary">
-              Sistem Operasi POS & Bisnis Standar Indonesia
-            </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-slate-100 text-xs font-semibold shadow-sm">
+            <Sparkles className="size-3.5 text-amber-400" />
+            <span>Sistem Operasi POS & Bisnis Standar Indonesia</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1]">
+          <h1 className="text-4xl md:text-6xl font-heading font-black tracking-tight leading-[1.1] text-slate-950">
             Kelola Ritel, Kafe, Dimsum & UMKM dengan Presisi Finansial Nyata.
           </h1>
 
-          <p className="text-base md:text-lg text-muted-foreground font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             Bukan sekadar pencatat transaksi. KADAI memadukan akurasi inventori batch FIFO, resep bahan baku (BOM) otomatis, pemesanan meja QR, Kitchen Display System (KDS), hingga kepatuhan pajak PPN 11% & PB1 Restoran 10%.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-            <Button asChild size="lg" className="w-full sm:w-auto neo-border neo-shadow font-black bg-primary text-primary-foreground text-sm px-8 h-12">
+            <Button asChild size="lg" className="w-full sm:w-auto font-heading font-black bg-amber-500 hover:bg-amber-600 text-slate-950 text-sm px-8 h-12 shadow-sm rounded-lg transition-transform active:scale-95">
               <Link href="/register">
                 Mulai Uji Coba Gratis 14 Hari <ArrowRight className="size-4 ml-2" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto neo-border font-bold text-sm h-12 px-6">
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto font-heading font-bold text-sm h-12 px-6 rounded-lg border-slate-300">
               <Link href="/login">Masuk ke Toko Anda</Link>
             </Button>
           </div>
 
-          {/* Social Proof Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs font-bold text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="size-4 text-accent-success" /> Kepatuhan SAK EMKM RI
+          {/* Social Proof Badges (Tor Pill Pattern) */}
+          <div className="pt-8 flex flex-wrap items-center justify-center gap-3 text-xs font-semibold text-slate-600">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+              <CheckCircle2 className="size-3.5 text-emerald-600" /> Kepatuhan SAK EMKM RI
             </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="size-4 text-accent-success" /> PPN 11% & PB1 10% Otomatis
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+              <CheckCircle2 className="size-3.5 text-emerald-600" /> PPN 11% & PB1 10% Otomatis
             </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="size-4 text-accent-success" /> Self-Order QR & Layar Dapur
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+              <CheckCircle2 className="size-3.5 text-emerald-600" /> Self-Order QR & Layar Dapur
             </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="size-4 text-accent-success" /> Bebas Hardware Khusus
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+              <CheckCircle2 className="size-3.5 text-emerald-600" /> Bebas Hardware Khusus
             </span>
           </div>
         </div>

@@ -33,7 +33,9 @@ import {
   Edit,
   Trash2,
   Loader2,
+  UtensilsCrossed,
 } from "lucide-react";
+import { RecipeDialog } from "@/components/products/recipe-dialog";
 import type { ProductWithStock, PaginatedResponse } from "@/types";
 
 export default function ProductsPage() {
@@ -58,6 +60,8 @@ export default function ProductsPage() {
     name: string;
   } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [selectedRecipeProduct, setSelectedRecipeProduct] =
+    useState<ProductWithStock | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -377,6 +381,15 @@ export default function ProductsPage() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
+                            title="Resep Bahan Baku (BOM)"
+                            className="text-primary hover:text-primary hover:bg-primary/10"
+                            onClick={() => setSelectedRecipeProduct(product)}
+                          >
+                            <UtensilsCrossed className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
                             asChild
                           >
                             <Link href={`/products/${product.id}`}>
@@ -476,6 +489,26 @@ export default function ProductsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bill of Materials (BOM) Recipe Modal */}
+      {selectedRecipeProduct && (
+        <RecipeDialog
+          open={!!selectedRecipeProduct}
+          onOpenChange={(open) => {
+            if (!open) setSelectedRecipeProduct(null);
+          }}
+          productId={selectedRecipeProduct.id}
+          productName={selectedRecipeProduct.name}
+          onSaved={() => {
+            // reload products
+            fetch(`/api/products?page=${page}&limit=${pageSize}`)
+              .then((r) => r.json())
+              .then((d) => {
+                if (d.data) setProducts(d.data);
+              });
+          }}
+        />
+      )}
     </div>
   );
 }

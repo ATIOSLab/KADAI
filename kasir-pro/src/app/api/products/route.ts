@@ -146,6 +146,8 @@ export async function POST(request: NextRequest) {
         sku: data.sku,
         barcode: data.barcode,
         description: data.description,
+        productType: (data.productType as any) || "FINISHED_GOOD",
+        station: (data.station as any) || "GENERAL",
         unit: unitName,
         categoryId: data.categoryId,
         lowStockThreshold: data.lowStockThreshold,

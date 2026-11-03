@@ -113,32 +113,80 @@ export async function POST(request: NextRequest) {
       let itemDiscountTotal = new Decimal(0);
 
       for (const item of data.items) {
-        const fifoResult = item.selectedBatchId
-          ? await processSelectedBatchDeduction(
-              tx,
-              item.productId,
-              item.selectedBatchId,
-              item.quantity
-            )
-          : await processFIFODeduction(tx, item.productId, item.quantity);
-        const itemDiscount = new Decimal(item.discountAmount || 0);
-        const itemTotalPrice = fifoResult.totalRevenue.sub(itemDiscount);
-
-        processedItems.push({
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPrice: fifoResult.averageSellingPrice,
-          totalPrice: itemTotalPrice,
-          totalCost: fifoResult.totalCost,
-          discountAmount: item.discountAmount || 0,
-          allocations: fifoResult.allocations,
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
+          include: {
+            recipesAsParent: {
+              include: { ingredient: true },
+            },
+          },
         });
 
-        totalCost = totalCost.add(fifoResult.totalCost);
-        subtotal = subtotal.add(fifoResult.totalRevenue);
-        itemDiscountTotal = itemDiscountTotal.add(itemDiscount);
+        if (product?.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
+          // F&B Manufactured Product with Recipe (e.g. Dimsum, Kopi)
+          // Deduct from raw material ingredients' batches via FIFO!
+          let itemCost = new Decimal(0);
+          const rawAllocations: any[] = [];
 
-        await applyFIFODeductions(tx, fifoResult.allocations);
+          for (const recipe of product.recipesAsParent) {
+            const qtyNeeded = Math.ceil(
+              Number(recipe.quantityNeeded) * item.quantity * (1 + Number(recipe.wastagePercent) / 100)
+            );
+            if (qtyNeeded > 0) {
+              const rawFifo = await processFIFODeduction(tx, recipe.ingredientId, qtyNeeded);
+              itemCost = itemCost.add(rawFifo.totalCost);
+              rawAllocations.push(...rawFifo.allocations);
+              await applyFIFODeductions(tx, rawFifo.allocations);
+            }
+          }
+
+          const unitSellingPrice = new Decimal(item.unitPrice);
+          const lineRevenue = unitSellingPrice.mul(item.quantity);
+          const itemDiscount = new Decimal(item.discountAmount || 0);
+          const itemTotalPrice = lineRevenue.sub(itemDiscount);
+
+          processedItems.push({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: unitSellingPrice,
+            totalPrice: itemTotalPrice,
+            totalCost: itemCost,
+            discountAmount: item.discountAmount || 0,
+            allocations: rawAllocations,
+          });
+
+          totalCost = totalCost.add(itemCost);
+          subtotal = subtotal.add(lineRevenue);
+          itemDiscountTotal = itemDiscountTotal.add(itemDiscount);
+        } else {
+          // Standard Retail Finished Good FIFO deduction
+          const fifoResult = item.selectedBatchId
+            ? await processSelectedBatchDeduction(
+                tx,
+                item.productId,
+                item.selectedBatchId,
+                item.quantity
+              )
+            : await processFIFODeduction(tx, item.productId, item.quantity);
+          const itemDiscount = new Decimal(item.discountAmount || 0);
+          const itemTotalPrice = fifoResult.totalRevenue.sub(itemDiscount);
+
+          processedItems.push({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: fifoResult.averageSellingPrice,
+            totalPrice: itemTotalPrice,
+            totalCost: fifoResult.totalCost,
+            discountAmount: item.discountAmount || 0,
+            allocations: fifoResult.allocations,
+          });
+
+          totalCost = totalCost.add(fifoResult.totalCost);
+          subtotal = subtotal.add(fifoResult.totalRevenue);
+          itemDiscountTotal = itemDiscountTotal.add(itemDiscount);
+
+          await applyFIFODeductions(tx, fifoResult.allocations);
+        }
       }
 
       // 2. Generate invoice number

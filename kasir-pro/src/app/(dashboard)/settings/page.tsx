@@ -39,7 +39,11 @@ interface StoreData {
   name: string;
   address: string | null;
   phone: string | null;
+  taxType: string;
   taxRate: number;
+  taxInclusive: boolean;
+  serviceChargeRate: number;
+  enableRounding: boolean;
 }
 
 interface UserData {
@@ -82,7 +86,11 @@ export default function SettingsPage() {
     name: "",
     address: "",
     phone: "",
-    taxRate: 0,
+    taxType: "PB1_10",
+    taxRate: 10,
+    taxInclusive: false,
+    serviceChargeRate: 5,
+    enableRounding: true,
   });
 
   const [loadingBot, setLoadingBot] = useState(true);
@@ -135,7 +143,11 @@ export default function SettingsPage() {
         name: res.data.name || "",
         address: res.data.address || "",
         phone: res.data.phone || "",
-        taxRate: res.data.taxRate || 0,
+        taxType: res.data.taxType || "PB1_10",
+        taxRate: res.data.taxRate ?? 10,
+        taxInclusive: Boolean(res.data.taxInclusive),
+        serviceChargeRate: res.data.serviceChargeRate ?? 5,
+        enableRounding: Boolean(res.data.enableRounding),
       });
     } catch {
       toast.error("Gagal memuat konfigurasi toko");
@@ -213,7 +225,11 @@ export default function SettingsPage() {
           name: storeForm.name,
           address: storeForm.address || null,
           phone: storeForm.phone || null,
+          taxType: storeForm.taxType,
           taxRate: storeForm.taxRate,
+          taxInclusive: storeForm.taxInclusive,
+          serviceChargeRate: storeForm.serviceChargeRate,
+          enableRounding: storeForm.enableRounding,
         },
       });
       toast.success("Konfigurasi toko berhasil disimpan!");
@@ -463,20 +479,84 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Pajak (%)</Label>
+                  <Label>Tipe Pajak Usaha</Label>
+                  <select
+                    value={storeForm.taxType}
+                    onChange={(e: any) =>
+                      setStoreForm({ ...storeForm, taxType: e.target.value })
+                    }
+                    className="w-full h-10 px-3 rounded-lg neo-border bg-card text-xs font-bold"
+                  >
+                    <option value="PB1_10">PB1 - Pajak Restoran / Kuliner (10%)</option>
+                    <option value="PPN_11">PPN - Pajak Pertambahan Nilai (11%)</option>
+                    <option value="PPN_12">PPN - Tarif 12%</option>
+                    <option value="NONE">Tanpa Pajak / Non-PKP (0%)</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Tarif Pajak Efektif (%)</Label>
                   <Input
                     type="number"
                     min="0"
                     max="100"
                     step="0.1"
                     value={storeForm.taxRate}
-                    onChange={(e) =>
+                    onChange={(e: any) =>
                       setStoreForm({
                         ...storeForm,
                         taxRate: parseFloat(e.target.value) || 0,
                       })
                     }
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Biaya Layanan / Service Charge (%)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    value={storeForm.serviceChargeRate}
+                    onChange={(e: any) =>
+                      setStoreForm({
+                        ...storeForm,
+                        serviceChargeRate: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex flex-col justify-center space-y-2 pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input
+                      type="checkbox"
+                      checked={storeForm.enableRounding}
+                      onChange={(e: any) =>
+                        setStoreForm({
+                          ...storeForm,
+                          enableRounding: e.target.checked,
+                        })
+                      }
+                      className="size-4 rounded"
+                    />
+                    Pembulatan Kasir Otomatis (ke Rp 100 terdekat)
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input
+                      type="checkbox"
+                      checked={storeForm.taxInclusive}
+                      onChange={(e: any) =>
+                        setStoreForm({
+                          ...storeForm,
+                          taxInclusive: e.target.checked,
+                        })
+                      }
+                      className="size-4 rounded"
+                    />
+                    Harga Jual Sudah Termasuk Pajak (Inklusif DPP)
+                  </label>
                 </div>
               </div>
               <Button onClick={handleSaveStore} disabled={savingStore}>

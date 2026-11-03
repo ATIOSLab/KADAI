@@ -5,6 +5,8 @@ export const createProductSchema = z.object({
   sku: z.string().min(1, "SKU wajib diisi").max(50),
   barcode: z.string().max(50).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
+  productType: z.enum(["FINISHED_GOOD", "RAW_MATERIAL", "MANUFACTURED", "SERVICE"]).default("FINISHED_GOOD"),
+  station: z.enum(["KITCHEN", "BAR", "DESSERT", "GENERAL"]).default("GENERAL"),
   unit: z.string().trim().min(1, "Satuan wajib diisi").max(50),
   categoryId: z.string().min(1, "Kategori wajib dipilih"),
   lowStockThreshold: z.number().int().min(0).default(10),

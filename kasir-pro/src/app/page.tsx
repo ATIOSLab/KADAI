@@ -134,7 +134,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card Ritel */}
           <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
             <div className="space-y-4">
@@ -237,7 +237,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border border-border shadow-sm bg-card p-5 space-y-3 rounded-xl">
               <Receipt className="size-8 text-primary" />
               <h4 className="font-bold text-base text-slate-950">Perhitungan Pajak Fleksibel</h4>
@@ -277,7 +277,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Free Tier */}
           <Card className="border border-border shadow-sm bg-card p-6 space-y-4 flex flex-col justify-between rounded-xl">
             <div className="space-y-3">

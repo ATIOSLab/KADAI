@@ -11,6 +11,7 @@ export type AppRole = (typeof APP_ROLES)[number];
 
 export const ADMIN_ONLY_ROLES = ["ADMIN"] as const;
 export const ADMIN_MANAGER_ROLES = ["ADMIN", "MANAGER"] as const;
+export const ADMIN_CASHIER_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
 export const POS_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
 export const KDS_ROLES = ["ADMIN", "MANAGER", "KITCHEN"] as const;
 export const INVENTORY_ROLES = ["ADMIN", "MANAGER", "INVENTORY"] as const;

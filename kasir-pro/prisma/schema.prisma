@@ -15,6 +15,9 @@ enum UserRole {
   ADMIN
   MANAGER
   CASHIER
+  KITCHEN
+  INVENTORY
+  ACCOUNTANT
 }
 
 enum BusinessType {
@@ -154,6 +157,7 @@ model User {
   name          String
   email         String    @unique
   passwordHash  String
+  supervisorPin String?   // Hash 6-digit PIN untuk otorisasi instan supervisor di POS
   role          UserRole  @default(CASHIER)
   avatar        String?
   isActive      Boolean   @default(true)

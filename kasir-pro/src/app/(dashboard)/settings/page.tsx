@@ -389,9 +389,12 @@ export default function SettingsPage() {
   };
 
   const roleLabels: Record<string, string> = {
-    ADMIN: "Admin",
-    MANAGER: "Manager",
-    CASHIER: "Kasir",
+    ADMIN: "Pemilik Toko (Admin)",
+    MANAGER: "Manager Cabang",
+    CASHIER: "Kasir POS",
+    KITCHEN: "Dapur & Bar (KDS)",
+    INVENTORY: "Staf Gudang & Stok",
+    ACCOUNTANT: "Akuntan SAK EMKM",
   };
 
   const paginatedUsers = paginateItems(users, userPage, userPageSize);
@@ -967,9 +970,12 @@ export default function SettingsPage() {
                     searchPlaceholder="Cari role..."
                     emptyMessage="Role tidak ditemukan."
                     options={[
-                      { value: "ADMIN", label: "Admin" },
-                      { value: "MANAGER", label: "Manager" },
-                      { value: "CASHIER", label: "Kasir" },
+                      { value: "ADMIN", label: "Pemilik Toko (Admin)" },
+                      { value: "MANAGER", label: "Manager Cabang" },
+                      { value: "CASHIER", label: "Kasir POS" },
+                      { value: "KITCHEN", label: "Koki Dapur & Bar (KDS)" },
+                      { value: "INVENTORY", label: "Staf Gudang & Stok" },
+                      { value: "ACCOUNTANT", label: "Akuntan SAK EMKM" },
                     ]}
                   />
                 </div>

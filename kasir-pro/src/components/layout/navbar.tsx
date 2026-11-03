@@ -49,15 +49,20 @@ export function Navbar({
       .join("")
       .slice(0, 2)
       .toUpperCase() || "US";
-  const roleLabel =
-    currentUser?.role === "ADMIN"
-      ? "Administrator"
-      : currentUser?.role === "MANAGER"
-        ? "Manager"
-        : "Kasir";
+  const roleLabelMap: Record<string, string> = {
+    ADMIN: "Owner (Admin)",
+    MANAGER: "Manager Cabang",
+    CASHIER: "Kasir POS",
+    KITCHEN: "Dapur & Bar (KDS)",
+    INVENTORY: "Staf Gudang",
+    ACCOUNTANT: "Akuntan SAK EMKM",
+  };
+  const roleLabel = currentUser?.role ? roleLabelMap[currentUser.role] || currentUser.role : "Kasir";
   const canAccessSettings = currentUser?.role === "ADMIN";
   const canAccessPos =
-    currentUser?.role === "ADMIN" || currentUser?.role === "CASHIER";
+    currentUser?.role === "ADMIN" ||
+    currentUser?.role === "MANAGER" ||
+    currentUser?.role === "CASHIER";
 
   return (
     <header className="z-40 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur">

@@ -106,6 +106,9 @@ export async function PUT(
     if (data.role !== undefined) updateData.role = data.role;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
     if (data.avatar !== undefined) updateData.avatar = data.avatar;
+    if (data.supervisorPin) {
+      updateData.supervisorPin = await bcrypt.hash(data.supervisorPin, 10);
+    }
     if (data.password) {
       updateData.passwordHash = await bcrypt.hash(data.password, 12);
     }

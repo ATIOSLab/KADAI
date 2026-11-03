@@ -1,11 +1,28 @@
-export const APP_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
+export const APP_ROLES = [
+  "ADMIN",
+  "MANAGER",
+  "CASHIER",
+  "KITCHEN",
+  "INVENTORY",
+  "ACCOUNTANT",
+] as const;
 
 export type AppRole = (typeof APP_ROLES)[number];
 
 export const ADMIN_ONLY_ROLES = ["ADMIN"] as const;
 export const ADMIN_MANAGER_ROLES = ["ADMIN", "MANAGER"] as const;
-export const ADMIN_CASHIER_ROLES = ["ADMIN", "CASHIER"] as const;
-export const ALL_AUTHENTICATED_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
+export const POS_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
+export const KDS_ROLES = ["ADMIN", "MANAGER", "KITCHEN"] as const;
+export const INVENTORY_ROLES = ["ADMIN", "MANAGER", "INVENTORY"] as const;
+export const FINANCE_ROLES = ["ADMIN", "MANAGER", "ACCOUNTANT"] as const;
+export const ALL_AUTHENTICATED_ROLES = [
+  "ADMIN",
+  "MANAGER",
+  "CASHIER",
+  "KITCHEN",
+  "INVENTORY",
+  "ACCOUNTANT",
+] as const;
 
 type RouteAccessRule = {
   path: string;
@@ -15,18 +32,19 @@ type RouteAccessRule = {
 const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/profile", roles: ALL_AUTHENTICATED_ROLES },
   { path: "/settings", roles: ADMIN_ONLY_ROLES },
-  { path: "/finance", roles: ADMIN_MANAGER_ROLES },
-  { path: "/reports", roles: ADMIN_MANAGER_ROLES },
+  { path: "/finance/tax", roles: FINANCE_ROLES },
+  { path: "/finance", roles: FINANCE_ROLES },
+  { path: "/reports", roles: FINANCE_ROLES },
   { path: "/activity-log", roles: ADMIN_MANAGER_ROLES },
   { path: "/dashboard", roles: ADMIN_MANAGER_ROLES },
-  { path: "/products", roles: ADMIN_MANAGER_ROLES },
-  { path: "/inventory/restock", roles: ADMIN_MANAGER_ROLES },
-  { path: "/inventory/adjustments", roles: ADMIN_MANAGER_ROLES },
-  { path: "/inventory", roles: ALL_AUTHENTICATED_ROLES },
-  { path: "/sales", roles: ALL_AUTHENTICATED_ROLES },
-  { path: "/pos", roles: ADMIN_CASHIER_ROLES },
+  { path: "/products", roles: ["ADMIN", "MANAGER", "INVENTORY"] },
+  { path: "/inventory/restock", roles: INVENTORY_ROLES },
+  { path: "/inventory/adjustments", roles: INVENTORY_ROLES },
+  { path: "/inventory", roles: INVENTORY_ROLES },
+  { path: "/sales", roles: ["ADMIN", "MANAGER", "CASHIER", "ACCOUNTANT"] },
+  { path: "/pos", roles: POS_ROLES },
   { path: "/tables", roles: ADMIN_MANAGER_ROLES },
-  { path: "/kds", roles: ALL_AUTHENTICATED_ROLES },
+  { path: "/kds", roles: KDS_ROLES },
 ];
 
 type SessionPayload = {
@@ -60,7 +78,18 @@ export function hasRequiredRole(
 }
 
 export function getDefaultPathForRole(role: string | null | undefined) {
-  return role === "CASHIER" ? "/pos" : "/dashboard";
+  switch (role) {
+    case "CASHIER":
+      return "/pos";
+    case "KITCHEN":
+      return "/kds";
+    case "INVENTORY":
+      return "/inventory";
+    case "ACCOUNTANT":
+      return "/finance";
+    default:
+      return "/dashboard";
+  }
 }
 
 export function getAllowedRolesForPath(pathname: string) {

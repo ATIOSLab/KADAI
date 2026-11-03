@@ -9,7 +9,8 @@ export const createUserSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
   email: z.string().email("Email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
-  role: z.enum(["ADMIN", "MANAGER", "CASHIER"]).default("CASHIER"),
+  supervisorPin: z.string().min(4).max(8).optional().nullable(),
+  role: z.enum(["ADMIN", "MANAGER", "CASHIER", "KITCHEN", "INVENTORY", "ACCOUNTANT"]).default("CASHIER"),
   avatar: z.string().optional().nullable(),
 });
 
@@ -17,7 +18,8 @@ export const updateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
   password: z.string().min(6).optional(),
-  role: z.enum(["ADMIN", "MANAGER", "CASHIER"]).optional(),
+  supervisorPin: z.string().min(4).max(8).optional().nullable(),
+  role: z.enum(["ADMIN", "MANAGER", "CASHIER", "KITCHEN", "INVENTORY", "ACCOUNTANT"]).optional(),
   isActive: z.boolean().optional(),
   avatar: z.string().optional().nullable(),
 });

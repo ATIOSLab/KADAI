@@ -8,7 +8,8 @@ import {
   getSystemFinanceCategoryId,
 } from "@/lib/finance";
 import { getSessionUserFromRequest } from "@/lib/session";
-import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { verifySupervisorPin } from "@/lib/rbac/pin";
 
 // POST /api/sales/[id]/void — Void a sale and restore stock
 export async function POST(
@@ -21,16 +22,32 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
-      return NextResponse.json(
-        { error: "Hanya admin yang dapat melakukan void transaksi" },
-        { status: 403 }
-      );
-    }
-
     const { id } = await params;
     const body = await request.json();
     const { reason } = voidSaleSchema.parse(body);
+
+    const isSupervisor = hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES);
+    let approvedSupervisorName: string | null = null;
+
+    if (!isSupervisor) {
+      // Kasir memerlukan verifikasi PIN Supervisor
+      const pin = body.supervisorPin;
+      if (!pin) {
+        return NextResponse.json(
+          { error: "Pembatalan transaksi oleh kasir memerlukan PIN Supervisor" },
+          { status: 403 }
+        );
+      }
+
+      const pinCheck = await verifySupervisorPin(pin);
+      if (!pinCheck.valid) {
+        return NextResponse.json(
+          { error: pinCheck.error || "PIN Supervisor tidak valid" },
+          { status: 403 }
+        );
+      }
+      approvedSupervisorName = `${pinCheck.supervisor?.name} (${pinCheck.supervisor?.role})`;
+    }
 
     const sale = await prisma.sale.findUnique({
       where: { id },
@@ -96,7 +113,11 @@ export async function POST(
       action: "SALE_VOIDED",
       entity: "Sale",
       entityId: id,
-      details: { invoiceNumber: sale.invoiceNumber, reason },
+      details: {
+        invoiceNumber: sale.invoiceNumber,
+        reason,
+        approvedBy: approvedSupervisorName || `${sessionUser.name} (${sessionUser.role})`,
+      },
     });
 
     return NextResponse.json({ success: true });

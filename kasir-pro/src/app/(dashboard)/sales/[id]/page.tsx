@@ -21,6 +21,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { SupervisorPinDialog } from "@/components/shared/supervisor-pin-dialog";
 import { Receipt, ArrowLeft, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -82,6 +83,8 @@ export default function SaleDetailPage({
   const [error, setError] = useState<string | null>(null);
 
   const [showVoid, setShowVoid] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [supervisorPin, setSupervisorPin] = useState<string | null>(null);
   const [voidReason, setVoidReason] = useState("");
   const [voiding, setVoiding] = useState(false);
 
@@ -131,11 +134,15 @@ export default function SaleDetailPage({
     try {
       await apiFetch(`/api/sales/${id}/void`, {
         method: "POST",
-        body: { reason: voidReason },
+        body: {
+          reason: voidReason,
+          supervisorPin: supervisorPin || undefined,
+        },
       });
       toast.success("Transaksi berhasil dibatalkan");
       setShowVoid(false);
       setVoidReason("");
+      setSupervisorPin(null);
       setLoading(true);
       setError(null);
       const res = await apiFetch<{ data: SaleDetail }>(`/api/sales/${id}`);
@@ -207,7 +214,18 @@ export default function SaleDetailPage({
   const grossProfit = Number(sale.grossProfit);
   const marginPercent =
     totalAmount > 0 ? ((grossProfit / totalAmount) * 100).toFixed(1) : "0";
-  const canVoidSale = user?.role === "ADMIN";
+  const canVoidSale =
+    user?.role === "ADMIN" ||
+    user?.role === "MANAGER" ||
+    user?.role === "CASHIER";
+
+  const handleStartVoid = () => {
+    if (user?.role === "CASHIER") {
+      setShowPinModal(true);
+    } else {
+      setShowVoid(true);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
@@ -222,7 +240,7 @@ export default function SaleDetailPage({
           </Link>
         </Button>
         {!sale.isVoided && canVoidSale && (
-          <Button variant="danger" onClick={() => setShowVoid(true)}>
+          <Button variant="danger" onClick={handleStartVoid}>
             <XCircle className="w-4 h-4 mr-1" /> Batalkan
           </Button>
         )}
@@ -411,6 +429,18 @@ export default function SaleDetailPage({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Supervisor PIN Authorization Modal for Cashiers */}
+      <SupervisorPinDialog
+        open={showPinModal}
+        onOpenChange={setShowPinModal}
+        title="Otorisasi Void Transaksi"
+        description="Kasir memerlukan otorisasi Manager atau Pemilik Toko untuk membatalkan transaksi ini."
+        onAuthorized={(supervisor: any) => {
+          setSupervisorPin("SUPERVISOR_APPROVED");
+          setShowVoid(true);
+        }}
+      />
     </div>
   );
 }

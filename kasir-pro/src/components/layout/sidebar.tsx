@@ -27,12 +27,15 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
       ),
     }))
     .filter((section) => section.items.length > 0);
-  const roleLabel =
-    currentUser?.role === "ADMIN"
-      ? "Administrator"
-      : currentUser?.role === "MANAGER"
-        ? "Manager"
-        : "Kasir";
+  const roleLabelMap: Record<string, string> = {
+    ADMIN: "Owner (Admin)",
+    MANAGER: "Manager Cabang",
+    CASHIER: "Kasir POS",
+    KITCHEN: "Dapur & Bar (KDS)",
+    INVENTORY: "Staf Gudang",
+    ACCOUNTANT: "Akuntan SAK EMKM",
+  };
+  const roleLabel = currentUser?.role ? roleLabelMap[currentUser.role] || currentUser.role : "Kasir";
   const homeHref = getDefaultPathForRole(currentUser?.role);
 
   return (

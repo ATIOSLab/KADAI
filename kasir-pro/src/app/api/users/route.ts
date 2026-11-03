@@ -59,11 +59,17 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(data.password, 12);
+    let supervisorPinHash: string | null = null;
+    if (data.supervisorPin) {
+      supervisorPinHash = await bcrypt.hash(data.supervisorPin, 10);
+    }
+
     const user = await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         passwordHash,
+        supervisorPin: supervisorPinHash,
         role: data.role,
         avatar: data.avatar,
       },

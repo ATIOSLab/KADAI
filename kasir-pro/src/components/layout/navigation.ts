@@ -54,7 +54,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Kasir",
         description: "Mulai transaksi baru dan kelola keranjang.",
         icon: ShoppingCart,
-        roles: ["ADMIN", "CASHIER"],
+        roles: ["ADMIN", "MANAGER", "CASHIER"],
       },
       {
         href: "/products",
@@ -62,7 +62,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Produk",
         description: "Kelola katalog, harga jual, dan SKU.",
         icon: Package,
-        roles: ["ADMIN", "MANAGER"],
+        roles: ["ADMIN", "MANAGER", "INVENTORY"],
       },
       {
         href: "/inventory",
@@ -70,7 +70,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Stok",
         description: "Cek stok masuk, batch, dan restock.",
         icon: Warehouse,
-        roles: ["ADMIN", "MANAGER", "CASHIER"],
+        roles: ["ADMIN", "MANAGER", "INVENTORY"],
       },
       {
         href: "/tables",
@@ -86,7 +86,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Dapur",
         description: "Kitchen & Bar Display pesanan aktif real-time.",
         icon: ChefHat,
-        roles: ["ADMIN", "MANAGER", "CASHIER"],
+        roles: ["ADMIN", "MANAGER", "KITCHEN"],
       },
     ],
   },
@@ -99,7 +99,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Sales",
         description: "Lihat histori transaksi dan detail invoice.",
         icon: Receipt,
-        roles: ["ADMIN", "MANAGER", "CASHIER"],
+        roles: ["ADMIN", "MANAGER", "CASHIER", "ACCOUNTANT"],
       },
       {
         href: "/reports",
@@ -107,7 +107,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Laporan",
         description: "Analisis revenue, profit, dan tren kategori.",
         icon: BarChart3,
-        roles: ["ADMIN", "MANAGER"],
+        roles: ["ADMIN", "MANAGER", "ACCOUNTANT"],
       },
       {
         href: "/finance",
@@ -115,7 +115,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Keuangan",
         description: "Pantau arus kas, modal, pengeluaran, dan saldo bisnis.",
         icon: CircleDollarSign,
-        roles: ["ADMIN", "MANAGER"],
+        roles: ["ADMIN", "MANAGER", "ACCOUNTANT"],
       },
       {
         href: "/finance/tax",
@@ -123,7 +123,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Pajak",
         description: "Rekapitulasi perpajakan PPN, PB1, dan PPh Final 0.5% PP 55/2022.",
         icon: Scale,
-        roles: ["ADMIN", "MANAGER"],
+        roles: ["ADMIN", "MANAGER", "ACCOUNTANT"],
       },
     ],
   },

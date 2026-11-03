@@ -31,7 +31,6 @@
   --color-border-default: #E2E8F0;
   --color-border-light: #E2E8F0;
 
-  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
@@ -62,10 +61,9 @@
     user-select: auto;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: var(--font-heading);
+  h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
   }
 
   /* Tabular numbers for financial and POS precision */

@@ -335,7 +335,6 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 changeAmount < 0)
             }
             size="lg"
-            className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-heading font-black text-sm shadow-sm rounded-lg px-6 transition-transform active:scale-95"
           >
             {loading ? (
               <>

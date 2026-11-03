@@ -5,31 +5,31 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   NEOBRUTALISM DESIGN TOKENS
-   Bold borders, offset shadows, high-contrast colors
+   MODERN TACTILE ENTERPRISE DESIGN TOKENS (B2B SAAS TIER)
+   Crisp hairline borders, soft ambient elevation, zero eye-fatigue
    ============================================================ */
 
 @theme {
-  --color-bg-main: #FEFCE8;
+  --color-bg-main: #F8FAFC;
   --color-bg-card: #FFFFFF;
-  --color-bg-sidebar: #FFF8E1;
-  --color-bg-dark: #1A1A1A;
+  --color-bg-sidebar: #FFFFFF;
+  --color-bg-dark: #0F172A;
 
-  --color-accent-primary: #FF6B35;
-  --color-accent-secondary: #004E89;
-  --color-accent-success: #2D6A4F;
-  --color-accent-warning: #FFB703;
-  --color-accent-danger: #D62828;
-  --color-accent-purple: #7209B7;
-  --color-accent-orange: #FB8500;
+  --color-accent-primary: #EA580C;
+  --color-accent-secondary: #0F172A;
+  --color-accent-success: #10B981;
+  --color-accent-warning: #F59E0B;
+  --color-accent-danger: #EF4444;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-orange: #F97316;
 
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A4A4A;
-  --color-text-muted: #8A8A8A;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
   --color-text-inverse: #FFFFFF;
 
-  --color-border-default: #1A1A1A;
-  --color-border-light: #E5E5E5;
+  --color-border-default: #E2E8F0;
+  --color-border-light: #E2E8F0;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -62,127 +62,135 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
+
+  /* Tabular numbers for financial and POS precision */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
   html {
     @apply font-sans;
   }
 }
 
 /* ============================================================
-   NEOBRUTALISM UTILITIES
+   MODERN TACTILE ENTERPRISE UTILITIES
+   Refined drop-in replacements for hairline elevation
    ============================================================ */
 
 @layer utilities {
-  /* Neobrutalism borders */
+  /* Precision hairline borders */
   .neo-border {
-    border: 2.5px solid var(--color-border-default);
+    border: 1px solid #E2E8F0;
   }
 
   .neo-border-thin {
-    border: 1.5px solid var(--color-border-default);
+    border: 1px solid #E2E8F0;
   }
 
-  /* Neobrutalism shadows */
+  /* Soft ambient shadows (Zero harsh black blocks) */
   .neo-shadow {
-    box-shadow: 4px 4px 0px var(--color-border-default);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
   }
 
   .neo-shadow-sm {
-    box-shadow: 2px 2px 0px var(--color-border-default);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   }
 
   .neo-shadow-lg {
-    box-shadow: 6px 6px 0px var(--color-border-default);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
   }
 
-  /* Hover shadow effect: moves to pressed */
+  /* Tactile interactive hover & click feedback */
   .neo-hover {
-    transition: all 0.15s ease;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .neo-hover:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px var(--color-border-default);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
   }
 
   .neo-hover:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px var(--color-border-default);
+    transform: translateY(0);
   }
 
-  /* Neobrutalism card */
+  /* Enterprise tactile card */
   .neo-card {
-    background: var(--color-bg-card);
-    border: 2.5px solid var(--color-border-default);
-    box-shadow: 4px 4px 0px var(--color-border-default);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
     border-radius: 0.75rem;
   }
 
-  /* Neobrutalism button */
+  /* Tactile button */
   .neo-button {
-    border: 2.5px solid var(--color-border-default);
-    box-shadow: 3px 3px 0px var(--color-border-default);
-    font-weight: 700;
-    transition: all 0.15s ease;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 0.5rem;
   }
 
   .neo-button:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0px var(--color-border-default);
+    filter: brightness(1.04);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
   }
 
   .neo-button:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px var(--color-border-default);
+    transform: scale(0.98);
   }
 
-  /* Neobrutalism input */
+  /* Tactile input */
   .neo-input {
-    border: 2.5px solid var(--color-border-default);
+    border: 1px solid #CBD5E1;
     border-radius: 0.5rem;
     font-weight: 500;
-    transition: box-shadow 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .neo-input:focus {
     outline: none;
-    box-shadow: 3px 3px 0px var(--color-border-default);
+    border-color: #EA580C;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
   }
 
-  /* Neobrutalism badge */
+  /* Clean badge */
   .neo-badge {
-    border: 2px solid var(--color-border-default);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 9999px;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.75rem;
-    padding: 0.125rem 0.75rem;
+    padding: 0.15rem 0.65rem;
   }
 
-  /* Neobrutalism table */
+  /* Enterprise Table */
   .neo-table {
-    border: 2.5px solid var(--color-border-default);
+    border: 1px solid #E2E8F0;
     border-radius: 0.75rem;
     overflow: hidden;
+    background: #FFFFFF;
   }
 
   .neo-table th {
-    background: var(--color-bg-main);
-    border-bottom: 2.5px solid var(--color-border-default);
-    font-weight: 800;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: #64748B;
   }
 
   .neo-table td {
-    border-bottom: 1.5px solid var(--color-border-default);
+    border-bottom: 1px solid #F1F5F9;
   }
 
-  .neo-table tr:nth-child(even) td {
-    background: #FEFCE8;
+  .neo-table tr:hover td {
+    background: #F8FAFC;
   }
 
   .neo-table tr:last-child td {
@@ -191,30 +199,34 @@
 
   /* Scrollbar styling */
   .neo-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   .neo-scrollbar::-webkit-scrollbar-track {
-    background: var(--color-bg-main);
+    background: transparent;
   }
 
   .neo-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-border-default);
+    background: #CBD5E1;
     border-radius: 4px;
   }
 
-  /* Gradient accents */
+  .neo-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+
+  /* Gradients */
   .gradient-primary {
-    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-orange));
+    background: linear-gradient(135deg, #EA580C, #F97316);
   }
 
   .gradient-secondary {
-    background: linear-gradient(135deg, var(--color-accent-secondary), var(--color-accent-purple));
+    background: linear-gradient(135deg, #0F172A, #1E293B);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, var(--color-accent-success), #52B788);
+    background: linear-gradient(135deg, #10B981, #059669);
   }
 }
 
@@ -223,12 +235,12 @@
    ============================================================ */
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-16px); }
+  from { opacity: 0; transform: translateY(-12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -238,28 +250,17 @@
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
-
-@keyframes pulse-neo {
-  0%, 100% { box-shadow: 4px 4px 0px var(--color-border-default); }
-  50% { box-shadow: 2px 2px 0px var(--color-border-default); }
 }
 
 @layer utilities {
   .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-slide-down {
-    animation: slideDown 0.3s ease-out;
+    animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-fade-in {
@@ -267,15 +268,7 @@
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
-  }
-
-  .animate-shake {
-    animation: shake 0.3s ease;
-  }
-
-  .animate-pulse-neo {
-    animation: pulse-neo 2s ease-in-out infinite;
+    animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
@@ -323,70 +316,70 @@
 }
 
 :root {
-  --background: #fefce8;
-  --foreground: #1a1a1a;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #ff6b35;
+  --popover-foreground: #0f172a;
+  --primary: #ea580c;
   --primary-foreground: #ffffff;
-  --secondary: #fff4d6;
-  --secondary-foreground: #1a1a1a;
-  --muted: #fff8e1;
-  --muted-foreground: #7a7a7a;
-  --accent: #fff1e3;
-  --accent-foreground: #1a1a1a;
-  --destructive: #d62828;
-  --border: rgb(26 26 26 / 12%);
-  --input: rgb(26 26 26 / 10%);
-  --ring: #ff6b35;
-  --chart-1: #ff6b35;
-  --chart-2: #004e89;
-  --chart-3: #2d6a4f;
-  --chart-4: #ffb703;
-  --chart-5: #7209b7;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f8fafc;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #ea580c;
+  --chart-1: #ea580c;
+  --chart-2: #0f172a;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --chart-5: #8b5cf6;
   --radius: 0.625rem;
-  --sidebar: #fffdf7;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #ff6b35;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #ea580c;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fff1e3;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: rgb(26 26 26 / 10%);
-  --sidebar-ring: #ff6b35;
+  --sidebar-accent: #f8fafc;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #ea580c;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #090d16;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #f97316;
+  --primary-foreground: #090d16;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #f87171;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #f97316;
+  --chart-1: #f97316;
+  --chart-2: #38bdf8;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #a78bfa;
+  --sidebar: #0b1120;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #f97316;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #f97316;
 }

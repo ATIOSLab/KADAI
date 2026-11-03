@@ -48,6 +48,7 @@ export default function KDSPage() {
   const [orders, setOrders] = useState<KDSOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStation, setActiveStation] = useState<"ALL" | "KITCHEN" | "BAR">("ALL");
+  const [cockpitMode, setCockpitMode] = useState(true);
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   // Polling every second for timers and every 6 seconds for new orders
@@ -156,6 +157,16 @@ export default function KDSPage() {
           </div>
 
           <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCockpitMode(!cockpitMode)}
+            className="neo-border text-xs font-bold"
+            title="Ubah Mode Layar"
+          >
+            {cockpitMode ? "🌙 Cockpit Dapur" : "☀️ Mode Terang"}
+          </Button>
+
+          <Button
             size="icon"
             variant="outline"
             onClick={() => fetchOrders()}
@@ -171,11 +182,11 @@ export default function KDSPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-64 rounded-2xl border border-border bg-card animate-pulse" />
+            <div key={i} className={`h-64 rounded-2xl border ${cockpitMode ? "border-slate-800 bg-slate-900" : "border-border bg-card"} animate-pulse`} />
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <Card className="neo-border neo-shadow p-16 text-center">
+        <Card className={`neo-border neo-shadow p-16 text-center ${cockpitMode ? "bg-slate-900 border-slate-800 text-slate-100" : ""}`}>
           <CheckCircle2 className="size-16 mx-auto text-accent-success mb-4" />
           <h3 className="text-xl font-black">Tidak Ada Antrean Dapur</h3>
           <p className="text-sm text-muted-foreground mt-1">
@@ -193,6 +204,8 @@ export default function KDSPage() {
               ? "bg-destructive text-destructive-foreground animate-pulse"
               : isWarning
               ? "bg-accent-warning text-black"
+              : cockpitMode
+              ? "bg-slate-800 text-slate-200 border-slate-700"
               : "bg-muted text-foreground";
 
             const stationBadgeBg =
@@ -203,16 +216,20 @@ export default function KDSPage() {
             return (
               <Card
                 key={ord.id}
-                className="neo-border neo-shadow bg-card flex flex-col justify-between overflow-hidden"
+                className={`neo-border neo-shadow flex flex-col justify-between overflow-hidden transition-all ${
+                  cockpitMode
+                    ? "bg-slate-900 border-slate-800 text-slate-100 shadow-lg"
+                    : "bg-card"
+                }`}
               >
                 {/* Header */}
-                <div className="p-4 border-b border-border/60 bg-muted/20">
+                <div className={`p-4 border-b ${cockpitMode ? "border-slate-800 bg-slate-950/60" : "border-border/60 bg-muted/20"}`}>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded-lg text-xs font-black ${stationBadgeBg}`}>
                         {ord.station === "BAR" ? "BAR" : "DAPUR"}
                       </span>
-                      <h2 className="text-xl font-black tracking-tight">
+                      <h2 className={`text-xl font-black tracking-tight ${cockpitMode ? "text-white" : ""}`}>
                         {ord.tableNo || "Takeaway"}
                       </h2>
                     </div>
@@ -225,7 +242,7 @@ export default function KDSPage() {
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                     <span className="font-mono">#{ord.sale.invoiceNumber}</span>
-                    <span className="font-semibold text-foreground">
+                    <span className={`font-semibold ${cockpitMode ? "text-slate-200" : "text-foreground"}`}>
                       {ord.sale.customerName || "Pelanggan"}
                     </span>
                   </div>
@@ -236,7 +253,11 @@ export default function KDSPage() {
                   {ord.itemsJson.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-2.5 rounded-xl bg-muted/40 neo-border flex items-start justify-between gap-3"
+                      className={`p-2.5 rounded-xl neo-border flex items-start justify-between gap-3 ${
+                        cockpitMode
+                          ? "bg-slate-800/80 border-slate-700/60 text-slate-100"
+                          : "bg-muted/40"
+                      }`}
                     >
                       <div>
                         <div className="flex items-center gap-2">

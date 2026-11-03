@@ -1,12 +1,12 @@
 {
-  "name": "KADAI POS",
+  "name": "KADAI Enterprise POS & ERP",
   "short_name": "KADAI",
-  "description": "Aplikasi Point of Sale untuk UMKM",
-  "start_url": "/",
+  "description": "Sistem Operasi Bisnis, Point of Sale, dan ERP Rantai Pasok Terintegrasi",
+  "start_url": "/pos",
   "display": "standalone",
-  "background_color": "#FEFCE8",
-  "theme_color": "#FF6B35",
-  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0F172A",
+  "orientation": "any",
   "icons": [
     {
       "src": "/favicon.ico",

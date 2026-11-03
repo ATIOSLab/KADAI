@@ -8,6 +8,8 @@ import {
   Loader2,
   QrCode,
   Wallet,
+  Printer,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch, ApiError } from "@/lib/api";
@@ -114,19 +116,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
       setInvoiceNumber(response.data.invoiceNumber);
       setSuccess(true);
-
-      setTimeout(() => {
-        clearCart();
-        bumpCatalogVersion();
-        setSuccess(false);
-        setInvoiceNumber("");
-        setPaymentType("CASH");
-        setPaymentRef("");
-        setCustomerName("");
-        setCashAmount("");
-        setNotes("");
-        onOpenChange(false);
-      }, 2000);
+      clearCart();
+      bumpCatalogVersion();
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : "Checkout gagal diproses";
@@ -136,31 +127,61 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     }
   };
 
+  const handleResetForm = () => {
+    setSuccess(false);
+    setInvoiceNumber("");
+    setPaymentType("CASH");
+    setPaymentRef("");
+    setCustomerName("");
+    setCashAmount("");
+    setNotes("");
+    onOpenChange(false);
+  };
+
   if (success) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-sm text-center">
-          <div className="py-8 animate-scale-in">
-            <div className="w-20 h-20 mx-auto rounded-full bg-accent-success/10 flex items-center justify-center mb-4 neo-border border-accent-success">
-              <CheckCircle2 className="w-10 h-10 text-accent-success" />
+          <div className="py-6 space-y-4">
+            <div className="size-16 mx-auto rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <CheckCircle2 className="size-8 text-emerald-600" />
             </div>
-            <h3 className="text-2xl font-black mb-2">Pembayaran Berhasil!</h3>
-            <p className="text-lg font-bold text-accent-primary">
-              {formatCurrency(grandTotal)}
-            </p>
-            {invoiceNumber && (
-              <p className="mt-2 text-xs font-bold text-text-muted">
-                Invoice: {invoiceNumber}
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Pembayaran Berhasil!</h3>
+              <p className="text-2xl font-black text-primary tabular-nums mt-1">
+                {formatCurrency(grandTotal)}
               </p>
-            )}
+              {invoiceNumber && (
+                <p className="mt-1 text-xs font-mono font-bold text-muted-foreground">
+                  Invoice: {invoiceNumber}
+                </p>
+              )}
+            </div>
+
             {paymentType === "CASH" && changeAmount > 0 && (
-              <p className="text-sm text-text-muted mt-2">
-                Kembalian:{" "}
-                <span className="font-bold text-accent-success">
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs">
+                <span className="text-muted-foreground block">Uang Kembalian:</span>
+                <span className="text-base font-black text-emerald-700 tabular-nums">
                   {formatCurrency(changeAmount)}
                 </span>
-              </p>
+              </div>
             )}
+
+            <div className="flex flex-col gap-2 pt-2">
+              <Button
+                variant="outline"
+                className="w-full font-bold text-xs h-10"
+                onClick={() => window.print()}
+              >
+                <Printer className="size-4 mr-2" /> Cetak Struk Kasir (Thermal)
+              </Button>
+              <Button
+                className="w-full font-bold text-xs h-10 shadow-sm"
+                onClick={handleResetForm}
+              >
+                Transaksi Baru (Selesai)
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -263,7 +284,16 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
             {paymentType === "CASH" && (
               <div className="space-y-2">
-                <Label>Jumlah Uang Diterima</Label>
+                <div className="flex justify-between items-center">
+                  <Label className="text-xs font-semibold">Uang Tunai Diterima</Label>
+                  <button
+                    type="button"
+                    onClick={() => setCashAmount(String(grandTotal))}
+                    className="text-[11px] font-bold text-primary hover:underline cursor-pointer"
+                  >
+                    Uang Pas
+                  </button>
+                </div>
                 <Input
                   type="text"
                   inputMode="numeric"
@@ -272,16 +302,37 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                   onChange={(event) =>
                     setCashAmount(sanitizeAmountInput(event.target.value))
                   }
+                  className="font-mono text-base font-bold tabular-nums"
                 />
+
+                {/* Quick Cash Chips for Tablets & Phones */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {[10000, 20000, 50000, 100000, 200000, 500000]
+                    .filter((nominal) => nominal >= grandTotal || nominal >= 50000)
+                    .slice(0, 4)
+                    .map((denom) => (
+                      <button
+                        key={denom}
+                        type="button"
+                        onClick={() => setCashAmount(String(denom))}
+                        className="px-2.5 py-1 rounded-lg border border-border bg-muted/60 hover:bg-muted text-[11px] font-mono font-bold transition-colors cursor-pointer"
+                      >
+                        Rp {denom >= 1000 ? `${denom / 1000}k` : denom}
+                      </button>
+                    ))}
+                </div>
+
                 {cashAmount && changeAmount >= 0 && (
-                  <p className="text-sm font-bold text-accent-success">
-                    Kembalian: {formatCurrency(changeAmount)}
-                  </p>
+                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-xs font-bold text-emerald-700 flex justify-between items-center">
+                    <span>Kembalian:</span>
+                    <span className="font-mono text-sm tabular-nums">{formatCurrency(changeAmount)}</span>
+                  </div>
                 )}
                 {cashAmount && changeAmount < 0 && (
-                  <p className="text-sm font-bold text-accent-danger">
-                    Kurang: {formatCurrency(Math.abs(changeAmount))}
-                  </p>
+                  <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200/80 text-xs font-bold text-destructive flex justify-between items-center">
+                    <span>Kurang Bayar:</span>
+                    <span className="font-mono text-sm tabular-nums">{formatCurrency(Math.abs(changeAmount))}</span>
+                  </div>
                 )}
               </div>
             )}

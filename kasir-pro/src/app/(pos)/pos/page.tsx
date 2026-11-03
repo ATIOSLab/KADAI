@@ -59,32 +59,32 @@ export default function PosPage() {
       {/* POS Content: Split view */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left: Product Search */}
-        <div className="flex-1 overflow-y-auto neo-scrollbar p-3 lg:p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-4">
+        <div className="flex-1 overflow-y-auto neo-scrollbar p-3 sm:p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4">
           <ProductSearch />
         </div>
 
-        {/* Mobile Floating Cart Summary */}
-        <div className="lg:hidden absolute bottom-4 inset-x-4 z-40 pb-[env(safe-area-inset-bottom)]">
+        {/* Mobile Floating Cart Summary (<768px Phones only) */}
+        <div className="md:hidden absolute bottom-4 inset-x-4 z-40 pb-[env(safe-area-inset-bottom)]">
           <Button
-            size="xl"
-            className="w-full flex items-center justify-between rounded-2xl shadow-[0_16px_32px_rgba(255,107,53,0.3)]"
+            size="lg"
+            className="w-full flex items-center justify-between rounded-xl shadow-lg h-12 px-4"
             onClick={() => setIsCartOpen(true)}
           >
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5" />
-              <span className="text-sm font-bold">{itemCount} Item</span>
+              <ShoppingBag className="size-5" />
+              <span className="text-xs font-bold">{itemCount} Item</span>
             </div>
-            <span className="text-lg font-black">
+            <span className="text-sm font-black tabular-nums">
               {formatCurrency(grandTotal)}
             </span>
           </Button>
         </div>
 
-        {/* Right: Cart */}
+        {/* Right: Cart (Persistent on Tablet 768px+ & Desktop, Slide-over on Phones) */}
         <div
           className={cn(
-            "fixed inset-0 z-50 bg-bg-card flex flex-col transition-transform duration-300 ease-in-out",
-            "lg:static lg:w-[420px] lg:border-l-[2.5px] lg:border-border-default lg:translate-y-0",
+            "fixed inset-0 z-50 bg-card flex flex-col transition-transform duration-300 ease-in-out",
+            "md:static md:w-[340px] lg:w-[390px] xl:w-[420px] md:border-l md:border-border md:translate-y-0",
             isCartOpen ? "translate-y-0" : "translate-y-full"
           )}
         >

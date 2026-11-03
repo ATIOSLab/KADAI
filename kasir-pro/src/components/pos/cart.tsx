@@ -27,12 +27,12 @@ export function Cart({ onClose }: CartProps) {
 
   return (
     <>
-      <div className="p-4 border-b-[2.5px] border-border-default flex items-center justify-between shrink-0">
+      <div className="p-3.5 border-b border-border flex items-center justify-between shrink-0 bg-card">
         <div className="flex items-center gap-2">
-          <ShoppingBag className="w-5 h-5 text-accent-primary" />
-          <h2 className="font-extrabold text-lg">Keranjang</h2>
+          <ShoppingBag className="size-5 text-primary" />
+          <h2 className="font-bold text-base text-foreground">Keranjang</h2>
           {itemCount > 0 && (
-            <span className="neo-badge bg-accent-primary text-white text-xs">
+            <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
               {itemCount}
             </span>
           )}
@@ -43,10 +43,10 @@ export function Cart({ onClose }: CartProps) {
               variant="ghost"
               size="sm"
               onClick={clearCart}
-              className="text-accent-danger"
+              className="text-destructive text-xs h-8 px-2"
             >
-              <Trash2 className="w-4 h-4 mr-1 lg:mr-0" />
-              <span className="hidden lg:inline">Hapus</span>
+              <Trash2 className="size-3.5 mr-1" />
+              <span>Kosongkan</span>
             </Button>
           )}
           {onClose && (
@@ -54,7 +54,7 @@ export function Cart({ onClose }: CartProps) {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="lg:hidden"
+              className="md:hidden text-xs h-8 px-2"
             >
               Tutup
             </Button>
@@ -62,15 +62,15 @@ export function Cart({ onClose }: CartProps) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto neo-scrollbar p-4 space-y-2">
+      <div className="flex-1 overflow-y-auto neo-scrollbar p-3 space-y-2">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-12">
-            <div className="w-16 h-16 rounded-2xl bg-bg-main neo-border flex items-center justify-center mb-3">
-              <ShoppingBag className="w-8 h-8 text-text-muted" />
+            <div className="size-14 rounded-2xl bg-muted border border-border flex items-center justify-center mb-3">
+              <ShoppingBag className="size-6 text-muted-foreground opacity-50" />
             </div>
-            <p className="font-bold text-text-muted">Keranjang Kosong</p>
-            <p className="text-xs text-text-muted mt-1">
-              Klik produk untuk menambahkan
+            <p className="font-bold text-sm text-foreground">Keranjang Kosong</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Sentuh produk di sebelah kiri untuk menambahkan
             </p>
           </div>
         ) : (
@@ -79,34 +79,34 @@ export function Cart({ onClose }: CartProps) {
       </div>
 
       {items.length > 0 && (
-        <div className="border-t-[2.5px] border-border-default p-4 space-y-3 shrink-0 bg-bg-card">
-          <div className="space-y-1">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium text-text-secondary">Subtotal</span>
-              <span className="font-bold">{formatCurrency(subtotal)}</span>
+        <div className="border-t border-border p-3.5 space-y-3 shrink-0 bg-card">
+          <div className="space-y-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="font-bold tabular-nums">{formatCurrency(subtotal)}</span>
             </div>
             {discountTotal > 0 && (
-              <div className="flex justify-between text-sm text-accent-danger">
-                <span className="font-medium">Diskon</span>
-                <span className="font-bold">
+              <div className="flex justify-between text-destructive">
+                <span>Diskon</span>
+                <span className="font-bold tabular-nums">
                   -{formatCurrency(discountTotal)}
                 </span>
               </div>
             )}
-            <div className="flex justify-between text-lg pt-2 border-t-[1.5px] border-border-default">
-              <span className="font-extrabold">Total</span>
-              <span className="font-black text-accent-primary">
+            <div className="flex justify-between text-base pt-2 border-t border-border">
+              <span className="font-bold text-foreground">Total Tagihan</span>
+              <span className="font-black text-primary tabular-nums">
                 {formatCurrency(grandTotal)}
               </span>
             </div>
           </div>
 
           <Button
-            size="xl"
-            className="w-full"
+            size="lg"
+            className="w-full font-bold text-sm h-11 rounded-xl shadow-sm"
             onClick={() => setShowCheckout(true)}
           >
-            Bayar - {formatCurrency(grandTotal)}
+            Bayar ({formatCurrency(grandTotal)})
           </Button>
         </div>
       )}

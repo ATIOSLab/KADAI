@@ -22,7 +22,7 @@ import { formatCurrency } from "@/lib/utils";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { SupervisorPinDialog } from "@/components/shared/supervisor-pin-dialog";
-import { Receipt, ArrowLeft, XCircle, Loader2 } from "lucide-react";
+import { Receipt, ArrowLeft, XCircle, Loader2, Printer } from "lucide-react";
 import Link from "next/link";
 
 const paymentLabels: Record<string, string> = {
@@ -234,6 +234,9 @@ export default function SaleDetailPage({
         description={`Transaksi pada ${new Date(sale.createdAt).toLocaleString("id-ID", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}`}
         icon={Receipt}
       >
+        <Button variant="outline" onClick={() => window.print()}>
+          <Printer className="w-4 h-4 mr-1" /> Cetak Struk
+        </Button>
         <Button variant="outline" asChild>
           <Link href="/sales">
             <ArrowLeft className="w-4 h-4 mr-1" /> Kembali

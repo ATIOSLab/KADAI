@@ -26,30 +26,31 @@ export default function PosPage() {
   return (
     <div className="h-screen flex flex-col bg-bg-main relative overflow-hidden">
       {/* POS Header */}
-      <header className="h-14 bg-bg-card border-b-[2.5px] border-border-default flex items-center justify-between px-4 shrink-0 relative z-20">
+      <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0 relative z-20">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild className="size-8 rounded-lg">
             <Link href="/dashboard">
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="size-4" />
             </Link>
           </Button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center neo-border-thin">
-              <ShoppingCart className="w-4 h-4 text-white" />
+            <div className="size-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-sm">
+              <ShoppingCart className="size-4" />
             </div>
             <div>
-              <h1 className="font-black text-sm leading-tight">KADAI</h1>
-              <p className="text-[10px] font-bold text-text-muted">
-                Mode Kasir
+              <h1 className="font-bold text-sm leading-tight text-foreground">KADAI</h1>
+              <p className="text-[10px] font-medium text-muted-foreground">
+                Terminal Kasir POS
               </p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-text-muted hidden sm:inline-block">
+          <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block">
             {roleLabel}: {user?.name ?? "Memuat..."}
           </span>
-          <div className="neo-badge bg-accent-success text-white">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Online
           </div>
         </div>

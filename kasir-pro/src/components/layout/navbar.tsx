@@ -1,14 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   LogOut,
+  Menu,
   PanelLeft,
   Search,
   Settings,
   ShoppingCart,
+  Store,
   User,
+  X,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +27,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { navigationSections, isActivePath } from "@/components/layout/navigation";
 import { useLogout } from "@/hooks/use-logout";
+import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/session";
 
 interface NavbarProps {
@@ -36,6 +43,8 @@ export function Navbar({
   onToggleSidebar,
   currentUser,
 }: NavbarProps) {
+  const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { logout, isPending } = useLogout();
   const todayLabel = new Intl.DateTimeFormat("id-ID", {
     weekday: "short",
@@ -64,72 +73,94 @@ export function Navbar({
     currentUser?.role === "MANAGER" ||
     currentUser?.role === "CASHIER";
 
+  const visibleSections = navigationSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) =>
+          !item.roles ||
+          (currentUser ? item.roles.includes(currentUser.role) : false)
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+
   return (
-    <header className="z-40 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur">
-      <div className="flex h-full items-center justify-between gap-3 px-4 lg:px-6">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <button
-            type="button"
-            onClick={onToggleSidebar}
-            className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:inline-flex"
-            aria-label={sidebarCollapsed ? "Buka navigasi" : "Ciutkan navigasi"}
-          >
-            <PanelLeft className="size-4" />
-          </button>
-          <div className="hidden h-4 w-px bg-border lg:block" />
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <Input
-              placeholder="Cari produk, transaksi, atau menu..."
-              className="h-9 rounded-md border-border bg-card pl-9 text-sm shadow-none"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-2 text-xs font-semibold text-text-secondary lg:flex">
-            <CalendarDays className="h-4 w-4 text-accent-primary" />
-            <span>{todayLabel}</span>
-          </div>
-
-          <NotificationMenu currentUser={currentUser} />
-
-          {canAccessPos && (
-            <Button
-              variant="outline"
-              size="icon"
-              asChild
-              className="hidden rounded-2xl sm:inline-flex"
+    <>
+      <header className="z-40 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur">
+        <div className="flex h-full items-center justify-between gap-3 px-4 lg:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            {/* Mobile Hamburger Button */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted lg:hidden"
+              aria-label="Buka menu navigasi"
             >
-              <Link href="/pos" aria-label="Buka halaman kasir">
-                <ShoppingCart className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
+              <Menu className="size-5" />
+            </button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 rounded-2xl border border-black/10 bg-white/75 p-1.5 pl-1.5 pr-3 transition-colors hover:bg-white">
-                <Avatar className="h-9 w-9">
-                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                </Avatar>
-                <div className="hidden text-left md:block">
-                  <p className="text-sm font-bold leading-tight">
-                    {currentUser?.name ?? "Pengguna"}
-                  </p>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">
-                    {roleLabel}
-                  </p>
-                </div>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <>
+            {/* Desktop Collapse Button */}
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:inline-flex"
+              aria-label={sidebarCollapsed ? "Buka navigasi" : "Ciutkan navigasi"}
+            >
+              <PanelLeft className="size-4" />
+            </button>
+            <div className="hidden h-4 w-px bg-border lg:block" />
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Cari transaksi, menu, persediaan..."
+                className="h-9 rounded-md border-border bg-card pl-9 text-xs shadow-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground lg:flex">
+              <CalendarDays className="size-3.5 text-primary" />
+              <span>{todayLabel}</span>
+            </div>
+
+            <NotificationMenu currentUser={currentUser} />
+
+            {canAccessPos && (
+              <Button
+                variant="outline"
+                size="icon"
+                asChild
+                className="hidden rounded-lg sm:inline-flex size-9"
+              >
+                <Link href="/pos" aria-label="Buka terminal kasir">
+                  <ShoppingCart className="size-4" />
+                </Link>
+              </Button>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-lg border border-border bg-card p-1 sm:pl-1.5 sm:pr-2.5 transition-colors hover:bg-muted">
+                  <Avatar className="size-8">
+                    <AvatarFallback className="text-xs font-bold">{initials}</AvatarFallback>
+                  </Avatar>
+                  <div className="hidden text-left md:block">
+                    <p className="text-xs font-bold leading-tight text-foreground">
+                      {currentUser?.name ?? "Pengguna"}
+                    </p>
+                    <p className="text-[10px] font-medium text-muted-foreground">
+                      {roleLabel}
+                    </p>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
+                    <User className="mr-2 size-4" />
                     Profil
                   </Link>
                 </DropdownMenuItem>
@@ -137,29 +168,117 @@ export function Navbar({
                   <>
                     <DropdownMenuItem asChild>
                       <Link href="/settings" className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Pengaturan
+                        <Settings className="mr-2 size-4" />
+                        Pengaturan Sistem
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
-              </>
-              <DropdownMenuItem
-                className="cursor-pointer text-accent-danger focus:text-accent-danger"
-                disabled={isPending}
-                onSelect={(event) => {
-                  event.preventDefault();
+                <DropdownMenuItem
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  disabled={isPending}
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    logout();
+                  }}
+                >
+                  <LogOut className="mr-2 size-4" />
+                  {isPending ? "Keluar..." : "Keluar"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileNavOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-card shadow-2xl border-r border-border">
+            {/* Drawer Header */}
+            <div className="flex h-14 items-center justify-between border-b border-border px-4">
+              <div className="flex items-center gap-2">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-slate-900 text-white shadow-sm">
+                  <Store className="size-4" />
+                </span>
+                <div>
+                  <span className="text-sm font-bold text-foreground">KADAI</span>
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase block -mt-1">
+                    {roleLabel}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(false)}
+                className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted"
+                aria-label="Tutup navigasi"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Navigation Sections */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {visibleSections.map((section) => (
+                <div key={section.label} className="space-y-1.5">
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2">
+                    {section.label}
+                  </h4>
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const active = isActivePath(pathname, item.href);
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileNavOpen(false)}
+                          className={cn(
+                            "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors",
+                            active
+                              ? "bg-primary text-primary-foreground font-bold shadow-sm"
+                              : "text-slate-600 hover:bg-muted hover:text-foreground"
+                          )}
+                        >
+                          <Icon className="size-4 shrink-0" />
+                          <span className="truncate">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="p-4 border-t border-border flex items-center justify-between">
+              <div className="text-xs font-semibold text-slate-800 truncate">
+                {currentUser?.name || "Staf"}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-destructive hover:text-destructive h-8 px-2"
+                onClick={() => {
+                  setMobileNavOpen(false);
                   logout();
                 }}
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                {isPending ? "Keluar..." : "Keluar"}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <LogOut className="size-3.5 mr-1" /> Keluar
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </header>
+      )}
+    </>
   );
 }

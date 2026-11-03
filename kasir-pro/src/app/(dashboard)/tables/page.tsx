@@ -141,7 +141,7 @@ export default function TablesPage() {
         </div>
         <Button
           onClick={() => setIsAddOpen(true)}
-          className="neo-border neo-shadow font-bold bg-primary text-primary-foreground hover:bg-primary/90"
+          className="font-bold shadow-sm"
         >
           <Plus className="size-4 mr-2" />
           Tambah Meja Baru
@@ -156,13 +156,13 @@ export default function TablesPage() {
           ))}
         </div>
       ) : tables.length === 0 ? (
-        <Card className="neo-border neo-shadow p-12 text-center">
+        <Card className="border border-border p-12 text-center bg-card shadow-sm">
           <Utensils className="size-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-bold">Belum Ada Meja Terdaftar</h3>
           <p className="text-sm text-muted-foreground mt-1 mb-6">
-            Tambahkan nomor meja pertama untuk mulai menggunakan fitur F&B Dine-In dan Self-Order QR.
+            Tambahkan nomor meja pertama untuk mulai menggunakan fitur Dining dan Self-Order QR.
           </p>
-          <Button onClick={() => setIsAddOpen(true)} className="neo-border neo-shadow font-bold">
+          <Button onClick={() => setIsAddOpen(true)} className="font-bold shadow-sm">
             <Plus className="size-4 mr-2" /> Tambah Meja Pertama
           </Button>
         </Card>
@@ -173,7 +173,7 @@ export default function TablesPage() {
             return (
               <Card
                 key={t.id}
-                className="neo-border neo-shadow bg-card hover:-translate-y-1 transition-all duration-200"
+                className="border border-border bg-card hover:shadow-md transition-shadow duration-200"
               >
                 <CardHeader className="pb-3 border-b border-border/50 flex flex-row items-center justify-between">
                   <div>
@@ -182,7 +182,7 @@ export default function TablesPage() {
                   </div>
                   <Badge
                     variant={t.isOccupied ? "danger" : "secondary"}
-                    className="font-bold neo-border"
+                    className="font-bold"
                   >
                     {t.isOccupied ? "Terisi" : "Tersedia"}
                   </Badge>
@@ -203,7 +203,7 @@ export default function TablesPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedQR(t)}
-                      className="neo-border text-xs font-bold"
+                      className="text-xs font-bold"
                     >
                       <QrCode className="size-3.5 mr-1.5" />
                       Lihat QR

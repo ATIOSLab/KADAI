@@ -122,13 +122,13 @@ export default function KDSPage() {
         </div>
 
         {/* Station Filters */}
-        <div className="flex items-center gap-2">
-          <div className="flex bg-muted p-1 rounded-xl neo-border">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex bg-muted p-1 rounded-xl border border-border">
             <button
               onClick={() => setActiveStation("ALL")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 activeStation === "ALL"
-                  ? "bg-card text-foreground neo-border neo-shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -138,7 +138,7 @@ export default function KDSPage() {
               onClick={() => setActiveStation("KITCHEN")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeStation === "KITCHEN"
-                  ? "bg-card text-foreground neo-border neo-shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -148,11 +148,11 @@ export default function KDSPage() {
               onClick={() => setActiveStation("BAR")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                 activeStation === "BAR"
-                  ? "bg-card text-foreground neo-border neo-shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Coffee className="size-3.5 text-accent-secondary" /> Bar
+              <Coffee className="size-3.5 text-amber-600" /> Bar
             </button>
           </div>
 
@@ -160,7 +160,7 @@ export default function KDSPage() {
             size="sm"
             variant="outline"
             onClick={() => setCockpitMode(!cockpitMode)}
-            className="neo-border text-xs font-bold"
+            className="text-xs font-bold"
             title="Ubah Mode Layar"
           >
             {cockpitMode ? "🌙 Cockpit Dapur" : "☀️ Mode Terang"}
@@ -170,7 +170,7 @@ export default function KDSPage() {
             size="icon"
             variant="outline"
             onClick={() => fetchOrders()}
-            className="neo-border"
+            className="size-8"
             title="Refresh Antrean"
           >
             <RefreshCw className="size-4" />
@@ -186,11 +186,11 @@ export default function KDSPage() {
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <Card className={`neo-border neo-shadow p-16 text-center ${cockpitMode ? "bg-slate-900 border-slate-800 text-slate-100" : ""}`}>
-          <CheckCircle2 className="size-16 mx-auto text-accent-success mb-4" />
-          <h3 className="text-xl font-black">Tidak Ada Antrean Dapur</h3>
+        <Card className={`border border-border shadow-sm p-16 text-center ${cockpitMode ? "bg-slate-900 border-slate-800 text-slate-100" : "bg-card"}`}>
+          <CheckCircle2 className="size-16 mx-auto text-emerald-600 mb-4" />
+          <h3 className="text-xl font-bold">Tidak Ada Antrean Dapur</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Semua pesanan makanan & minuman saat ini sudah siap saji atau telah diantar.
+            Semua pesanan saat ini sudah siap saji atau telah diantar ke pelanggan.
           </p>
         </Card>
       ) : (
@@ -203,23 +203,23 @@ export default function KDSPage() {
             const timerBg = isLate
               ? "bg-destructive text-destructive-foreground animate-pulse"
               : isWarning
-              ? "bg-accent-warning text-black"
+              ? "bg-amber-100 text-amber-900 border-amber-300"
               : cockpitMode
               ? "bg-slate-800 text-slate-200 border-slate-700"
               : "bg-muted text-foreground";
 
             const stationBadgeBg =
               ord.station === "BAR"
-                ? "bg-accent-secondary text-white"
+                ? "bg-slate-800 text-white"
                 : "bg-primary text-primary-foreground";
 
             return (
               <Card
                 key={ord.id}
-                className={`neo-border neo-shadow flex flex-col justify-between overflow-hidden transition-all ${
+                className={`border shadow-sm flex flex-col justify-between overflow-hidden transition-all ${
                   cockpitMode
                     ? "bg-slate-900 border-slate-800 text-slate-100 shadow-lg"
-                    : "bg-card"
+                    : "bg-card border-border"
                 }`}
               >
                 {/* Header */}

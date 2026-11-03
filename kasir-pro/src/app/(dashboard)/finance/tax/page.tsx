@@ -94,44 +94,44 @@ export default function TaxSummaryPage() {
       {/* KPI Cards */}
       {data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="neo-border neo-shadow bg-card p-4 space-y-1">
+          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Total Omzet Bruto ({year})
             </span>
-            <p className="text-2xl font-black text-foreground">
+            <p className="text-2xl font-black text-foreground tabular-nums">
               Rp {data.totals.totalGrossRevenue.toLocaleString("id-ID")}
             </p>
             <p className="text-[11px] text-muted-foreground">Dasar Perhitungan Pajak (DPP)</p>
           </Card>
 
-          <Card className="neo-border neo-shadow bg-card p-4 space-y-1">
+          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Pajak Terpungut ({data.store.taxType})
             </span>
-            <p className="text-2xl font-black text-accent-secondary">
+            <p className="text-2xl font-black text-slate-800 tabular-nums">
               Rp {data.totals.totalTaxCollected.toLocaleString("id-ID")}
             </p>
-            <p className="text-[11px] text-muted-foreground">Titipan Pajak Belum/Sudah Disetor</p>
+            <p className="text-[11px] text-muted-foreground">Titipan Pajak Terhitung</p>
           </Card>
 
-          <Card className="neo-border neo-shadow bg-card p-4 space-y-1">
+          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Total HPP FIFO Bahan
+              Total HPP FIFO Persediaan
             </span>
-            <p className="text-2xl font-black text-destructive">
+            <p className="text-2xl font-black text-destructive tabular-nums">
               Rp {data.totals.totalHPP.toLocaleString("id-ID")}
             </p>
-            <p className="text-[11px] text-muted-foreground">Biaya Pokok Riil Persediaan</p>
+            <p className="text-[11px] text-muted-foreground">Biaya Pokok Riil Bahan/Barang</p>
           </Card>
 
-          <Card className="neo-border neo-shadow bg-card p-4 space-y-1">
+          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Estimasi PPh Final 0.5%
             </span>
-            <p className="text-2xl font-black text-primary">
+            <p className="text-2xl font-black text-primary tabular-nums">
               Rp {data.totals.totalPphFinal.toLocaleString("id-ID")}
             </p>
-            <p className="text-[11px] text-accent-success font-bold">
+            <p className="text-[11px] text-emerald-600 font-bold">
               {data.totals.totalGrossRevenue <= 500_000_000
                 ? "Bebas Pajak (PTKP < Rp 500jt)"
                 : "Tarif 0.5% PP 55/2022"}
@@ -141,11 +141,11 @@ export default function TaxSummaryPage() {
       )}
 
       {/* Monthly Breakdown Table */}
-      <Card className="neo-border neo-shadow bg-card overflow-hidden">
+      <Card className="border border-border shadow-sm bg-card overflow-hidden">
         <CardHeader className="border-b border-border/60 pb-3">
-          <CardTitle className="text-base font-black flex items-center justify-between">
+          <CardTitle className="text-base font-bold flex items-center justify-between">
             <span>Buku Peredaran Bruto Bulanan (Januari - Desember {year})</span>
-            <Badge className="font-bold neo-border bg-muted text-foreground text-xs">
+            <Badge variant="outline" className="font-bold text-xs">
               SAK EMKM Compliant
             </Badge>
           </CardTitle>

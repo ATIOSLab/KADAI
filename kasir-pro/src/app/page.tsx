@@ -114,71 +114,104 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Multi-Vertical Feature Section */}
-      <section id="fnb-ritel" className="py-16 px-6 max-w-6xl mx-auto w-full space-y-12">
+      {/* Multi-Vertical Solution Section */}
+      <section id="multi-vertikal" className="py-16 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
         <div className="text-center space-y-3">
-          <Badge variant="outline" className="font-semibold rounded-full px-3 py-1">Solusi Industri</Badge>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-950">
-            Arsitektur Fleksibel untuk Ritel, Kuliner, dan Multi-Cabang
+          <Badge variant="outline" className="font-semibold rounded-full px-3 py-1">Solusi Lintas Industri</Badge>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-950">
+            Arsitektur Fleksibel untuk Seluruh Sektor Bisnis
           </h2>
-          <p className="text-sm text-slate-600 max-w-xl mx-auto">
-            KADAI menyesuaikan alur operasionalnya sesuai tipe usaha Anda, mulai dari toko ritel dengan barcode hingga kafe dan kedai kuliner yang sarat resep bahan baku.
+          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
+            KADAI dirancang secara modular dan agnostik untuk beradaptasi dengan model operasional usaha Anda, mulai dari pencatatan barcode ritel, perakitan resep kuliner, hingga reservasi jasa.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card Ritel */}
-          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-6 space-y-4 rounded-xl">
-            <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-              <ShoppingCart className="size-6" />
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
+                <ShoppingCart className="size-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-950">Ritel & Distribusi Komersial</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Minimarket modern, supermarket, fashion, farmasi/apotek, elektronik, toko bangunan, dan grosir.
+                </p>
+              </div>
+              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Pelacakan persediaan multi-batch FIFO & expired date.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Scan barcode scanner USB, Bluetooth & kamera HP.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Kartu stok mutasi otomatis & batas minimum restock.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Cetak struk kasir thermal 58mm/80mm & label barcode.
+                </li>
+              </ul>
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-slate-950">Untuk Toko Ritel & Grosir</h3>
-              <p className="text-xs text-muted-foreground mt-1">
-                Toko kelontong, minimarket, toko baju, apotek, dan barang konsumsi langsung jual.
-              </p>
-            </div>
-            <ul className="space-y-2 text-xs font-semibold text-muted-foreground pt-2">
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> Pelacakan stok per batch FIFO dengan tanggal kedaluwarsa.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> Scan barcode USB & Bluetooth super cepat tanpa jeda.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> Peringatan stok menipis dan kartu stok mutasi masuk/keluar.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> Pencetakan label harga dan struk kasir thermal 58mm/80mm.
-              </li>
-            </ul>
           </Card>
 
           {/* Card FnB */}
-          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-6 space-y-4 rounded-xl">
-            <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-              <UtensilsCrossed className="size-6" />
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
+                <UtensilsCrossed className="size-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-950">Kuliner, F&B & Hospitality</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Restoran casual dining, kafe modern, fast food (QSR), bakery, dan cloud kitchen.
+                </p>
+              </div>
+              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Bill of Materials (BOM):</strong> Potong bahan baku otomatis saat menu laku.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Meja & Self-Order QR:</strong> Pelanggan pesan langsung dari HP.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Kitchen Display (KDS):</strong> Tiket real-time ke monitor dapur & bar.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Otomatisasi Pajak Restoran (PB1 10%) & Service Charge.
+                </li>
+              </ul>
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-slate-950">Untuk Kafe, Restoran & Dimsum</h3>
-              <p className="text-xs text-muted-foreground mt-1">
-                Kedai kopi, penjual dimsum, warung makan, bakery, hingga restoran casual dining.
-              </p>
+          </Card>
+
+          {/* Card Services */}
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
+                <Building className="size-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-950">Layanan Jasa & Multi-Cabang</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Barbershop, salon kecantikan, bengkel otomotif, cuci mobil/motor, laundry, dan franchise.
+                </p>
+              </div>
+              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Pencatatan invoice billing jasa & produk dalam 1 transaksi.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Database pelanggan CRM, riwayat kunjungan & poin member.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Manajemen multi-cabang terpusat dari satu dashboard akun.
+                </li>
+                <li className="flex items-center gap-2 text-slate-800">
+                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Kontrol hak akses staf RBAC 6 role & PIN supervisor.
+                </li>
+              </ul>
             </div>
-            <ul className="space-y-2 text-xs font-semibold text-muted-foreground pt-2">
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> <strong>Bill of Materials (BOM):</strong> Potong bahan mentah otomatis saat menu terjual.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> <strong>Meja & QR Code:</strong> Pelanggan scan QR di meja untuk pesan langsung dari HP.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> <strong>Kitchen Display System (KDS):</strong> Tiket real-time ke layar koki dan barista bar.
-              </li>
-              <li className="flex items-center gap-2 text-foreground">
-                <CheckCircle2 className="size-4 text-emerald-600" /> Perhitungan PB1 Pajak Restoran 10% dan Service Charge kafe.
-              </li>
-            </ul>
           </Card>
         </div>
       </section>
@@ -255,11 +288,11 @@ export default async function HomePage() {
             </Button>
           </Card>
 
-          {/* Starter */}
+          {/* Professional Tier */}
           <Card className="border border-border shadow-sm bg-card p-6 space-y-4 flex flex-col justify-between rounded-xl">
             <div className="space-y-3">
               <h4 className="font-bold text-lg text-slate-950">Professional</h4>
-              <p className="text-xs text-muted-foreground">Toko ritel mandiri atau kedai kuliner berkembang.</p>
+              <p className="text-xs text-muted-foreground">Untuk unit usaha ritel, F&B, dan jasa mandiri yang berkembang.</p>
               <div className="text-2xl font-black text-primary">Rp 99.000 <span className="text-xs font-normal text-muted-foreground">/ bln</span></div>
               <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-border">
                 <li>• 1 Outlet & 3 Akun Kasir</li>

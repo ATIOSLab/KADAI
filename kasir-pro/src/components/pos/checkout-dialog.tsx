@@ -66,6 +66,9 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [tablesList, setTablesList] = useState<Array<{ id: string; tableNo: string; section: string }>>([]);
   const [paymentRef, setPaymentRef] = useState("");
   const [customerName, setCustomerName] = useState("");
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [customerResults, setCustomerResults] = useState<Array<{ id: string; name: string; phone: string | null; memberTier: string }>>([]);
   const [cashAmount, setCashAmount] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,6 +83,22 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!customerSearch.trim()) {
+      setCustomerResults([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetch(`/api/customers?search=${encodeURIComponent(customerSearch)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.data) setCustomerResults(data.data.slice(0, 5));
+        })
+        .catch(() => {});
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [customerSearch]);
 
   const grandTotal = getGrandTotal();
   const changeAmount =
@@ -109,6 +128,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           paymentType,
           paymentRef: paymentRef || null,
           customerName: customerName || null,
+          customerId: customerId || null,
           discountAmount: 0,
           notes: notes || null,
         },
@@ -133,6 +153,9 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     setPaymentType("CASH");
     setPaymentRef("");
     setCustomerName("");
+    setCustomerId(null);
+    setCustomerSearch("");
+    setCustomerResults([]);
     setCashAmount("");
     setNotes("");
     onOpenChange(false);
@@ -350,11 +373,66 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
             <div className="space-y-2">
               <Label>Nama Pelanggan (opsional)</Label>
-              <Input
-                placeholder="Nama pelanggan"
-                value={customerName}
-                onChange={(event) => setCustomerName(event.target.value)}
-              />
+              {customerId ? (
+                <div className="flex items-center justify-between rounded-lg border border-border-default px-3 py-2">
+                  <div>
+                    <span className="font-bold text-sm">{customerName}</span>
+                    {customerResults.find((c) => c.id === customerId)?.memberTier && (
+                      <span className="ml-2 text-[10px] text-muted-foreground uppercase">
+                        {customerResults.find((c) => c.id === customerId)?.memberTier}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="text-xs text-destructive hover:underline"
+                    onClick={() => {
+                      setCustomerId(null);
+                      setCustomerName("");
+                    }}
+                  >
+                    Lepas
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Input
+                    placeholder="Cari pelanggan member (nama/telepon)..."
+                    value={customerSearch}
+                    onChange={(event) => setCustomerSearch(event.target.value)}
+                  />
+                  <Input
+                    placeholder="atau ketik nama pelanggan manual"
+                    value={customerName}
+                    onChange={(event) => setCustomerName(event.target.value)}
+                  />
+                  {customerResults.length > 0 && (
+                    <div className="space-y-1 max-h-32 overflow-auto">
+                      {customerResults.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          className="w-full text-left rounded-md border border-border-default px-3 py-1.5 text-sm hover:bg-accent transition-colors"
+                          onClick={() => {
+                            setCustomerId(c.id);
+                            setCustomerName(c.name);
+                            setCustomerSearch("");
+                            setCustomerResults([]);
+                          }}
+                        >
+                          <span className="font-semibold">{c.name}</span>
+                          {c.phone && (
+                            <span className="text-muted-foreground ml-2">{c.phone}</span>
+                          )}
+                          <span className="text-[10px] text-muted-foreground uppercase ml-2">
+                            {c.memberTier}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="space-y-2">

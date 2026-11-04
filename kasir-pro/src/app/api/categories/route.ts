@@ -3,6 +3,8 @@ import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createCategorySchema } from "@/lib/validators/category";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { getSessionUserFromRequest } from "@/lib/session";
 
 // GET /api/categories
 export async function GET() {
@@ -22,6 +24,11 @@ export async function GET() {
 // POST /api/categories
 export async function POST(request: NextRequest) {
   try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await request.json();
     const data = createCategorySchema.parse(body);
 

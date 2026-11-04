@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createUnitSchema } from "@/lib/validators/unit";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { getSessionUserFromRequest } from "@/lib/session";
 
 function normalizeUnitName(name: string) {
   return name.trim().toLowerCase();
@@ -32,6 +34,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await request.json();
     const data = createUnitSchema.parse(body);
     const normalizedName = normalizeUnitName(data.name);

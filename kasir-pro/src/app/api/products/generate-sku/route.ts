@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildSkuPrefix, formatSku } from "@/lib/utils";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { getSessionUserFromRequest } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get("categoryId");
     const categoryName = searchParams.get("categoryName");

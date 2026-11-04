@@ -1,3 +1,5 @@
+import { verifyAndParseSession } from "@/lib/security";
+
 export const APP_ROLES = [
   "ADMIN",
   "MANAGER",
@@ -58,18 +60,6 @@ type SessionPayload = {
   role: AppRole;
 };
 
-function decodeBase64(value: string) {
-  if (typeof atob === "function") {
-    return atob(value);
-  }
-
-  if (typeof Buffer !== "undefined") {
-    return Buffer.from(value, "base64").toString("utf8");
-  }
-
-  throw new Error("Base64 decoding is not available in this runtime.");
-}
-
 export function isAppRole(value: string): value is AppRole {
   return (APP_ROLES as readonly string[]).includes(value);
 }
@@ -123,21 +113,21 @@ export function parseSessionCookie(
     return null;
   }
 
-  try {
-    const parsed = JSON.parse(decodeBase64(value)) as Partial<SessionPayload>;
-
-    if (
-      typeof parsed.id !== "string" ||
-      typeof parsed.name !== "string" ||
-      typeof parsed.email !== "string" ||
-      typeof parsed.role !== "string" ||
-      !isAppRole(parsed.role)
-    ) {
-      return null;
-    }
-
-    return parsed as SessionPayload;
-  } catch {
+  // A02: Verify HMAC signature before trusting cookie payload
+  const parsed = verifyAndParseSession<Partial<SessionPayload>>(value);
+  if (!parsed) {
     return null;
   }
+
+  if (
+    typeof parsed.id !== "string" ||
+    typeof parsed.name !== "string" ||
+    typeof parsed.email !== "string" ||
+    typeof parsed.role !== "string" ||
+    !isAppRole(parsed.role)
+  ) {
+    return null;
+  }
+
+  return parsed as SessionPayload;
 }

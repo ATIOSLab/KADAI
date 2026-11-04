@@ -4,6 +4,7 @@ import {
   getDefaultPathForRole,
   parseSessionCookie,
 } from "@/lib/rbac";
+import { isCsrfSafe, SECURITY_HEADERS, CSP_HEADER } from "@/lib/security";
 
 const publicPaths = [
   "/login",
@@ -20,14 +21,31 @@ const publicPaths = [
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // A05: Add security headers to every response
+  const response = NextResponse.next();
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  response.headers.set("Content-Security-Policy", CSP_HEADER);
+
   // Allow landing page
   if (pathname === "/") {
-    return NextResponse.next();
+    return response;
   }
 
   // Allow public paths
   if (publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-    return NextResponse.next();
+    // A04: CSRF check for state-changing requests on non-auth public endpoints
+    if (
+      pathname.startsWith("/api/") &&
+      !pathname.startsWith("/api/auth/") &&
+      !pathname.startsWith("/api/order") &&
+      !pathname.startsWith("/api/telegram") &&
+      !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))
+    ) {
+      return NextResponse.json({ error: "CSRF validation failed" }, { status: 403 });
+    }
+    return response;
   }
 
   // Allow static files and internal paths
@@ -36,7 +54,18 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.includes(".")
   ) {
-    return NextResponse.next();
+    return response;
+  }
+
+  // A04: CSRF protection — verify Origin header for state-changing requests
+  if (
+    pathname.startsWith("/api/") &&
+    !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))
+  ) {
+    return NextResponse.json(
+      { error: "CSRF validation failed — Origin mismatch" },
+      { status: 403 }
+    );
   }
 
   // Check session cookie
@@ -58,7 +87,7 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

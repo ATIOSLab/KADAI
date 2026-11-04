@@ -94,7 +94,7 @@ export function SupervisorPinDialog({
               className="text-center text-2xl tracking-[0.5em] font-mono neo-border h-12"
             />
             <p className="text-[10px] text-muted-foreground">
-              (PIN Default Manager jika belum disetel: <strong>123456</strong>)
+              Hubungi Manager/Admin untuk mendapatkan PIN otorisasi.
             </p>
           </div>
 

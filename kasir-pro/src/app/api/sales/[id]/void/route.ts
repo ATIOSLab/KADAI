@@ -39,7 +39,11 @@ export async function POST(
         );
       }
 
-      const pinCheck = await verifySupervisorPin(pin);
+      const clientIp =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip") ||
+        "unknown";
+      const pinCheck = await verifySupervisorPin(pin, clientIp);
       if (!pinCheck.valid) {
         return NextResponse.json(
           { error: pinCheck.error || "PIN Supervisor tidak valid" },

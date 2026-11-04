@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkRateLimit, sanitizeError } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   try {
+    // A07: Rate limit registration — prevent abuse
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+    const rateLimit = checkRateLimit(`register:${clientIp}`, 3, 60 * 60 * 1000, 24 * 60 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Terlalu banyak percobaan registrasi. Coba lagi nanti." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const {
       storeName,
@@ -125,10 +139,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("POST /api/auth/register error:", error);
-    return NextResponse.json(
-      { error: "Terjadi kesalahan saat memproses registrasi" },
-      { status: 500 }
-    );
+    const message = sanitizeError(error, "Terjadi kesalahan saat memproses registrasi");
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

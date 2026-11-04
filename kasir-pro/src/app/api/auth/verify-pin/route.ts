@@ -16,7 +16,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "PIN wajib diisi" }, { status: 400 });
     }
 
-    const verification = await verifySupervisorPin(pin);
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+
+    const verification = await verifySupervisorPin(pin, clientIp);
 
     if (!verification.valid) {
       return NextResponse.json(

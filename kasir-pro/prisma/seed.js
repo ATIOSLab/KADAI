@@ -201,12 +201,14 @@ async function ensureAdminUser() {
   }
 
   const passwordHash = await bcrypt.hash(admin.password, 12);
+  const supervisorPinHash = await bcrypt.hash("123456", 10);
 
   await prisma.user.create({
     data: {
       name: admin.name,
       email: admin.email,
       passwordHash,
+      supervisorPin: supervisorPinHash,
       role: admin.role,
       isActive: true,
     },

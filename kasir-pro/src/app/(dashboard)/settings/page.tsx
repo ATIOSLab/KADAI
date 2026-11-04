@@ -1097,7 +1097,7 @@ export default function SettingsPage() {
                       placeholder={
                         userDialog.mode === "edit"
                           ? "Kosongkan jika tidak ingin mengubah"
-                          : "Default 123456 jika kosong"
+                          : "Wajib diisi untuk Admin/Manager"
                       }
                     />
                     <p className="text-[11px] text-muted-foreground">

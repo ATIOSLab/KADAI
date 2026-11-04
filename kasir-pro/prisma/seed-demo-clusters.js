@@ -204,19 +204,19 @@ async function seedDemoClusters() {
       await prisma.productBatch.upsert({
         where: { batchNumber: batchNo },
         update: {
-          initialStock: prod.stock,
-          currentStock: prod.stock,
-          buyPrice: prod.cost,
-          sellPrice: prod.price,
+          quantity: prod.stock,
+          remainingQty: prod.stock,
+          costPrice: prod.cost,
+          sellingPrice: prod.price,
         },
         create: {
           productId: p.id,
           batchNumber: batchNo,
-          initialStock: prod.stock,
-          currentStock: prod.stock,
-          buyPrice: prod.cost,
-          sellPrice: prod.price,
-          inDate: new Date(),
+          quantity: prod.stock,
+          remainingQty: prod.stock,
+          costPrice: prod.cost,
+          sellingPrice: prod.price,
+          purchaseDate: new Date(),
         },
       });
       console.log(`  [Product] ${prod.name} (Rp ${prod.price.toLocaleString("id-ID")})`);

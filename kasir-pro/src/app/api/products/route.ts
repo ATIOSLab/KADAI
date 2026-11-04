@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createProductSchema } from "@/lib/validators/product";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { ADMIN_MANAGER_ROLES, INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ZodError } from "zod";
 
 function normalizeUnitName(name: string) {
@@ -32,6 +32,9 @@ export async function GET(request: NextRequest) {
       }),
       ...(categoryId && { categoryId }),
     };
+
+    const sessionUser = getSessionUserFromRequest(request);
+    const isCashier = sessionUser?.role === "CASHIER";
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -61,8 +64,16 @@ export async function GET(request: NextRequest) {
           ? Number(product.batches[0].sellingPrice)
           : null;
 
+      const safeBatches = isCashier
+        ? product.batches.map((b: any) => {
+            const { costPrice: _c, ...rest } = b;
+            return rest;
+          })
+        : product.batches;
+
       return {
         ...product,
+        batches: safeBatches,
         totalStock,
         currentSellingPrice,
         pricingBatches: product.batches.map((batch) => ({
@@ -100,7 +111,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat menambah produk" },
         { status: 403 }

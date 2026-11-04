@@ -23,7 +23,7 @@ interface ProfileData {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "MANAGER" | "CASHIER";
+  role: "ADMIN" | "MANAGER" | "CASHIER" | "KITCHEN" | "INVENTORY" | "ACCOUNTANT";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -46,15 +46,15 @@ const dateTimeFormatter = new Intl.DateTimeFormat("id-ID", {
 });
 
 function getRoleLabel(role: ProfileData["role"]) {
-  if (role === "ADMIN") {
-    return "Administrator";
-  }
-
-  if (role === "MANAGER") {
-    return "Manager";
-  }
-
-  return "Kasir";
+  const labels: Record<ProfileData["role"], string> = {
+    ADMIN: "Administrator",
+    MANAGER: "Manager",
+    CASHIER: "Kasir",
+    KITCHEN: "Dapur & Bar",
+    INVENTORY: "Staf Gudang",
+    ACCOUNTANT: "Akuntan",
+  };
+  return labels[role] ?? role;
 }
 
 function formatDate(value: string | null, withTime = false) {

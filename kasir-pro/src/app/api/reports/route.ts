@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { FINANCE_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { getDefaultDashboardRange, getCurrentWeekRange, getWeekRangeFromDate } from "@/lib/dashboard-periods";
 import { getReportSnapshot } from "@/lib/reporting";
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, FINANCE_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat mengakses laporan" },
         { status: 403 }

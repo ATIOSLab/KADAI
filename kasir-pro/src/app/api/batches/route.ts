@@ -9,7 +9,7 @@ import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
   getSystemFinanceCategoryId,
 } from "@/lib/finance";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ZodError } from "zod";
 
 // POST /api/batches — Create new batch (restock)
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat melakukan restock" },
         { status: 403 }

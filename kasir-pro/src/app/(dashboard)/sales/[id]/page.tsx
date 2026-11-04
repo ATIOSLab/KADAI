@@ -371,18 +371,22 @@ export default function SaleDetailPage({
               </span>
             </div>
             <hr className="border-border-default" />
-            <div className="flex justify-between text-sm text-text-muted">
-              <span>HPP</span>
-              <span>{formatCurrency(Number(sale.totalCost))}</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-accent-success">
-              <span>Gross Profit</span>
-              <span>{formatCurrency(grossProfit)}</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-accent-success">
-              <span>Margin</span>
-              <span>{marginPercent}%</span>
-            </div>
+            {user?.role !== "CASHIER" && (
+              <>
+                <div className="flex justify-between text-sm text-text-muted">
+                  <span>HPP</span>
+                  <span>{formatCurrency(Number(sale.totalCost))}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-accent-success">
+                  <span>Gross Profit</span>
+                  <span>{formatCurrency(grossProfit)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-accent-success">
+                  <span>Margin</span>
+                  <span>{marginPercent}%</span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -439,8 +443,8 @@ export default function SaleDetailPage({
         onOpenChange={setShowPinModal}
         title="Otorisasi Void Transaksi"
         description="Kasir memerlukan otorisasi Manager atau Pemilik Toko untuk membatalkan transaksi ini."
-        onAuthorized={(supervisor: any) => {
-          setSupervisorPin("SUPERVISOR_APPROVED");
+        onAuthorized={(_supervisor: any, pin: string) => {
+          setSupervisorPin(pin);
           setShowVoid(true);
         }}
       />

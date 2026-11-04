@@ -107,7 +107,9 @@ export default function InventoryPage() {
   const lowStockCount = inventory.filter((p) => p.isLowStock).length;
 
   const canManageInventory =
-    user?.role === "ADMIN" || user?.role === "MANAGER";
+    user?.role === "ADMIN" ||
+    user?.role === "MANAGER" ||
+    user?.role === "INVENTORY";
 
   return (
     <div className="space-y-6 animate-slide-up">

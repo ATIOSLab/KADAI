@@ -16,6 +16,7 @@ export const checkoutSchema = z.object({
   tableId: z.string().optional().nullable(),
   paymentRef: z.string().optional().nullable(),
   customerName: z.string().optional().nullable(),
+  customerId: z.string().optional().nullable(),
   discountAmount: z.number().min(0).default(0),
   notes: z.string().max(500).optional().nullable(),
 });

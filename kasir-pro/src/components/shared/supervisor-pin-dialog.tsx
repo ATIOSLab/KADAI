@@ -19,7 +19,10 @@ interface SupervisorPinDialogProps {
   onOpenChange: (open: boolean) => void;
   title?: string;
   description?: string;
-  onAuthorized: (supervisor: { id: string; name: string; role: string }) => void;
+  onAuthorized: (
+    supervisor: { id: string; name: string; role: string },
+    pin: string
+  ) => void;
 }
 
 export function SupervisorPinDialog({
@@ -55,7 +58,8 @@ export function SupervisorPinDialog({
       }
 
       toast.success(data.message || "Otorisasi berhasil");
-      onAuthorized(data.supervisor);
+      const verifiedPin = pin;
+      onAuthorized(data.supervisor, verifiedPin);
       setPin("");
       onOpenChange(false);
     } catch {

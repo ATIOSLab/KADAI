@@ -6,8 +6,8 @@ import { logActivity } from "@/lib/activity-logger";
 import { deleteProductImageByUrl } from "@/lib/product-image";
 import { getSessionUserFromRequest } from "@/lib/session";
 import {
-  ADMIN_MANAGER_ROLES,
   ADMIN_ONLY_ROLES,
+  INVENTORY_ROLES,
   hasRequiredRole,
 } from "@/lib/rbac";
 import { ZodError } from "zod";
@@ -27,7 +27,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat melihat detail produk" },
         { status: 403 }
@@ -82,7 +82,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat mengubah produk" },
         { status: 403 }

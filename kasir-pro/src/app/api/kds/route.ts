@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
+import { KDS_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasRequiredRole(sessionUser.role, KDS_ROLES)) {
+      return NextResponse.json(
+        { error: "Role Anda tidak dapat mengakses KDS" },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -52,6 +60,13 @@ export async function PUT(req: NextRequest) {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasRequiredRole(sessionUser.role, KDS_ROLES)) {
+      return NextResponse.json(
+        { error: "Role Anda tidak dapat memperbarui tiket dapur" },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();

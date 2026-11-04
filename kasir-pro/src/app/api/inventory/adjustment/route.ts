@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/activity-logger";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { z } from "zod";
 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat melakukan adjustment stok" },
         { status: 403 }
@@ -86,6 +86,13 @@ export async function GET(request: NextRequest) {
     const sessionUser = getSessionUserFromRequest(request);
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return NextResponse.json(
+        { error: "Role Anda tidak dapat melihat riwayat adjustment stok" },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(request.url);

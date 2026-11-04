@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { ADMIN_MANAGER_ROLES, INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 // GET /api/suppliers
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser) {
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

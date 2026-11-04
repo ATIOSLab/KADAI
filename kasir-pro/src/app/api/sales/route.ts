@@ -260,6 +260,7 @@ export async function POST(request: NextRequest) {
           paymentType: data.paymentType,
           paymentRef: data.paymentRef,
           customerName: data.customerName,
+          customerId: data.customerId || null,
           notes: data.notes,
           cashierId: sessionUser.id,
           items: {
@@ -367,6 +368,20 @@ export async function POST(request: NextRequest) {
           saleId: sale.id,
         },
       });
+
+      // 8. Update customer CRM stats
+      if (data.customerId) {
+        const loyaltyEarned = Math.floor(Number(totalAmount) / 10000);
+        await tx.customer.update({
+          where: { id: data.customerId },
+          data: {
+            totalSpent: { increment: totalAmount },
+            visitCount: { increment: 1 },
+            loyaltyPoints: { increment: loyaltyEarned },
+            lastVisitAt: new Date(),
+          },
+        });
+      }
 
       return sale;
     }, {

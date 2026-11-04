@@ -14,6 +14,7 @@ const publicPaths = [
   "/api/auth/logout",
   "/api/auth/register",
   "/api/order",
+  "/api/telegram/webhook",
 ];
 
 export function proxy(request: NextRequest) {

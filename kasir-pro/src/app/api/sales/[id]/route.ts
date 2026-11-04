@@ -50,6 +50,16 @@ export async function GET(
       );
     }
 
+    // Mask HPP / Gross Profit for CASHIER role
+    if (sessionUser.role === "CASHIER") {
+      const maskedSale = {
+        ...sale,
+        totalCost: 0,
+        grossProfit: 0,
+      };
+      return NextResponse.json({ data: maskedSale });
+    }
+
     return NextResponse.json({ data: sale });
   } catch (error) {
     console.error("GET /api/sales/[id] error:", error);

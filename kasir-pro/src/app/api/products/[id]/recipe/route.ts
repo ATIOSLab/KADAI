@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
-import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { Decimal } from "@prisma/client/runtime/library";
 
 // GET /api/products/[id]/recipe
@@ -13,6 +13,13 @@ export async function GET(
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return NextResponse.json(
+        { error: "Role Anda tidak dapat melihat resep produk" },
+        { status: 403 }
+      );
     }
 
     const { id } = await params;
@@ -99,7 +106,7 @@ export async function PUT(
 ) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

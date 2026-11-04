@@ -143,7 +143,11 @@ export async function getSystemFinanceCategoryId(
 }
 
 export function canAccessFinance(user: SessionUser | null) {
-  return user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
+  return (
+    user?.role === UserRole.ADMIN ||
+    user?.role === UserRole.MANAGER ||
+    user?.role === UserRole.ACCOUNTANT
+  );
 }
 
 export function assertFinanceAccess(user: SessionUser | null) {

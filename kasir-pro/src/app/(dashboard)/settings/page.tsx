@@ -124,11 +124,18 @@ export default function SettingsPage() {
     mode: "add" | "edit";
     userId?: string;
   }>({ open: false, mode: "add" });
-  const [userForm, setUserForm] = useState({
+  const [userForm, setUserForm] = useState<{
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    supervisorPin: string;
+  }>({
     name: "",
     email: "",
     password: "",
     role: "CASHIER",
+    supervisorPin: "",
   });
   const [savingUser, setSavingUser] = useState(false);
 
@@ -302,7 +309,13 @@ export default function SettingsPage() {
 
   // ── Open Add User Dialog ──
   const openAddUser = () => {
-    setUserForm({ name: "", email: "", password: "", role: "CASHIER" });
+    setUserForm({
+      name: "",
+      email: "",
+      password: "",
+      role: "CASHIER",
+      supervisorPin: "",
+    });
     setUserDialog({ open: true, mode: "add" });
   };
 
@@ -313,6 +326,7 @@ export default function SettingsPage() {
       email: user.email,
       password: "",
       role: user.role,
+      supervisorPin: "",
     });
     setUserDialog({ open: true, mode: "edit", userId: user.id });
   };
@@ -333,7 +347,10 @@ export default function SettingsPage() {
       if (userDialog.mode === "add") {
         await apiFetch("/api/users", {
           method: "POST",
-          body: userForm,
+          body: {
+            ...userForm,
+            supervisorPin: userForm.supervisorPin || undefined,
+          },
         });
         toast.success("Pengguna berhasil ditambahkan!");
       } else {
@@ -343,6 +360,7 @@ export default function SettingsPage() {
           role: userForm.role,
         };
         if (userForm.password) payload.password = userForm.password;
+        if (userForm.supervisorPin) payload.supervisorPin = userForm.supervisorPin;
 
         await apiFetch(`/api/users/${userDialog.userId}`, {
           method: "PUT",
@@ -1059,6 +1077,35 @@ export default function SettingsPage() {
                     ]}
                   />
                 </div>
+                {(userForm.role === "ADMIN" ||
+                  userForm.role === "MANAGER") && (
+                  <div className="space-y-2">
+                    <Label>
+                      PIN Supervisor (6-8 digit)
+                    </Label>
+                    <Input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={8}
+                      value={userForm.supervisorPin}
+                      onChange={(e) =>
+                        setUserForm({
+                          ...userForm,
+                          supervisorPin: e.target.value.replace(/\D/g, ""),
+                        })
+                      }
+                      placeholder={
+                        userDialog.mode === "edit"
+                          ? "Kosongkan jika tidak ingin mengubah"
+                          : "Default 123456 jika kosong"
+                      }
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      PIN digunakan untuk otorisasi void transaksi & diskon
+                      besar oleh Kasir.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </DialogBody>

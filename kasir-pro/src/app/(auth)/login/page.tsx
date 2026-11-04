@@ -35,7 +35,18 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      const role = data.data?.role;
+      const homePath =
+        role === "CASHIER"
+          ? "/pos"
+          : role === "KITCHEN"
+            ? "/kds"
+            : role === "INVENTORY"
+              ? "/inventory"
+              : role === "ACCOUNTANT"
+                ? "/finance"
+                : "/dashboard";
+      router.push(homePath);
       router.refresh();
     } catch {
       setError("Terjadi kesalahan. Silakan coba lagi.");

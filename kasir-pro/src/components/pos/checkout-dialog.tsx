@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Banknote,
   Building2,
@@ -72,14 +72,14 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [success, setSuccess] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
 
-  useState(() => {
+  useEffect(() => {
     fetch("/api/tables")
       .then((res) => res.json())
       .then((data) => {
         if (data.data) setTablesList(data.data);
       })
       .catch(() => {});
-  });
+  }, []);
 
   const grandTotal = getGrandTotal();
   const changeAmount =

@@ -4,17 +4,15 @@ import { useState } from "react";
 import {
   ShoppingCart,
   UtensilsCrossed,
-  Building,
-  Sparkles,
+  Scissors,
+  Stethoscope,
   CheckCircle2,
-  Barcode,
   ArrowRight,
   ShieldCheck,
   Receipt,
   Layers,
   ChefHat,
-  Scissors,
-  Stethoscope,
+  Sparkles,
 } from "lucide-react";
 
 interface VerticalData {
@@ -161,7 +159,7 @@ export function IndustrySolutionsTabs() {
   return (
     <div className="w-full space-y-8">
       {/* Sector Navigation Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-3xl mx-auto border border-slate-200">
+      <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-900/80 rounded-2xl max-w-3xl mx-auto border border-white/10 backdrop-blur-md">
         {VERTICALS.map((v) => {
           const VIcon = v.icon;
           const isActive = activeVertical === v.id;
@@ -170,13 +168,13 @@ export function IndustrySolutionsTabs() {
               key={v.id}
               type="button"
               onClick={() => setActiveVertical(v.id)}
-              className={`flex-1 min-w-[130px] sm:min-w-[160px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${
+              className={`flex-1 min-w-[130px] sm:min-w-[160px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 isActive
-                  ? "bg-white text-slate-950 shadow-sm border border-slate-200/80 scale-[1.02]"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                  ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 scale-[1.02]"
+                  : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
               }`}
             >
-              <VIcon className={`size-4 ${isActive ? "text-orange-600" : "text-slate-500"}`} />
+              <VIcon className={`size-4 ${isActive ? "text-white" : "text-slate-400"}`} />
               <span className="truncate">{v.name}</span>
             </button>
           );
@@ -184,50 +182,50 @@ export function IndustrySolutionsTabs() {
       </div>
 
       {/* Active Sector Deep-Dive Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-8 max-w-5xl mx-auto">
+      <div className="bg-slate-900/60 rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] p-6 sm:p-8 space-y-8 max-w-5xl mx-auto backdrop-blur-xl">
         {/* Top Header of Sector */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-400 bg-orange-950/60 border border-orange-500/30 px-2.5 py-1 rounded-md">
               <IconComponent className="size-3.5" />
               <span>{selected.badge}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-950">{selected.title}</h3>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">{selected.title}</h3>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-3xl leading-relaxed">
               {selected.description}
             </p>
           </div>
 
-          <div className="shrink-0 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-left md:text-right">
+          <div className="shrink-0 bg-slate-950/80 p-3.5 rounded-xl border border-white/10 text-left md:text-right">
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Klaster Terverifikasi</div>
-            <div className="text-xs font-black text-slate-900 mt-0.5">{selected.clusterRef}</div>
+            <div className="text-xs font-black text-orange-400 mt-0.5">{selected.clusterRef}</div>
           </div>
         </div>
 
         {/* Feature Highlights Bento */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {selected.highlights.map((h, i) => (
-            <div key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
-              <div className="size-7 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs font-mono">
+            <div key={i} className="bg-slate-950/60 p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-orange-500/30 transition-colors">
+              <div className="size-7 rounded-lg bg-orange-950/80 text-orange-400 border border-orange-500/30 flex items-center justify-center font-bold text-xs font-mono">
                 0{i + 1}
               </div>
-              <h4 className="font-bold text-sm text-slate-950">{h.title}</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">{h.desc}</p>
+              <h4 className="font-bold text-sm text-white">{h.title}</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">{h.desc}</p>
             </div>
           ))}
         </div>
 
         {/* Specs & Performance Metrics Bar */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-slate-100 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-white/[0.08] items-center">
           {/* Specs Checklist */}
           <div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
               Fitur Bawaan Standar
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-300">
               {selected.specs.map((spec, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
                   <span>{spec}</span>
                 </div>
               ))}
@@ -235,7 +233,7 @@ export function IndustrySolutionsTabs() {
           </div>
 
           {/* Real Metrics Telemetry */}
-          <div className="grid grid-cols-3 gap-2 bg-slate-900 text-white p-4 rounded-xl">
+          <div className="grid grid-cols-3 gap-2 bg-slate-950 p-4 rounded-xl border border-white/10">
             {selected.metrics.map((m, i) => (
               <div key={i} className="text-center space-y-1">
                 <div className="text-[10px] text-slate-400 font-medium">{m.label}</div>

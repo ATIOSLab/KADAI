@@ -55,26 +55,26 @@ export function FaqAccordion() {
         return (
           <div
             key={idx}
-            className="rounded-xl border border-slate-200 bg-white overflow-hidden transition-all duration-150"
+            className="rounded-xl border border-white/10 bg-slate-900/60 overflow-hidden transition-all duration-200 backdrop-blur-md hover:border-white/20"
           >
             <button
               type="button"
               onClick={() => toggle(idx)}
-              className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-900 text-sm sm:text-base hover:bg-slate-50 transition-colors"
+              className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-white text-sm sm:text-base hover:bg-white/[0.03] transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2.5">
-                <HelpCircle className="size-4 text-orange-600 shrink-0" />
+                <HelpCircle className="size-4 text-orange-400 shrink-0" />
                 <span>{faq.question}</span>
               </span>
               <ChevronDown
                 className={`size-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                  isOpen ? "rotate-180 text-orange-600" : ""
+                  isOpen ? "rotate-180 text-orange-400" : ""
                 }`}
               />
             </button>
 
             {isOpen && (
-              <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/40">
+              <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/[0.06] bg-slate-950/40">
                 {faq.answer}
               </div>
             )}

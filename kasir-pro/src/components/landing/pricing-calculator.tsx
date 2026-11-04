@@ -92,14 +92,14 @@ export function PricingCalculator() {
     <div className="w-full space-y-8">
       {/* Billing Switcher */}
       <div className="flex flex-col items-center justify-center gap-2">
-        <div className="inline-flex items-center gap-3 p-1.5 bg-slate-200/70 rounded-full border border-slate-300/80">
+        <div className="inline-flex items-center gap-3 p-1.5 bg-slate-900/90 rounded-full border border-white/10 backdrop-blur-md">
           <button
             type="button"
             onClick={() => setBillingCycle("monthly")}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               billingCycle === "monthly"
                 ? "bg-white text-slate-950 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             Bulanan
@@ -107,22 +107,22 @@ export function PricingCalculator() {
           <button
             type="button"
             onClick={() => setBillingCycle("annual")}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               billingCycle === "annual"
-                ? "bg-orange-600 text-white shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                ? "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <span>Tahunan</span>
-            <span className="bg-orange-200 text-orange-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
+            <span className="bg-orange-300 text-orange-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
               HEMAT 20%
             </span>
           </button>
         </div>
-        <p className="text-xs text-slate-500 font-medium">
+        <p className="text-xs text-slate-400 font-medium">
           {billingCycle === "annual"
-            ? "Penagihan tahunan dengan potongan harga 20% + gratis migrasi data."
-            : "Fleksibel tanpa komitmen jangka panjang, batalkan kapan saja."}
+            ? "Penagihan tahunan dengan diskon 20% + gratis migrasi data dari sistem lama."
+            : "Fleksibel tanpa kontrak jangka panjang, batalkan kapan saja."}
         </p>
       </div>
 
@@ -133,14 +133,14 @@ export function PricingCalculator() {
           return (
             <div
               key={idx}
-              className={`flex flex-col justify-between rounded-2xl p-6 transition-all duration-200 ${
+              className={`flex flex-col justify-between rounded-2xl p-6 transition-all duration-300 ${
                 p.highlight
-                  ? "bg-slate-950 text-white ring-2 ring-orange-500 shadow-xl scale-[1.02] relative"
-                  : "bg-white text-slate-950 border border-slate-200 shadow-sm hover:shadow-md"
+                  ? "bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white border-2 border-orange-500 shadow-[0_0_40px_rgba(234,88,12,0.25)] scale-[1.02] relative"
+                  : "bg-slate-900/60 text-slate-100 border border-white/10 hover:border-white/20 hover:bg-slate-900/80 shadow-md backdrop-blur-md"
               }`}
             >
               {p.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[10px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-600 to-amber-600 text-white text-[10px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-lg shadow-orange-600/40 flex items-center gap-1">
                   <Sparkles className="size-3" /> Rekomendasi Utama
                 </div>
               )}
@@ -149,10 +149,10 @@ export function PricingCalculator() {
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <h4 className="text-lg font-black">{p.name}</h4>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                       p.highlight
-                        ? "bg-slate-800 text-orange-400 border border-slate-700"
-                        : "bg-slate-100 text-slate-600"
+                        ? "bg-orange-950/80 text-orange-400 border-orange-500/40"
+                        : "bg-slate-800 text-slate-400 border-white/10"
                     }`}
                   >
                     {p.badge}
@@ -161,49 +161,39 @@ export function PricingCalculator() {
 
                 <p
                   className={`text-xs mb-5 min-h-[36px] ${
-                    p.highlight ? "text-slate-400" : "text-slate-500"
+                    p.highlight ? "text-slate-300" : "text-slate-400"
                   }`}
                 >
                   {p.desc}
                 </p>
 
-                <div className="mb-6 pb-6 border-b border-slate-200/20">
+                <div className="mb-6 pb-6 border-b border-white/10">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xs font-semibold text-slate-400">Rp</span>
-                    <span className="text-3xl font-black font-mono">
+                    <span className="text-3xl font-black font-mono text-white">
                       {currentPrice.toLocaleString("id-ID")}
                     </span>
-                    <span
-                      className={`text-xs ${
-                        p.highlight ? "text-slate-400" : "text-slate-500"
-                      }`}
-                    >
-                      /bln
-                    </span>
+                    <span className="text-xs text-slate-400">/bln</span>
                   </div>
                   {billingCycle === "annual" && currentPrice > 0 && (
-                    <div className="text-[11px] text-emerald-500 font-semibold mt-1">
+                    <div className="text-[11px] text-emerald-400 font-semibold mt-1">
                       Ditagih tahunan (Rp {(currentPrice * 12).toLocaleString("id-ID")}/thn)
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2.5 mb-8">
-                  <div
-                    className={`text-[11px] font-bold uppercase tracking-wider ${
-                      p.highlight ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  >
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     Fitur Yang Termasuk:
                   </div>
                   {p.features.map((feat, fIdx) => (
                     <div key={fIdx} className="flex items-start gap-2.5 text-xs">
                       <Check
                         className={`size-4 shrink-0 mt-0.5 ${
-                          p.highlight ? "text-orange-400" : "text-emerald-600"
+                          p.highlight ? "text-orange-400" : "text-emerald-400"
                         }`}
                       />
-                      <span className={p.highlight ? "text-slate-200" : "text-slate-700"}>
+                      <span className={p.highlight ? "text-slate-200" : "text-slate-300"}>
                         {feat}
                       </span>
                     </div>
@@ -213,10 +203,10 @@ export function PricingCalculator() {
 
               <Link
                 href={p.ctaLink}
-                className={`w-full py-3 px-4 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5 shadow-sm ${
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   p.highlight
-                    ? "bg-orange-600 hover:bg-orange-500 text-white shadow-orange-900/30"
-                    : "bg-slate-900 hover:bg-slate-800 text-white"
+                    ? "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white shadow-lg shadow-orange-600/30"
+                    : "bg-slate-800 hover:bg-slate-700 text-white border border-white/10"
                 }`}
               >
                 <span>{p.cta}</span>

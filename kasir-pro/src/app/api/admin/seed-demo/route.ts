@@ -5,6 +5,7 @@ import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import bcrypt from "bcryptjs";
 import { ProductType, StationType, UserRole } from "@prisma/client";
 import path from "path";
+import fs from "fs";
 
 // POST /api/admin/seed-demo
 // Secured endpoint: Only authenticated ADMIN or valid setup secret can trigger cluster seeding
@@ -27,7 +28,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 });
     }
 
-    const seedPath = path.resolve(process.cwd(), "prisma/seed-demo-clusters.js");
+    const candidates = [
+      "/app/prisma/seed-demo-clusters.js",
+      path.resolve(process.cwd(), "prisma/seed-demo-clusters.js"),
+      path.resolve(__dirname, "../../../../prisma/seed-demo-clusters.js")
+    ];
+    let seedPath = candidates.find(p => fs.existsSync(p));
+    if (!seedPath) {
+      return NextResponse.json({ error: "File seed-demo-clusters.js tidak ditemukan di container. Candidates: " + JSON.stringify(candidates) }, { status: 500 });
+    }
     const demoModule = require(seedPath);
     if (typeof demoModule === "function") {
       await demoModule();

@@ -5,7 +5,7 @@ import { canAccessPath, getDefaultPathForRole } from "@/lib/rbac";
 import { isCsrfSafe, SECURITY_HEADERS, CSP_HEADER } from "@/lib/security";
 
 const publicPages = ["/", "/login", "/register", "/pricing", "/order"];
-const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook"];
+const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook", "/api/admin/seed-demo"];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 
 export async function proxy(request: NextRequest) {
@@ -17,8 +17,8 @@ export async function proxy(request: NextRequest) {
     return response;
   };
   const isApi = pathname.startsWith("/api/");
-  // Webhook has its own shared-secret authentication, not browser cookies.
-  if (isApi && pathname !== "/api/telegram/webhook" &&
+  // Webhook and Seed have their own shared-secret authentication, not browser cookies.
+  if (isApi && pathname !== "/api/telegram/webhook" && pathname !== "/api/admin/seed-demo" &&
       !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))) {
     return secure(NextResponse.json({ error: "CSRF validation failed" }, { status: 403 }));
   }

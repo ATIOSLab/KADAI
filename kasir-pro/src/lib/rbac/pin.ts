@@ -10,8 +10,8 @@ export async function verifySupervisorPin(
   supervisor?: { id: string; name: string; role: string };
   error?: string;
 }> {
-  if (!pin || pin.length < 4 || pin.length > 8) {
-    return { valid: false, error: "PIN harus berupa 4-8 digit angka" };
+  if (!/^\d{6,8}$/.test(pin)) {
+    return { valid: false, error: "PIN harus berupa 6-8 digit angka" };
   }
 
   // A07: Rate limit PIN attempts — prevent brute force

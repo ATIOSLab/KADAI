@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { redactCosts, SALES_READ_ROLES } from "@/app/api/_lib/access";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { checkoutSchema } from "@/lib/validators/sale";
@@ -15,7 +16,7 @@ import {
 } from "@/lib/finance";
 import { Decimal } from "@prisma/client/runtime/library";
 import { getSessionUserFromRequest } from "@/lib/session";
-import { ADMIN_CASHIER_ROLES, ALL_AUTHENTICATED_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ZodError } from "zod";
 
 // GET /api/sales — List sales
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ALL_AUTHENTICATED_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, SALES_READ_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat melihat transaksi" },
         { status: 403 }
@@ -38,9 +39,18 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const paymentType = searchParams.get("paymentType");
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+    const page = Number(searchParams.get("page") || "1");
+    const limit = Number(searchParams.get("limit") || "20");
+    if (!Number.isSafeInteger(page) || page < 1 || page > 100000 ||
+        !Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+      return NextResponse.json({ error: "Pagination tidak valid" }, { status: 400 });
+    }
 
+    if ((paymentType && !["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET"].includes(paymentType)) ||
+        [startDate, endDate].some((d) => d !== null &&
+          (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !Number.isFinite(Date.parse(d))))) {
+      return NextResponse.json({ error: "Filter tidak valid" }, { status: 400 });
+    }
     const where = {
       ...(search && {
         OR: [
@@ -77,7 +87,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      data: sales,
+      data: redactCosts(sales, sessionUser.role),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
@@ -103,6 +113,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const data = checkoutSchema.parse(body);
+    if (data.items.length > 100 || data.items.some((item) => item.quantity > 10000 ||
+        item.discountAmount > 1e12) || data.discountAmount > 1e12) {
+      return NextResponse.json({ error: "Batas transaksi terlampaui" }, { status: 400 });
+    }
 
     // Process sale in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -122,7 +136,9 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (product?.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
+        if (!product?.isActive) throw new Error("Produk tidak tersedia");
+
+        if (product.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
           // F&B Manufactured Product with Recipe (e.g. Dimsum, Kopi)
           // Deduct from raw material ingredients' batches via FIFO!
           let itemCost = new Decimal(0);
@@ -140,7 +156,13 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          const unitSellingPrice = new Decimal(item.unitPrice);
+          // Manufactured prices must also come from the server, never the POS body.
+          const priceBatch = await tx.productBatch.findFirst({
+            where: { productId: product.id, remainingQty: { gt: 0 } },
+            orderBy: { purchaseDate: "asc" },
+          });
+          if (!priceBatch) throw new Error("Harga produk belum tersedia");
+          const unitSellingPrice = priceBatch.sellingPrice;
           const lineRevenue = unitSellingPrice.mul(item.quantity);
           const itemDiscount = new Decimal(item.discountAmount || 0);
           const itemTotalPrice = lineRevenue.sub(itemDiscount);
@@ -210,6 +232,9 @@ export async function POST(request: NextRequest) {
       const transactionDiscount = new Decimal(data.discountAmount || 0);
       const discountAmount = itemDiscountTotal.add(transactionDiscount);
       const netSubtotal = subtotal.sub(discountAmount);
+      if (netSubtotal.isNegative() || processedItems.some((item) => item.totalPrice.isNegative())) {
+        throw new Error("Diskon melebihi nilai transaksi");
+      }
 
       let serviceCharge = new Decimal(0);
       if (serviceRate > 0) {
@@ -400,7 +425,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, data: result }, { status: 201 });
+    return NextResponse.json({ success: true, data: redactCosts(result, sessionUser.role) }, { status: 201 });
   } catch (error) {
     console.error("POST /api/sales error:", error);
     if (error instanceof ZodError) {
@@ -414,6 +439,6 @@ export async function POST(request: NextRequest) {
       message.includes("Stok tidak cukup") || message.includes("Kurang")
         ? 400
         : 500;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: status === 400 ? "Stok tidak mencukupi" : "Gagal membuat transaksi" }, { status });
   }
 }

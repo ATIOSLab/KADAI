@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validImageContent, validUploadUrl } from "@/app/api/_lib/access";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import {
   deleteProductImageByUrl,
@@ -23,6 +24,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (Number(request.headers.get("content-length")) > 6 * 1024 * 1024) {
+      return NextResponse.json({ error: "Upload terlalu besar" }, { status: 413 });
+    }
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -33,6 +37,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (file.size === 0 || file.size > 5 * 1024 * 1024 ||
+        !validImageContent(new Uint8Array(await file.arrayBuffer()), file.type)) {
+      return NextResponse.json({ error: "Isi file gambar tidak valid" }, { status: 400 });
+    }
     const uploaded = await saveProductImage(file);
 
     return NextResponse.json({
@@ -44,8 +52,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("POST /api/uploads/products error:", error);
-    const message =
-      error instanceof Error ? error.message : "Gagal mengupload gambar produk";
+    const message = "Gagal mengupload gambar produk";
 
     return NextResponse.json({ error: message }, { status: 400 });
   }
@@ -71,7 +78,7 @@ export async function DELETE(request: NextRequest) {
         ? body.url.trim()
         : null;
 
-    if (!imageUrl) {
+    if (!validUploadUrl(imageUrl)) {
       return NextResponse.json(
         { error: "URL gambar wajib dikirim" },
         { status: 400 }

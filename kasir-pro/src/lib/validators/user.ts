@@ -2,14 +2,14 @@ import { z } from "zod";
 
 export const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
+  password: z.string().min(6, "Password minimal 6 karakter").max(72),
 });
 
 export const createUserSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
   email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
-  supervisorPin: z.string().min(4).max(8).optional().nullable(),
+  password: z.string().min(6, "Password minimal 6 karakter").max(72),
+  supervisorPin: z.string().regex(/^\d{6,8}$/, "PIN harus 6-8 digit angka").optional().nullable(),
   role: z.enum(["ADMIN", "MANAGER", "CASHIER", "KITCHEN", "INVENTORY", "ACCOUNTANT"]).default("CASHIER"),
   avatar: z.string().optional().nullable(),
 });
@@ -18,7 +18,7 @@ export const updateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
   password: z.string().min(6).optional(),
-  supervisorPin: z.string().min(4).max(8).optional().nullable(),
+  supervisorPin: z.string().regex(/^\d{6,8}$/, "PIN harus 6-8 digit angka").optional().nullable(),
   role: z.enum(["ADMIN", "MANAGER", "CASHIER", "KITCHEN", "INVENTORY", "ACCOUNTANT"]).optional(),
   isActive: z.boolean().optional(),
   avatar: z.string().optional().nullable(),

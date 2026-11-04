@@ -22,6 +22,9 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (!hasRequiredRole(sessionUser.role, ["ADMIN", "MANAGER", "CASHIER"])) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const { id } = await params;
     const body = await request.json();
     const { reason } = voidSaleSchema.parse(body);
@@ -66,12 +69,21 @@ export async function POST(
       return NextResponse.json({ error: "Transaksi tidak ditemukan" }, { status: 404 });
     }
 
+    if (sessionUser.role === "CASHIER" && sale.cashierId !== sessionUser.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     if (sale.isVoided) {
       return NextResponse.json({ error: "Transaksi sudah di-void" }, { status: 400 });
     }
 
     // Restore stock in transaction
     await prisma.$transaction(async (tx) => {
+      // Atomic claim prevents concurrent requests from restoring stock twice.
+      const claim = await tx.sale.updateMany({
+        where: { id, isVoided: false },
+        data: { isVoided: true },
+      });
+      if (claim.count !== 1) throw new Error("SALE_ALREADY_VOIDED");
       // Mark sale as voided
       const voidedSale = await tx.sale.update({
         where: { id },

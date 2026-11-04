@@ -1,97 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  canAccessPath,
-  getDefaultPathForRole,
-  parseSessionCookie,
-} from "@/lib/rbac";
+import { parseSessionUser } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import { canAccessPath, getDefaultPathForRole } from "@/lib/rbac";
 import { isCsrfSafe, SECURITY_HEADERS, CSP_HEADER } from "@/lib/security";
 
-const publicPaths = [
-  "/login",
-  "/register",
-  "/pricing",
-  "/order",
-  "/api/auth/login",
-  "/api/auth/logout",
-  "/api/auth/register",
-  "/api/order",
-  "/api/telegram/webhook",
-];
+const publicPages = ["/", "/login", "/register", "/pricing", "/order"];
+const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook"];
+const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // A05: Add security headers to every response
-  const response = NextResponse.next();
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    response.headers.set(key, value);
-  }
-  response.headers.set("Content-Security-Policy", CSP_HEADER);
-
-  // Allow landing page
-  if (pathname === "/") {
+  const secure = (response: NextResponse) => {
+    for (const [key, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(key, value);
+    response.headers.set("Content-Security-Policy", CSP_HEADER);
+    if (pathname.startsWith("/api/")) response.headers.set("Cache-Control", "no-store");
     return response;
+  };
+  const isApi = pathname.startsWith("/api/");
+  // Webhook has its own shared-secret authentication, not browser cookies.
+  if (isApi && pathname !== "/api/telegram/webhook" &&
+      !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))) {
+    return secure(NextResponse.json({ error: "CSRF validation failed" }, { status: 403 }));
   }
-
-  // Allow public paths
-  if (publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-    // A04: CSRF check for state-changing requests on non-auth public endpoints
-    if (
-      pathname.startsWith("/api/") &&
-      !pathname.startsWith("/api/auth/") &&
-      !pathname.startsWith("/api/order") &&
-      !pathname.startsWith("/api/telegram") &&
-      !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))
-    ) {
-      return NextResponse.json({ error: "CSRF validation failed" }, { status: 403 });
+  if ((!isApi && publicPages.some(p => pathname === p || (p !== "/" && matches(pathname, p)))) ||
+      (isApi && publicApis.some(p => matches(pathname, p)))) {
+    return secure(NextResponse.next());
+  }
+  // Never bypass authentication merely because a path contains a dot.
+  const user = parseSessionUser(request.cookies.get("session")?.value);
+  if (!user) {
+    return secure(isApi ? NextResponse.json({ error: "Unauthorized" }, { status: 401 }) :
+      NextResponse.redirect(new URL("/login", request.url)));
+  }
+  // Revalidate authoritative identity on every protected request: a role change,
+  // password update or deactivation immediately invalidates the signed cookie.
+  try {
+    const current = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { isActive: true, role: true, updatedAt: true },
+    });
+    if (!current?.isActive || current.role !== user.role || current.updatedAt.toISOString() !== user.version) {
+      const denied = isApi ? NextResponse.json({ error: "Session expired" }, { status: 401 }) :
+        NextResponse.redirect(new URL("/login", request.url));
+      denied.cookies.delete("session");
+      return secure(denied);
     }
-    return response;
+  } catch {
+    return secure(NextResponse.json({ error: "Authentication service unavailable" }, { status: 503 }));
   }
-
-  // Allow static files and internal paths
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.includes(".")
-  ) {
-    return response;
+  if (!isApi && !canAccessPath(pathname, user.role)) {
+    return secure(NextResponse.redirect(new URL(getDefaultPathForRole(user.role), request.url)));
   }
-
-  // A04: CSRF protection — verify Origin header for state-changing requests
-  if (
-    pathname.startsWith("/api/") &&
-    !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))
-  ) {
-    return NextResponse.json(
-      { error: "CSRF validation failed — Origin mismatch" },
-      { status: 403 }
-    );
-  }
-
-  // Check session cookie
-  const sessionValue = request.cookies.get("session")?.value;
-  const sessionUser = parseSessionCookie(sessionValue);
-
-  if (!sessionUser) {
-    // Redirect to login for page requests
-    if (!pathname.startsWith("/api")) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    // Return 401 for API requests
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (!pathname.startsWith("/api") && !canAccessPath(pathname, sessionUser.role)) {
-    return NextResponse.redirect(
-      new URL(getDefaultPathForRole(sessionUser.role), request.url)
-    );
-  }
-
-  return response;
+  return secure(NextResponse.next());
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|uploads).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.json|window.svg|vercel.svg|next.svg|globe.svg|file.svg|uploads/).*)"],
 };
+

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { redactCosts, SALES_READ_ROLES } from "@/app/api/_lib/access";
 import { prisma } from "@/lib/prisma";
-import { ALL_AUTHENTICATED_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 
 // GET /api/sales/[id] — Sale detail with batch allocations
@@ -14,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ALL_AUTHENTICATED_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, SALES_READ_ROLES)) {
       return NextResponse.json(
         { error: "Role Anda tidak dapat melihat transaksi" },
         { status: 403 }
@@ -50,17 +51,7 @@ export async function GET(
       );
     }
 
-    // Mask HPP / Gross Profit for CASHIER role
-    if (sessionUser.role === "CASHIER") {
-      const maskedSale = {
-        ...sale,
-        totalCost: 0,
-        grossProfit: 0,
-      };
-      return NextResponse.json({ data: maskedSale });
-    }
-
-    return NextResponse.json({ data: sale });
+    return NextResponse.json({ data: redactCosts(sale, sessionUser.role) });
   } catch (error) {
     console.error("GET /api/sales/[id] error:", error);
     return NextResponse.json({ error: "Gagal memuat detail transaksi" }, { status: 500 });

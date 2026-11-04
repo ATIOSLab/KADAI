@@ -1,4 +1,4 @@
-import { verifyAndParseSession } from "@/lib/security";
+
 
 export const APP_ROLES = [
   "ADMIN",
@@ -106,28 +106,3 @@ export function canAccessPath(pathname: string, role: string | null | undefined)
   return hasRequiredRole(role, allowedRoles);
 }
 
-export function parseSessionCookie(
-  value?: string | null
-): SessionPayload | null {
-  if (!value) {
-    return null;
-  }
-
-  // A02: Verify HMAC signature before trusting cookie payload
-  const parsed = verifyAndParseSession<Partial<SessionPayload>>(value);
-  if (!parsed) {
-    return null;
-  }
-
-  if (
-    typeof parsed.id !== "string" ||
-    typeof parsed.name !== "string" ||
-    typeof parsed.email !== "string" ||
-    typeof parsed.role !== "string" ||
-    !isAppRole(parsed.role)
-  ) {
-    return null;
-  }
-
-  return parsed as SessionPayload;
-}

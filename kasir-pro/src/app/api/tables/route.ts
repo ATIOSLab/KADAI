@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { hasRequiredRole, ADMIN_MANAGER_ROLES } from "@/lib/rbac";
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const qrToken = `table-${tableNo.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${Date.now().toString(36)}`;
+    const qrToken = randomUUID();
 
     const table = await prisma.restaurantTable.create({
       data: {

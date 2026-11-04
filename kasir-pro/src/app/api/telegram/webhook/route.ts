@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import {
   enqueueTelegramUpdate,
   getTelegramWebhookSecret,
@@ -24,17 +25,20 @@ export async function POST(request: NextRequest) {
     const secretHeader = request.headers.get("x-telegram-bot-api-secret-token");
     const expectedSecret = getTelegramWebhookSecret();
 
-    if (!expectedSecret || secretHeader !== expectedSecret) {
+    if (!expectedSecret || !secretHeader ||
+        Buffer.byteLength(secretHeader) !== Buffer.byteLength(expectedSecret) ||
+        !timingSafeEqual(Buffer.from(secretHeader), Buffer.from(expectedSecret))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const update = (await request.json()) as TelegramUpdate;
-    if (!update.update_id) {
+    if (!update || !Number.isSafeInteger(update.update_id) || Number(update.update_id) < 0) {
       return NextResponse.json({ ok: true });
     }
 
     const chat = update.message?.chat;
-    if (chat?.id) {
+    if (chat?.id && (typeof chat.id === "number" || typeof chat.id === "string") &&
+        /^-?\d{1,20}$/.test(String(chat.id))) {
       const titleParts = [chat.first_name, chat.last_name].filter(Boolean).join(" ");
       await registerTelegramChatCandidate({
         telegramChatId: String(chat.id),

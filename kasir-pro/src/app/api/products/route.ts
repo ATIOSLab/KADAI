@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { redactCosts } from "@/app/api/_lib/access";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { createProductSchema } from "@/lib/validators/product";
@@ -17,8 +18,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const categoryId = searchParams.get("categoryId") || undefined;
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+    const page = Number(searchParams.get("page") || "1");
+    const limit = Number(searchParams.get("limit") || "20");
+    if (!Number.isSafeInteger(page) || page < 1 || page > 100000 ||
+        !Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+      return NextResponse.json({ error: "Pagination tidak valid" }, { status: 400 });
+    }
     const skip = (page - 1) * limit;
 
     const where = {
@@ -34,7 +39,7 @@ export async function GET(request: NextRequest) {
     };
 
     const sessionUser = getSessionUserFromRequest(request);
-    const isCashier = sessionUser?.role === "CASHIER";
+    if (!sessionUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -64,12 +69,7 @@ export async function GET(request: NextRequest) {
           ? Number(product.batches[0].sellingPrice)
           : null;
 
-      const safeBatches = isCashier
-        ? product.batches.map((b: any) => {
-            const { costPrice: _c, ...rest } = b;
-            return rest;
-          })
-        : product.batches;
+      const safeBatches = product.batches;
 
       return {
         ...product,
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: productsWithStock,
+      data: redactCosts(productsWithStock, sessionUser.role),
       pagination: {
         page,
         limit,

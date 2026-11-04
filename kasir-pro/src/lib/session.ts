@@ -9,6 +9,7 @@ const sessionUserSchema = z.object({
   name: z.string().min(1),
   email: z.email(),
   role: z.nativeEnum(UserRole),
+  version: z.string().min(1),
 });
 
 export type SessionUser = z.infer<typeof sessionUserSchema>;

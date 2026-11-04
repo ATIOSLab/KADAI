@@ -6,13 +6,14 @@ import { createHmac, timingSafeEqual } from "crypto";
 // Session cookie MUST be HMAC-signed to prevent forgery.
 // Format: base64(payload).base64(hmac)
 
-const SESSION_SECRET =
-  process.env.BETTER_AUTH_SECRET ||
-  process.env.NEXTAUTH_SECRET ||
-  "kadai-dev-secret-change-in-production-please";
+export const SESSION_TTL_SECONDS = 8 * 60 * 60;
 
 function getSecret(): string {
-  return SESSION_SECRET;
+  const secret = process.env.BETTER_AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    throw new Error("Session signing requires a secret of at least 32 bytes");
+  }
+  return secret;
 }
 
 function hmacSign(data: string): string {
@@ -20,7 +21,7 @@ function hmacSign(data: string): string {
 }
 
 export function signSession(payload: Record<string, unknown>): string {
-  const payloadStr = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const payloadStr = Buffer.from(JSON.stringify({ ...payload, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS })).toString("base64url");
   const signature = hmacSign(payloadStr);
   return `${payloadStr}.${signature}`;
 }
@@ -28,7 +29,7 @@ export function signSession(payload: Record<string, unknown>): string {
 export function verifyAndParseSession<T = Record<string, unknown>>(
   token: string | null | undefined
 ): T | null {
-  if (!token) return null;
+  if (!token || token.length > 4096) return null;
 
   const parts = token.split(".");
   if (parts.length !== 2) return null;
@@ -49,7 +50,12 @@ export function verifyAndParseSession<T = Record<string, unknown>>(
 
   try {
     const decoded = Buffer.from(payloadPart, "base64url").toString("utf8");
-    return JSON.parse(decoded) as T;
+    const parsed: unknown = JSON.parse(decoded);
+    if (!parsed || typeof parsed !== "object" || !("exp" in parsed) || !("iat" in parsed)) return null;
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof parsed.exp !== "number" || typeof parsed.iat !== "number" ||
+        parsed.exp <= now || parsed.iat > now || parsed.exp - parsed.iat > SESSION_TTL_SECONDS) return null;
+    return parsed as T;
   } catch {
     return null;
   }
@@ -107,6 +113,9 @@ export function checkRateLimit(
 
   // Reset window if expired
   if (!entry || now > entry.resetAt) {
+    if (rateLimitMap.size >= 10000 && !entry) {
+      return { allowed: false, remaining: 0, retryAfterSeconds: 300, locked: true };
+    }
     rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
     return { allowed: true, remaining: maxAttempts - 1, retryAfterSeconds: 0, locked: false };
   }
@@ -156,7 +165,7 @@ export function isCsrfSafe(
     const originUrl = new URL(origin);
     const hostUrl = new URL(host.startsWith("http") ? host : `https://${host}`);
 
-    return originUrl.hostname === hostUrl.hostname;
+    return ["https:", "http:"].includes(originUrl.protocol) && originUrl.host === hostUrl.host;
   } catch {
     return false;
   }
@@ -178,7 +187,7 @@ export const SECURITY_HEADERS: Record<string, string> = {
 
 export const CSP_HEADER =
   "default-src 'self'; " +
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+  "script-src 'self' 'unsafe-inline'; " +
   "style-src 'self' 'unsafe-inline'; " +
   "img-src 'self' data: blob: https:; " +
   "font-src 'self' data:; " +

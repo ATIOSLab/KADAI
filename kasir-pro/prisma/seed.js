@@ -61,7 +61,7 @@ function getAdminSeedConfig() {
   return {
     name: process.env.ADMIN_NAME || "Admin Kadai",
     email: process.env.ADMIN_EMAIL || "admin@kadai.com",
-    password: process.env.ADMIN_PASSWORD || "admin123",
+    password: process.env.ADMIN_PASSWORD,
     role: UserRole.ADMIN,
   };
 }
@@ -200,8 +200,13 @@ async function ensureAdminUser() {
     };
   }
 
+  if (!admin.password || admin.password.length < 12) {
+    throw new Error("Set ADMIN_PASSWORD with at least 12 characters before initial seeding");
+  }
   const passwordHash = await bcrypt.hash(admin.password, 12);
-  const supervisorPinHash = await bcrypt.hash("123456", 10);
+  const pin = process.env.ADMIN_SUPERVISOR_PIN;
+  if (pin && !/^\d{6,8}$/.test(pin)) throw new Error("ADMIN_SUPERVISOR_PIN must be 6-8 digits");
+  const supervisorPinHash = pin ? await bcrypt.hash(pin, 12) : null;
 
   await prisma.user.create({
     data: {
@@ -233,7 +238,7 @@ async function main() {
   console.log("Seed selesai.");
   console.log(`Admin: ${admin.email}`);
   if (admin.created) {
-    console.log(`Password awal: ${admin.password}`);
+    console.log("Admin dibuat. Gunakan kredensial provisioning yang telah ditetapkan.");
   } else {
     console.log("User admin sudah ada. Password lama dipertahankan.");
   }

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/lib/validators/user";
-import { signSession, checkRateLimit, resetRateLimit, sanitizeError } from "@/lib/security";
+import { signSession, checkRateLimit, resetRateLimit, sanitizeError, SESSION_TTL_SECONDS } from "@/lib/security";
 import { logActivity } from "@/lib/activity-logger";
+import { ZodError } from "zod";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,11 @@ export async function POST(request: NextRequest) {
       request.headers.get("x-real-ip") ||
       "unknown";
 
-    const rateLimitKey = `login:${email.toLowerCase()}:${clientIp}`;
+    const rateLimitKey = `login:account:${email.toLowerCase()}`;
+    const ipLimit = checkRateLimit(`login:ip:${clientIp}`, 30, 15 * 60 * 1000, 30 * 60 * 1000);
+    if (!ipLimit.allowed) return NextResponse.json({ error: "Terlalu banyak percobaan login" }, {
+      status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) },
+    });
     const rateLimit = checkRateLimit(rateLimitKey, 5, 15 * 60 * 1000, 30 * 60 * 1000);
 
     if (!rateLimit.allowed) {
@@ -55,7 +60,7 @@ export async function POST(request: NextRequest) {
     resetRateLimit(rateLimitKey);
 
     // Update last login
-    await prisma.user.update({
+    const authenticatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
@@ -66,6 +71,7 @@ export async function POST(request: NextRequest) {
       name: user.name,
       email: user.email,
       role: user.role,
+      version: authenticatedUser.updatedAt.toISOString(),
     };
 
     // A02: Sign session with HMAC — prevent cookie forgery
@@ -81,7 +87,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: SESSION_TTL_SECONDS,
     });
 
     // A09: Log successful login
@@ -95,6 +101,9 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    if (error instanceof ZodError || error instanceof SyntaxError) {
+      return NextResponse.json({ error: "Input login tidak valid" }, { status: 400 });
+    }
     const message = sanitizeError(error, "Terjadi kesalahan saat login");
     return NextResponse.json({ error: message }, { status: 500 });
   }

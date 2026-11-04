@@ -30,6 +30,10 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 RUN chmod +x ./docker/start.sh
 RUN chmod +x ./docker/start-worker.sh
+RUN addgroup -S -g 1001 kadai && adduser -S -u 1001 -G kadai kadai \
+    && mkdir -p /app/public/uploads /app/.next/cache \
+    && chown -R kadai:kadai /app/public/uploads /app/.next
+USER kadai
 
 EXPOSE 3000
 

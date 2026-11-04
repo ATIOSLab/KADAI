@@ -249,11 +249,15 @@ async function seedDemoClusters() {
   console.log("\n=== Semua Klaster Demo Klien Berhasil Dibuat! ===");
 }
 
-seedDemoClusters()
-  .catch((e) => {
-    console.error("Error seeding demo clusters:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+module.exports = seedDemoClusters;
+
+if (require.main === module) {
+  seedDemoClusters()
+    .catch((e) => {
+      console.error("Error seeding demo clusters:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

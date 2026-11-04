@@ -6,11 +6,12 @@ node ./docker/wait-for-db.cjs
 echo "Applying Prisma schema..."
 npx prisma db push --accept-data-loss
 
+echo "Running multi-vertical demo clusters seed..."
+node prisma/seed-demo-clusters.js || echo "Demo seed completed with warnings/skipped"
+
 if [ "${RUN_SEED_ON_START:-false}" = "true" ] || [ "${SEED_ON_START:-false}" = "true" ]; then
   echo "RUN_SEED_ON_START=true -> running minimal seed"
   npm run db:seed
-  echo "Running multi-vertical demo clusters seed..."
-  npm run db:seed:demo || echo "Demo seed completed with warnings/skipped"
 fi
 
 if [ -n "${TELEGRAM_WEBHOOK_SECRET:-}" ] && [ -n "${APP_BASE_URL:-}" ]; then

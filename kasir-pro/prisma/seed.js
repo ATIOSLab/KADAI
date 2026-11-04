@@ -242,6 +242,17 @@ async function main() {
   } else {
     console.log("User admin sudah ada. Password lama dipertahankan.");
   }
+
+  // Auto seed multi-vertical client demo clusters
+  try {
+    console.log("Memulai integrasi demo clusters...");
+    const demoModule = require("./seed-demo-clusters.js");
+    if (typeof demoModule === "function") {
+      await demoModule();
+    }
+  } catch (err) {
+    console.warn("Demo clusters auto-seed notice:", err.message);
+  }
 }
 
 main()

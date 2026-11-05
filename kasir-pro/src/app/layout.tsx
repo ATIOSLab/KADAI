@@ -77,6 +77,41 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const schemaGraph = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://kadai.asia/#organization",
+      "name": "KADAI",
+      "url": "https://kadai.asia",
+      "logo": "https://kadai.asia/icon.svg",
+      "sameAs": ["https://github.com/ATIOSLab/KADAI"],
+      "founder": {
+        "@type": "Organization",
+        "name": "ATIOSLab",
+      },
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://kadai.asia/#software",
+      "name": "KADAI Enterprise POS & ERP",
+      "operatingSystem": "Web, Windows, macOS, Android, iOS",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Point of Sale & Supply Chain Management",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "IDR",
+        "lowPrice": "0",
+        "highPrice": "599000",
+        "offerCount": "4",
+      },
+      "description":
+        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM.",
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,6 +119,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={cn("font-sans antialiased", geistSans.variable, geistMono.variable)}>
+      <head>
+        <script
+          type="application/ld+json"
+        >
+          {JSON.stringify(schemaGraph)}
+        </script>
+      </head>
       <body className="min-h-screen antialiased bg-slate-50 text-slate-900 selection:bg-primary/20">
         <PwaRegister />
         {children}

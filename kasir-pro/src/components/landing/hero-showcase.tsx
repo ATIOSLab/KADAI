@@ -1,28 +1,84 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const BACKGROUND_SLIDES = [
+  {
+    url: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1920&q=80",
+    label: "Kafe & Restoran Modern",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1920&q=80",
+    label: "Toko Ritel & Gerai Cabang",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1920&q=80",
+    label: "Dapur Komersial & Produksi",
+  },
+] as const;
 
 export function HeroShowcase({
   dashboardPath,
 }: {
   dashboardPath: string | null;
 }) {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Auto-advance slide every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % BACKGROUND_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handlePrev = () => {
+    setActiveSlide((prev) => (prev - 1 + BACKGROUND_SLIDES.length) % BACKGROUND_SLIDES.length);
+  };
+
+  const handleNext = () => {
+    setActiveSlide((prev) => (prev + 1) % BACKGROUND_SLIDES.length);
+  };
+
   return (
-    <section className="relative overflow-hidden py-12 sm:py-20 px-4 sm:px-6 border-b border-border bg-gradient-to-b from-card via-card to-background w-full">
-      <div className="max-w-4xl mx-auto text-center space-y-6">
+    <section className="relative overflow-hidden py-14 sm:py-20 md:py-24 px-4 sm:px-6 border-b border-border w-full">
+      {/* 3-Slide Dynamic Background Image Layer with Smooth Crossfade */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        {BACKGROUND_SLIDES.map((slide, index) => (
+          <div
+            key={slide.url}
+            className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out transform ${
+              activeSlide === index
+                ? "opacity-20 scale-105"
+                : "opacity-0 scale-100"
+            }`}
+            style={{
+              backgroundImage: `url('${slide.url}')`,
+            }}
+          />
+        ))}
+        {/* Harmonious Dual-Gradient Scrim for crisp text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-card/90 via-card/80 to-background backdrop-blur-[2px]" />
+      </div>
+
+      {/* Main Hero Content */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
         {/* Animated Badge */}
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200/90 text-slate-800 text-xs font-semibold shadow-xs"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/90 text-slate-800 text-xs font-semibold shadow-xs backdrop-blur-xs"
         >
           <Sparkles className="size-3.5 text-primary shrink-0" />
           <span>Sistem Operasi Bisnis & POS Multi-Cabang Indonesia</span>
@@ -84,7 +140,7 @@ export function HeroShowcase({
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-slate-50"
+                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-slate-50 bg-white/80 backdrop-blur-xs"
               >
                 <Link href="/login">Masuk ke Toko Anda</Link>
               </Button>
@@ -99,31 +155,72 @@ export function HeroShowcase({
           transition={{ duration: 0.6, delay: 0.4 }}
           className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-xl mx-auto text-left w-full"
         >
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/90 border border-slate-200/90 shadow-xs backdrop-blur-xs">
             <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-800">
               Kepatuhan Standar SAK EMKM RI & PPh Final 0.5%
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/90 border border-slate-200/90 shadow-xs backdrop-blur-xs">
             <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-800">
               Otomatisasi Pajak Restoran PB1 10% & PPN 11%
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/90 border border-slate-200/90 shadow-xs backdrop-blur-xs">
             <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-800">
               Self-Order QR Mandiri & Layar Dapur KDS Real-time
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/90 border border-slate-200/90 shadow-xs backdrop-blur-xs">
             <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-800">
               Multi-Cabang, Transfer Stok & Hak Akses 6-Role RBAC
             </span>
           </div>
         </motion.div>
+
+        {/* Subtle Background Slide Navigation Controls */}
+        <div className="pt-4 flex items-center justify-center gap-3 text-xs text-slate-500">
+          <button
+            onClick={handlePrev}
+            className="p-1 rounded-full hover:bg-slate-200/70 text-slate-600 transition-colors"
+            title="Slide Sebelumnya"
+            aria-label="Slide Sebelumnya"
+          >
+            <ChevronLeft className="size-3.5" />
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {BACKGROUND_SLIDES.map((slide, idx) => (
+              <button
+                key={slide.url}
+                onClick={() => setActiveSlide(idx)}
+                className={`transition-all rounded-full ${
+                  activeSlide === idx
+                    ? "w-6 h-1.5 bg-primary"
+                    : "w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400"
+                }`}
+                title={slide.label}
+                aria-label={slide.label}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            className="p-1 rounded-full hover:bg-slate-200/70 text-slate-600 transition-colors"
+            title="Slide Berikutnya"
+            aria-label="Slide Berikutnya"
+          >
+            <ChevronRight className="size-3.5" />
+          </button>
+
+          <span className="text-[11px] font-mono text-slate-400 ml-1">
+            {BACKGROUND_SLIDES[activeSlide].label}
+          </span>
+        </div>
       </div>
     </section>
   );

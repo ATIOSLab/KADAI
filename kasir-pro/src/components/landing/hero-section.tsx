@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, UtensilsCrossed, Store, Warehouse } from "lucide-react";
+import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -141,21 +141,21 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             >
               <Link href={dashboardPath} className="flex items-center gap-2">
                 <span>Buka Dashboard Operasional</span>
-                <ArrowRight className="size-4 shrink-0" />
+                <ArrowUpRight className="size-4 shrink-0" />
               </Link>
             </Button>
           ) : (
             <>
-              {/* Compound Capsule Button (GetLayers style) */}
+              {/* Compound Capsule Button (GetLayers + Hexus ArrowUpRight) */}
               <Link
                 href="/register"
                 className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
               >
-                <span className="font-bold text-xs sm:text-sm tracking-tight">
+                <span className="font-semibold text-xs sm:text-sm tracking-tight">
                   Mulai Uji Coba Gratis 14 Hari
                 </span>
-                <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-                  <ArrowRight className="size-4" />
+                <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <ArrowUpRight className="size-4" />
                 </span>
               </Link>
 
@@ -163,7 +163,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto font-semibold text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
+                className="w-full sm:w-auto font-medium text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
               >
                 <Link href="/login">Masuk ke Toko Anda</Link>
               </Button>
@@ -197,141 +197,160 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* Interactive Mockup Container Window Frame (Light Luxury Glass) */}
-      <div className="rounded-[28px] luxury-glass-card shadow-2xl overflow-hidden border border-slate-200/90">
-        {/* Top Browser Bar */}
-        <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="size-2.5 rounded-full bg-red-500 inline-block" />
-            <span className="size-2.5 rounded-full bg-amber-500 inline-block" />
-            <span className="size-2.5 rounded-full bg-emerald-500 inline-block" />
-            <span className="font-mono text-slate-300 ml-2 text-[11px] font-semibold">
-              kadai.os // {current.path}
+      {/* Interactive Mockup Container Window Frame (Light Luxury Glass with Hexus Layered Depth) */}
+      <div className="relative">
+        <div className="rounded-[28px] luxury-glass-card shadow-2xl overflow-hidden border border-slate-200/90">
+          {/* Top Browser Bar */}
+          <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="size-2.5 rounded-full bg-red-500 inline-block" />
+              <span className="size-2.5 rounded-full bg-amber-500 inline-block" />
+              <span className="size-2.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="font-mono text-slate-300 ml-2 text-[11px] font-semibold">
+                kadai.os // {current.path}
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+              Realtime Operational Engine
             </span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-            Realtime Operational Engine
-          </span>
-        </div>
 
-        {/* Split Cockpit View */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
-          {/* Left Side: Dark Culinary / Operational Scene with Scrim */}
-          <div className="lg:col-span-6 relative p-6 sm:p-10 flex flex-col justify-end overflow-hidden min-h-[280px] lg:min-h-full">
-            <Image
-              src={current.photoUrl}
-              alt={current.title}
-              fill
-              unoptimized
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            {/* Scrim Gradasi Gelap Sinematik */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
+          {/* Split Cockpit View */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
+            {/* Left Side: Dark Culinary / Operational Scene with Scrim */}
+            <div className="lg:col-span-6 relative p-6 sm:p-10 flex flex-col justify-end overflow-hidden min-h-[280px] lg:min-h-full">
+              <Image
+                src={current.photoUrl}
+                alt={current.title}
+                fill
+                unoptimized
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              {/* Scrim Gradasi Gelap Sinematik */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
 
-            <div className="relative z-10 space-y-3">
-              <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-full">
-                {current.tag}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-                {current.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg font-normal">
-                {current.desc}
-              </p>
+              <div className="relative z-10 space-y-3">
+                <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-full">
+                  {current.tag}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                  {current.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg font-normal">
+                  {current.desc}
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side: Live Digital Thermal Receipt Card */}
+            <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
+              <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+                {/* Receipt Header */}
+                <CardHeader className="p-0 flex flex-row items-center justify-between border-b border-slate-100 pb-3 space-y-0">
+                  <CardTitle className="font-bold text-sm text-slate-950">
+                    {current.receipt.table}
+                  </CardTitle>
+                  <Badge
+                    variant="outline"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"
+                  >
+                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{current.receipt.status}</span>
+                  </Badge>
+                </CardHeader>
+
+                <div className="text-[11px] text-slate-500">
+                  {current.receipt.meta}
+                </div>
+
+                {/* Items Table */}
+                <CardContent className="p-0 space-y-2.5 text-xs">
+                  {current.receipt.items.map((it, i) => (
+                    <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
+                      <div>
+                        <span className="font-semibold text-slate-900 block">{it.name}</span>
+                        <span className="text-[10px] text-slate-500">{it.bom}</span>
+                      </div>
+                      <span className="font-semibold tabular-nums text-slate-900">{it.price}</span>
+                    </div>
+                  ))}
+
+                  {current.receipt.pb1 !== "Rp 0" && (
+                    <div className="flex justify-between items-center text-slate-600 pt-1">
+                      <span>Pajak Daerah Resto PB1 (10%)</span>
+                      <span className="font-medium tabular-nums">{current.receipt.pb1}</span>
+                    </div>
+                  )}
+
+                  {current.receipt.service !== "Rp 0" && (
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span>Biaya Layanan (5%)</span>
+                      <span className="font-medium tabular-nums">{current.receipt.service}</span>
+                    </div>
+                  )}
+
+                  {/* Total */}
+                  <div className="flex justify-between items-center text-sm font-bold text-slate-950 pt-3 border-t border-slate-200">
+                    <span>TOTAL TAGIHAN</span>
+                    <span className="text-primary font-bold text-base sm:text-lg tabular-nums">
+                      {current.receipt.total}
+                    </span>
+                  </div>
+                </CardContent>
+
+                {/* Receipt Footer */}
+                <CardFooter className="p-0 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+                  <span>{current.receipt.footer}</span>
+                  <span className="font-semibold text-slate-700">KADAI POS</span>
+                </CardFooter>
+              </Card>
             </div>
           </div>
 
-          {/* Right Side: Live Digital Thermal Receipt Card */}
-          <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
-            <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
-              {/* Receipt Header */}
-              <CardHeader className="p-0 flex flex-row items-center justify-between border-b border-slate-100 pb-3 space-y-0">
-                <CardTitle className="font-bold text-sm text-slate-950">
-                  {current.receipt.table}
-                </CardTitle>
-                <Badge
-                  variant="outline"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"
-                >
-                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{current.receipt.status}</span>
-                </Badge>
-              </CardHeader>
-
-              <div className="text-[11px] text-slate-500">
-                {current.receipt.meta}
-              </div>
-
-              {/* Items Table */}
-              <CardContent className="p-0 space-y-2.5 text-xs">
-                {current.receipt.items.map((it, i) => (
-                  <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
-                    <div>
-                      <span className="font-semibold text-slate-900 block">{it.name}</span>
-                      <span className="text-[10px] text-slate-500">{it.bom}</span>
-                    </div>
-                    <span className="font-semibold tabular-nums text-slate-900">{it.price}</span>
-                  </div>
-                ))}
-
-                {current.receipt.pb1 !== "Rp 0" && (
-                  <div className="flex justify-between items-center text-slate-600 pt-1">
-                    <span>Pajak Daerah Resto PB1 (10%)</span>
-                    <span className="font-medium tabular-nums">{current.receipt.pb1}</span>
-                  </div>
-                )}
-
-                {current.receipt.service !== "Rp 0" && (
-                  <div className="flex justify-between items-center text-slate-600">
-                    <span>Biaya Layanan (5%)</span>
-                    <span className="font-medium tabular-nums">{current.receipt.service}</span>
-                  </div>
-                )}
-
-                {/* Total */}
-                <div className="flex justify-between items-center text-sm font-bold text-slate-950 pt-3 border-t border-slate-200">
-                  <span>TOTAL TAGIHAN</span>
-                  <span className="text-primary font-bold text-base sm:text-lg tabular-nums">
-                    {current.receipt.total}
-                  </span>
-                </div>
-              </CardContent>
-
-              {/* Receipt Footer */}
-              <CardFooter className="p-0 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
-                <span>{current.receipt.footer}</span>
-                <span className="font-semibold text-slate-700">KADAI POS</span>
-              </CardFooter>
-            </Card>
+          {/* Bottom 3 Performance Metrics Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
+            <div className="p-4 text-center">
+              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                {current.metric1.label}
+              </span>
+              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                {current.metric1.val}
+              </span>
+            </div>
+            <div className="p-4 text-center">
+              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                {current.metric2.label}
+              </span>
+              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                {current.metric2.val}
+              </span>
+            </div>
+            <div className="p-4 text-center">
+              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                {current.metric3.label}
+              </span>
+              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                {current.metric3.val}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Bottom 3 Performance Metrics Bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
-          <div className="p-4 text-center">
-            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-              {current.metric1.label}
-            </span>
-            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-              {current.metric1.val}
-            </span>
+        {/* Floating Realtime KPI Badge (Hexus Layered Depth Pattern) */}
+        <div className="hidden sm:flex absolute -bottom-4 right-6 z-20 items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 shadow-xl shadow-slate-900/[0.08]">
+          <div className="size-9 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">
+            <TrendingUp className="size-4" />
           </div>
-          <div className="p-4 text-center">
-            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-              {current.metric2.label}
-            </span>
-            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-              {current.metric2.val}
-            </span>
-          </div>
-          <div className="p-4 text-center">
-            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-              {current.metric3.label}
-            </span>
-            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-              {current.metric3.val}
-            </span>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Akurasi HPP FIFO & BOM</span>
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
+            <div className="text-xs font-bold text-slate-950 tabular-nums flex items-baseline gap-1.5">
+              <span>99.8% Efisiensi Teruji</span>
+              <span className="text-[10px] font-semibold text-emerald-600 font-normal">• Live Multi-Batch</span>
+            </div>
           </div>
         </div>
       </div>

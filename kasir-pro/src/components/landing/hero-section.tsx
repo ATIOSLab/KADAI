@@ -107,7 +107,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
   return (
     <section className="relative w-full overflow-hidden">
       {/* 1. Full-Width Background Slider Banner (Full Viewport Width Behind Hero Text) */}
-      <div className="relative w-full min-h-[580px] sm:min-h-[640px] md:min-h-[700px] flex items-center justify-center pt-16 sm:pt-20 pb-20 sm:pb-24 px-4 sm:px-6">
+      <div className="relative w-full min-h-[520px] sm:min-h-[580px] md:min-h-[620px] flex items-center justify-center pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6">
         {/* Full-bleed background carousel */}
         <HeroBackgroundSlider
           currentSlide={activeTab}
@@ -183,7 +183,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       </div>
 
       {/* 2. Interactive Operational Cockpit Section (Unobstructed, Clean Vertical Flow) */}
-      <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-12 pb-16 sm:pb-24 space-y-6">
+      <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
         {/* 3 Operational Switcher Tabs (Centered Segmented Control) */}
         <div className="flex items-center justify-center overflow-x-auto pb-1">
           <div className="inline-flex p-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md gap-1.5">

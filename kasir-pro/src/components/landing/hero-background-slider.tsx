@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 export interface HeroSlide {
   id: string;
@@ -114,56 +113,6 @@ export function HeroBackgroundSlider({
       {/* Top and Bottom Linear Fade Masks into Page Background */}
       <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-b from-[#F8FAFC]/95 via-transparent to-[#F8FAFC]" />
       <div className="absolute inset-x-0 bottom-0 h-48 z-20 pointer-events-none bg-gradient-to-t from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent" />
-
-      {/* Slide Navigation Overlay Controls (Positioned at bottom center of the hero banner) */}
-      <div className="absolute bottom-6 inset-x-0 z-30 flex items-center justify-center gap-2">
-        {/* Active Scene Badge */}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 shadow-md text-[11px] font-semibold text-white">
-          <Sparkles className="size-3 text-primary" />
-          <span>{HERO_SLIDES[currentSlide].badge}</span>
-        </div>
-
-        {/* Carousel Arrow Controls */}
-        <div className="flex items-center gap-1 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-md">
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="Slide Sebelumnya"
-            className="size-7 rounded-full flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
-
-          {/* Indicator Dots */}
-          <div className="flex items-center gap-1.5 px-2">
-            {HERO_SLIDES.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onSlideChange(i);
-                }}
-                aria-label={`Buka Slide ${i + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  i === currentSlide
-                    ? "w-6 bg-primary"
-                    : "w-2 bg-white/40 hover:bg-white/70"
-                }`}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Slide Berikutnya"
-            className="size-7 rounded-full flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

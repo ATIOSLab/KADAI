@@ -57,15 +57,15 @@ export function HeroShowcase({
   const current = BACKGROUND_SLIDES[activeSlide];
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24 md:py-28 px-4 sm:px-6 border-b border-slate-800 bg-slate-950 text-white w-full">
-      {/* 3-Slide Full-Bleed Background Images with Smooth Crossfade */}
+    <section className="relative overflow-hidden py-16 sm:py-24 md:py-28 px-4 sm:px-6 border-b border-border bg-slate-950 text-white w-full">
+      {/* 3-Slide Full-Bleed Vivid Background Images with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         {BACKGROUND_SLIDES.map((slide, index) => (
           <div
             key={slide.url}
             className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform ${
               activeSlide === index
-                ? "opacity-35 scale-100"
+                ? "opacity-60 scale-100"
                 : "opacity-0 scale-105"
             }`}
             style={{
@@ -73,8 +73,9 @@ export function HeroShowcase({
             }}
           />
         ))}
-        {/* Harmonized Dark Gradient Scrim for crystal clear text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/75 to-slate-950" />
+        {/* Ambient Dark Scrim that preserves rich photo visibility while guaranteeing razor-sharp text */}
+        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[0.5px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-slate-950/90" />
       </div>
 
       {/* Main Hero Content - Direct Text without Box/Card */}
@@ -84,7 +85,7 @@ export function HeroShowcase({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-slate-200 text-xs font-semibold shadow-sm backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/80 text-slate-200 text-xs font-semibold shadow-sm backdrop-blur-md"
         >
           <Sparkles className="size-3.5 text-primary shrink-0" />
           <span>Sistem Operasi Bisnis, Kasir POS & Rantai Pasok Indonesia</span>
@@ -95,7 +96,7 @@ export function HeroShowcase({
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-white text-balance"
+          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-white text-balance drop-shadow-md"
         >
           Kelola Penjualan, Rantai Pasok, & Pembukuan dengan Akurasi Enterprise.
         </motion.h1>
@@ -105,7 +106,7 @@ export function HeroShowcase({
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-          className="text-sm sm:text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed text-balance"
+          className="text-sm sm:text-base md:text-lg text-slate-200 font-medium max-w-2xl mx-auto leading-relaxed text-balance drop-shadow-sm"
         >
           KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep
           Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan
@@ -146,7 +147,7 @@ export function HeroShowcase({
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-700 hover:bg-slate-900 bg-slate-900/60 text-slate-100 backdrop-blur-md"
+                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-700 hover:bg-slate-900 bg-slate-900/70 text-white shadow-xs backdrop-blur-md border"
               >
                 <Link href="/login">Masuk ke Toko Anda</Link>
               </Button>

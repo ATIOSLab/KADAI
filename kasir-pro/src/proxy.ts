@@ -17,6 +17,8 @@ const publicPages = [
   "/favicon.ico",
   "/manifest.json",
   "/sw.js",
+  "/images",
+  "/uploads",
 ];
 const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook", "/api/admin/seed-demo"];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);

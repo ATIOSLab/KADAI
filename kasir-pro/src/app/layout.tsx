@@ -1,13 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
 import "./globals.css";
 
-const geist = Geist({
+const geistSans = Geist({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -38,19 +45,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={cn("font-sans", geist.variable)}>
-      <body className="min-h-screen antialiased">
+    <html lang="id" className={cn("font-sans antialiased", geistSans.variable, geistMono.variable)}>
+      <body className="min-h-screen antialiased bg-slate-50 text-slate-900 selection:bg-primary/20">
         <PwaRegister />
         {children}
         <Toaster
           position="top-right"
+          richColors
           toastOptions={{
-            style: {
-              border: "2px solid #000",
-              boxShadow: "4px 4px 0px #000",
-              borderRadius: "0.5rem",
-              fontWeight: 700,
-            },
+            className: "font-sans text-xs border border-slate-200/90 shadow-md rounded-xl bg-white text-slate-900",
           }}
         />
       </body>

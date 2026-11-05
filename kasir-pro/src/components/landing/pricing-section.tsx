@@ -131,8 +131,8 @@ export function PricingSection() {
                   </span>
                 </div>
 
-                <CardContent className="p-0">
-                  <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                <CardContent className="p-0 flex-1">
+                  <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs text-slate-700 min-h-[170px]">
                     {plan.features.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <Check className="size-4 text-primary shrink-0 mt-0.5" />
@@ -145,7 +145,7 @@ export function PricingSection() {
                 </CardContent>
               </div>
 
-              <CardFooter className="p-0 pt-4 border-t border-slate-100">
+              <CardFooter className="p-0 pt-4 border-t border-slate-100 mt-auto">
                 <Button
                   asChild
                   className={`w-full font-bold text-xs h-10 rounded-xl transition-all ${

@@ -115,8 +115,8 @@ export function HeroBackgroundSlider({
       <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-b from-[#F8FAFC]/95 via-transparent to-[#F8FAFC]" />
       <div className="absolute inset-x-0 bottom-0 h-48 z-20 pointer-events-none bg-gradient-to-t from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent" />
 
-      {/* Slide Navigation Overlay Controls (Positioned at bottom right of the hero banner) */}
-      <div className="absolute bottom-6 right-6 sm:right-10 z-30 flex items-center gap-2">
+      {/* Slide Navigation Overlay Controls (Positioned at bottom center of the hero banner) */}
+      <div className="absolute bottom-6 inset-x-0 z-30 flex items-center justify-center gap-2">
         {/* Active Scene Badge */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 shadow-md text-[11px] font-semibold text-white">
           <Sparkles className="size-3 text-primary" />

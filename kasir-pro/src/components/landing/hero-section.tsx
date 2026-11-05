@@ -25,7 +25,7 @@ const SEGMENTS = [
     name: "Kafe & Restoran (F&B)",
     icon: UtensilsCrossed,
     path: "fnb-operational-engine",
-    photoUrl: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+    photoUrl: "/images/hero/slide-1.jpg",
     tag: "LINGKUNGAN OPERASIONAL",
     title: "Kasir POS Kilat, Resep BOM & Layar Dapur KDS",
     desc: "Pesanan meja langsung terhubung ke layar stasiun dapur & bar. HPP bahan baku terpotong otomatis per porsi laku.",
@@ -51,7 +51,7 @@ const SEGMENTS = [
     name: "Ritel & Minimarket",
     icon: Store,
     path: "retail-multi-batch-fifo",
-    photoUrl: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80",
+    photoUrl: "/images/hero/slide-3.jpg",
     tag: "MANAJEMEN PERSEDIAAN",
     title: "Kasir Barcode Cepat & Multi-Batch FIFO",
     desc: "Scan barcode USB/Bluetooth instan, pemantauan stok menipis, dan radar kadaluwarsa batch otomatis.",
@@ -77,7 +77,7 @@ const SEGMENTS = [
     name: "Dapur Pusat & Gudang",
     icon: Warehouse,
     path: "central-kitchen-routing",
-    photoUrl: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80",
+    photoUrl: "/images/hero/slide-2.jpg",
     tag: "RANTAI PASOK TERPUSAT",
     title: "Produksi Batch & Transfer Mutasi Cabang",
     desc: "Penerbitan surat jalan antar cabang, pencatatan produksi batch bahan baku setengah jadi, dan audit mutasi.",
@@ -184,7 +184,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
       {/* 2. Interactive Operational Cockpit Section (Unobstructed, Clean Vertical Flow) */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-12 pb-16 sm:pb-24 space-y-6">
-        {/* 3 Operational Switcher Tabs (Unified Cockpit Switcher) */}
+        {/* 3 Operational Switcher Tabs (Centered Segmented Control) */}
         <div className="flex items-center justify-center overflow-x-auto pb-1">
           <div className="inline-flex p-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md gap-1.5">
             {SEGMENTS.map((seg, idx) => {

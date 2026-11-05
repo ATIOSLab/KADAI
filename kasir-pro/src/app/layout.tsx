@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kadai.netkrida.cloud"),
+  metadataBase: new URL("https://kadai.asia"),
   title: {
     default: "KADAI - Enterprise POS & Rantai Pasok RI",
     template: "%s | KADAI Enterprise",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: "KADAI - Enterprise POS & Rantai Pasok RI",
     description:
       "Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda. Dilengkapi Kasir POS kilat, FIFO batch, dan kepatuhan fiskal RI.",
-    url: "https://kadai.netkrida.cloud",
+    url: "https://kadai.asia",
     siteName: "KADAI Operating System",
     locale: "id_ID",
     type: "website",

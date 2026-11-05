@@ -42,13 +42,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         {/* Center Navigation Links */}
         <nav
           aria-label="Navigasi Utama"
-          className="hidden sm:flex items-center gap-6 text-sm font-semibold text-slate-600"
+          className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600"
         >
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="hover:text-primary transition-colors font-medium text-slate-700 whitespace-nowrap"
+              className="hover:text-primary transition-colors font-medium text-slate-700 whitespace-nowrap text-xs sm:text-sm"
             >
               {link.label}
             </a>
@@ -56,15 +56,15 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         </nav>
 
         {/* Right Action Buttons */}
-        <div className="hidden sm:flex items-center gap-3 shrink-0">
+        <div className="hidden sm:flex items-center gap-2 shrink-0">
           {dashboardPath ? (
             <Button
               asChild
               size="sm"
-              className="font-bold text-xs h-9 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+              className="font-bold text-xs h-9 px-3.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
             >
               <Link href={dashboardPath} className="flex items-center gap-1.5">
-                <span>Buka Dashboard</span>
+                <span>Dashboard</span>
                 <ArrowRight className="size-3.5" />
               </Link>
             </Button>
@@ -74,14 +74,14 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 asChild
                 variant="ghost"
                 size="sm"
-                className="font-semibold text-xs h-9 px-3.5 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl"
+                className="font-semibold text-xs h-9 px-3 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl"
               >
                 <Link href="/login">Masuk</Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="font-bold text-xs h-9 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+                className="font-bold text-xs h-9 px-3.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
               >
                 <Link href="/register">Daftar Akun</Link>
               </Button>

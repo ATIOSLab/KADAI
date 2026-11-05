@@ -81,6 +81,52 @@
    Refined drop-in replacements for hairline elevation
    ============================================================ */
 
+/* ============================================================
+   KADAI LIQUID GLASS & ENTERPRISE TOKENS
+   Refined Light Liquid Glass Design System
+   ============================================================ */
+
+@layer utilities {
+  .glass-surface {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.70);
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+  }
+
+  .glass-surface-subtle {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(148, 163, 184, 0.20);
+  }
+
+  .glass-surface-card {
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  }
+
+  .glass-surface-dark {
+    background: rgba(16, 24, 40, 0.80);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .glow-orange {
+    background: radial-gradient(circle, rgba(244, 81, 11, 0.12) 0%, rgba(244, 81, 11, 0) 70%);
+  }
+
+  .glow-blue {
+    background: radial-gradient(circle, rgba(218, 232, 255, 0.80) 0%, rgba(218, 232, 255, 0) 70%);
+  }
+}
+
 @layer utilities {
   /* Precision hairline borders */
   .neo-border {

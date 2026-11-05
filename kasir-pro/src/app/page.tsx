@@ -5,6 +5,8 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { FAQSection } from "@/components/landing/faq-section";
+import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
 
 export default async function HomePage() {
@@ -28,7 +30,13 @@ export default async function HomePage() {
       {/* 5. Paket Langganan Komersial (4 Tier) */}
       <PricingSection />
 
-      {/* 6. Footer Resmi */}
+      {/* 6. Tanya Jawab (FAQ) */}
+      <FAQSection />
+
+      {/* 7. Final Conversion Banner */}
+      <FinalCTA />
+
+      {/* 8. Footer Resmi */}
       <SiteFooter />
     </div>
   );

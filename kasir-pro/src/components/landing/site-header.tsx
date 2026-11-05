@@ -16,6 +16,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
     { label: "Solusi Industri", href: "#solusi-industri" },
     { label: "Pajak & SAK EMKM", href: "#pajak-pembukuan" },
     { label: "Paket Langganan", href: "#harga" },
+    { label: "FAQ", href: "#faq" },
   ];
 
   return (

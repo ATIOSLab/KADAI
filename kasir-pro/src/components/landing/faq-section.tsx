@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface FAQItem {
   q: string;
@@ -47,18 +48,21 @@ export function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-20 sm:py-28 px-4 sm:px-6 bg-slate-50/70 border-b border-slate-200/80 w-full">
+    <section id="faq" className="py-16 sm:py-24 px-4 sm:px-6 bg-slate-50/70 border-t border-slate-200/80 w-full">
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Section Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
-            <span>Tanya Jawab (FAQ)</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <Badge
+            variant="outline"
+            className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
+          >
+            Tanya Jawab (FAQ)
+          </Badge>
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
             Pertanyaan yang Sering Diajukan
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-            Informasi lengkap seputar fitur, implementasi, dan operasional platform KADAI.
+            Jawaban lugas dan transparan seputar fitur, kepatuhan, dan integrasi operasional KADAI.
           </p>
         </div>
 
@@ -69,15 +73,18 @@ export function FAQSection() {
             return (
               <div
                 key={idx}
-                className="rounded-2xl liquid-glass-card overflow-hidden shadow-xs hover:shadow-md transition-all duration-200"
+                className="rounded-[20px] luxury-glass-card overflow-hidden border border-slate-200/90 shadow-2xs hover:shadow-md transition-all duration-200"
               >
                 <button
                   type="button"
                   onClick={() => toggle(idx)}
                   aria-expanded={isOpen}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-slate-900 hover:text-primary transition-colors"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-slate-900 hover:text-primary transition-colors"
                 >
-                  <span>{faq.q}</span>
+                  <span className="flex items-center gap-2.5">
+                    <HelpCircle className="size-4 text-primary shrink-0 opacity-70" />
+                    <span>{faq.q}</span>
+                  </span>
                   <ChevronDown
                     className={`size-4 shrink-0 text-slate-400 transition-transform duration-200 ${
                       isOpen ? "rotate-180 text-primary" : ""
@@ -86,7 +93,7 @@ export function FAQSection() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in pl-11">
                     {faq.a}
                   </div>
                 )}

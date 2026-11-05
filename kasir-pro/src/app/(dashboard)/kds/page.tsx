@@ -64,10 +64,11 @@ export default function KDSPage() {
   const [loading, setLoading] = useState(true);
   const [activeStation, setActiveStation] = useState<"ALL" | "KITCHEN" | "BAR">("ALL");
   const [cockpitMode, setCockpitMode] = useState(true);
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   // Polling every second for timers and every 6 seconds for new orders
   useEffect(() => {
+    setCurrentTime(Date.now());
     const timerInterval = setInterval(() => setCurrentTime(Date.now()), 1000);
     return () => clearInterval(timerInterval);
   }, []);

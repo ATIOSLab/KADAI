@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { hasRequiredRole, INVENTORY_ROLES } from "@/lib/rbac";
+import { produceBatchSchema } from "@/lib/validators/produce";
+import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
 
 // POST /api/products/[id]/produce
@@ -12,27 +14,21 @@ export async function POST(
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
-      return NextResponse.json(
-        { error: "Hanya Admin, Manager, atau Staf Gudang yang dapat mengeksekusi produksi batch" },
-        { status: 403 }
+      return jsonError(
+        "Hanya Admin, Manager, atau Staf Gudang yang dapat mengeksekusi produksi batch",
+        403
       );
     }
 
     const { id: productId } = await params;
     const body = await req.json();
-    const { quantityToProduce, outletId, batchNumber, expiryDate, notes } = body;
+    const validated = produceBatchSchema.parse(body);
 
-    const qty = Math.floor(Number(quantityToProduce));
-    if (!qty || qty <= 0) {
-      return NextResponse.json(
-        { error: "Jumlah produksi harus berupa angka bulat positif lebih dari 0" },
-        { status: 400 }
-      );
-    }
+    const qty = validated.quantityToProduce;
 
     // 1. Fetch product, recipes, and existing batches to inherit selling price
     const product = await prisma.product.findUnique({
@@ -58,21 +54,20 @@ export async function POST(
     });
 
     if (!product) {
-      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
+      return jsonError("Produk tidak ditemukan", 404);
     }
 
     if (product.recipesAsParent.length === 0) {
-      return NextResponse.json(
-        { error: `Produk "${product.name}" belum memiliki resep Bill of Materials (BOM)` },
-        { status: 400 }
+      return jsonError(
+        `Produk "${product.name}" belum memiliki resep Bill of Materials (BOM)`,
+        400
       );
     }
 
-    // Determine selling price from latest batch or default 0
     const fallbackSellingPrice = product.batches[0]?.sellingPrice || new Decimal(0);
 
     // 2. Resolve target outlet
-    let effectiveOutletId = outletId || null;
+    let effectiveOutletId = validated.outletId || null;
     if (!effectiveOutletId) {
       const defaultOutlet = await prisma.outlet.findFirst({
         where: { isMain: true },
@@ -80,23 +75,20 @@ export async function POST(
       effectiveOutletId = defaultOutlet?.id || null;
     }
 
-    // Generate batch number if not provided: PROD-SKU-YYYYMMDD-XXXX
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const finalBatchNumber =
-      batchNumber?.trim() || `PROD-${product.sku}-${dateStr}-${randomSuffix}`;
+      validated.batchNumber?.trim() || `PROD-${product.sku}-${dateStr}-${randomSuffix}`;
 
     // 3. Execute atomic production transaction
     const result = await prisma.$transaction(async (tx) => {
       let totalBatchCost = new Decimal(0);
 
-      // A. Verify and Deduct each recipe ingredient using FIFO
       for (const recipe of product.recipesAsParent) {
         const qtyPerPortion = Number(recipe.quantityNeeded);
         const wastage = Number(recipe.wastagePercent || 0);
         const totalNeeded = Math.ceil(qtyPerPortion * qty * (1 + wastage / 100));
 
-        // Fetch active batches for ingredient
         const availableBatches = await tx.productBatch.findMany({
           where: {
             productId: recipe.ingredientId,
@@ -129,11 +121,9 @@ export async function POST(
             data: { remainingQty: { decrement: take } },
           });
 
-          // Accumulate ingredient cost
           const costContribution = batch.costPrice.mul(take);
           totalBatchCost = totalBatchCost.add(costContribution);
 
-          // Log stock adjustment for ingredient
           await tx.stockAdjustment.create({
             data: {
               productId: recipe.ingredientId,
@@ -148,10 +138,8 @@ export async function POST(
         }
       }
 
-      // B. Calculate unit HPP for finished good
       const unitCost = totalBatchCost.div(qty);
 
-      // C. Create finished product batch
       const newBatch = await tx.productBatch.create({
         data: {
           productId: product.id,
@@ -162,12 +150,11 @@ export async function POST(
           sellingPrice: fallbackSellingPrice,
           outletId: effectiveOutletId,
           purchaseDate: new Date(),
-          expiryDate: expiryDate ? new Date(expiryDate) : null,
-          notes: notes || `Produksi batch mandiri dari resep BOM`,
+          expiryDate: validated.expiryDate ? new Date(validated.expiryDate) : null,
+          notes: validated.notes || "Produksi batch mandiri dari resep BOM",
         },
       });
 
-      // D. Log stock adjustment for finished good
       await tx.stockAdjustment.create({
         data: {
           productId: product.id,
@@ -178,7 +165,6 @@ export async function POST(
         },
       });
 
-      // E. Audit log
       await tx.activityLog.create({
         data: {
           action: "BATCH_PRODUCED",
@@ -203,16 +189,12 @@ export async function POST(
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      message: `Berhasil memproduksi ${qty} unit "${product.name}" dengan Batch #${finalBatchNumber}`,
-      data: result,
-    });
-  } catch (error: any) {
-    console.error("POST /api/products/[id]/produce error:", error);
-    return NextResponse.json(
-      { error: error?.message || "Gagal memproses eksekusi produksi batch" },
-      { status: 500 }
+    return jsonOk(
+      result,
+      `Berhasil memproduksi ${qty} unit "${product.name}" dengan Batch #${finalBatchNumber}`,
+      201
     );
+  } catch (error) {
+    return handleApiError(error, "POST /api/products/[id]/produce", "Gagal memproses eksekusi produksi batch");
   }
 }

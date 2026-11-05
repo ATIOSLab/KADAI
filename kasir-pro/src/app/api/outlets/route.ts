@@ -1,24 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { createOutletSchema, updateOutletSchema } from "@/lib/validators/outlet";
+import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 
 // GET /api/outlets
 export async function GET() {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const outlets = await prisma.outlet.findMany({
       orderBy: [{ isMain: "desc" }, { name: "asc" }],
     });
 
-    return NextResponse.json({ data: outlets });
+    return jsonOk(outlets);
   } catch (error) {
-    console.error("GET /api/outlets error:", error);
-    return NextResponse.json({ error: "Gagal memuat data cabang" }, { status: 500 });
+    return handleApiError(error, "GET /api/outlets", "Gagal memuat data cabang");
   }
 }
 
@@ -27,37 +28,21 @@ export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const {
-      name,
-      code,
-      address,
-      phone,
-      isMain,
-      taxType,
-      taxRate,
-      serviceChargeRate,
-      outletType,
-      kitchenWorkflow,
-      costingMethod,
-    } = body;
-
-    if (!name || !code) {
-      return NextResponse.json({ error: "Nama dan kode cabang wajib diisi" }, { status: 400 });
-    }
+    const validated = createOutletSchema.parse(body);
 
     // Check duplicate code
     const existing = await prisma.outlet.findUnique({
-      where: { code: code.trim().toUpperCase() },
+      where: { code: validated.code },
     });
     if (existing) {
-      return NextResponse.json({ error: `Kode cabang '${code}' sudah digunakan` }, { status: 400 });
+      return jsonError(`Kode cabang '${validated.code}' sudah digunakan`, 409);
     }
 
-    if (isMain) {
+    if (validated.isMain) {
       await prisma.outlet.updateMany({
         where: { isMain: true },
         data: { isMain: false },
@@ -66,24 +51,23 @@ export async function POST(req: NextRequest) {
 
     const outlet = await prisma.outlet.create({
       data: {
-        name: name.trim(),
-        code: code.trim().toUpperCase(),
-        address: address?.trim() || null,
-        phone: phone?.trim() || null,
-        isMain: Boolean(isMain),
-        taxType: taxType || "PB1_10",
-        taxRate: taxRate !== undefined ? Number(taxRate) : 10,
-        serviceChargeRate: serviceChargeRate !== undefined ? Number(serviceChargeRate) : 5,
-        outletType: outletType || "RETAIL_BOOTH",
-        kitchenWorkflow: kitchenWorkflow || "DIRECT_SERVE",
-        costingMethod: costingMethod || "FIFO",
+        name: validated.name,
+        code: validated.code,
+        address: validated.address || null,
+        phone: validated.phone || null,
+        isMain: validated.isMain,
+        taxType: validated.taxType,
+        taxRate: validated.taxRate,
+        serviceChargeRate: validated.serviceChargeRate,
+        outletType: validated.outletType,
+        kitchenWorkflow: validated.kitchenWorkflow,
+        costingMethod: validated.costingMethod,
       },
     });
 
-    return NextResponse.json({ success: true, data: outlet }, { status: 201 });
+    return jsonOk(outlet, "Cabang berhasil ditambahkan", 201);
   } catch (error) {
-    console.error("POST /api/outlets error:", error);
-    return NextResponse.json({ error: "Gagal menambahkan cabang" }, { status: 500 });
+    return handleApiError(error, "POST /api/outlets", "Gagal menambahkan cabang");
   }
 }
 
@@ -92,58 +76,38 @@ export async function PUT(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const {
-      id,
-      name,
-      code,
-      address,
-      phone,
-      isMain,
-      taxType,
-      taxRate,
-      serviceChargeRate,
-      isActive,
-      outletType,
-      kitchenWorkflow,
-      costingMethod,
-    } = body;
+    const validated = updateOutletSchema.parse(body);
 
-    if (!id) {
-      return NextResponse.json({ error: "ID cabang wajib diisi" }, { status: 400 });
-    }
-
-    if (isMain) {
+    if (validated.isMain) {
       await prisma.outlet.updateMany({
-        where: { isMain: true, NOT: { id } },
+        where: { isMain: true, NOT: { id: validated.id } },
         data: { isMain: false },
       });
     }
 
     const updated = await prisma.outlet.update({
-      where: { id },
+      where: { id: validated.id },
       data: {
-        ...(name && { name: name.trim() }),
-        ...(code && { code: code.trim().toUpperCase() }),
-        ...(address !== undefined && { address: address?.trim() || null }),
-        ...(phone !== undefined && { phone: phone?.trim() || null }),
-        ...(isMain !== undefined && { isMain: Boolean(isMain) }),
-        ...(taxType && { taxType }),
-        ...(taxRate !== undefined && { taxRate: Number(taxRate) }),
-        ...(serviceChargeRate !== undefined && { serviceChargeRate: Number(serviceChargeRate) }),
-        ...(isActive !== undefined && { isActive: Boolean(isActive) }),
-        ...(outletType && { outletType }),
-        ...(kitchenWorkflow && { kitchenWorkflow }),
-        ...(costingMethod && { costingMethod }),
+        ...(validated.name && { name: validated.name }),
+        ...(validated.code && { code: validated.code }),
+        ...(validated.address !== undefined && { address: validated.address }),
+        ...(validated.phone !== undefined && { phone: validated.phone }),
+        ...(validated.isMain !== undefined && { isMain: validated.isMain }),
+        ...(validated.taxType && { taxType: validated.taxType }),
+        ...(validated.taxRate !== undefined && { taxRate: validated.taxRate }),
+        ...(validated.serviceChargeRate !== undefined && { serviceChargeRate: validated.serviceChargeRate }),
+        ...(validated.outletType && { outletType: validated.outletType }),
+        ...(validated.kitchenWorkflow && { kitchenWorkflow: validated.kitchenWorkflow }),
+        ...(validated.costingMethod && { costingMethod: validated.costingMethod }),
       },
     });
 
-    return NextResponse.json({ success: true, data: updated });
+    return jsonOk(updated, "Cabang berhasil diperbarui");
   } catch (error) {
-    console.error("PUT /api/outlets error:", error);
-    return NextResponse.json({ error: "Gagal memperbarui data cabang" }, { status: 500 });
+    return handleApiError(error, "PUT /api/outlets", "Gagal memperbarui data cabang");
   }
 }

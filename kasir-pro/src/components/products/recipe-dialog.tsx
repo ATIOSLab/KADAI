@@ -5,10 +5,7 @@ import {
   UtensilsCrossed,
   Plus,
   Trash2,
-  Scale,
-  Sparkles,
   Loader2,
-  AlertCircle,
   PackageCheck,
 } from "lucide-react";
 import { ProductionBatchDialog } from "./production-batch-dialog";

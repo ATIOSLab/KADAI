@@ -39,6 +39,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
+import { TableSkeleton } from "@/components/shared/loading-skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
 
 interface TransferItem {
   id: string;
@@ -362,20 +364,15 @@ export default function StockTransfersPage() {
 
       {/* Transfers Table / Cards */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          Memuat riwayat transfer stok...
-        </div>
+        <TableSkeleton rows={5} cols={6} />
       ) : filteredTransfers.length === 0 ? (
-        <Card className="border border-dashed p-8 text-center space-y-3">
-          <Package className="size-10 text-muted-foreground mx-auto" />
-          <h3 className="font-bold text-base text-slate-900">Belum ada transfer stok</h3>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            Gunakan tombol &quot;Buat Transfer Baru&quot; di atas untuk mendistribusikan bahan baku atau produk jadi dari Gudang/Dapur Pusat ke gerai cabang.
-          </p>
-          <Button size="sm" onClick={handleOpenCreate} className="mt-2">
-            <Plus className="size-4 mr-1.5" /> Buat Transfer Sekarang
-          </Button>
-        </Card>
+        <EmptyState
+          icon={Package}
+          title="Belum ada mutasi transfer stok"
+          description="Gunakan tombol di atas untuk mendistribusikan bahan baku atau produk jadi dari Gudang/Dapur Pusat ke gerai cabang."
+          actionLabel="Buat Transfer Sekarang"
+          onAction={handleOpenCreate}
+        />
       ) : (
         <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs">
           <div className="overflow-x-auto">

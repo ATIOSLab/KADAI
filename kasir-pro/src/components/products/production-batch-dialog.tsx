@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  UtensilsCrossed,
   PackageCheck,
-  Building,
-  Calendar,
   AlertCircle,
   Loader2,
   CheckCircle2,
   Layers,
-  Sparkles,
 } from "lucide-react";
 import {
   Dialog,

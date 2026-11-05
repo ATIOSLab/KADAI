@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { CardGridSkeleton } from "@/components/shared/loading-skeleton";
 
 interface SupplierItem {
   id: string;
@@ -173,7 +174,7 @@ export default function SuppliersPage() {
 
       {/* Supplier Grid / List */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-muted-foreground">Memuat data pemasok...</div>
+        <CardGridSkeleton count={3} />
       ) : suppliers.length === 0 ? (
         <Card className="p-12 text-center space-y-3 bg-card border-border">
           <Building2 className="size-12 mx-auto text-muted-foreground opacity-40" />

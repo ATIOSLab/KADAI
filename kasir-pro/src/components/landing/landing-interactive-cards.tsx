@@ -7,10 +7,6 @@ import {
   UtensilsCrossed,
   Building,
   CheckCircle2,
-  Receipt,
-  Scale,
-  BarChart3,
-  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

@@ -1,18 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
-import { ADMIN_MANAGER_ROLES, INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { createSupplierSchema, updateSupplierSchema } from "@/lib/validators/supplier";
+import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 
 // GET /api/suppliers
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search") || "";
+    const search = searchParams.get("search")?.trim() || "";
 
     const suppliers = await prisma.supplier.findMany({
       where: {
@@ -32,10 +34,9 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    return NextResponse.json({ data: suppliers });
+    return jsonOk(suppliers);
   } catch (error) {
-    console.error("GET /api/suppliers error:", error);
-    return NextResponse.json({ error: "Gagal memuat data pemasok" }, { status: 500 });
+    return handleApiError(error, "GET /api/suppliers", "Gagal memuat data pemasok");
   }
 }
 
@@ -44,29 +45,24 @@ export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const { name, phone, email, address } = body;
-
-    if (!name || typeof name !== "string") {
-      return NextResponse.json({ error: "Nama pemasok wajib diisi" }, { status: 400 });
-    }
+    const validated = createSupplierSchema.parse(body);
 
     const supplier = await prisma.supplier.create({
       data: {
-        name: name.trim(),
-        phone: phone?.trim() || null,
-        email: email?.trim() || null,
-        address: address?.trim() || null,
+        name: validated.name,
+        phone: validated.phone || null,
+        email: validated.email || null,
+        address: validated.address || null,
       },
     });
 
-    return NextResponse.json({ success: true, data: supplier }, { status: 201 });
+    return jsonOk(supplier, "Pemasok berhasil ditambahkan", 201);
   } catch (error) {
-    console.error("POST /api/suppliers error:", error);
-    return NextResponse.json({ error: "Gagal menambahkan pemasok" }, { status: 500 });
+    return handleApiError(error, "POST /api/suppliers", "Gagal menambahkan pemasok");
   }
 }
 
@@ -75,57 +71,24 @@ export async function PUT(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const { id, name, phone, email, address, isActive } = body;
+    const validated = updateSupplierSchema.parse(body);
 
-    if (!id) {
-      return NextResponse.json({ error: "ID pemasok wajib diisi" }, { status: 400 });
-    }
-
-    const updated = await prisma.supplier.update({
-      where: { id },
+    const supplier = await prisma.supplier.update({
+      where: { id: validated.id },
       data: {
-        ...(name && { name: name.trim() }),
-        ...(phone !== undefined && { phone: phone?.trim() || null }),
-        ...(email !== undefined && { email: email?.trim() || null }),
-        ...(address !== undefined && { address: address?.trim() || null }),
-        ...(isActive !== undefined && { isActive: Boolean(isActive) }),
+        ...(validated.name && { name: validated.name }),
+        ...(validated.phone !== undefined && { phone: validated.phone || null }),
+        ...(validated.email !== undefined && { email: validated.email || null }),
+        ...(validated.address !== undefined && { address: validated.address || null }),
       },
     });
 
-    return NextResponse.json({ success: true, data: updated });
+    return jsonOk(supplier, "Data pemasok berhasil diperbarui");
   } catch (error) {
-    console.error("PUT /api/suppliers error:", error);
-    return NextResponse.json({ error: "Gagal memperbarui data pemasok" }, { status: 500 });
-  }
-}
-
-// DELETE /api/suppliers
-export async function DELETE(req: NextRequest) {
-  try {
-    const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json({ error: "ID pemasok wajib disertakan" }, { status: 400 });
-    }
-
-    await prisma.supplier.update({
-      where: { id },
-      data: { isActive: false },
-    });
-
-    return NextResponse.json({ success: true, message: "Pemasok berhasil dinonaktifkan" });
-  } catch (error) {
-    console.error("DELETE /api/suppliers error:", error);
-    return NextResponse.json({ error: "Gagal menghapus pemasok" }, { status: 500 });
+    return handleApiError(error, "PUT /api/suppliers", "Gagal memperbarui data pemasok");
   }
 }

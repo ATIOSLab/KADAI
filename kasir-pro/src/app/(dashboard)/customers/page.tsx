@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -226,11 +227,17 @@ export default function CustomersPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted-foreground">
-                    Memuat data pelanggan...
-                  </td>
-                </tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="py-3.5 px-4"><Skeleton className="h-4 w-32" /></td>
+                    <td className="py-3.5 px-4"><Skeleton className="h-4 w-28" /></td>
+                    <td className="py-3.5 px-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></td>
+                    <td className="py-3.5 px-4 text-right"><Skeleton className="h-4 w-12 ml-auto" /></td>
+                    <td className="py-3.5 px-4 text-right"><Skeleton className="h-4 w-20 ml-auto" /></td>
+                    <td className="py-3.5 px-4 text-center"><Skeleton className="h-4 w-8 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-right"><Skeleton className="h-7 w-8 ml-auto rounded" /></td>
+                  </tr>
+                ))
               ) : customers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-muted-foreground">

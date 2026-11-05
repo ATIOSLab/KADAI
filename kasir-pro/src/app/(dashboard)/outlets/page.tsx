@@ -33,6 +33,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { CardGridSkeleton } from "@/components/shared/loading-skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
 
 interface OutletItem {
   id: string;
@@ -178,7 +180,15 @@ export default function OutletsPage() {
 
       {/* Outlet Cards */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-muted-foreground">Memuat data cabang...</div>
+        <CardGridSkeleton count={3} />
+      ) : outlets.length === 0 ? (
+        <EmptyState
+          icon={Building}
+          title="Belum ada cabang terdaftar"
+          description="Tambahkan gerai toko, booth kaki lima, atau dapur pusat untuk mulai mengelola operasional multi-cabang."
+          actionLabel="Tambah Cabang Pertama"
+          onAction={handleOpenAdd}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {outlets.map((outlet) => (

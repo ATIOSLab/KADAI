@@ -1,143 +1,141 @@
-import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
-import { hasRequiredRole, ADMIN_MANAGER_ROLES } from "@/lib/rbac";
+import { POS_ROLES, ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { createTableSchema, updateTableSchema } from "@/lib/validators/table";
+import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import crypto from "crypto";
 
-export async function GET() {
+// GET /api/tables
+export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, POS_ROLES)) {
+      return jsonError("Unauthorized", 401);
     }
 
+    const { searchParams } = new URL(req.url);
+    const outletId = searchParams.get("outletId");
+
     const tables = await prisma.restaurantTable.findMany({
-      orderBy: [{ section: "asc" }, { tableNo: "asc" }],
+      where: {
+        ...(outletId && outletId !== "ALL" ? { outletId } : {}),
+      },
+      orderBy: { tableNo: "asc" },
       include: {
-        sales: {
-          where: { isVoided: false },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-          select: {
-            id: true,
-            invoiceNumber: true,
-            totalAmount: true,
-            customerName: true,
-            createdAt: true,
-          },
+        outlet: {
+          select: { id: true, name: true, code: true },
         },
       },
     });
 
-    return NextResponse.json({ data: tables });
+    return jsonOk(tables);
   } catch (error) {
-    console.error("GET /api/tables error:", error);
-    return NextResponse.json(
-      { error: "Gagal memuat data meja" },
-      { status: 500 }
-    );
+    return handleApiError(error, "GET /api/tables", "Gagal memuat data meja");
   }
 }
 
+// POST /api/tables
 export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const { tableNo, section = "Utama", capacity = 4 } = body;
+    const validated = createTableSchema.parse(body);
 
-    if (!tableNo || typeof tableNo !== "string") {
-      return NextResponse.json(
-        { error: "Nomor meja wajib diisi" },
-        { status: 400 }
-      );
+    let effectiveOutletId = validated.outletId || null;
+    if (!effectiveOutletId) {
+      const defaultOutlet = await prisma.outlet.findFirst({ where: { isMain: true } });
+      effectiveOutletId = defaultOutlet?.id || null;
     }
 
-    const qrToken = randomUUID();
+    const existing = await prisma.restaurantTable.findFirst({
+      where: {
+        tableNo: validated.tableNo,
+        outletId: effectiveOutletId,
+      },
+    });
+
+    if (existing) {
+      return jsonError(`Nomor meja ${validated.tableNo} sudah ada di cabang ini`, 409);
+    }
+
+    const qrToken = crypto.randomBytes(16).toString("hex");
 
     const table = await prisma.restaurantTable.create({
       data: {
-        tableNo,
-        section,
-        capacity: Number(capacity) || 4,
+        tableNo: validated.tableNo,
+        section: validated.section,
+        capacity: validated.capacity,
+        isOccupied: validated.isOccupied,
+        outletId: effectiveOutletId,
         qrToken,
+      },
+      include: {
+        outlet: {
+          select: { id: true, name: true, code: true },
+        },
       },
     });
 
-    return NextResponse.json({ data: table }, { status: 201 });
-  } catch (error: any) {
-    console.error("POST /api/tables error:", error);
-    if (error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Nomor meja atau token sudah digunakan" },
-        { status: 409 }
-      );
-    }
-    return NextResponse.json(
-      { error: "Gagal menambahkan meja" },
-      { status: 500 }
-    );
+    return jsonOk(table, "Meja berhasil ditambahkan", 201);
+  } catch (error) {
+    return handleApiError(error, "POST /api/tables", "Gagal menambahkan meja");
   }
 }
 
+// PUT /api/tables
 export async function PUT(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, POS_ROLES)) {
+      return jsonError("Forbidden", 403);
     }
 
     const body = await req.json();
-    const { id, tableNo, section, capacity, isOccupied } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: "ID meja wajib diisi" }, { status: 400 });
-    }
+    const validated = updateTableSchema.parse(body);
 
     const updated = await prisma.restaurantTable.update({
-      where: { id },
+      where: { id: validated.id },
       data: {
-        ...(tableNo && { tableNo }),
-        ...(section && { section }),
-        ...(capacity !== undefined && { capacity: Number(capacity) }),
-        ...(isOccupied !== undefined && { isOccupied: Boolean(isOccupied) }),
+        ...(validated.tableNo && { tableNo: validated.tableNo }),
+        ...(validated.section && { section: validated.section }),
+        ...(validated.capacity !== undefined && { capacity: validated.capacity }),
+        ...(validated.isOccupied !== undefined && { isOccupied: validated.isOccupied }),
+        ...(validated.outletId !== undefined && { outletId: validated.outletId }),
       },
     });
 
-    return NextResponse.json({ data: updated });
+    return jsonOk(updated, "Status meja berhasil diperbarui");
   } catch (error) {
-    console.error("PUT /api/tables error:", error);
-    return NextResponse.json(
-      { error: "Gagal memperbarui meja" },
-      { status: 500 }
-    );
+    return handleApiError(error, "PUT /api/tables", "Gagal memperbarui meja");
   }
 }
 
+// DELETE /api/tables
 export async function DELETE(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "ID meja wajib diisi" }, { status: 400 });
+      return jsonError("ID meja wajib disertakan", 400);
     }
 
-    await prisma.restaurantTable.delete({ where: { id } });
-    return NextResponse.json({ success: true });
+    await prisma.restaurantTable.delete({
+      where: { id },
+    });
+
+    return jsonOk(null, "Meja berhasil dihapus");
   } catch (error) {
-    console.error("DELETE /api/tables error:", error);
-    return NextResponse.json(
-      { error: "Gagal menghapus meja" },
-      { status: 500 }
-    );
+    return handleApiError(error, "DELETE /api/tables", "Gagal menghapus meja");
   }
 }

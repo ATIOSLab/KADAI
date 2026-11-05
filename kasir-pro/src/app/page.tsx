@@ -2,21 +2,16 @@ import Link from "next/link";
 import {
   Store,
   ShoppingCart,
-  ChefHat,
-  QrCode,
   Receipt,
-  Warehouse,
   CheckCircle2,
   ArrowRight,
-  ShieldCheck,
   Scale,
-  Sparkles,
   BarChart3,
   UtensilsCrossed,
   Building,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getServerSessionUser } from "@/lib/session";
 import { getDefaultPathForRole } from "@/lib/rbac";

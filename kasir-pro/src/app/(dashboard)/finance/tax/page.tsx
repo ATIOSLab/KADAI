@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import {
   Select,
   SelectContent,
@@ -189,8 +190,8 @@ export default function TaxSummaryPage() {
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
           {loading ? (
-            <div className="p-8 text-center text-sm font-bold text-muted-foreground animate-pulse">
-              Memuat data pembukuan...
+            <div className="p-4">
+              <TableSkeleton rows={6} cols={7} />
             </div>
           ) : (
             <table className="w-full text-xs text-left">

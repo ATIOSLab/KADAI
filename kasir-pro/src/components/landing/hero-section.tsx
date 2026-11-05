@@ -13,6 +13,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { HeroBackgroundSlider } from "./hero-background-slider";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -101,15 +102,22 @@ const SEGMENTS = [
 
 export function HeroSection({ dashboardPath }: HeroSectionProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const current = SEGMENTS[activeTab];
 
   return (
     <section className="relative overflow-hidden pt-8 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
+      {/* 3 High-Resolution Unsplash Background Image Slider with Scrim Masking */}
+      <HeroBackgroundSlider
+        currentSlide={currentSlide}
+        onSlideChange={setCurrentSlide}
+      />
+
       {/* GetLayers Studio Key-light Overhead Vignette */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[360px] studio-keylight pointer-events-none -z-10" />
 
-      {/* Hero Header Copy */}
-      <div className="max-w-4xl mx-auto text-center space-y-5">
+      {/* Hero Header Copy (Positioned above slider scrim with solid backdrop legibility) */}
+      <div className="relative z-30 max-w-4xl mx-auto text-center space-y-5">
         {/* Eyebrow Pill */}
         <Badge
           variant="outline"
@@ -173,7 +181,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       </div>
 
       {/* 3 Operational Switcher Tabs (GetLayers Pill Segment) */}
-      <div className="flex items-center justify-center overflow-x-auto pb-1">
+      <div className="relative z-30 flex items-center justify-center overflow-x-auto pb-1">
         <div className="inline-flex p-1.5 rounded-full luxury-glass-pill gap-1.5 border border-slate-200/90 shadow-xs">
           {SEGMENTS.map((seg, idx) => {
             const Icon = seg.icon;

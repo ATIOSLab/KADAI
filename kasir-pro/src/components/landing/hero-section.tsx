@@ -1,122 +1,319 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ChevronDown,
-  ShoppingCart,
-  Warehouse,
-  ChefHat,
-  Scale,
-  ShieldCheck,
-} from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, UtensilsCrossed, Store, Warehouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProductShowcase } from "@/components/landing/product-showcase";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
 }
 
+const SEGMENTS = [
+  {
+    id: "fnb",
+    name: "Kafe & Restoran (F&B)",
+    icon: UtensilsCrossed,
+    path: "fnb-operational-engine",
+    photoUrl: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+    tag: "LINGKUNGAN OPERASIONAL",
+    title: "Kasir POS Kilat, Resep BOM & Layar Dapur KDS",
+    desc: "Pesanan meja langsung terhubung ke layar stasiun dapur & bar. HPP bahan baku terpotong otomatis per porsi laku.",
+    receipt: {
+      table: "Order Meja 04 • Dine In",
+      status: "Dapur Aktif",
+      meta: "Order ID: 20241105-0041 • Kasir: Budi",
+      items: [
+        { name: "2x Nasi Goreng Spesial", bom: "BOM: Beras, Ayam, Telur", price: "Rp 64.000" },
+        { name: "2x Es Kopi Susu Aren", bom: "BOM: Arabica Gayo, Susu, Aren", price: "Rp 36.000" },
+      ],
+      pb1: "Rp 10.000",
+      service: "Rp 5.000",
+      total: "Rp 115.000",
+      footer: "Struk Thermal Siap Cetak • Tiket KDS: Terkirim",
+    },
+    metric1: { label: "PAJAK RESTORAN", val: "PB1 10% Otomatis" },
+    metric2: { label: "KECEPATAN KASIR", val: "< 0.2 Detik" },
+    metric3: { label: "FORMAT STRUK", val: "58mm / 80mm" },
+  },
+  {
+    id: "retail",
+    name: "Ritel & Minimarket",
+    icon: Store,
+    path: "retail-multi-batch-fifo",
+    photoUrl: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80",
+    tag: "MANAJEMEN PERSEDIAAN",
+    title: "Kasir Barcode Cepat & Multi-Batch FIFO",
+    desc: "Scan barcode USB/Bluetooth instan, pemantauan stok menipis, dan radar kadaluwarsa batch otomatis.",
+    receipt: {
+      table: "Nota Kasir Ritel • Kasir 01",
+      status: "Transaksi Sukses",
+      meta: "No. Faktur: RETAIL-20261105-0102 • Kasir: Siti",
+      items: [
+        { name: "3x Beras Pandan Wangi 5kg", bom: "Batch #02 • Exp: 12/2027", price: "Rp 255.000" },
+        { name: "2x Minyak Goreng Sawit 2L", bom: "Batch #05 • Exp: 08/2027", price: "Rp 68.000" },
+      ],
+      pb1: "Rp 32.300",
+      service: "Rp 0",
+      total: "Rp 355.300",
+      footer: "Struk Thermal 80mm • Kartu Stok Mutasi Terpotong",
+    },
+    metric1: { label: "PAJAK PERTAMBAHAN NILAI", val: "PPN 11% Otomatis" },
+    metric2: { label: "SCANNER BARCODE", val: "USB & Bluetooth" },
+    metric3: { label: "PENILAIAN STOK", val: "FIFO SAK EMKM" },
+  },
+  {
+    id: "central",
+    name: "Dapur Pusat & Gudang",
+    icon: Warehouse,
+    path: "central-kitchen-routing",
+    photoUrl: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80",
+    tag: "RANTAI PASOK TERPUSAT",
+    title: "Produksi Batch & Transfer Mutasi Cabang",
+    desc: "Penerbitan surat jalan antar cabang, pencatatan produksi batch bahan baku setengah jadi, dan audit mutasi.",
+    receipt: {
+      table: "Surat Jalan TRF-20261105-0014",
+      status: "Dalam Pengiriman",
+      meta: "Gudang Pusat (HQ) → Cabang Thamrin",
+      items: [
+        { name: "15 kg Biji Kopi Arabica Gayo", bom: "Batch #01 • Scoped HPP", price: "Rp 2.100.000" },
+        { name: "30 liter Susu Pasteurisasi", bom: "Batch #04 • Suhu Dingin", price: "Rp 600.000" },
+      ],
+      pb1: "Rp 0",
+      service: "Rp 0",
+      total: "Rp 2.700.000",
+      footer: "Surat Jalan Digital Terbit • Siap Terima di Cabang",
+    },
+    metric1: { label: "SURAT JALAN CABANG", val: "Digital Terenkripsi" },
+    metric2: { label: "TOPOLOGI JARINGAN", val: "Hub & Spoke" },
+    metric3: { label: "KONFIRMASI TERIMA", val: "1-Klik Petugas" },
+  },
+];
+
 export function HeroSection({ dashboardPath }: HeroSectionProps) {
-  const highlights = [
-    { label: "POS & Kasir", icon: ShoppingCart },
-    { label: "Inventori Multi-Cabang", icon: Warehouse },
-    { label: "Dapur Pusat & BOM", icon: ChefHat },
-    { label: "Pembukuan & Pajak RI", icon: Scale },
-  ];
+  const [activeTab, setActiveTab] = useState(0);
+  const current = SEGMENTS[activeTab];
 
   return (
-    <section className="relative overflow-hidden pt-8 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 w-full">
-      {/* Magic UI / Aceternity inspired Dot Pattern and Atmospheric Ambient Glows */}
-      <div className="absolute inset-0 bg-dot-pattern opacity-60 pointer-events-none [mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_75%)] -z-10" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] glow-blue pointer-events-none -z-10 animate-pulse-glow" />
-      <div className="absolute top-28 right-1/4 w-[450px] h-[350px] glow-orange pointer-events-none -z-10 opacity-75" />
+    <section className="pt-10 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
+      {/* Hero Header Copy */}
+      <div className="max-w-4xl mx-auto text-center space-y-5">
+        {/* Eyebrow Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
+          <span className="size-2 rounded-full bg-primary" />
+          <span className="font-mono text-[11px] text-slate-700 uppercase tracking-wider font-bold">
+            KADAI Operating System // Enterprise POS & Rantai Pasok RI
+          </span>
+        </div>
 
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Hero Top Copy */}
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-nav text-slate-800 text-xs font-semibold shadow-xs">
-            <span className="size-2 rounded-full bg-primary animate-pulse" />
-            <span className="font-mono text-[11px] text-slate-600 uppercase tracking-wider font-bold">
-              KADAI — POS & ERP Multi-Cabang
-            </span>
-            <span className="text-slate-300">|</span>
-            <span className="text-[11px] text-slate-700 font-bold flex items-center gap-1">
-              <ShieldCheck className="size-3 text-emerald-600" />
-              Kepatuhan Standar Indonesia
-            </span>
-          </div>
+        {/* Headline H1 */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 leading-[1.18] text-balance">
+          Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
+        </h1>
 
-          {/* Master Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.12] text-slate-950 text-balance">
-            Satu Platform untuk Seluruh Operasional Bisnis Anda.
-          </h1>
+        {/* Subtitle */}
+        <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed text-balance">
+          KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
+        </p>
 
-          {/* Subheadline */}
-          <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed text-balance">
-            Kelola transaksi, inventori, dapur pusat, operasional multi-cabang, dan pembukuan dalam satu sistem terintegrasi yang dirancang untuk kebutuhan bisnis Indonesia.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1 max-w-sm sm:max-w-none mx-auto w-full">
-            {dashboardPath ? (
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
+          {dashboardPath ? (
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+            >
+              <Link href={dashboardPath} className="flex items-center gap-2">
+                <span>Buka Dashboard Operasional</span>
+                <ArrowRight className="size-4 shrink-0" />
+              </Link>
+            </Button>
+          ) : (
+            <>
               <Button
                 asChild
                 size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
+                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
               >
-                <Link href={dashboardPath} className="flex items-center gap-2">
-                  <span>Buka Dashboard Operasional</span>
+                <Link href="/register" className="flex items-center gap-2">
+                  <span>Mulai Uji Coba Gratis 14 Hari</span>
                   <ArrowRight className="size-4 shrink-0" />
                 </Link>
               </Button>
-            ) : (
-              <>
-                <Button
-                  asChild
-                  size="lg"
-                  className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
-                >
-                  <Link href="/register" className="flex items-center gap-2">
-                    <span>Coba Gratis 14 Hari</span>
-                    <ArrowRight className="size-4 shrink-0" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-white bg-white/80 text-slate-900 shadow-xs backdrop-blur-md transition-all hover:border-slate-400"
-                >
-                  <a href="#kapabilitas" className="flex items-center gap-2">
-                    <span>Jelajahi Fitur</span>
-                    <ChevronDown className="size-4 shrink-0 text-slate-500" />
-                  </a>
-                </Button>
-              </>
-            )}
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 text-slate-800 hover:bg-slate-50 bg-white"
+              >
+                <Link href="/login">Masuk ke Toko Anda</Link>
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* 3 Operational Switcher Tabs */}
+      <div className="flex items-center justify-center overflow-x-auto pb-1">
+        <div className="inline-flex p-1.5 rounded-2xl bg-slate-100 border border-slate-200 gap-1.5">
+          {SEGMENTS.map((seg, idx) => {
+            const Icon = seg.icon;
+            const isActive = idx === activeTab;
+            return (
+              <button
+                key={seg.id}
+                type="button"
+                onClick={() => setActiveTab(idx)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  isActive
+                    ? "bg-white text-slate-950 shadow-xs border border-slate-200/80"
+                    : "text-slate-600 hover:text-slate-950 hover:bg-white/50"
+                }`}
+              >
+                <Icon className={`size-3.5 ${isActive ? "text-primary" : "text-slate-500"}`} />
+                <span>{seg.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Interactive Mockup Container Window Frame */}
+      <div className="rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+        {/* Top Browser Bar */}
+        <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="size-2.5 rounded-full bg-red-500 inline-block" />
+            <span className="size-2.5 rounded-full bg-amber-500 inline-block" />
+            <span className="size-2.5 rounded-full bg-emerald-500 inline-block" />
+            <span className="font-mono text-slate-300 ml-2 text-[11px] font-semibold">
+              kadai.os // {current.path}
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+            Realtime Operational Engine
+          </span>
+        </div>
+
+        {/* Split Cockpit View */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
+          {/* Left Side: Dark Culinary / Operational Scene with Scrim */}
+          <div className="lg:col-span-6 relative p-6 sm:p-10 flex flex-col justify-end overflow-hidden min-h-[280px] lg:min-h-full">
+            <Image
+              src={current.photoUrl}
+              alt={current.title}
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+            {/* Scrim Gradasi Gelap Sinematik */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
+
+            <div className="relative z-10 space-y-3">
+              <span className="inline-block text-[10px] font-mono font-bold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded">
+                {current.tag}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+                {current.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg">
+                {current.desc}
+              </p>
+            </div>
           </div>
 
-          {/* Verified Highlight Pills under CTA */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 max-w-2xl mx-auto text-xs font-semibold text-slate-700">
-            {highlights.map((h, i) => {
-              const Icon = h.icon;
-              return (
-                <div
-                  key={i}
-                  className="px-3.5 py-1.5 rounded-full liquid-glass-nav flex items-center gap-1.5 text-slate-800 shadow-2xs hover:border-primary/40 transition-colors"
-                >
-                  <Icon className="size-3.5 text-primary shrink-0" />
-                  <span>{h.label}</span>
+          {/* Right Side: Live Digital Thermal Receipt Card */}
+          <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+              {/* Receipt Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <span className="font-bold text-sm text-slate-900">
+                  {current.receipt.table}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{current.receipt.status}</span>
+                </span>
+              </div>
+
+              <div className="text-[11px] font-mono text-slate-500">
+                {current.receipt.meta}
+              </div>
+
+              {/* Items Table */}
+              <div className="space-y-2.5 text-xs">
+                {current.receipt.items.map((it, i) => (
+                  <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
+                    <div>
+                      <span className="font-bold text-slate-900 block">{it.name}</span>
+                      <span className="text-[10px] font-mono text-slate-500">{it.bom}</span>
+                    </div>
+                    <span className="font-mono font-bold text-slate-900">{it.price}</span>
+                  </div>
+                ))}
+
+                {current.receipt.pb1 !== "Rp 0" && (
+                  <div className="flex justify-between items-center text-slate-600 pt-1">
+                    <span>Pajak Daerah Resto PB1 (10%)</span>
+                    <span className="font-mono font-semibold">{current.receipt.pb1}</span>
+                  </div>
+                )}
+
+                {current.receipt.service !== "Rp 0" && (
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span>Biaya Layanan (5%)</span>
+                    <span className="font-mono font-semibold">{current.receipt.service}</span>
+                  </div>
+                )}
+
+                {/* Total */}
+                <div className="flex justify-between items-center text-sm font-black text-slate-950 pt-3 border-t border-slate-200">
+                  <span>TOTAL TAGIHAN</span>
+                  <span className="font-mono text-primary text-base sm:text-lg">
+                    {current.receipt.total}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+
+              {/* Receipt Footer */}
+              <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-mono flex items-center justify-between">
+                <span>{current.receipt.footer}</span>
+                <span className="font-bold text-slate-700">KADAI POS</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Master Floating Showcase Cockpit */}
-        <ProductShowcase />
+        {/* Bottom 3 Performance Metrics Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
+          <div className="p-4 text-center">
+            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+              {current.metric1.label}
+            </span>
+            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+              {current.metric1.val}
+            </span>
+          </div>
+          <div className="p-4 text-center">
+            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+              {current.metric2.label}
+            </span>
+            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+              {current.metric2.val}
+            </span>
+          </div>
+          <div className="p-4 text-center">
+            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+              {current.metric3.label}
+            </span>
+            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+              {current.metric3.val}
+            </span>
+          </div>
+        </div>
       </div>
     </section>
   );

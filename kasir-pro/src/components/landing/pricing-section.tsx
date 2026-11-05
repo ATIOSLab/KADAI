@@ -1,156 +1,152 @@
 "use client";
 
 import Link from "next/link";
-import { Check, ShieldCheck } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PLANS = [
   {
     name: "Starter",
+    subtitle: "Untuk perintis usaha mikro yang baru memulai.",
     price: "Rp 0",
-    period: "/ bulan",
-    desc: "Untuk perintis usaha mikro yang baru memulai operasional kasir.",
+    period: "/ bln",
     features: [
-      "1 Outlet Gerai",
-      "1 Akun Staf Kasir",
+      "1 Outlet & 1 Kasir",
       "Maksimal 50 Produk",
-      "Terminal Kasir POS Kilat",
-      "Cetak Struk Thermal 58mm/80mm",
-      "Laporan Penjualan Harian",
+      "Kasir POS Standar",
+      "Struk Cetak Thermal",
     ],
     cta: "Mulai Gratis",
-    ctaVariant: "outline" as const,
     featured: false,
   },
   {
     name: "Professional",
+    subtitle: "Untuk unit usaha ritel, F&B, dan jasa mandiri yang berkembang.",
     price: "Rp 99.000",
-    period: "/ bulan",
-    desc: "Untuk unit usaha ritel, F&B, dan jasa mandiri yang sedang bertumbuh.",
+    period: "/ bln",
     features: [
-      "1 Outlet Gerai",
-      "3 Akun Staf Kasir",
-      "Unlimited Produk & Kategori",
-      "Inventori Multi-Batch FIFO",
-      "Radar Kadaluwarsa Produk",
+      "1 Outlet & 3 Akun Kasir",
+      "Unlimited Produk Ritel",
+      "Inventori Batch FIFO",
       "Pajak PPN 11% / PB1 10%",
       "Laporan Laba Rugi Dasar",
     ],
     cta: "Pilih Professional",
-    ctaVariant: "outline" as const,
     featured: false,
   },
   {
     name: "Business Pro",
+    badge: "Paling Populer",
+    subtitle: "Kafe, resto & gerai ritel modern dengan operasional penuh.",
     price: "Rp 249.000",
-    period: "/ bulan",
-    desc: "Kafe, resto & gerai ritel modern dengan operasional dapur penuh.",
+    period: "/ bln",
     features: [
       "Hingga 3 Outlet Cabang",
-      "Unlimited Akun Kasir & Staf",
+      "Unlimited Kasir & Staf",
       "Resep Bahan Pokok (BOM)",
       "Meja & Self-Order QR HP",
       "Kitchen Display System (KDS)",
-      "Laporan Laba Rugi SAK EMKM",
-      "Tutup Shift Kasir (Z-Report)",
+      "Laporan Lengkap SAK EMKM",
     ],
     cta: "Pilih Business Pro",
-    ctaVariant: "default" as const,
     featured: true,
   },
   {
     name: "Enterprise",
+    subtitle: "Jaringan multi-cabang & central kitchen korporasi.",
     price: "Rp 599.000",
-    period: "/ bulan",
-    desc: "Jaringan multi-cabang, franchise, dan central kitchen korporasi.",
+    period: "/ bln",
     features: [
       "Unlimited Outlet & Gudang",
-      "Dapur Pusat (CK) Routing",
+      "Central Kitchen (CK) Routing",
       "Transfer Stok Antar-Cabang",
-      "Surat Jalan Digital Terenkripsi",
-      "Laporan Konsolidasi Multi-Cabang",
-      "Hak Akses 6-Role & Supervisor PIN",
-      "Prioritas Bantuan Teknis",
+      "Laporan Konsolidasi Grup",
+      "Prioritas Support Teknis 24/7",
     ],
     cta: "Hubungi Tim Kami",
-    ctaVariant: "outline" as const,
     featured: false,
   },
 ];
 
 export function PricingSection() {
   return (
-    <section id="harga" className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
-      {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
-          <span>Paket Komersial</span>
+    <section id="harga" className="py-16 sm:py-24 px-4 sm:px-6 bg-slate-50/70 border-t border-slate-200/80 w-full">
+      <div className="max-w-6xl mx-auto space-y-12">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">
+            Paket Komersial
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+            Pilihan Paket Langganan Sesuai Skala Bisnis Anda
+          </h2>
+          <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
+            Semua paket dilengkapi garansi update fitur berkala dan penyimpanan database cloud yang aman.
+          </p>
         </div>
-        <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">
-          Pilihan Paket Sesuai Skala Bisnis Anda.
-        </h2>
-        <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Pilihan paket langganan transparan dengan garansi pembaruan fitur berkala dan penyimpanan database cloud yang aman.
-        </p>
-      </div>
 
-      {/* 4 Pricing Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-        {PLANS.map((plan) => (
-          <div
-            key={plan.name}
-            className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all duration-300 relative ${
-              plan.featured
-                ? "bg-white border-2 border-primary shadow-2xl shadow-primary/[0.12] ring-2 ring-primary/20 scale-[1.02]"
-                : "liquid-glass-card hover:shadow-xl hover:scale-[1.01]"
-            }`}
-          >
-            {plan.featured && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-xs flex items-center gap-1">
-                <ShieldCheck className="size-3" />
-                <span>Paling Populer</span>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-bold text-lg text-slate-950">{plan.name}</h3>
-                <p className="text-xs text-slate-500 mt-1 min-h-[32px] leading-relaxed">
-                  {plan.desc}
-                </p>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100 flex items-baseline gap-1">
-                <span className={`text-3xl font-black font-mono tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}>
-                  {plan.price}
-                </span>
-                <span className="text-xs font-medium text-slate-500">{plan.period}</span>
-              </div>
-
-              {/* Feature Checklist */}
-              <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs">
-                {plan.features.map((feat, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-slate-700">
-                    <Check className={`size-3.5 shrink-0 mt-0.5 ${plan.featured ? "text-primary font-bold" : "text-emerald-600"}`} />
-                    <span className={plan.featured ? "font-medium text-slate-900" : ""}>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <Button
-              asChild
-              variant={plan.ctaVariant}
-              className={`w-full font-bold text-xs h-11 rounded-xl shadow-xs ${
+        {/* 4-Tier Pricing Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.name}
+              className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all relative ${
                 plan.featured
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-slate-300 hover:bg-slate-50 bg-white"
+                  ? "bg-white border-2 border-primary shadow-xl ring-1 ring-primary/20 scale-[1.02]"
+                  : "bg-white border border-slate-200 shadow-xs hover:shadow-md"
               }`}
             >
-              <Link href="/register">{plan.cta}</Link>
-            </Button>
-          </div>
-        ))}
+              {plan.featured && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs">
+                  {plan.badge}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-950">{plan.name}</h3>
+                  <p className="text-xs text-slate-500 mt-1 min-h-[32px] leading-relaxed">
+                    {plan.subtitle}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-baseline gap-1">
+                  <span className={`text-3xl font-black font-mono tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}>
+                    {plan.price}
+                  </span>
+                  <span className="text-xs font-medium text-slate-500">
+                    {plan.period}
+                  </span>
+                </div>
+
+                <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                  {plan.features.map((feat, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                      <span className={plan.featured ? "font-semibold text-slate-900" : ""}>
+                        {feat}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <Button
+                  asChild
+                  className={`w-full font-bold text-xs h-10 rounded-xl transition-all ${
+                    plan.featured
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+                      : "border-slate-300 text-slate-800 hover:bg-slate-50 bg-white"
+                  }`}
+                  variant={plan.featured ? "default" : "outline"}
+                >
+                  <Link href="/register">{plan.cta}</Link>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

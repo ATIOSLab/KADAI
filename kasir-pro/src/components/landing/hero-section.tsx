@@ -5,6 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, UtensilsCrossed, Store, Warehouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -103,12 +111,15 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       {/* Hero Header Copy */}
       <div className="max-w-4xl mx-auto text-center space-y-5">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs">
+        <Badge
+          variant="outline"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80"
+        >
           <span className="size-2 rounded-full bg-primary" />
           <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
             KADAI Operating System // Enterprise POS & Rantai Pasok RI
           </span>
-        </div>
+        </Badge>
 
         {/* Headline H1 */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight text-slate-950 leading-[1.15] text-balance">
@@ -233,24 +244,27 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
           {/* Right Side: Live Digital Thermal Receipt Card */}
           <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+            <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
               {/* Receipt Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span className="font-bold text-sm text-slate-900">
+              <CardHeader className="p-0 flex flex-row items-center justify-between border-b border-slate-100 pb-3 space-y-0">
+                <CardTitle className="font-bold text-sm text-slate-950">
                   {current.receipt.table}
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                </CardTitle>
+                <Badge
+                  variant="outline"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"
+                >
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>{current.receipt.status}</span>
-                </span>
-              </div>
+                </Badge>
+              </CardHeader>
 
               <div className="text-[11px] text-slate-500">
                 {current.receipt.meta}
               </div>
 
               {/* Items Table */}
-              <div className="space-y-2.5 text-xs">
+              <CardContent className="p-0 space-y-2.5 text-xs">
                 {current.receipt.items.map((it, i) => (
                   <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
                     <div>
@@ -282,14 +296,14 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                     {current.receipt.total}
                   </span>
                 </div>
-              </div>
+              </CardContent>
 
               {/* Receipt Footer */}
-              <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+              <CardFooter className="p-0 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
                 <span>{current.receipt.footer}</span>
                 <span className="font-semibold text-slate-700">KADAI POS</span>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           </div>
         </div>
 

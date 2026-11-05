@@ -1,6 +1,14 @@
 "use client";
 
 import { ShoppingCart, UtensilsCrossed, Building2, Check } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export function IndustrySolutions() {
   const industries = [
@@ -44,9 +52,12 @@ export function IndustrySolutions() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+          <Badge
+            variant="outline"
+            className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
+          >
             Solusi Lintas Industri
-          </span>
+          </Badge>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
             Arsitektur Fleksibel untuk Seluruh Sektor Bisnis
           </h2>
@@ -55,27 +66,29 @@ export function IndustrySolutions() {
           </p>
         </div>
 
-        {/* 3-Column Card Grid */}
+        {/* 3-Column Reusable Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {industries.map((ind, idx) => {
             const Icon = ind.icon;
             return (
-              <div
+              <Card
                 key={idx}
                 className="rounded-[24px] luxury-glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border border-slate-200/90"
               >
-                <div className="space-y-4">
+                <CardHeader className="p-0 space-y-4">
                   <div className="size-11 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">
                     <Icon className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-950">
+                    <CardTitle className="text-lg font-bold text-slate-950">
                       {ind.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 italic leading-relaxed">
+                    </CardTitle>
+                    <CardDescription className="text-xs text-slate-500 mt-1 italic leading-relaxed">
                       {ind.subtitle}
-                    </p>
+                    </CardDescription>
                   </div>
+                </CardHeader>
+                <CardContent className="p-0">
                   <ul className="space-y-2.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
                     {ind.features.map((feat, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-2.5">
@@ -84,8 +97,8 @@ export function IndustrySolutions() {
                       </li>
                     ))}
                   </ul>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

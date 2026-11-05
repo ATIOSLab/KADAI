@@ -1,6 +1,13 @@
 "use client";
 
 import { Percent, Scale, BarChart3 } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export function AccountingTaxSection() {
   const cards = [
@@ -25,9 +32,12 @@ export function AccountingTaxSection() {
     <section id="pajak-pembukuan" className="py-16 sm:py-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-12">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+        <Badge
+          variant="outline"
+          className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
+        >
           Standar Keuangan Indonesia
-        </span>
+        </Badge>
         <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
           Pajak & Pembukuan Resmi Sesuai Regulasi Republik Indonesia
         </h2>
@@ -36,27 +46,29 @@ export function AccountingTaxSection() {
         </p>
       </div>
 
-      {/* 3-Column Compliance Grid */}
+      {/* 3-Column Reusable Compliance Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards.map((card, idx) => {
           const Icon = card.icon;
           return (
-            <div
+            <Card
               key={idx}
               className="rounded-[24px] luxury-glass-card p-6 sm:p-8 flex flex-col justify-between space-y-4 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border border-slate-200/90"
             >
-              <div className="space-y-4">
+              <CardHeader className="p-0 space-y-4">
                 <div className="size-11 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">
                   <Icon className="size-5" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-950">
+                <CardTitle className="text-lg font-bold text-slate-950">
                   {card.title}
-                </h3>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {card.desc}
                 </p>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>

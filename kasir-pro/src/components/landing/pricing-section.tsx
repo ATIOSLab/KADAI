@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const PLANS = [
   {
@@ -74,9 +83,12 @@ export function PricingSection() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+          <Badge
+            variant="outline"
+            className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
+          >
             Paket Komersial
-          </span>
+          </Badge>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
             Pilihan Paket Langganan Sesuai Skala Bisnis Anda
           </h2>
@@ -85,10 +97,10 @@ export function PricingSection() {
           </p>
         </div>
 
-        {/* 4-Tier Pricing Grid */}
+        {/* 4-Tier Reusable Pricing Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {PLANS.map((plan) => (
-            <div
+            <Card
               key={plan.name}
               className={`rounded-[24px] p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all duration-300 relative ${
                 plan.featured
@@ -97,18 +109,18 @@ export function PricingSection() {
               }`}
             >
               {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs border-0">
                   {plan.badge}
-                </div>
+                </Badge>
               )}
 
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-bold text-lg text-slate-950">{plan.name}</h3>
-                  <p className="text-xs text-slate-500 mt-1 min-h-[32px] leading-relaxed">
+                <CardHeader className="p-0">
+                  <CardTitle className="text-lg font-bold text-slate-950">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs text-slate-500 mt-1 min-h-[32px] leading-relaxed">
                     {plan.subtitle}
-                  </p>
-                </div>
+                  </CardDescription>
+                </CardHeader>
 
                 <div className="pt-2 border-t border-slate-100 flex items-baseline gap-1">
                   <span className={`text-3xl font-bold tabular-nums tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}>
@@ -119,19 +131,21 @@ export function PricingSection() {
                   </span>
                 </div>
 
-                <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs text-slate-700">
-                  {plan.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                      <span className={plan.featured ? "font-semibold text-slate-900" : ""}>
-                        {feat}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <CardContent className="p-0">
+                  <ul className="space-y-2.5 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                    {plan.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                        <span className={plan.featured ? "font-semibold text-slate-900" : ""}>
+                          {feat}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
               </div>
 
-              <div className="pt-4 border-t border-slate-100">
+              <CardFooter className="p-0 pt-4 border-t border-slate-100">
                 <Button
                   asChild
                   className={`w-full font-bold text-xs h-10 rounded-xl transition-all ${
@@ -143,8 +157,8 @@ export function PricingSection() {
                 >
                   <Link href="/register">{plan.cta}</Link>
                 </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

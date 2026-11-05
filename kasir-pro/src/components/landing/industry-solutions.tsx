@@ -62,7 +62,7 @@ export function IndustrySolutions() {
             return (
               <div
                 key={idx}
-                className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-xs flex flex-col justify-between space-y-6 hover:shadow-md transition-shadow"
+                className="rounded-[24px] luxury-glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border border-slate-200/90"
               >
                 <div className="space-y-4">
                   <div className="size-11 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">

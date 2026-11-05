@@ -96,11 +96,14 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
   const current = SEGMENTS[activeTab];
 
   return (
-    <section className="pt-10 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
+    <section className="relative overflow-hidden pt-8 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
+      {/* GetLayers Studio Key-light Overhead Vignette */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[360px] studio-keylight pointer-events-none -z-10" />
+
       {/* Hero Header Copy */}
       <div className="max-w-4xl mx-auto text-center space-y-5">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs">
           <span className="size-2 rounded-full bg-primary" />
           <span className="font-mono text-[11px] text-slate-700 uppercase tracking-wider font-bold">
             KADAI Operating System // Enterprise POS & Rantai Pasok RI
@@ -108,12 +111,12 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         </div>
 
         {/* Headline H1 */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 leading-[1.18] text-balance">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-black tracking-tight text-slate-950 leading-[1.14] text-balance">
           Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed text-balance">
+        <p className="text-sm sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance">
           KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
         </p>
 
@@ -123,7 +126,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             <Button
               asChild
               size="lg"
-              className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+              className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
             >
               <Link href={dashboardPath} className="flex items-center gap-2">
                 <span>Buka Dashboard Operasional</span>
@@ -132,21 +135,24 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             </Button>
           ) : (
             <>
-              <Button
-                asChild
-                size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+              {/* Compound Capsule Button (GetLayers style) */}
+              <Link
+                href="/register"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
               >
-                <Link href="/register" className="flex items-center gap-2">
-                  <span>Mulai Uji Coba Gratis 14 Hari</span>
-                  <ArrowRight className="size-4 shrink-0" />
-                </Link>
-              </Button>
+                <span className="font-bold text-xs sm:text-sm tracking-tight">
+                  Mulai Uji Coba Gratis 14 Hari
+                </span>
+                <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                  <ArrowRight className="size-4" />
+                </span>
+              </Link>
+
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 text-slate-800 hover:bg-slate-50 bg-white"
+                className="w-full sm:w-auto font-semibold text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
               >
                 <Link href="/login">Masuk ke Toko Anda</Link>
               </Button>
@@ -155,9 +161,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* 3 Operational Switcher Tabs */}
+      {/* 3 Operational Switcher Tabs (GetLayers Pill Segment) */}
       <div className="flex items-center justify-center overflow-x-auto pb-1">
-        <div className="inline-flex p-1.5 rounded-2xl bg-slate-100 border border-slate-200 gap-1.5">
+        <div className="inline-flex p-1.5 rounded-full luxury-glass-pill gap-1.5 border border-slate-200/90 shadow-xs">
           {SEGMENTS.map((seg, idx) => {
             const Icon = seg.icon;
             const isActive = idx === activeTab;
@@ -166,10 +172,10 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 key={seg.id}
                 type="button"
                 onClick={() => setActiveTab(idx)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
                   isActive
-                    ? "bg-white text-slate-950 shadow-xs border border-slate-200/80"
-                    : "text-slate-600 hover:text-slate-950 hover:bg-white/50"
+                    ? "bg-slate-950 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/70"
                 }`}
               >
                 <Icon className={`size-3.5 ${isActive ? "text-primary" : "text-slate-500"}`} />
@@ -180,8 +186,8 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* Interactive Mockup Container Window Frame */}
-      <div className="rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+      {/* Interactive Mockup Container Window Frame (Light Luxury Glass) */}
+      <div className="rounded-[28px] luxury-glass-card shadow-2xl overflow-hidden border border-slate-200/90">
         {/* Top Browser Bar */}
         <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
           <div className="flex items-center gap-2">

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import {
   Store,
-  ShoppingCart,
   Receipt,
-  CheckCircle2,
   ArrowRight,
   Scale,
-  BarChart3,
-  UtensilsCrossed,
-  Building,
+  ShieldCheck,
+  Lock,
+  Percent,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,15 +16,18 @@ import { Badge } from "@/components/ui/badge";
 import { getServerSessionUser } from "@/lib/session";
 import { getDefaultPathForRole } from "@/lib/rbac";
 import { HeroShowcase } from "@/components/landing/hero-showcase";
+import { SupplyChainTopology } from "@/components/landing/supply-chain-topology";
+import { EnterpriseBentoGrid } from "@/components/landing/enterprise-bento-grid";
+import { RoiSavingsCalculator } from "@/components/landing/roi-savings-calculator";
 
 export default async function HomePage() {
   const sessionUser = await getServerSessionUser();
   const dashboardPath = sessionUser ? getDefaultPathForRole(sessionUser.role) : null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden w-full">
+    <div className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden w-full font-sans selection:bg-primary/20">
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur border-b border-border shadow-xs px-4 sm:px-6 py-2.5 sm:py-3 w-full">
+      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border shadow-xs px-4 sm:px-6 py-2.5 sm:py-3 w-full">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           {/* Brand */}
           <div className="flex items-center gap-2 shrink-0">
@@ -32,18 +35,22 @@ export default async function HomePage() {
               <Store className="size-4 text-primary" />
             </span>
             <div>
-              <span className="text-lg sm:text-xl font-bold tracking-tight block text-slate-950 leading-none">KADAI</span>
+              <span className="text-lg sm:text-xl font-bold tracking-tight block text-slate-950 leading-none">
+                KADAI<span className="text-primary font-black">.</span>
+              </span>
               <span className="text-[9px] sm:text-[10px] text-muted-foreground font-mono font-bold tracking-wider uppercase block mt-0.5">
-                Enterprise POS & ERP
+                Enterprise POS & Supply OS
               </span>
             </div>
           </div>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
-            <a href="#multi-vertikal" className="hover:text-primary transition-colors">Solusi Industri</a>
-            <a href="#standar-keuangan" className="hover:text-primary transition-colors">Pajak & SAK EMKM</a>
-            <a href="#harga" className="hover:text-primary transition-colors">Paket Langganan</a>
+            <a href="#topologi-rantai-pasok" className="hover:text-primary transition-colors">Topologi Pasok</a>
+            <a href="#fitur-enterprise" className="hover:text-primary transition-colors">Core Engines</a>
+            <a href="#pajak-keuangan" className="hover:text-primary transition-colors">Pajak PB1 & SAK EMKM</a>
+            <a href="#kalkulator-roi" className="hover:text-primary transition-colors">Kalkulator ROI</a>
+            <a href="#harga" className="hover:text-primary transition-colors">Paket Harga</a>
           </div>
 
           {/* Action Buttons */}
@@ -60,7 +67,7 @@ export default async function HomePage() {
                   <Link href="/login">Masuk</Link>
                 </Button>
                 <Button asChild size="sm" className="font-bold text-xs shadow-xs h-8 sm:h-9 px-3 sm:px-4 rounded-lg">
-                  <Link href="/register">Daftar Akun</Link>
+                  <Link href="/register">Coba Gratis 14 Hari</Link>
                 </Button>
               </>
             )}
@@ -68,160 +75,91 @@ export default async function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section with Motion Showcase */}
+      {/* Section 1: Hero Section with Motion Showcase Slider */}
       <HeroShowcase dashboardPath={dashboardPath} />
 
-      {/* Multi-Vertical Solution Section */}
-      <section id="multi-vertikal" className="py-16 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
-        <div className="text-center space-y-3">
-          <Badge variant="outline" className="font-semibold rounded-full px-3 py-1">Solusi Lintas Industri</Badge>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-950">
-            Arsitektur Fleksibel untuk Seluruh Sektor Bisnis
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
-            KADAI dirancang secara modular dan agnostik untuk beradaptasi dengan model operasional usaha Anda, mulai dari pencatatan barcode ritel, perakitan resep kuliner, hingga reservasi jasa.
-          </p>
+      {/* Live Operational Ticker Bar */}
+      <div className="border-b border-border bg-slate-900 text-slate-300 py-3 px-4 text-xs font-mono">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-bold text-white">Live Platform Metrics:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-[11px]">
+            <div>Latensi Kasir: <strong className="text-emerald-400">&lt; 0.2s</strong></div>
+            <div>Akurasi HPP FIFO: <strong className="text-white">100% SAK EMKM</strong></div>
+            <div>Struk Cetak: <strong className="text-white">58mm / 80mm</strong></div>
+            <div>SLA Uptime: <strong className="text-emerald-400">99.9% Cloudflare</strong></div>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Card Ritel */}
-          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-                <ShoppingCart className="size-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-950">Ritel & Distribusi Komersial</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Minimarket modern, supermarket, fashion, farmasi/apotek, elektronik, toko bangunan, dan grosir.
-                </p>
-              </div>
-              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Pelacakan persediaan multi-batch FIFO & expired date.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Scan barcode scanner USB, Bluetooth & kamera HP.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Kartu stok mutasi otomatis & batas minimum restock.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Cetak struk kasir thermal 58mm/80mm & label barcode.
-                </li>
-              </ul>
-            </div>
-          </Card>
+      {/* Section 2: Hub-and-Spoke Topology & Supply Chain Architecture */}
+      <SupplyChainTopology />
 
-          {/* Card FnB */}
-          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-                <UtensilsCrossed className="size-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-950">Kuliner, F&B & Hospitality</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Restoran casual dining, kafe modern, fast food (QSR), bakery, dan cloud kitchen.
-                </p>
-              </div>
-              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Bill of Materials (BOM):</strong> Potong bahan baku otomatis saat menu laku.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Meja & Self-Order QR:</strong> Pelanggan pesan langsung dari HP.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> <strong>Kitchen Display (KDS):</strong> Tiket real-time ke monitor dapur & bar.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Otomatisasi Pajak Restoran (PB1 10%) & Service Charge.
-                </li>
-              </ul>
-            </div>
-          </Card>
+      {/* Section 3: Enterprise Bento Grid Core Engines */}
+      <EnterpriseBentoGrid />
 
-          {/* Card Services */}
-          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow bg-card p-5 sm:p-6 space-y-4 rounded-xl flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="size-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
-                <Building className="size-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-950">Layanan Jasa & Multi-Cabang</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Barbershop, salon kecantikan, bengkel otomotif, cuci mobil/motor, laundry, dan franchise.
-                </p>
-              </div>
-              <ul className="space-y-2 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Pencatatan invoice billing jasa & produk dalam 1 transaksi.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Database pelanggan CRM, riwayat kunjungan & poin member.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Manajemen multi-cabang terpusat dari satu dashboard akun.
-                </li>
-                <li className="flex items-center gap-2 text-slate-800">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0" /> Kontrol hak akses staf RBAC 6 role & PIN supervisor.
-                </li>
-              </ul>
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      {/* Tax & Financial Standards Section */}
-      <section id="pajak-keuangan" className="py-16 px-6 bg-slate-50/60 border-y border-border">
+      {/* Section 4: Indonesian Fiscal & Legal Moat */}
+      <section id="pajak-keuangan" className="py-16 sm:py-24 px-4 sm:px-6 bg-slate-50/70 border-y border-border w-full">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center space-y-3">
-            <Badge variant="outline" className="font-semibold rounded-full px-3 py-1">Standar Keuangan Indonesia</Badge>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-950">
-              Pajak & Pembukuan Resmi Sesuai Regulasi Republik Indonesia
+            <Badge variant="outline" className="font-semibold rounded-full px-3.5 py-1 bg-white text-slate-800 border-slate-300">
+              Kepatuhan Fiskal & Akuntansi Indonesia
+            </Badge>
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+              Dibangun Presisi Mengikuti Regulasi Fiskal & Akuntansi Republik Indonesia
             </h2>
-            <p className="text-sm text-slate-600 max-w-xl mx-auto">
-              Tak perlu pusing menghitung pajak manual atau menyusun laporan pembukuan akuntansi dari nol saat pemeriksaan pajak.
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Tidak perlu memaksakan sistem luar negeri yang kaku. KADAI memahami perbedaan Pajak Daerah PB1 10% dan PPN 11%, serta menyusun buku omzet bulanan sesuai PP 55/2022.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border border-border shadow-sm bg-card p-5 space-y-3 rounded-xl">
-              <Receipt className="size-8 text-primary" />
-              <h4 className="font-bold text-base text-slate-950">Perhitungan Pajak Fleksibel</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="border border-border shadow-xs bg-white p-6 space-y-3.5 rounded-2xl">
+              <div className="size-11 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-primary">
+                <Percent className="size-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-950">Pajak Fleksibel: PPN 11% & PB1 10%</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Mendukung PPN 11%/12% (Inklusif & Eksklusif) untuk ritel umum, dan PB1 (Pajak Restoran 10%) untuk usaha kuliner. Bisa diaktifkan atau dinonaktifkan sesuai status wajib pajak.
+                Tentukan mode perpajakan per cabang: Pajak Pertambahan Nilai (PPN 11%) untuk perdagangan ritel atau Pajak Restoran (PB1 10%) untuk usaha kuliner dan kafe. Tarif dapat dikustomisasi sesuai Perda setempat.
               </p>
             </Card>
 
-            <Card className="border border-border shadow-sm bg-card p-5 space-y-3 rounded-xl">
-              <Scale className="size-8 text-primary" />
-              <h4 className="font-bold text-base text-slate-950">Rekap PPh Final UMKM 0.5%</h4>
+            <Card className="border border-border shadow-xs bg-white p-6 space-y-3.5 rounded-2xl">
+              <div className="size-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <Receipt className="size-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-950">PPh Final UMKM 0.5% (PP 55/2022)</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Sesuai PP 55/2022 (pengganti PP 23/2018). Sistem merangkum otomatis Buku Peredaran Bruto Bulanan dan memonitor batas pembebasan omzet Rp 500 Juta bagi Wajib Pajak Orang Pribadi.
+                Kalkulasi otomatis proyeksi setoran pajak penghasilan final 0.5% dari omzet bruto bulanan. Dilengkapi simulasi ambang batas bebas pajak Rp 500 Juta untuk Wajib Pajak Orang Pribadi.
               </p>
             </Card>
 
-            <Card className="border border-border shadow-sm bg-card p-5 space-y-3 rounded-xl">
-              <BarChart3 className="size-8 text-primary" />
-              <h4 className="font-bold text-base text-slate-950">Laporan Standar SAK EMKM</h4>
+            <Card className="border border-border shadow-xs bg-white p-6 space-y-3.5 rounded-2xl">
+              <div className="size-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                <Scale className="size-5" />
+              </div>
+              <h3 className="text-base font-bold text-slate-950">Laporan Laba Rugi SAK EMKM</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Laporan Laba Rugi real-time berbasis HPP FIFO, Laporan Posisi Keuangan (Neraca Sederhana), dan Laporan Arus Kas (Cash Flow) yang siap dicetak untuk pelaporan perbankan.
+                Susun laporan laba rugi periodik yang mencerminkan pendapatan riil, beban pokok penjualan (HPP berbasis FIFO), dan laba bersih yang sah untuk pengajuan modal perbankan & audit internal.
               </p>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Pricing Matrix Section */}
-      <section id="harga" className="py-20 px-6 max-w-6xl mx-auto w-full space-y-12">
+      {/* Section 5: Interactive TCO & Shrinkage Savings ROI Calculator */}
+      <RoiSavingsCalculator />
+
+      {/* Section 6: Commercial Pricing Section */}
+      <section id="harga" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
         <div className="text-center space-y-3">
           <Badge variant="outline" className="font-semibold rounded-full px-3 py-1">Paket Komersial</Badge>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-950">
+          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
             Pilihan Paket Langganan Sesuai Skala Bisnis Anda
           </h2>
-          <p className="text-sm text-slate-600 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
             Semua paket dilengkapi garansi update fitur berkala dan penyimpanan database cloud yang aman.
           </p>
         </div>
@@ -308,16 +246,77 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Section 7: Enterprise Security & SLA */}
+      <section className="py-16 px-4 sm:px-6 bg-slate-950 text-white border-t border-slate-800">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-mono font-bold text-emerald-400 block uppercase tracking-wider">
+                Enterprise Trust & Security
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black mt-1">
+                Keamanan Data, Audit Trail & Garansi Keandalan 99.9% SLA
+              </h3>
+            </div>
+            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-mono py-1 px-3">
+              ISO-grade Hygiene Ready
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <ShieldCheck className="size-5 text-emerald-400" />
+              <h4 className="font-bold text-sm text-slate-200">Zero Trust Boundary</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Validasi input tak terpercaya via skema Zod ketat di setiap gateway API untuk menangkal injeksi & tamper.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <Lock className="size-5 text-blue-400" />
+              <h4 className="font-bold text-sm text-slate-200">Session Cookie HMAC-SHA256</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Token sesi terenkripsi dengan bendera HttpOnly, SameSite=Lax, Secure, dan invalidasi otomatis saat perubahan role.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <Layers className="size-5 text-purple-400" />
+              <h4 className="font-bold text-sm text-slate-200">Immutable Activity Log</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Seluruh aktivitas kritis seperti transfer stok, void penjualan, dan opname dicatat permanen dengan metadata aktor & IP.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <Sparkles className="size-5 text-amber-400" />
+              <h4 className="font-bold text-sm text-slate-200">99.9% SLA Guaranteed</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Arsitektur Docker swarm di VPS Dokploy berkecepatan tinggi dengan transmisi jaringan Cloudflare Tunnel terisolasi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="mt-auto border-t border-border bg-slate-900 text-slate-400 py-8 px-6 text-xs">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-border bg-slate-900 text-slate-400 py-10 px-4 sm:px-6 text-xs">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white text-sm">KADAI</span>
-            <span>• Platform Operasi Bisnis Terpadu UMKM Indonesia</span>
+            <span className="font-black text-white text-base">KADAI</span>
+            <span>• Platform Operasi Bisnis Terpadu & Rantai Pasok Indonesia</span>
           </div>
-          <div>
-            Dikembangkan secara berdaulat oleh <strong className="text-white">ATIOSLab</strong> untuk kemajuan ekonomi nasional.
+          <div className="flex flex-wrap items-center gap-6">
+            <a href="#topologi-rantai-pasok" className="hover:text-white transition-colors">Topologi Pasok</a>
+            <a href="#fitur-enterprise" className="hover:text-white transition-colors">Core Engines</a>
+            <a href="#pajak-keuangan" className="hover:text-white transition-colors">Pajak PB1/PPN</a>
+            <a href="#kalkulator-roi" className="hover:text-white transition-colors">Kalkulator ROI</a>
+            <a href="#harga" className="hover:text-white transition-colors">Paket Harga</a>
+            <Link href="/login" className="hover:text-white transition-colors">Masuk Kasir</Link>
           </div>
+          <p className="text-[11px] text-slate-500 font-mono">
+            Dikembangkan secara berdaulat oleh <strong className="text-slate-300">ATIOSLab</strong>. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

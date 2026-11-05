@@ -57,15 +57,15 @@ export function HeroShowcase({
   const current = BACKGROUND_SLIDES[activeSlide];
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24 md:py-28 px-4 sm:px-6 border-b border-border bg-slate-950 text-white w-full">
-      {/* 3-Slide Full-Bleed Vivid Background Images with Smooth Crossfade */}
+    <section className="relative overflow-hidden py-14 sm:py-20 md:py-24 px-4 sm:px-6 border-b border-border bg-gradient-to-b from-card via-card to-background text-slate-950 w-full">
+      {/* 3-Slide Ambient Background Images with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         {BACKGROUND_SLIDES.map((slide, index) => (
           <div
             key={slide.url}
             className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform ${
               activeSlide === index
-                ? "opacity-60 scale-100"
+                ? "opacity-25 scale-100"
                 : "opacity-0 scale-105"
             }`}
             style={{
@@ -73,30 +73,29 @@ export function HeroShowcase({
             }}
           />
         ))}
-        {/* Ambient Dark Scrim that preserves rich photo visibility while guaranteeing razor-sharp text */}
-        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[0.5px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-slate-950/90" />
+        {/* Clean, Luminous Light Gradient Scrim for crisp typography and seamless harmony */}
+        <div className="absolute inset-0 bg-gradient-to-b from-card/90 via-card/80 to-background backdrop-blur-[1px]" />
       </div>
 
-      {/* Main Hero Content - Direct Text without Box/Card */}
+      {/* Main Hero Content - Direct Clean Layout (No Card/Box) */}
       <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-        {/* Animated Badge */}
+        {/* Animated Headline Badge */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/80 text-slate-200 text-xs font-semibold shadow-sm backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200/90 text-slate-800 text-xs font-semibold shadow-xs"
         >
           <Sparkles className="size-3.5 text-primary shrink-0" />
           <span>Sistem Operasi Bisnis, Kasir POS & Rantai Pasok Indonesia</span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Main Title */}
         <motion.h1
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-white text-balance drop-shadow-md"
+          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-slate-950 text-balance"
         >
           Kelola Penjualan, Rantai Pasok, & Pembukuan dengan Akurasi Enterprise.
         </motion.h1>
@@ -106,7 +105,7 @@ export function HeroShowcase({
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-          className="text-sm sm:text-base md:text-lg text-slate-200 font-medium max-w-2xl mx-auto leading-relaxed text-balance drop-shadow-sm"
+          className="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed text-balance"
         >
           KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep
           Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan
@@ -124,7 +123,7 @@ export function HeroShowcase({
             <Button
               asChild
               size="lg"
-              className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-md rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-sm rounded-xl"
             >
               <Link href={dashboardPath} className="flex items-center gap-2">
                 <span>Buka Dashboard Operasional</span>
@@ -136,7 +135,7 @@ export function HeroShowcase({
               <Button
                 asChild
                 size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-md rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-sm rounded-xl"
               >
                 <Link href="/register" className="flex items-center gap-2">
                   <span>Mulai Uji Coba Gratis 14 Hari</span>
@@ -147,7 +146,7 @@ export function HeroShowcase({
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-700 hover:bg-slate-900 bg-slate-900/70 text-white shadow-xs backdrop-blur-md border"
+                className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-slate-50 bg-white"
               >
                 <Link href="/login">Masuk ke Toko Anda</Link>
               </Button>
@@ -162,44 +161,44 @@ export function HeroShowcase({
           transition={{ duration: 0.6, delay: 0.4 }}
           className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-xl mx-auto text-left w-full"
         >
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 shadow-xs backdrop-blur-md">
-            <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+            <span className="text-xs font-semibold text-slate-800">
               Kepatuhan Standar SAK EMKM RI & PPh Final 0.5%
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 shadow-xs backdrop-blur-md">
-            <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+            <span className="text-xs font-semibold text-slate-800">
               Otomatisasi Pajak Restoran PB1 10% & PPN 11%
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 shadow-xs backdrop-blur-md">
-            <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+            <span className="text-xs font-semibold text-slate-800">
               Self-Order QR Mandiri & Layar Dapur KDS Real-time
             </span>
           </div>
-          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 shadow-xs backdrop-blur-md">
-            <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 shadow-xs">
+            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+            <span className="text-xs font-semibold text-slate-800">
               Multi-Cabang, Transfer Stok & Hak Akses 6-Role RBAC
             </span>
           </div>
         </motion.div>
 
-        {/* Background Slide Indicator & Industry Switcher */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        {/* Clean Background Slide Indicator */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 border-t border-slate-200/60 max-w-2xl mx-auto">
           <div className="flex items-center gap-2">
             <Store className="size-3.5 text-primary" />
-            <span className="font-bold text-slate-200">{current.label}:</span>
-            <span className="text-slate-400 text-[11px] hidden sm:inline">{current.tagline}</span>
+            <span className="font-bold text-slate-800">{current.label}:</span>
+            <span className="text-slate-500 text-[11px] hidden sm:inline">{current.tagline}</span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handlePrev}
-              className="p-1 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="p-1 rounded-full hover:bg-slate-200 text-slate-600 transition-colors"
               title="Slide Sebelumnya"
               aria-label="Slide Sebelumnya"
             >
@@ -214,7 +213,7 @@ export function HeroShowcase({
                   className={`transition-all rounded-full ${
                     activeSlide === idx
                       ? "w-6 h-1.5 bg-primary"
-                      : "w-1.5 h-1.5 bg-slate-700 hover:bg-slate-500"
+                      : "w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400"
                   }`}
                   title={slide.label}
                   aria-label={slide.label}
@@ -224,7 +223,7 @@ export function HeroShowcase({
 
             <button
               onClick={handleNext}
-              className="p-1 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="p-1 rounded-full hover:bg-slate-200 text-slate-600 transition-colors"
               title="Slide Berikutnya"
               aria-label="Slide Berikutnya"
             >

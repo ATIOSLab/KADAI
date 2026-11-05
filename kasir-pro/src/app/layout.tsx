@@ -18,11 +18,49 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KADAI - Enterprise POS & ERP System",
+  metadataBase: new URL("https://kadai.netkrida.cloud"),
+  title: {
+    default: "KADAI - Enterprise POS & Rantai Pasok RI",
+    template: "%s | KADAI Enterprise",
+  },
   description:
-    "Platform Operasi Bisnis Terpadu: Point of Sale (POS), Manajemen Persediaan FIFO, Resep BOM Kuliner, dan Kepatuhan Akuntansi SAK EMKM.",
-  keywords: ["POS", "kasir", "point of sale", "inventory", "FIFO", "BOM", "KDS", "SAK EMKM", "enterprise"],
+    "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM.",
+  keywords: [
+    "POS",
+    "kasir online",
+    "point of sale indonesia",
+    "inventori FIFO",
+    "BOM kuliner",
+    "KDS restoran",
+    "SAK EMKM",
+    "pajak resto PB1",
+    "PPh Final PP 55/2022",
+    "multi-cabang",
+  ],
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
+  openGraph: {
+    title: "KADAI - Enterprise POS & Rantai Pasok RI",
+    description:
+      "Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda. Dilengkapi Kasir POS kilat, FIFO batch, dan kepatuhan fiskal RI.",
+    url: "https://kadai.netkrida.cloud",
+    siteName: "KADAI Operating System",
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KADAI - Enterprise POS & Rantai Pasok RI",
+    description:
+      "Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

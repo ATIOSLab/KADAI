@@ -13,7 +13,6 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { HeroBackgroundSlider } from "./hero-background-slider";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -102,81 +101,168 @@ const SEGMENTS = [
 
 export function HeroSection({ dashboardPath }: HeroSectionProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const current = SEGMENTS[activeTab];
 
   return (
-    <section className="relative overflow-hidden pt-8 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
-      {/* 3 High-Resolution Unsplash Background Image Slider with Scrim Masking */}
-      <HeroBackgroundSlider
-        currentSlide={currentSlide}
-        onSlideChange={setCurrentSlide}
-      />
-
-      {/* GetLayers Studio Key-light Overhead Vignette */}
+    <section className="relative overflow-hidden pt-6 sm:pt-10 pb-16 sm:pb-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-10">
+      {/* Studio Key-light Overhead Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[360px] studio-keylight pointer-events-none -z-10" />
 
-      {/* Hero Header Copy (Positioned above slider scrim with solid backdrop legibility) */}
-      <div className="relative z-30 max-w-4xl mx-auto text-center space-y-5">
-        {/* Eyebrow Pill */}
-        <Badge
-          variant="outline"
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80"
-        >
-          <span className="size-2 rounded-full bg-primary" />
-          <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
-            KADAI Operating System // Enterprise POS & Rantai Pasok RI
-          </span>
-        </Badge>
+      {/* Hero Header Area: Flanked by Lifestyle & Hardware Mockup Cards */}
+      <div className="relative z-20 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        {/* Left Visual: Laptop Mockup & Live Revenue Metric Card */}
+        <div className="hidden lg:block lg:col-span-3 space-y-4">
+          {/* Revenue Card (Rp 24.680.000) */}
+          <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-lg shadow-slate-900/[0.04] space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                Penjualan Hari Ini
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                +12.4%
+              </span>
+            </div>
+            <div>
+              <span className="text-xl font-bold text-slate-950 tabular-nums tracking-tight">
+                Rp 24.680.000
+              </span>
+              <div className="text-[11px] text-slate-500 flex items-center justify-between mt-1">
+                <span>368 Transaksi</span>
+                <span className="font-semibold text-slate-700">9 Outlets Live</span>
+              </div>
+            </div>
+            {/* Mini Trendline Sparkline Bar */}
+            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex">
+              <div className="bg-primary h-full w-[65%]" />
+              <div className="bg-emerald-500 h-full w-[25%]" />
+              <div className="bg-amber-400 h-full w-[10%]" />
+            </div>
+          </div>
 
-        {/* Headline H1 */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight text-slate-950 leading-[1.15] text-balance">
-          Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
-        </h1>
+          {/* Lifestyle Hardware Preview Image */}
+          <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-200/90 shadow-md">
+            <Image
+              src="/images/hero/slide-1.jpg"
+              alt="Laptop kasir & pembukuan KADAI POS"
+              fill
+              className="object-cover"
+              sizes="25vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+                Dashboard POS
+              </span>
+              <span className="text-xs font-semibold leading-tight block">
+                Realtime Analytics
+              </span>
+            </div>
+          </div>
+        </div>
 
-        {/* Subtitle */}
-        <p className="text-sm sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance">
-          KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
-        </p>
+        {/* Center Main Headline & CTA Copy */}
+        <div className="lg:col-span-6 text-center space-y-5">
+          {/* Eyebrow Pill */}
+          <Badge
+            variant="outline"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80"
+          >
+            <span className="size-2 rounded-full bg-primary" />
+            <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
+              KADAI OPERATING SYSTEM // ENTERPRISE POS & RANTAI PASOK ID
+            </span>
+          </Badge>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
-          {dashboardPath ? (
-            <Button
-              asChild
-              size="lg"
-              className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
-            >
-              <Link href={dashboardPath} className="flex items-center gap-2">
-                <span>Buka Dashboard Operasional</span>
-                <ArrowUpRight className="size-4 shrink-0" />
-              </Link>
-            </Button>
-          ) : (
-            <>
-              {/* Compound Capsule Button (GetLayers + Hexus ArrowUpRight) */}
-              <Link
-                href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
-              >
-                <span className="font-semibold text-xs sm:text-sm tracking-tight">
-                  Mulai Uji Coba Gratis 14 Hari
-                </span>
-                <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                  <ArrowUpRight className="size-4" />
-                </span>
-              </Link>
+          {/* Headline H1 */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-bold tracking-tight text-slate-950 leading-[1.15] text-balance">
+            Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
+          </h1>
 
+          {/* Subtitle */}
+          <p className="text-sm sm:text-base md:text-base text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed text-balance">
+            KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
+            {dashboardPath ? (
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="w-full sm:w-auto font-medium text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
+                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
               >
-                <Link href="/login">Masuk ke Toko Anda</Link>
+                <Link href={dashboardPath} className="flex items-center gap-2">
+                  <span>Buka Dashboard Operasional</span>
+                  <ArrowUpRight className="size-4 shrink-0" />
+                </Link>
               </Button>
-            </>
-          )}
+            ) : (
+              <>
+                {/* Compound Capsule Button */}
+                <Link
+                  href="/register"
+                  className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
+                >
+                  <span className="font-semibold text-xs sm:text-sm tracking-tight">
+                    Mulai Uji Coba Gratis 14 Hari
+                  </span>
+                  <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                    <ArrowUpRight className="size-4" />
+                  </span>
+                </Link>
+
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto font-medium text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
+                >
+                  <Link href="/login">Masuk ke Toko Anda</Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Right Visual: Executive Review Photo & Accounting Card */}
+        <div className="hidden lg:block lg:col-span-3 space-y-4">
+          {/* Executive Review Photo */}
+          <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-200/90 shadow-md">
+            <Image
+              src="/images/hero/slide-2.jpg"
+              alt="Owner memeriksa laporan akuntansi via tablet"
+              fill
+              className="object-cover"
+              sizes="25vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+                SAK EMKM & Fiskal
+              </span>
+              <span className="text-xs font-semibold leading-tight block">
+                Audit & Kepatuhan Pajak
+              </span>
+            </div>
+          </div>
+
+          {/* Accounting SAK EMKM Card */}
+          <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-lg shadow-slate-900/[0.04] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                Status Rekonsiliasi
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                • Siap Lapor
+              </span>
+            </div>
+            <div className="text-xs font-bold text-slate-900">
+              PB1 10% & PPh Final 0.5%
+            </div>
+            <p className="text-[11px] text-slate-500 leading-tight">
+              Jurnal pembukuan otomatis terbit seiring transaksi kasir selesai ditutup.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 # Kredensial Akses & Panduan Uji RBAC KADAI
 
-**Target Instance**: [https://kadai.netkrida.cloud](https://kadai.netkrida.cloud)  
+**Target Instance**: [https://kadai.asia](https://kadai.asia)  
 **Status**: Production / Live (Commit `db973b6` via Dokploy)
 
 ---
@@ -8,7 +8,7 @@
 ## 1. Akun Administrator Master (Seed Default)
 
 Akun master yang terdaftar di database VPS:
-- **URL Login**: `https://kadai.netkrida.cloud/login`
+- **URL Login**: `https://kadai.asia/login`
 - **Email**: `admin@kadai.com`
 - **Password**: `admin123` *(jika belum pernah diganti di pengaturan profil)*
 - **Role**: `ADMIN` (Owner)
@@ -18,7 +18,7 @@ Akun master yang terdaftar di database VPS:
 
 ## 2. Matriks Uji 6 Role Pengguna
 
-Karena endpoint registrasi publik telah ditutup demi keamanan (mencegah pendaftaran akun sembarangan di database shared), silakan login sebagai **Admin**, buka menu **Pengaturan ➔ Kelola Pengguna** (`https://kadai.netkrida.cloud/settings`), lalu daftarkan akun uji masing-masing role berikut:
+Karena endpoint registrasi publik telah ditutup demi keamanan (mencegah pendaftaran akun sembarangan di database shared), silakan login sebagai **Admin**, buka menu **Pengaturan ➔ Kelola Pengguna** (`https://kadai.asia/settings`), lalu daftarkan akun uji masing-masing role berikut:
 
 | No | Role | Rekomendasi Email Uji | Password Uji | PIN Supervisor | Default Landing Page |
 |:---|:---|:---|:---|:---|:---|

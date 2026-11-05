@@ -1,6 +1,6 @@
 # KADAI Demo Client Clusters & Master Test Credentials
 
-**URL Akses Aplikasi**: [https://kadai.netkrida.cloud](https://kadai.netkrida.cloud)  
+**URL Akses Aplikasi**: [https://kadai.asia](https://kadai.asia)  
 **Standard Password Default Semua Akun Demo**: `password123`  
 **Master Admin VPS**: `admin@kadai.com` / `admin123` (PIN: `123456`)
 
@@ -156,7 +156,7 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ---
 
 ## Ringkasan Petunjuk Uji Coba Lapangan
-1. **Buka Aplikasi**: Akses [https://kadai.netkrida.cloud/login](https://kadai.netkrida.cloud/login).
+1. **Buka Aplikasi**: Akses [https://kadai.asia/login](https://kadai.asia/login).
 2. **Login dengan Akun Kasir**: Contoh `kasir.dimsum@kadai.com` / `password123`.
    - Coba selesaikan transaksi penjualan pesanan Siomay Hakau & Lumpia.
    - Perhatikan bahwa kasir tidak bisa melihat margin dan modal HPP bahan udang.

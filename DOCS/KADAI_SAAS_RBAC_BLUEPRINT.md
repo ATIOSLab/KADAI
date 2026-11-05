@@ -5,7 +5,7 @@
 > **Status:** Master Security Specification (Commercial Tier)  
 > **Version:** 2.1.0 (Commercial B2B Ready)  
 > **Author & Architect:** Netkrida (@netkridabot) for Irvan  
-> **Product Target:** KADAI SaaS POS Platform (`https://kadai.netkrida.cloud`)  
+> **Product Target:** KADAI SaaS POS Platform (`https://kadai.asia`)  
 > **Repository:** `ATIOSLab/KADAI` (`main` branch)
 
 ---

@@ -82,7 +82,7 @@ async function ensureStore() {
       tier: "PRO_BUSINESS",
       address: process.env.STORE_ADDRESS || "Jl. Sudirman No. 45, Jakarta Pusat",
       phone: process.env.STORE_PHONE || "08127634091",
-      email: process.env.STORE_EMAIL || "halo@kadai.netkrida.cloud",
+      email: process.env.STORE_EMAIL || "halo@kadai.asia",
       taxType: "PB1_10",
       taxRate: 10,
       taxInclusive: false,

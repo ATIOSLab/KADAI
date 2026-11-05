@@ -42,13 +42,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         {/* Center Navigation Links */}
         <nav
           aria-label="Navigasi Utama"
-          className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600"
+          className="hidden sm:flex items-center gap-6 text-sm font-semibold text-slate-600"
         >
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="hover:text-primary transition-colors font-medium text-slate-700"
+              className="hover:text-primary transition-colors font-medium text-slate-700 whitespace-nowrap"
             >
               {link.label}
             </a>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   QrCode,
   Plus,
@@ -8,8 +9,6 @@ import {
   Utensils,
   ExternalLink,
   Trash2,
-  Edit2,
-  CheckCircle2,
   Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -168,13 +167,11 @@ export default function TablesPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {tables.map((t) => {
-            const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/order/${t.qrToken}` : `/order/${t.qrToken}`;
-            return (
-              <Card
-                key={t.id}
-                className="border border-border bg-card hover:shadow-md transition-shadow duration-200"
-              >
+          {tables.map((t) => (
+            <Card
+              key={t.id}
+              className="border border-border bg-card hover:shadow-md transition-shadow duration-200"
+            >
                 <CardHeader className="pb-3 border-b border-border/50 flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-lg font-black">{t.tableNo}</CardTitle>
@@ -238,8 +235,7 @@ export default function TablesPage() {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+          ))}
         </div>
       )}
 
@@ -315,13 +311,16 @@ export default function TablesPage() {
             </DialogHeader>
             <div className="py-6 flex flex-col items-center justify-center space-y-4">
               <div className="p-4 bg-white rounded-2xl neo-border neo-shadow">
-                <img
+                <Image
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
                     typeof window !== "undefined"
                       ? `${window.location.origin}/order/${selectedQR.qrToken}`
                       : ""
                   )}`}
                   alt={`QR Code ${selectedQR.tableNo}`}
+                  width={208}
+                  height={208}
+                  unoptimized
                   className="size-52"
                 />
               </div>

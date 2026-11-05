@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ export const metadata: Metadata = {
     "Platform Operasi Bisnis Terpadu: Point of Sale (POS), Manajemen Persediaan FIFO, Resep BOM Kuliner, dan Kepatuhan Akuntansi SAK EMKM.",
   keywords: ["POS", "kasir", "point of sale", "inventory", "FIFO", "BOM", "KDS", "SAK EMKM", "enterprise"],
   manifest: "/manifest.json",
-  themeColor: "#0F172A",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -23,7 +22,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
+  themeColor: "#0F172A",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -38,12 +38,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={cn("font-sans", geist.variable)}>
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="min-h-screen antialiased">
         {children}
         <Toaster

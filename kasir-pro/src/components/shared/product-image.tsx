@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +25,14 @@ export function ProductImage({
       )}
     >
       {src ? (
-        <img src={src} alt={alt} className="h-full w-full object-cover" />
+        <Image
+          src={src}
+          alt={alt}
+          width={120}
+          height={120}
+          unoptimized
+          className="h-full w-full object-cover"
+        />
       ) : (
         <Package className={cn("h-6 w-6 text-text-muted", iconClassName)} />
       )}

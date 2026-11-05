@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Scale,
-  Receipt,
-  FileText,
-  Calendar,
   Download,
-  AlertCircle,
-  CheckCircle2,
-  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

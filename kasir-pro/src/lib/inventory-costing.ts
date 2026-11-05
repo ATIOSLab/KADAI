@@ -1,6 +1,5 @@
 import type { Prisma, PrismaClient, CostingMethod } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
-import { prisma } from "./prisma";
 
 export interface CostingAllocation {
   batchId: string;
@@ -37,7 +36,7 @@ export async function processStockDeduction(
   const outletId = options?.outletId ?? null;
 
   // 1. Fetch available batches. If outletId is provided, match that outlet or global (null)
-  let batches = await db.productBatch.findMany({
+  const batches = await db.productBatch.findMany({
     where: {
       productId,
       remainingQty: { gt: 0 },

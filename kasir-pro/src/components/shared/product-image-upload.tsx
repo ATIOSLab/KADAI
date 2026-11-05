@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useId, useMemo, useState } from "react";
 import { ImagePlus, Package, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,9 +58,12 @@ export function ProductImageUpload({
         <div className="flex flex-col gap-4 p-4 md:flex-row items-center md:items-start">
           <div className="flex h-[120px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-xl border border-dashed border-border-default bg-bg-main">
             {activePreview ? (
-              <img
+              <Image
                 src={activePreview}
                 alt="Preview gambar produk"
+                width={120}
+                height={120}
+                unoptimized
                 className="h-full w-full object-cover"
               />
             ) : (

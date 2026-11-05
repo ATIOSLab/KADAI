@@ -5,6 +5,7 @@ import { hasRequiredRole, INVENTORY_ROLES } from "@/lib/rbac";
 import { createTransferSchema, updateTransferStatusSchema } from "@/lib/validators/transfer";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 
 // GET /api/inventory/transfers
 export async function GET(request: NextRequest) {
@@ -23,8 +24,8 @@ export async function GET(request: NextRequest) {
     const sourceOutletId = searchParams.get("sourceOutletId");
     const destinationOutletId = searchParams.get("destinationOutletId");
 
-    const where: any = {};
-    if (status && status !== "ALL") where.status = status;
+    const where: Prisma.StockTransferWhereInput = {};
+    if (status && status !== "ALL") where.status = status as any;
     if (sourceOutletId && sourceOutletId !== "ALL") where.sourceOutletId = sourceOutletId;
     if (destinationOutletId && destinationOutletId !== "ALL") where.destinationOutletId = destinationOutletId;
 

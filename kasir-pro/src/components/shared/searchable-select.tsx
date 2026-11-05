@@ -85,6 +85,7 @@ export function SearchableSelect({
           type="button"
           role="combobox"
           aria-expanded={open}
+          aria-controls="searchable-select-listbox"
           disabled={disabled}
           className={cn(
             "flex h-10 w-full items-center justify-between gap-2 neo-input bg-bg-card px-3 py-2 text-sm font-medium text-left disabled:cursor-not-allowed disabled:opacity-50",
@@ -121,7 +122,7 @@ export function SearchableSelect({
             </div>
           </div>
 
-          <div className="max-h-72 overflow-y-auto p-1">
+          <div id="searchable-select-listbox" role="listbox" className="max-h-72 overflow-y-auto p-1">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-6 text-center text-sm font-medium text-text-muted">
                 {emptyMessage}

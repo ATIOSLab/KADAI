@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-// @ts-ignore Node native TypeScript runner requires the explicit extension.
+// @ts-expect-error Node native TypeScript runner requires the explicit extension.
 import { redactCosts, SALES_READ_ROLES, validUploadUrl, validImageContent } from "../src/app/api/_lib/access.ts";
 
 const route = (p: string) => readFileSync(new URL(`../src/app/api/${p}/route.ts`, import.meta.url), "utf8");

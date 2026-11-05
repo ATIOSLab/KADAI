@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Image from "next/image";
 import {
   Utensils,
   Plus,
   Minus,
   ShoppingBag,
-  Clock,
   CheckCircle2,
   AlertCircle,
   Receipt,
@@ -310,9 +310,12 @@ export default function TableOrderPage({
                 >
                   <CardContent className="p-3 flex gap-3 items-center">
                     {p.image ? (
-                      <img
+                      <Image
                         src={p.image}
                         alt={p.name}
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="size-20 rounded-xl object-cover neo-border shrink-0"
                       />
                     ) : (
@@ -457,6 +460,16 @@ export default function TableOrderPage({
                   />
                 </div>
               ))}
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <label className="text-xs font-bold text-muted-foreground">Catatan Pesanan / Dapur (Opsional)</label>
+              <Input
+                placeholder="Contoh: Tolong antarkan tisu dan sendok tambahan"
+                value={generalNotes}
+                onChange={(e) => setGeneralNotes(e.target.value)}
+                className="text-xs bg-card neo-border h-9"
+              />
             </div>
 
             {/* Summary Breakdown */}

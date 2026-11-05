@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/dialog";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
-import { formatCurrency, formatNumber } from "@/lib/utils";
-import { Warehouse, AlertTriangle, Plus, Search, TrendingDown, TrendingUp } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
+import { Warehouse, AlertTriangle, Plus } from "lucide-react";
 
 interface AdjustmentEntry {
   id: string;
@@ -67,7 +67,6 @@ const REASON_VARIANTS: Record<string, "danger" | "secondary" | "default"> = {
 };
 
 export default function AdjustmentsPage() {
-  const { user } = useSessionUser();
   const [adjustments, setAdjustments] = useState<AdjustmentEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

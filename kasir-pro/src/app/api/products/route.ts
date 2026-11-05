@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createProductSchema } from "@/lib/validators/product";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
-import { ADMIN_MANAGER_ROLES, INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ZodError } from "zod";
 
 function normalizeUnitName(name: string) {

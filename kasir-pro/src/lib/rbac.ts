@@ -54,7 +54,7 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/kds", roles: KDS_ROLES },
 ];
 
-type SessionPayload = {
+export type SessionPayload = {
   id: string;
   name: string;
   email: string;

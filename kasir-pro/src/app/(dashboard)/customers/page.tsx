@@ -5,17 +5,10 @@ import {
   Users,
   Plus,
   Search,
-  Phone,
-  Mail,
-  Award,
-  CreditCard,
-  ShoppingBag,
   Edit2,
-  CheckCircle2,
-  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {

@@ -7,9 +7,6 @@ import {
   Store,
   UtensilsCrossed,
   ShoppingBag,
-  Sparkles,
-  CheckCircle2,
-  ArrowRight,
   Eye,
   EyeOff,
 } from "lucide-react";

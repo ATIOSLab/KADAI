@@ -36,7 +36,7 @@ test("Transfer validation: rejects transfer where source equals destination", ()
         items: [{ productId: "prod_1", quantity: 5 }],
       });
     },
-    (err: any) => {
+    (err: unknown) => {
       assert(err instanceof ZodError);
       assert(err.message.includes("Cabang asal dan cabang tujuan tidak boleh sama"));
       return true;

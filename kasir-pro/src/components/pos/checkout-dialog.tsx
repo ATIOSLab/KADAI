@@ -9,7 +9,6 @@ import {
   QrCode,
   Wallet,
   Printer,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch, ApiError } from "@/lib/api";

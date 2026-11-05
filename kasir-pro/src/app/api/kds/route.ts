@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { KDS_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,12 +22,12 @@ export async function GET(req: NextRequest) {
     const station = searchParams.get("station"); // KITCHEN, BAR, or null for ALL
     const outletId = searchParams.get("outletId");
 
-    const whereClause: any = {
+    const whereClause: Prisma.KDSOrderWhereInput = {
       status: { in: ["QUEUED", "COOKING", "READY"] },
     };
 
     if (station && station !== "ALL") {
-      whereClause.station = station;
+      whereClause.station = station as any;
     }
 
     if (outletId && outletId !== "ALL") {

@@ -10,9 +10,6 @@ import {
   MapPin,
   PackageCheck,
   Edit2,
-  Trash2,
-  CheckCircle2,
-  XCircle,
   Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { logActivity } from "@/lib/activity-logger";
-import { z } from "zod";
+import { jsonOk, handleApiError } from "@/lib/api-response";
 
 // GET /api/inventory — Stock overview
 export async function GET(request: NextRequest) {
@@ -50,10 +49,9 @@ export async function GET(request: NextRequest) {
       })
       .filter((p) => !lowStockOnly || p.isLowStock);
 
-    return NextResponse.json({ data: inventory });
+    return jsonOk(inventory);
   } catch (error) {
-    console.error("GET /api/inventory error:", error);
-    return NextResponse.json({ error: "Gagal memuat data inventori" }, { status: 500 });
+    return handleApiError(error, "GET /api/inventory", "Gagal memuat data inventori");
   }
 }
 

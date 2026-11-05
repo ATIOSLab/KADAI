@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, KeyRound, Loader2, X } from "lucide-react";
+import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,

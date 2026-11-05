@@ -185,10 +185,10 @@ export default async function BlogDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
       <SiteHeader dashboardPath={null} />
 
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-10">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-10 overflow-hidden">
         {/* Back Link */}
         <Link
           href="/blog"

@@ -15,7 +15,7 @@ export default async function HomePage() {
   const dashboardPath = sessionUser ? getDefaultPathForRole(sessionUser.role) : null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col overflow-x-hidden w-full font-sans selection:bg-primary/20">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col overflow-x-hidden w-full max-w-full font-sans selection:bg-primary/20">
       {/* 1. Header Navigation Bar */}
       <SiteHeader dashboardPath={dashboardPath} />
 

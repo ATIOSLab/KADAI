@@ -4,7 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { canAccessPath, getDefaultPathForRole } from "@/lib/rbac";
 import { isCsrfSafe, SECURITY_HEADERS, CSP_HEADER } from "@/lib/security";
 
-const publicPages = ["/", "/login", "/register", "/pricing", "/order"];
+const publicPages = [
+  "/",
+  "/login",
+  "/register",
+  "/pricing",
+  "/order",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/icon.svg",
+  "/favicon.ico",
+  "/manifest.json",
+  "/sw.js",
+];
 const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook", "/api/admin/seed-demo"];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 

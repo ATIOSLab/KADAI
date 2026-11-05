@@ -12,6 +12,7 @@ const publicPages = [
   "/order",
   "/robots.txt",
   "/sitemap.xml",
+  "/llms.txt",
   "/icon.svg",
   "/favicon.ico",
   "/manifest.json",

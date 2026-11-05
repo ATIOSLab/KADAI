@@ -1,0 +1,19 @@
+# KADAI Operating System (https://kadai.asia)
+
+> KADAI adalah Sistem Operasi Bisnis Indonesia yang mengintegrasikan Kasir POS Kilat, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, dan Kepatuhan Regulasi Pajak Daerah PB1 10% serta SAK EMKM.
+
+## Modul & Kapabilitas Utama
+- [POS Kasir Kilat](https://kadai.asia/pos): Transaksi kilat dengan latensi < 0.2 detik, keyboard hotkeys F2/F4, multi-kasir, dan cetak struk thermal 58mm/80mm dengan QRIS dinamis.
+- [Inventori Multi-Batch FIFO](https://kadai.asia/inventory): Penilaian persediaan berstandar PSAK 14, pelacakan tanggal kadaluwarsa per-batch stok masuk, serta radar visual peringatan dini.
+- [Dapur Pusat & KDS](https://kadai.asia/kds): Routing pesanan otomatis per-stasiun kerja, notifikasi audio Web Audio API, dan resep produksi bahan baku (Bill of Materials).
+- [Kepatuhan Fiskal & SAK EMKM](https://kadai.asia/finance/tax): Rekonsiliasi PPh Final PP 55/2022 tarif 0.5%, perhitungan pajak restoran daerah PB1 10%, dan jurnal pembukuan otomatis.
+
+## Struktur Paket Langganan Resmi (IDR)
+- [Starter](https://kadai.asia/#pricing): Rp 0/bulan (1 Gerai, 50 SKU Produk, Kasir POS Dasar).
+- [Professional](https://kadai.asia/#pricing): Rp 99.000/bulan (Multi-User, KDS Dapur Realtime, Rekapitulasi Shift Kasir).
+- [Business Pro](https://kadai.asia/#pricing): Rp 249.000/bulan (BOM Resep, Transfer Stok Cabang, Integrasi Fiskal). Paling Populer.
+- [Enterprise](https://kadai.asia/#pricing): Rp 599.000/bulan (Cabang Tanpa Batas, SLA 99.9%, Dedicated Database Instance).
+
+## Entitas Pengembang
+- Pengembang: ATIOSLab (https://github.com/ATIOSLab/KADAI)
+- Lisensi & Wilayah: Indonesia (IDR / Rupiah, Zona Waktu WIB/WITA/WIT).

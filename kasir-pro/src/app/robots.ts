@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/login", "/register", "/icon.svg", "/manifest.json"],
+        allow: ["/", "/login", "/register", "/icon.svg", "/manifest.json", "/llms.txt"],
         disallow: [
           "/api/",
           "/dashboard/",
@@ -34,7 +34,7 @@ export default function robots(): MetadataRoute.Robots {
           "PerplexityBot",
           "ClaudeBot",
         ],
-        allow: ["/", "/login", "/register", "/sitemap.xml"],
+        allow: ["/", "/login", "/register", "/sitemap.xml", "/llms.txt"],
       },
     ],
     sitemap: "https://kadai.asia/sitemap.xml",

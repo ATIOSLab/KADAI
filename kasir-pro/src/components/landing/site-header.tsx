@@ -29,25 +29,25 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
     {
       title: "Kasir POS Kilat",
       desc: "Transaksi cepat dengan tombol pintas F2/F4 dan cetak struk thermal 58/80mm.",
-      href: "#kapabilitas",
+      href: "/fitur#kasir-pos",
       icon: ShoppingBag,
     },
     {
       title: "Inventori Multi-Batch FIFO",
       desc: "Penilaian stok akurat berstandar PSAK 14 dan radar peringatan tanggal kadaluwarsa.",
-      href: "#kapabilitas",
+      href: "/fitur#inventori-fifo",
       icon: Layers,
     },
     {
       title: "Layar Dapur & Bar (KDS)",
       desc: "Routing pesanan otomatis ke dapur dengan notifikasi audio suara lonceng.",
-      href: "#kapabilitas",
+      href: "/fitur#dapur-kds",
       icon: ChefHat,
     },
     {
       title: "Pajak & Pembukuan",
       desc: "Kelola pengaturan pajak dan laporan pembukuan usaha.",
-      href: "#pajak-pembukuan",
+      href: "/fitur#pembukuan-pajak",
       icon: Receipt,
     },
   ];
@@ -56,19 +56,19 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
     {
       title: "Kafe & Restoran (F&B)",
       desc: "Manajemen meja, pesanan split-bill, dan pemotongan resep bahan baku (BOM).",
-      href: "#solusi-industri",
+      href: "/solusi#kuliner-fnb",
       icon: UtensilsCrossed,
     },
     {
       title: "Toko Ritel & Minimarket",
       desc: "Scan barcode produk kilat, kontrol varian SKU, dan batas minimum stok.",
-      href: "#solusi-industri",
+      href: "/solusi#ritel-minimarket",
       icon: Store,
     },
     {
       title: "Dapur Pusat & Multi-Gudang",
       desc: "Penerbitan surat jalan antar-cabang dan konsolidasi laporan grup owner.",
-      href: "#solusi-industri",
+      href: "/solusi#dapur-pusat-gudang",
       icon: Warehouse,
     },
   ];
@@ -138,7 +138,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 {capabilities.map((item, idx) => {
                   const Icon = item.icon;
                   return (
-                    <a
+                    <Link
                       key={idx}
                       href={item.href}
                       onClick={() => setActiveDropdown(null)}
@@ -155,7 +155,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                           {item.desc}
                         </div>
                       </div>
-                    </a>
+                    </Link>
                   );
                 })}
               </div>
@@ -195,7 +195,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 {solutions.map((item, idx) => {
                   const Icon = item.icon;
                   return (
-                    <a
+                    <Link
                       key={idx}
                       href={item.href}
                       onClick={() => setActiveDropdown(null)}
@@ -212,32 +212,38 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                           {item.desc}
                         </div>
                       </div>
-                    </a>
+                    </Link>
                   );
                 })}
               </div>
             )}
           </div>
 
-          {/* 3. Tautan Tunggal Tanpa Dropdown (Harga & FAQ) */}
-          <a
-            href="#pajak-pembukuan"
-            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
-          >
-            Pajak & Pembukuan
-          </a>
-          <a
-            href="#harga"
+          {/* 3. Tautan Tunggal Tanpa Dropdown (Harga, Blog & FAQ) */}
+          <Link
+            href="/harga"
             className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
           >
             Paket Langganan
-          </a>
-          <a
-            href="#faq"
+          </Link>
+          <Link
+            href="/blog"
+            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
+          >
+            Blog & Edukasi
+          </Link>
+          <Link
+            href="/#pajak-pembukuan"
+            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
+          >
+            Pajak
+          </Link>
+          <Link
+            href="/#faq"
             className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
           >
             FAQ
-          </a>
+          </Link>
         </nav>
 
         {/* Right Modular Island: Auth & CTA Pill */}
@@ -301,41 +307,48 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
       {mobileMenuOpen && (
         <div className="xl:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">
-            <a
-              href="#kapabilitas"
+            <Link
+              href="/fitur"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Fitur & Kapabilitas
-            </a>
-            <a
-              href="#solusi-industri"
+            </Link>
+            <Link
+              href="/solusi"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Solusi Industri
-            </a>
-            <a
-              href="#pajak-pembukuan"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
-            >
-              Pajak & Pembukuan
-            </a>
-            <a
-              href="#harga"
+            </Link>
+            <Link
+              href="/harga"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Paket Langganan
-            </a>
-            <a
-              href="#faq"
+            </Link>
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+            >
+              Blog & Edukasi
+            </Link>
+            <Link
+              href="/#pajak-pembukuan"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+            >
+              Pajak & Pembukuan
+            </Link>
+            <Link
+              href="/#faq"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
             >
               FAQ
-            </a>
+            </Link>
           </nav>
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             {!dashboardPath && (

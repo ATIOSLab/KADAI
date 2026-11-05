@@ -9,6 +9,7 @@ const publicPages = [
   "/login",
   "/register",
   "/harga",
+  "/hardware",
   "/fitur",
   "/solusi",
   "/blog",

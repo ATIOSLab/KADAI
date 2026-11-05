@@ -133,17 +133,69 @@ export default function LoginPage() {
               {loading ? "Masuk..." : "Masuk"}
             </Button>
 
-            {/* Demo credentials hint */}
-            {/* <div className="p-3 rounded-lg bg-accent-secondary/10 neo-border-thin border-accent-secondary">
-              <p className="text-xs font-bold text-accent-secondary mb-1">
-                Demo Credentials:
-              </p>
-              <p className="text-xs text-text-secondary font-medium">
-                Email: admin@kadai.com
-                <br />
-                Password: admin123
-              </p>
-            </div> */}
+            {/* Quick Demo Switcher */}
+            <div className="pt-3 border-t border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Coba Akun Demo Instan:
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">1-Klik Isi</span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("kasir.cafe@kadai.com");
+                    setPassword("password123");
+                  }}
+                  className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
+                >
+                  <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
+                    ☕ Kasir Kafe
+                  </div>
+                  <div className="text-[9px] text-slate-500">Akses Cepat POS</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("dapur.dimsum@kadai.com");
+                    setPassword("password123");
+                  }}
+                  className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
+                >
+                  <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
+                    🍳 Chef Dapur
+                  </div>
+                  <div className="text-[9px] text-slate-500">Layar Display KDS</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("gudang.sembako@kadai.com");
+                    setPassword("password123");
+                  }}
+                  className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
+                >
+                  <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
+                    📦 Gudang FIFO
+                  </div>
+                  <div className="text-[9px] text-slate-500">Stok & Kadaluwarsa</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("owner.dimsum@kadai.com");
+                    setPassword("password123");
+                  }}
+                  className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
+                >
+                  <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
+                    👑 Owner Bisnis
+                  </div>
+                  <div className="text-[9px] text-slate-500">Dashboard & Finansial</div>
+                </button>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>

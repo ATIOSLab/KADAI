@@ -15,7 +15,8 @@
     "db:push": "prisma db push",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "db:seed:demo": "node prisma/seed-demo-clusters.js",
+    "db:seed:demo": "node prisma/seed-demo-clusters.js && node prisma/simulate-transactions.js",
+    "seed:demo": "node prisma/seed-demo-clusters.js && node prisma/simulate-transactions.js",
     "db:reset:seed": "prisma db push --force-reset && prisma db seed",
     "db:studio": "prisma studio"
   },

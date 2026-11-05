@@ -17,7 +17,7 @@ export function AccountingTaxSection() {
       desc: "Konfigurasi tarif Pajak Barang dan Jasa Tertentu (PB1 / PBJT 10%) per outlet restoran atau kafe sesuai Perda daerah masing-masing, terpisah rapi dari omzet bersih.",
       highlight: "Otomatis tertera di struk kasir & rekap setoran daerah",
       icon: Percent,
-      accent: "text-orange-600 bg-orange-50 border-orange-200",
+      accent: "text-primary bg-orange-50 border-orange-200/90",
     },
     {
       title: "PPN Ritel 11%",
@@ -25,7 +25,7 @@ export function AccountingTaxSection() {
       desc: "Dukungan penghitungan Pajak Pertambahan Nilai (PPN 11%) untuk gerai ritel dan minimarket dengan opsi harga inklusif atau eksklusif pajak per faktur.",
       highlight: "Faktur penjualan tercatat dengan nomor seri rapi",
       icon: Receipt,
-      accent: "text-blue-600 bg-blue-50 border-blue-200",
+      accent: "text-slate-800 bg-slate-100 border-slate-200",
     },
     {
       title: "Buku Omzet & PPh Final 0.5%",
@@ -33,7 +33,7 @@ export function AccountingTaxSection() {
       desc: "Rekapitulasi peredaran bruto harian dan bulanan untuk mempermudah perhitungan setoran PPh Final UMKM 0.5% sesuai ketentuan PP 55 Tahun 2022.",
       highlight: "Dilengkapi simulasi batas omzet bebas pajak (PTKP Rp 500 Jt untuk OP)",
       icon: FileSpreadsheet,
-      accent: "text-purple-600 bg-purple-50 border-purple-200",
+      accent: "text-slate-800 bg-slate-100 border-slate-200",
     },
     {
       title: "Laba Rugi Standar SAK EMKM",
@@ -41,7 +41,7 @@ export function AccountingTaxSection() {
       desc: "Penyusunan laporan laba rugi periodik dengan kalkulasi HPP bahan baku berbasis FIFO riil. Format standar IAI yang diakui untuk pengajuan kredit usaha perbankan.",
       highlight: "Ekspor data CSV & format cetak laporan keuangan resmi",
       icon: Scale,
-      accent: "text-emerald-600 bg-emerald-50 border-emerald-200",
+      accent: "text-slate-800 bg-slate-100 border-slate-200",
     },
   ];
 

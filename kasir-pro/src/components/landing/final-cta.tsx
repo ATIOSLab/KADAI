@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FinalCTA() {
@@ -14,7 +14,7 @@ export function FinalCTA() {
 
       <div className="max-w-4xl mx-auto rounded-3xl liquid-glass-card p-8 sm:p-14 shadow-2xl text-center space-y-6 relative border border-white/95">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200/90 text-primary text-xs font-bold shadow-2xs">
-          <Sparkles className="size-3.5 shrink-0" />
+          <ShieldCheck className="size-3.5 shrink-0 text-primary" />
           <span>Langkah Nyata Efisiensi Bisnis</span>
         </div>
 

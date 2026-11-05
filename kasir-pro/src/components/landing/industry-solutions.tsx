@@ -7,7 +7,6 @@ import {
   Store,
   Scissors,
   CheckCircle2,
-  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -69,8 +68,8 @@ export function IndustrySolutions() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-nav text-slate-800 text-xs font-semibold shadow-2xs">
-            <Sparkles className="size-3 text-primary" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+            <Store className="size-3 text-primary" />
             <span>Solusi Lintas Industri</span>
           </div>
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">

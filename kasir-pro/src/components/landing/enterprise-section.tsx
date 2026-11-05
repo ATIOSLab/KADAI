@@ -16,37 +16,37 @@ export function EnterpriseSection() {
       title: "Visibilitas Multi-Cabang Terpusat",
       desc: "Pantau performa penjualan, pergerakan stok, dan arus kas seluruh cabang, booth kaki lima, hingga gudang utama dalam satu cockpit pemilik.",
       icon: Building2,
-      accent: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+      accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
       title: "Hak Akses 6-Role Granular (RBAC)",
       desc: "Pemisahan tugas ketat (Admin, Manager, Kasir, Kitchen, Inventory, Accountant). Nilai HPP modal pembelian secara rekursif disembunyikan dari staf kasir.",
       icon: Lock,
-      accent: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+      accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
       title: "Otorisasi Supervisor PIN",
       desc: "Tindakan sensitif di kasir (pembatalan nota/void, diskon khusus manual, dan penyesuaian stok darurat) wajib diotorisasi PIN Supervisor.",
       icon: KeyRound,
-      accent: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+      accent: "text-primary bg-orange-500/10 border-orange-500/20",
     },
     {
       title: "Immutable Activity Audit Trail",
       desc: "Setiap mutasi inventori, transfer antar-cabang, dan penutupan shift kasir dicatat permanen lengkap dengan identitas aktor, waktu, dan riwayat perubahan.",
       icon: Layers,
-      accent: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
       title: "Cloud Infrastructure & Edge Proxy",
       desc: "Didukung infrastruktur container terisolasi, enkripsi transmisi TLS 1.3, proteksi header keamanan OWASP ketat, dan jaringan Cloudflare.",
       icon: Cloud,
-      accent: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+      accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
       title: "Resiliensi Kasir & PWA Ready",
       desc: "Aplikasi dapat diinstal langsung di layar desktop atau tablet kasir (PWA) dengan service worker offline shell caching untuk kelancaran operasional.",
       icon: ShieldCheck,
-      accent: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+      accent: "text-slate-200 bg-white/5 border-white/10",
     },
   ];
 

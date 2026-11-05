@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Store, ArrowRight, Menu, X, Sparkles } from "lucide-react";
+import { Store, ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SiteHeaderProps {
@@ -101,8 +101,8 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 className="font-bold text-xs h-9 px-4 rounded-xl shadow-xs bg-primary text-primary-foreground hover:bg-primary/90 transition-all hover:shadow-md hover:shadow-primary/20"
               >
                 <Link href="/register" className="flex items-center gap-1.5">
-                  <Sparkles className="size-3" />
                   <span>Coba Gratis</span>
+                  <ArrowRight className="size-3.5" />
                 </Link>
               </Button>
             </>

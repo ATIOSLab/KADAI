@@ -8,7 +8,7 @@ import {
   Warehouse,
   ChefHat,
   Scale,
-  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductShowcase } from "@/components/landing/product-showcase";
@@ -35,16 +35,16 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Hero Top Copy */}
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          {/* Eyebrow Pill with Shiny Highlight */}
+          {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-nav text-slate-800 text-xs font-semibold shadow-xs">
             <span className="size-2 rounded-full bg-primary animate-pulse" />
             <span className="font-mono text-[11px] text-slate-600 uppercase tracking-wider font-bold">
-              KADAI — Enterprise POS & ERP
+              KADAI — POS & ERP Multi-Cabang
             </span>
             <span className="text-slate-300">|</span>
-            <span className="text-[11px] text-primary font-bold flex items-center gap-1">
-              <Sparkles className="size-3" />
-              Sistem Operasi Bisnis Indonesia
+            <span className="text-[11px] text-slate-700 font-bold flex items-center gap-1">
+              <ShieldCheck className="size-3 text-emerald-600" />
+              Kepatuhan Standar Indonesia
             </span>
           </div>
 

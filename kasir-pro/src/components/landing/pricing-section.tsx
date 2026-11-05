@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Sparkles } from "lucide-react";
+import { Check, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PLANS = [
@@ -107,7 +107,7 @@ export function PricingSection() {
           >
             {plan.featured && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-xs flex items-center gap-1">
-                <Sparkles className="size-3" />
+                <ShieldCheck className="size-3" />
                 <span>Paling Populer</span>
               </div>
             )}

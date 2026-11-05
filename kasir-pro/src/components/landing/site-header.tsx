@@ -45,7 +45,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         {/* Center Modular Island: Navigation Pill (GetLayers style) */}
         <nav
           aria-label="Navigasi Utama"
-          className="hidden md:flex items-center gap-1 luxury-glass-pill px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600"
+          className="hidden sm:flex items-center gap-1 luxury-glass-pill px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600"
         >
           {navLinks.map((link) => (
             <a

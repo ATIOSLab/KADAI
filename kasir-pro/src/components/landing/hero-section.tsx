@@ -145,6 +145,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               src="/images/hero/slide-1.jpg"
               alt="Laptop kasir & pembukuan KADAI POS"
               fill
+              unoptimized
               className="object-cover"
               sizes="25vw"
             />
@@ -232,6 +233,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               src="/images/hero/slide-2.jpg"
               alt="Owner memeriksa laporan akuntansi via tablet"
               fill
+              unoptimized
               className="object-cover"
               sizes="25vw"
             />

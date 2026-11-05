@@ -107,7 +107,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
   return (
     <section className="relative w-full overflow-hidden">
       {/* 1. Full-Width Background Slider Banner (Full Viewport Width Behind Hero Text) */}
-      <div className="relative w-full min-h-[520px] sm:min-h-[580px] md:min-h-[620px] flex items-center justify-center pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6">
+      <div className="relative w-full min-h-[520px] sm:min-h-[580px] md:min-h-[620px] flex items-center justify-center pt-24 sm:pt-28 pb-12 sm:pb-16 px-4 sm:px-6">
         {/* Full-bleed background carousel */}
         <HeroBackgroundSlider
           currentSlide={activeTab}
@@ -131,7 +131,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           </Badge>
 
           {/* Headline H1 */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold tracking-tight text-slate-950 leading-[1.12] text-balance">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance">
             Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda.
           </h1>
 
@@ -140,13 +140,13 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO (PSAK 14), resep produksi Bill of Materials (BOM), Kitchen Display System (KDS), hingga rekonsiliasi pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons (Clean Enterprise Action) */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
             {dashboardPath ? (
               <Button
                 asChild
                 size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
+                className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md"
               >
                 <Link href={dashboardPath} className="flex items-center gap-2">
                   <span>Buka Dashboard Operasional</span>
@@ -155,24 +155,19 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               </Button>
             ) : (
               <>
-                {/* Compound Capsule Button */}
-                <Link
-                  href="/register"
-                  className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
                 >
-                  <span className="font-semibold text-xs sm:text-sm tracking-tight">
-                    Mulai Uji Coba Gratis 14 Hari
-                  </span>
-                  <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                    <ArrowUpRight className="size-4" />
-                  </span>
-                </Link>
+                  <Link href="/register">Coba Gratis 14 Hari</Link>
+                </Button>
 
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto font-medium text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
+                  className="w-full sm:w-auto font-semibold text-sm h-12 px-8 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
                 >
                   <Link href="/login">Masuk ke Toko Anda</Link>
                 </Button>

@@ -92,7 +92,7 @@ export default function HargaPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
       <SiteHeader dashboardPath={null} />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-16 overflow-hidden">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-16 overflow-hidden">
         {/* Header Breadcrumb & Title */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <Badge variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">

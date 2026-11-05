@@ -74,236 +74,240 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/70 bg-white/75 px-4 py-3 backdrop-blur-xl sm:px-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-        {/* Left Modular Island: Brand Squircle */}
-        <Link
-          href="/"
-          className="px-1 py-1 rounded-xl flex items-center gap-2.5 shrink-0 group hover:border-slate-300 transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-slate-950 text-white shadow-2xs group-hover:scale-105 transition-transform">
-            <Store className="size-4 text-primary" />
-          </span>
-          <div>
-            <div className="flex items-baseline gap-0.5">
-              <span className="text-lg font-bold tracking-tight text-slate-950 leading-none">
-                KADAI
-              </span>
-              <span className="text-primary font-bold text-xl leading-none">.</span>
-            </div>
-            <span className="text-[9px] font-semibold text-slate-500 block leading-tight">
-              Sistem Operasi Bisnis Indonesia
+    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
+      <div className="w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
+          {/* Brand Logo (Clean Human-Grade, No Pill Nesting) */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+          >
+            <span className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs group-hover:bg-primary transition-colors">
+              <Store className="size-4.5 text-white" />
             </span>
-          </div>
-        </Link>
-
-        {/* Center Modular Island: Minimalist Transparent Glass Menu with Mega Dropdown */}
-        <nav
-          aria-label="Navigasi Utama"
-          className="hidden xl:flex items-center gap-1 px-2 py-1.5 rounded-full text-xs font-semibold text-slate-600 relative"
-          onMouseLeave={() => setActiveDropdown(null)}
-          onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null); }}
-          onKeyDown={(event) => { if (event.key === "Escape") { event.currentTarget.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')?.focus(); setActiveDropdown(null); } }}
-        >
-          {/* 1. Dropdown Kapabilitas */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown("kapabilitas")}
-                      >
-                        <button
-                          type="button"
-                          aria-expanded={activeDropdown === "kapabilitas"}
-                          aria-controls="nav-kapabilitas"
-                          onClick={() => setActiveDropdown(activeDropdown === "kapabilitas" ? null : "kapabilitas")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all font-medium whitespace-nowrap ${
-                activeDropdown === "kapabilitas"
-                  ? "text-slate-950 bg-slate-100/90 font-bold"
-                  : "text-slate-700 hover:text-slate-950 hover:bg-slate-100/80"
-              }`}
-            >
-              <span>Fitur & Kapabilitas</span>
-              <ChevronDown
-                className={`size-3 text-slate-500 transition-transform duration-200 ${
-                  activeDropdown === "kapabilitas" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {/* Glass Dropdown Panel: Kapabilitas */}
-            {activeDropdown === "kapabilitas" && (
-              <div id="nav-kapabilitas" className="absolute top-full left-0 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Modul Utama KADAI
-                </div>
-                {capabilities.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={idx}
-                      href={item.href}
-                      onClick={() => setActiveDropdown(null)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
-                    >
-                      <span className="size-8 rounded-lg bg-orange-50 border border-orange-200/60 flex items-center justify-center text-primary shrink-0 group-hover:scale-105 transition-transform">
-                        <Icon className="size-4" />
-                      </span>
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
-                          {item.title}
-                        </div>
-                        <div className="text-[11px] text-slate-500 leading-tight">
-                          {item.desc}
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+            <div className="flex flex-col">
+              <div className="flex items-baseline leading-none">
+                <span className="text-xl font-extrabold tracking-tight text-slate-950">
+                  KADAI
+                </span>
+                <span className="text-primary font-black text-2xl leading-none">.</span>
               </div>
+              <span className="text-[10px] font-medium text-slate-500 tracking-normal mt-0.5">
+                Sistem Operasi Bisnis Indonesia
+              </span>
+            </div>
+          </Link>
+
+          {/* Center Navigation Links (Clean Flat Typography like Moka) */}
+          <nav
+            aria-label="Navigasi Utama"
+            className="hidden xl:flex items-center gap-1 text-sm font-medium text-slate-600 relative h-full"
+            onMouseLeave={() => setActiveDropdown(null)}
+            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null); }}
+            onKeyDown={(event) => { if (event.key === "Escape") { event.currentTarget.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')?.focus(); setActiveDropdown(null); } }}
+          >
+            {/* 1. Dropdown Kapabilitas */}
+            <div
+              className="relative h-full flex items-center"
+              onMouseEnter={() => setActiveDropdown("kapabilitas")}
+            >
+              <button
+                type="button"
+                aria-expanded={activeDropdown === "kapabilitas"}
+                aria-controls="nav-kapabilitas"
+                onClick={() => setActiveDropdown(activeDropdown === "kapabilitas" ? null : "kapabilitas")}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-colors cursor-pointer ${
+                  activeDropdown === "kapabilitas"
+                    ? "text-primary font-bold bg-slate-50"
+                    : "text-slate-700 hover:text-primary hover:bg-slate-50"
+                }`}
+              >
+                <span>Layanan & Fitur</span>
+                <ChevronDown
+                  className={`size-3.5 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === "kapabilitas" ? "rotate-180 text-primary" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Moka-Style Large Mega Dropdown Card */}
+              {activeDropdown === "kapabilitas" && (
+                <div
+                  id="nav-kapabilitas"
+                  className="absolute top-full left-0 w-88 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                >
+                  <div className="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Modul Operasional Utama
+                  </div>
+                  {capabilities.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={item.href}
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                      >
+                        <span className="size-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-primary shrink-0 group-hover:scale-105 transition-transform">
+                          <Icon className="size-4" />
+                        </span>
+                        <div className="space-y-0.5">
+                          <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
+                            {item.title}
+                          </div>
+                          <div className="text-[11px] text-slate-500 leading-tight">
+                            {item.desc}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* 2. Dropdown Solusi Bisnis */}
+            <div
+              className="relative h-full flex items-center"
+              onMouseEnter={() => setActiveDropdown("solusi")}
+            >
+              <button
+                type="button"
+                aria-expanded={activeDropdown === "solusi"}
+                aria-controls="nav-solusi"
+                onClick={() => setActiveDropdown(activeDropdown === "solusi" ? null : "solusi")}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-colors cursor-pointer ${
+                  activeDropdown === "solusi"
+                    ? "text-primary font-bold bg-slate-50"
+                    : "text-slate-700 hover:text-primary hover:bg-slate-50"
+                }`}
+              >
+                <span>Solusi Industri</span>
+                <ChevronDown
+                  className={`size-3.5 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === "solusi" ? "rotate-180 text-primary" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Moka-Style Large Mega Dropdown Card */}
+              {activeDropdown === "solusi" && (
+                <div
+                  id="nav-solusi"
+                  className="absolute top-full left-0 w-88 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                >
+                  <div className="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Sektor Industri
+                  </div>
+                  {solutions.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={item.href}
+                        onClick={() => setActiveDropdown(null)}
+                        className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                      >
+                        <span className="size-8 rounded-lg bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 shrink-0 group-hover:scale-105 transition-transform">
+                          <Icon className="size-4" />
+                        </span>
+                        <div className="space-y-0.5">
+                          <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
+                            {item.title}
+                          </div>
+                          <div className="text-[11px] text-slate-500 leading-tight">
+                            {item.desc}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Direct Links */}
+            <Link
+              href="/harga"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Harga
+            </Link>
+            <Link
+              href="/blog"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Blog
+            </Link>
+            <Link
+              href="/#pajak-pembukuan"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Pajak
+            </Link>
+            <Link
+              href="/#faq"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              FAQ
+            </Link>
+          </nav>
+
+          {/* Right Action: Clean Moka-style Login + Rounded Solid CTA */}
+          <div className="hidden xl:flex items-center gap-4 shrink-0">
+            {dashboardPath ? (
+              <Button
+                asChild
+                className="font-bold text-sm h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-white shadow-xs"
+              >
+                <Link href={dashboardPath} className="flex items-center gap-1.5">
+                  <span>Dashboard</span>
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1"
+                >
+                  Masuk
+                </Link>
+                <Button
+                  asChild
+                  className="font-bold text-sm h-10 px-6 rounded-full bg-primary hover:bg-primary/90 text-white shadow-xs transition-transform active:scale-95"
+                >
+                  <Link href="/register">Coba Gratis</Link>
+                </Button>
+              </>
             )}
           </div>
 
-          {/* 2. Dropdown Solusi Bisnis */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown("solusi")}
-                      >
-                        <button
-                          type="button"
-                          aria-expanded={activeDropdown === "solusi"}
-                          aria-controls="nav-solusi"
-                          onClick={() => setActiveDropdown(activeDropdown === "solusi" ? null : "solusi")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all font-medium whitespace-nowrap ${
-                activeDropdown === "solusi"
-                  ? "text-slate-950 bg-slate-100/90 font-bold"
-                  : "text-slate-700 hover:text-slate-950 hover:bg-slate-100/80"
-              }`}
-            >
-              <span>Solusi Industri</span>
-              <ChevronDown
-                className={`size-3 text-slate-500 transition-transform duration-200 ${
-                  activeDropdown === "solusi" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {/* Glass Dropdown Panel: Solusi Industri */}
-            {activeDropdown === "solusi" && (
-              <div id="nav-solusi" className="absolute top-full left-0 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Sektor Industri
-                </div>
-                {solutions.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={idx}
-                      href={item.href}
-                      onClick={() => setActiveDropdown(null)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
-                    >
-                      <span className="size-8 rounded-lg bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 shrink-0 group-hover:scale-105 transition-transform">
-                        <Icon className="size-4" />
-                      </span>
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
-                          {item.title}
-                        </div>
-                        <div className="text-[11px] text-slate-500 leading-tight">
-                          {item.desc}
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+          {/* Mobile Menu Button */}
+          <div className="flex xl:hidden items-center gap-3">
+            {dashboardPath ? (
+              <Button asChild size="sm" className="h-9 text-xs font-bold px-3 rounded-full bg-primary text-white">
+                <Link href={dashboardPath}>Dashboard</Link>
+              </Button>
+            ) : (
+              <Button asChild size="sm" className="h-9 text-xs font-bold px-4 rounded-full bg-primary text-white">
+                <Link href="/register">Coba Gratis</Link>
+              </Button>
             )}
-          </div>
-
-          {/* 3. Tautan Tunggal Tanpa Dropdown (Harga, Blog & FAQ) */}
-          <Link
-            href="/harga"
-            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
-          >
-            Paket Langganan
-          </Link>
-          <Link
-            href="/blog"
-            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
-          >
-            Blog & Edukasi
-          </Link>
-          <Link
-            href="/#pajak-pembukuan"
-            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
-          >
-            Pajak
-          </Link>
-          <Link
-            href="/#faq"
-            className="px-3.5 py-1.5 rounded-full hover:text-slate-950 hover:bg-slate-100/80 transition-all font-medium text-slate-700 whitespace-nowrap"
-          >
-            FAQ
-          </Link>
-        </nav>
-
-        {/* Right Modular Island: Auth & CTA Pill */}
-        <div className="hidden xl:flex items-center gap-2 shrink-0 p-1.5 rounded-2xl">
-          {dashboardPath ? (
-            <Button
-              asChild
-              size="sm"
-              className="font-bold text-xs h-8 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs"
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+              aria-label="Toggle Menu"
+              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              <Link href={dashboardPath} className="flex items-center gap-1.5">
-                <span>Dashboard</span>
-                <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
-          ) : (
-            <>
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="font-semibold text-xs h-8 px-3 text-slate-700 hover:text-slate-950 hover:bg-slate-100/70 rounded-xl"
-              >
-                <Link href="/login">Masuk</Link>
-              </Button>
-              <Button
-                asChild
-                size="sm"
-                className="font-bold text-xs h-8 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs"
-              >
-                <Link href="/register">Daftar Akun</Link>
-              </Button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Hamburger Toggle */}
-        <div className="flex xl:hidden items-center gap-2">
-          {dashboardPath ? (
-            <Button asChild size="sm" className="h-8 text-xs font-bold px-3 rounded-xl bg-primary text-primary-foreground">
-              <Link href={dashboardPath}>Dashboard</Link>
-            </Button>
-          ) : (
-            <Button asChild size="sm" className="h-8 text-xs font-bold px-3 rounded-xl bg-primary text-primary-foreground">
-              <Link href="/register">Daftar</Link>
-            </Button>
-          )}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-expanded={mobileMenuOpen}
-            aria-label="Toggle Menu"
-            className="p-2 rounded-xl luxury-glass-pill text-slate-700 hover:bg-slate-100"
-          >
-            {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
-          </button>
+              {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Accessible Mobile Drawer */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="xl:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">

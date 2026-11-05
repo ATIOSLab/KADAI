@@ -105,13 +105,13 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         {/* Eyebrow Pill */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs">
           <span className="size-2 rounded-full bg-primary" />
-          <span className="font-mono text-[11px] text-slate-700 uppercase tracking-wider font-bold">
+          <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
             KADAI Operating System // Enterprise POS & Rantai Pasok RI
           </span>
         </div>
 
         {/* Headline H1 */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-black tracking-tight text-slate-950 leading-[1.14] text-balance">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-bold tracking-tight text-slate-950 leading-[1.15] text-balance">
           Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
         </h1>
 
@@ -219,13 +219,13 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
 
             <div className="relative z-10 space-y-3">
-              <span className="inline-block text-[10px] font-mono font-bold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded">
+              <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-full">
                 {current.tag}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
                 {current.title}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg font-normal">
                 {current.desc}
               </p>
             </div>
@@ -239,13 +239,13 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 <span className="font-bold text-sm text-slate-900">
                   {current.receipt.table}
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>{current.receipt.status}</span>
                 </span>
               </div>
 
-              <div className="text-[11px] font-mono text-slate-500">
+              <div className="text-[11px] text-slate-500">
                 {current.receipt.meta}
               </div>
 
@@ -254,40 +254,40 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 {current.receipt.items.map((it, i) => (
                   <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
                     <div>
-                      <span className="font-bold text-slate-900 block">{it.name}</span>
-                      <span className="text-[10px] font-mono text-slate-500">{it.bom}</span>
+                      <span className="font-semibold text-slate-900 block">{it.name}</span>
+                      <span className="text-[10px] text-slate-500">{it.bom}</span>
                     </div>
-                    <span className="font-mono font-bold text-slate-900">{it.price}</span>
+                    <span className="font-semibold tabular-nums text-slate-900">{it.price}</span>
                   </div>
                 ))}
 
                 {current.receipt.pb1 !== "Rp 0" && (
                   <div className="flex justify-between items-center text-slate-600 pt-1">
                     <span>Pajak Daerah Resto PB1 (10%)</span>
-                    <span className="font-mono font-semibold">{current.receipt.pb1}</span>
+                    <span className="font-medium tabular-nums">{current.receipt.pb1}</span>
                   </div>
                 )}
 
                 {current.receipt.service !== "Rp 0" && (
                   <div className="flex justify-between items-center text-slate-600">
                     <span>Biaya Layanan (5%)</span>
-                    <span className="font-mono font-semibold">{current.receipt.service}</span>
+                    <span className="font-medium tabular-nums">{current.receipt.service}</span>
                   </div>
                 )}
 
                 {/* Total */}
-                <div className="flex justify-between items-center text-sm font-black text-slate-950 pt-3 border-t border-slate-200">
+                <div className="flex justify-between items-center text-sm font-bold text-slate-950 pt-3 border-t border-slate-200">
                   <span>TOTAL TAGIHAN</span>
-                  <span className="font-mono text-primary text-base sm:text-lg">
+                  <span className="text-primary font-bold text-base sm:text-lg tabular-nums">
                     {current.receipt.total}
                   </span>
                 </div>
               </div>
 
               {/* Receipt Footer */}
-              <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-mono flex items-center justify-between">
+              <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
                 <span>{current.receipt.footer}</span>
-                <span className="font-bold text-slate-700">KADAI POS</span>
+                <span className="font-semibold text-slate-700">KADAI POS</span>
               </div>
             </div>
           </div>
@@ -296,26 +296,26 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         {/* Bottom 3 Performance Metrics Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
           <div className="p-4 text-center">
-            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
               {current.metric1.label}
             </span>
-            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
               {current.metric1.val}
             </span>
           </div>
           <div className="p-4 text-center">
-            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
               {current.metric2.label}
             </span>
-            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
               {current.metric2.val}
             </span>
           </div>
           <div className="p-4 text-center">
-            <span className="text-[10px] font-mono font-bold text-slate-500 block uppercase">
+            <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
               {current.metric3.label}
             </span>
-            <span className="text-xs font-black text-slate-900 font-mono mt-0.5 block">
+            <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
               {current.metric3.val}
             </span>
           </div>

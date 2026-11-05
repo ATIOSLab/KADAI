@@ -74,10 +74,10 @@ export function PricingSection() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">
+          <span className="text-xs font-semibold text-primary uppercase tracking-wider">
             Paket Komersial
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
             Pilihan Paket Langganan Sesuai Skala Bisnis Anda
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
@@ -97,7 +97,7 @@ export function PricingSection() {
               }`}
             >
               {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs">
                   {plan.badge}
                 </div>
               )}
@@ -111,7 +111,7 @@ export function PricingSection() {
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 flex items-baseline gap-1">
-                  <span className={`text-3xl font-black font-mono tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}>
+                  <span className={`text-3xl font-bold tabular-nums tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}>
                     {plan.price}
                   </span>
                   <span className="text-xs font-medium text-slate-500">

@@ -25,10 +25,10 @@ export function AccountingTaxSection() {
     <section id="pajak-pembukuan" className="py-16 sm:py-24 px-4 sm:px-6 w-full max-w-6xl mx-auto space-y-12">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">
+        <span className="text-xs font-semibold text-primary uppercase tracking-wider">
           Standar Keuangan Indonesia
         </span>
-        <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+        <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
           Pajak & Pembukuan Resmi Sesuai Regulasi Republik Indonesia
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">

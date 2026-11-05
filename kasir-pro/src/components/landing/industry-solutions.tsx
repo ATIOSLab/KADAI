@@ -44,10 +44,10 @@ export function IndustrySolutions() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">
+          <span className="text-xs font-semibold text-primary uppercase tracking-wider">
             Solusi Lintas Industri
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
             Arsitektur Fleksibel untuk Seluruh Sektor Bisnis
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">

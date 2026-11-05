@@ -31,10 +31,10 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           </span>
           <div>
             <div className="flex items-baseline gap-0.5">
-              <span className="text-lg font-black tracking-tight text-slate-950 leading-none">
+              <span className="text-lg font-bold tracking-tight text-slate-950 leading-none">
                 KADAI
               </span>
-              <span className="text-primary font-black text-xl leading-none">.</span>
+              <span className="text-primary font-bold text-xl leading-none">.</span>
             </div>
             <span className="text-[9px] font-semibold text-slate-500 block leading-tight">
               Enterprise POS & Rantai Pasok

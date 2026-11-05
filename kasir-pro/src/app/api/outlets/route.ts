@@ -31,7 +31,19 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, code, address, phone, isMain, taxType, taxRate, serviceChargeRate } = body;
+    const {
+      name,
+      code,
+      address,
+      phone,
+      isMain,
+      taxType,
+      taxRate,
+      serviceChargeRate,
+      outletType,
+      kitchenWorkflow,
+      costingMethod,
+    } = body;
 
     if (!name || !code) {
       return NextResponse.json({ error: "Nama dan kode cabang wajib diisi" }, { status: 400 });
@@ -62,6 +74,9 @@ export async function POST(req: NextRequest) {
         taxType: taxType || "PB1_10",
         taxRate: taxRate !== undefined ? Number(taxRate) : 10,
         serviceChargeRate: serviceChargeRate !== undefined ? Number(serviceChargeRate) : 5,
+        outletType: outletType || "RETAIL_BOOTH",
+        kitchenWorkflow: kitchenWorkflow || "DIRECT_SERVE",
+        costingMethod: costingMethod || "FIFO",
       },
     });
 
@@ -81,7 +96,21 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, name, code, address, phone, isMain, taxType, taxRate, serviceChargeRate, isActive } = body;
+    const {
+      id,
+      name,
+      code,
+      address,
+      phone,
+      isMain,
+      taxType,
+      taxRate,
+      serviceChargeRate,
+      isActive,
+      outletType,
+      kitchenWorkflow,
+      costingMethod,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID cabang wajib diisi" }, { status: 400 });
@@ -106,6 +135,9 @@ export async function PUT(req: NextRequest) {
         ...(taxRate !== undefined && { taxRate: Number(taxRate) }),
         ...(serviceChargeRate !== undefined && { serviceChargeRate: Number(serviceChargeRate) }),
         ...(isActive !== undefined && { isActive: Boolean(isActive) }),
+        ...(outletType && { outletType }),
+        ...(kitchenWorkflow && { kitchenWorkflow }),
+        ...(costingMethod && { costingMethod }),
       },
     });
 

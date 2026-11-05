@@ -86,6 +86,31 @@ enum AdjustmentReason {
   OTHER
 }
 
+enum OutletType {
+  CENTRAL_WAREHOUSE
+  CENTRAL_KITCHEN
+  RETAIL_BOOTH
+  FULL_SERVICE_STORE
+}
+
+enum CostingMethod {
+  FIFO
+  AVERAGE
+}
+
+enum KitchenWorkflow {
+  DIRECT_SERVE
+  KITCHEN_DISPATCH
+  HYBRID
+}
+
+enum TransferStatus {
+  DRAFT
+  IN_TRANSIT
+  RECEIVED
+  CANCELLED
+}
+
 enum ActionType {
   // Sale actions
   SALE_CREATED
@@ -98,6 +123,8 @@ enum ActionType {
   BATCH_CREATED
   // Stock actions
   STOCK_ADJUSTED
+  STOCK_TRANSFERRED
+  BATCH_PRODUCED
   // Table actions
   TABLE_CREATED
   TABLE_UPDATED
@@ -166,6 +193,8 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
+  outletId         String?
+  outlet           Outlet?           @relation(fields: [outletId], references: [id])
   sales            Sale[]
   activityLogs     ActivityLog[]
   stockAdjustments StockAdjustment[]
@@ -179,6 +208,8 @@ model Store {
   name              String
   businessType      BusinessType     @default(FNB_CAFE)
   tier              SubscriptionTier @default(PRO_BUSINESS)
+  costingMethod     CostingMethod    @default(FIFO)
+  kitchenWorkflow   KitchenWorkflow  @default(KITCHEN_DISPATCH)
   address           String?
   phone             String?
   email             String?
@@ -317,18 +348,29 @@ model Customer {
 }
 
 model Outlet {
-  id                String   @id @default(cuid())
+  id                String          @id @default(cuid())
   name              String
-  code              String   @unique
+  code              String          @unique
+  outletType        OutletType      @default(RETAIL_BOOTH)
+  kitchenWorkflow   KitchenWorkflow @default(DIRECT_SERVE)
+  costingMethod     CostingMethod   @default(FIFO)
   address           String?
   phone             String?
-  isMain            Boolean  @default(false)
-  taxType           TaxType  @default(PB1_10)
-  taxRate           Decimal  @default(10) @db.Decimal(5, 2)
-  serviceChargeRate Decimal  @default(5) @db.Decimal(5, 2)
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  isMain            Boolean         @default(false)
+  taxType           TaxType         @default(PB1_10)
+  taxRate           Decimal         @default(10) @db.Decimal(5, 2)
+  serviceChargeRate Decimal         @default(5) @db.Decimal(5, 2)
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  users             User[]
+  batches           ProductBatch[]
+  sales             Sale[]
+  tables            RestaurantTable[]
+  transfersSent     StockTransfer[] @relation("SourceOutlet")
+  transfersReceived StockTransfer[] @relation("DestinationOutlet")
 
   @@map("outlets")
 }
@@ -350,12 +392,13 @@ model Product {
 
   // Relations
   categoryId          String
-  category            Category          @relation(fields: [categoryId], references: [id])
+  category            Category            @relation(fields: [categoryId], references: [id])
   batches             ProductBatch[]
   saleItems           SaleItem[]
   stockAdjustments    StockAdjustment[]
-  recipesAsParent     RecipeItem[]      @relation("ParentRecipe")
-  recipesAsIngredient RecipeItem[]      @relation("IngredientRecipe")
+  recipesAsParent     RecipeItem[]        @relation("ParentRecipe")
+  recipesAsIngredient RecipeItem[]        @relation("IngredientRecipe")
+  stockTransferItems  StockTransferItem[]
 
   @@index([categoryId])
   @@index([name])
@@ -397,6 +440,8 @@ model ProductBatch {
   // Relations
   productId       String
   product         Product        @relation(fields: [productId], references: [id])
+  outletId        String?
+  outlet          Outlet?        @relation(fields: [outletId], references: [id])
   supplierId      String?
   supplier        Supplier?      @relation(fields: [supplierId], references: [id])
   saleItemBatches SaleItemBatch[]
@@ -404,6 +449,7 @@ model ProductBatch {
 
   @@index([productId, remainingQty])
   @@index([productId, purchaseDate])
+  @@index([outletId])
   @@map("product_batches")
 }
 
@@ -418,6 +464,8 @@ model RestaurantTable {
   capacity   Int      @default(4)
   qrToken    String   @unique @default(cuid())
   isOccupied Boolean  @default(false)
+  outletId   String?
+  outlet     Outlet?  @relation(fields: [outletId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -434,6 +482,8 @@ model Sale {
   id             String           @id @default(cuid())
   invoiceNumber  String           @unique
   orderType      OrderType        @default(DINE_IN)
+  outletId       String?
+  outlet         Outlet?          @relation(fields: [outletId], references: [id])
   tableId        String?
   table          RestaurantTable? @relation(fields: [tableId], references: [id])
   subtotal       Decimal          @db.Decimal(15, 2)
@@ -464,6 +514,7 @@ model Sale {
   kdsOrders      KDSOrder[]
 
   @@index([cashierId])
+  @@index([outletId])
   @@index([createdAt])
   @@index([invoiceNumber])
   @@map("sales")
@@ -626,4 +677,48 @@ model FinanceEntry {
   @@index([productBatchId])
   @@index([isArchived, entryDate])
   @@map("finance_entries")
+}
+
+// ============================================================
+// MUTASI & TRANSFER STOK MULTI-CABANG (CENTRAL HUB & SPOKE)
+// ============================================================
+
+model StockTransfer {
+  id                  String              @id @default(cuid())
+  transferNumber      String              @unique
+  sourceOutletId      String
+  sourceOutlet        Outlet              @relation("SourceOutlet", fields: [sourceOutletId], references: [id])
+  destinationOutletId String
+  destinationOutlet   Outlet              @relation("DestinationOutlet", fields: [destinationOutletId], references: [id])
+  status              TransferStatus      @default(IN_TRANSIT)
+  notes               String?
+  createdById         String?
+  receivedById        String?
+  shippedAt           DateTime?           @default(now())
+  receivedAt          DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  items               StockTransferItem[]
+
+  @@index([sourceOutletId])
+  @@index([destinationOutletId])
+  @@index([status])
+  @@map("stock_transfers")
+}
+
+model StockTransferItem {
+  id              String        @id @default(cuid())
+  stockTransferId String
+  stockTransfer   StockTransfer @relation(fields: [stockTransferId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id])
+  quantity        Int
+  costPrice       Decimal       @default(0) @db.Decimal(15, 2)
+  notes           String?
+  createdAt       DateTime      @default(now())
+
+  @@index([stockTransferId])
+  @@index([productId])
+  @@map("stock_transfer_items")
 }

@@ -304,6 +304,7 @@ export async function getReportSnapshot(params: {
   endDate: string;
   weekDate: string;
   timezone?: string;
+  outletId?: string | null;
 }) {
   const timezone = params.timezone || DEFAULT_BUSINESS_TIMEZONE;
   const startDate = parseCalendarDate(params.startDate, timezone);
@@ -340,10 +341,16 @@ export async function getReportSnapshot(params: {
     },
   } satisfies Prisma.SaleInclude;
 
+  const outletFilter =
+    params.outletId && params.outletId !== "ALL"
+      ? { outletId: params.outletId }
+      : {};
+
   const [rangeSales, weekSales] = await Promise.all([
     prisma.sale.findMany({
       where: {
         isVoided: false,
+        ...outletFilter,
         createdAt: { gte: startDate, lte: endDate },
       },
       include: saleInclude,
@@ -352,6 +359,7 @@ export async function getReportSnapshot(params: {
     prisma.sale.findMany({
       where: {
         isVoided: false,
+        ...outletFilter,
         createdAt: { gte: weekStartDate, lte: weekEndDate },
       },
       include: saleInclude,

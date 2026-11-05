@@ -34,8 +34,10 @@ import {
   Trash2,
   Loader2,
   UtensilsCrossed,
+  PackageCheck,
 } from "lucide-react";
 import { RecipeDialog } from "@/components/products/recipe-dialog";
+import { ProductionBatchDialog } from "@/components/products/production-batch-dialog";
 import type { ProductWithStock, PaginatedResponse } from "@/types";
 
 export default function ProductsPage() {
@@ -61,6 +63,8 @@ export default function ProductsPage() {
   } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [selectedRecipeProduct, setSelectedRecipeProduct] =
+    useState<ProductWithStock | null>(null);
+  const [producingProduct, setProducingProduct] =
     useState<ProductWithStock | null>(null);
 
   // Debounce search input
@@ -387,6 +391,17 @@ export default function ProductsPage() {
                           >
                             <UtensilsCrossed className="w-4 h-4" />
                           </Button>
+                          {product.productType === "MANUFACTURED" && (
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              title="Eksekusi Produksi Batch"
+                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                              onClick={() => setProducingProduct(product)}
+                            >
+                              <PackageCheck className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon-sm"
@@ -500,6 +515,26 @@ export default function ProductsPage() {
           productId={selectedRecipeProduct.id}
           productName={selectedRecipeProduct.name}
           onSaved={() => {
+            // reload products
+            fetch(`/api/products?page=${page}&limit=${pageSize}`)
+              .then((r) => r.json())
+              .then((d) => {
+                if (d.data) setProducts(d.data);
+              });
+          }}
+        />
+      )}
+
+      {/* Production Batch Modal */}
+      {producingProduct && (
+        <ProductionBatchDialog
+          open={!!producingProduct}
+          onOpenChange={(open) => {
+            if (!open) setProducingProduct(null);
+          }}
+          productId={producingProduct.id}
+          productName={producingProduct.name}
+          onSuccess={() => {
             // reload products
             fetch(`/api/products?page=${page}&limit=${pageSize}`)
               .then((r) => r.json())

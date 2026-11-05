@@ -44,6 +44,9 @@ interface OutletItem {
   taxType: string;
   taxRate: number | string;
   serviceChargeRate: number | string;
+  outletType?: string;
+  kitchenWorkflow?: string;
+  costingMethod?: string;
   isActive: boolean;
 }
 
@@ -63,6 +66,9 @@ export default function OutletsPage() {
     taxType: "PB1_10",
     taxRate: 10,
     serviceChargeRate: 5,
+    outletType: "RETAIL_BOOTH",
+    kitchenWorkflow: "DIRECT_SERVE",
+    costingMethod: "FIFO",
   });
 
   const fetchOutlets = async () => {
@@ -95,6 +101,9 @@ export default function OutletsPage() {
       taxType: "PB1_10",
       taxRate: 10,
       serviceChargeRate: 5,
+      outletType: "RETAIL_BOOTH",
+      kitchenWorkflow: "DIRECT_SERVE",
+      costingMethod: "FIFO",
     });
     setIsDialogOpen(true);
   };
@@ -110,6 +119,9 @@ export default function OutletsPage() {
       taxType: outlet.taxType,
       taxRate: Number(outlet.taxRate),
       serviceChargeRate: Number(outlet.serviceChargeRate),
+      outletType: outlet.outletType || "RETAIL_BOOTH",
+      kitchenWorkflow: outlet.kitchenWorkflow || "DIRECT_SERVE",
+      costingMethod: outlet.costingMethod || "FIFO",
     });
     setIsDialogOpen(true);
   };
@@ -214,6 +226,20 @@ export default function OutletsPage() {
                     <span className="text-muted-foreground">Service Charge:</span>
                     <span className="font-semibold text-slate-900">{outlet.serviceChargeRate}%</span>
                   </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1.5 border-t border-slate-200/60">
+                    <Badge variant="outline" className="text-[10px] font-bold">
+                      {outlet.outletType === "CENTRAL_WAREHOUSE" ? "🏢 Gudang Pusat" :
+                       outlet.outletType === "CENTRAL_KITCHEN" ? "🍳 Dapur Pusat" :
+                       outlet.outletType === "FULL_SERVICE_STORE" ? "🍽️ Full Service" : "🏪 Booth / Kios"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] font-bold">
+                      {outlet.kitchenWorkflow === "DIRECT_SERVE" ? "⚡ Langsung Saji" :
+                       outlet.kitchenWorkflow === "KITCHEN_DISPATCH" ? "👨‍🍳 Tiket KDS" : "🔄 Hybrid"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] font-mono">
+                      HPP: {outlet.costingMethod || "FIFO"}
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-border flex items-center justify-end">
@@ -282,18 +308,54 @@ export default function OutletsPage() {
 
             <div className="grid grid-cols-2 gap-3 pt-1 border-t border-border">
               <div className="space-y-1.5">
-                <Label>Tipe Pajak</Label>
+                <Label>Tipe Cabang</Label>
                 <Select
-                  value={formData.taxType}
-                  onValueChange={(val) => setFormData({ ...formData, taxType: val })}
+                  value={formData.outletType}
+                  onValueChange={(val) => setFormData({ ...formData, outletType: val })}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PB1_10">PB1 Pajak Resto (10%)</SelectItem>
-                    <SelectItem value="PPN_11">PPN 11% (Ritel)</SelectItem>
-                    <SelectItem value="NONE">Tanpa Pajak</SelectItem>
+                    <SelectItem value="RETAIL_BOOTH">Booth / Kaki Lima / Pop-up</SelectItem>
+                    <SelectItem value="FULL_SERVICE_STORE">Restoran / Toko Full Service</SelectItem>
+                    <SelectItem value="CENTRAL_KITCHEN">Dapur Pusat (Central Kitchen)</SelectItem>
+                    <SelectItem value="CENTRAL_WAREHOUSE">Gudang Pusat (Warehouse)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Alur Operasional Dapur</Label>
+                <Select
+                  value={formData.kitchenWorkflow}
+                  onValueChange={(val) => setFormData({ ...formData, kitchenWorkflow: val })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DIRECT_SERVE">Langsung Saji (Bypass KDS)</SelectItem>
+                    <SelectItem value="KITCHEN_DISPATCH">Kirim ke Layar Dapur (KDS)</SelectItem>
+                    <SelectItem value="HYBRID">Hybrid (Sesuai Kategori)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Metode Perhitungan HPP</Label>
+                <Select
+                  value={formData.costingMethod}
+                  onValueChange={(val) => setFormData({ ...formData, costingMethod: val })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FIFO">FIFO (First-In, First-Out)</SelectItem>
+                    <SelectItem value="AVERAGE">Weighted Average (Rata-rata)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -308,6 +370,23 @@ export default function OutletsPage() {
                   onChange={(e) => setFormData({ ...formData, serviceChargeRate: Number(e.target.value) })}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Tipe Pajak</Label>
+              <Select
+                value={formData.taxType}
+                onValueChange={(val) => setFormData({ ...formData, taxType: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PB1_10">PB1 Pajak Resto (10%)</SelectItem>
+                  <SelectItem value="PPN_11">PPN 11% (Ritel)</SelectItem>
+                  <SelectItem value="NONE">Tanpa Pajak</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-2 pt-2">

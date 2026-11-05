@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const paymentType = searchParams.get("paymentType");
+    const outletId = searchParams.get("outletId");
     const page = Number(searchParams.get("page") || "1");
     const limit = Number(searchParams.get("limit") || "20");
     if (!Number.isSafeInteger(page) || page < 1 || page > 100000 ||
@@ -59,6 +60,7 @@ export async function GET(request: NextRequest) {
         ],
       }),
       ...(sessionUser.role === "CASHIER" && { cashierId: sessionUser.id }),
+      ...(outletId && { outletId }),
       ...(startDate && endDate && {
         createdAt: {
           gte: new Date(startDate),
@@ -73,6 +75,7 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           cashier: { select: { id: true, name: true, email: true } },
+          outlet: { select: { id: true, name: true, code: true } },
           items: {
             include: {
               product: { select: { id: true, name: true, sku: true, unit: true } },
@@ -120,7 +123,41 @@ export async function POST(request: NextRequest) {
 
     // Process sale in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Process FIFO for each item
+      // Resolve effective outlet, costing method, and kitchen workflow
+      let effectiveOutletId = data.outletId || null;
+      if (!effectiveOutletId) {
+        const userRec = await tx.user.findUnique({
+          where: { id: sessionUser.id },
+          select: { outletId: true },
+        });
+        if (userRec?.outletId) {
+          effectiveOutletId = userRec.outletId;
+        } else {
+          const mainOutlet = await tx.outlet.findFirst({
+            where: { isMain: true, isActive: true },
+            select: { id: true },
+          });
+          effectiveOutletId = mainOutlet?.id || null;
+        }
+      }
+
+      const store = await tx.store.findFirst();
+      let effectiveCostingMethod: "FIFO" | "AVERAGE" = store?.costingMethod || "FIFO";
+      let effectiveKitchenWorkflow: "DIRECT_SERVE" | "KITCHEN_DISPATCH" | "HYBRID" =
+        store?.kitchenWorkflow || "KITCHEN_DISPATCH";
+
+      if (effectiveOutletId) {
+        const targetOutlet = await tx.outlet.findUnique({
+          where: { id: effectiveOutletId },
+          select: { costingMethod: true, kitchenWorkflow: true },
+        });
+        if (targetOutlet) {
+          effectiveCostingMethod = targetOutlet.costingMethod;
+          effectiveKitchenWorkflow = targetOutlet.kitchenWorkflow;
+        }
+      }
+
+      // 1. Process Stock Deduction (FIFO or Weighted Average) for each item
       const processedItems = [];
       let totalCost = new Decimal(0);
       let subtotal = new Decimal(0);
@@ -140,7 +177,7 @@ export async function POST(request: NextRequest) {
 
         if (product.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
           // F&B Manufactured Product with Recipe (e.g. Dimsum, Kopi)
-          // Deduct from raw material ingredients' batches via FIFO!
+          // Deduct from raw material ingredients' batches
           let itemCost = new Decimal(0);
           const rawAllocations: any[] = [];
 
@@ -149,7 +186,10 @@ export async function POST(request: NextRequest) {
               Number(recipe.quantityNeeded) * item.quantity * (1 + Number(recipe.wastagePercent) / 100)
             );
             if (qtyNeeded > 0) {
-              const rawFifo = await processFIFODeduction(tx, recipe.ingredientId, qtyNeeded);
+              const rawFifo = await processFIFODeduction(tx, recipe.ingredientId, qtyNeeded, {
+                outletId: effectiveOutletId,
+                method: effectiveCostingMethod,
+              });
               itemCost = itemCost.add(rawFifo.totalCost);
               rawAllocations.push(...rawFifo.allocations);
               await applyFIFODeductions(tx, rawFifo.allocations);
@@ -158,7 +198,11 @@ export async function POST(request: NextRequest) {
 
           // Manufactured prices must also come from the server, never the POS body.
           const priceBatch = await tx.productBatch.findFirst({
-            where: { productId: product.id, remainingQty: { gt: 0 } },
+            where: {
+              productId: product.id,
+              remainingQty: { gt: 0 },
+              ...(effectiveOutletId ? { OR: [{ outletId: effectiveOutletId }, { outletId: null }] } : {}),
+            },
             orderBy: { purchaseDate: "asc" },
           });
           if (!priceBatch) throw new Error("Harga produk belum tersedia");
@@ -181,7 +225,7 @@ export async function POST(request: NextRequest) {
           subtotal = subtotal.add(lineRevenue);
           itemDiscountTotal = itemDiscountTotal.add(itemDiscount);
         } else {
-          // Standard Retail Finished Good FIFO deduction
+          // Standard Retail Finished Good deduction (FIFO or AVERAGE)
           const fifoResult = item.selectedBatchId
             ? await processSelectedBatchDeduction(
                 tx,
@@ -189,7 +233,10 @@ export async function POST(request: NextRequest) {
                 item.selectedBatchId,
                 item.quantity
               )
-            : await processFIFODeduction(tx, item.productId, item.quantity);
+            : await processFIFODeduction(tx, item.productId, item.quantity, {
+                outletId: effectiveOutletId,
+                method: effectiveCostingMethod,
+              });
           const itemDiscount = new Decimal(item.discountAmount || 0);
           const itemTotalPrice = fifoResult.totalRevenue.sub(itemDiscount);
 
@@ -222,7 +269,6 @@ export async function POST(request: NextRequest) {
       const invoiceNumber = generateInvoiceNumber(todaySalesCount + 1);
 
       // 3. Store tax & service charge settings
-      const store = await tx.store.findFirst();
       const serviceRate = Number(store?.serviceChargeRate || 0);
       const taxRate = Number(store?.taxRate || 0);
       const taxInclusive = store?.taxInclusive ?? false;
@@ -245,21 +291,21 @@ export async function POST(request: NextRequest) {
       let taxAmount = new Decimal(0);
       let preRoundingTotal = new Decimal(0);
 
-      if (taxRate > 0) {
-        if (taxInclusive) {
-          const dpp = taxableBase.div(1 + taxRate / 100);
-          taxAmount = taxableBase.sub(dpp);
-          preRoundingTotal = taxableBase;
-        } else {
-          taxAmount = taxableBase.mul(taxRate).div(100);
-          preRoundingTotal = taxableBase.add(taxAmount);
+      if (taxInclusive) {
+        if (taxRate > 0) {
+          taxAmount = taxableBase.mul(taxRate).div(100 + taxRate);
         }
-      } else {
         preRoundingTotal = taxableBase;
+      } else {
+        if (taxRate > 0) {
+          taxAmount = taxableBase.mul(taxRate).div(100);
+        }
+        preRoundingTotal = taxableBase.add(taxAmount);
       }
 
       let roundingAmount = new Decimal(0);
       let totalAmount = preRoundingTotal;
+
       if (enableRounding) {
         const rounded = Math.round(Number(preRoundingTotal) / 100) * 100;
         roundingAmount = new Decimal(rounded).sub(preRoundingTotal);
@@ -273,6 +319,7 @@ export async function POST(request: NextRequest) {
         data: {
           invoiceNumber,
           orderType: data.orderType || "DINE_IN",
+          outletId: effectiveOutletId,
           tableId: data.tableId || null,
           subtotal,
           discountAmount,
@@ -327,52 +374,58 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 7. Route to Kitchen Display System (KDS)
-      const kitchenItems = sale.items.filter(
-        (i: any) => i.product.station === "KITCHEN" || i.product.station === "GENERAL"
-      );
-      const barItems = sale.items.filter((i: any) => i.product.station === "BAR");
+      // 7. Route to Kitchen Display System (KDS) according to KitchenWorkflow
+      const shouldDispatchKDS =
+        effectiveKitchenWorkflow === "KITCHEN_DISPATCH" ||
+        (effectiveKitchenWorkflow === "HYBRID" && (data.orderType || "DINE_IN") === "DINE_IN");
 
-      if (kitchenItems.length > 0) {
-        await tx.kDSOrder.create({
-          data: {
-            saleId: sale.id,
-            station: "KITCHEN",
-            status: "QUEUED",
-            tableNo: sale.table?.tableNo || null,
-            orderType: data.orderType || "DINE_IN",
-            notes: data.notes || null,
-            itemsJson: kitchenItems.map((k: any) => ({
-              productId: k.productId,
-              name: k.product.name,
-              quantity: k.quantity,
-              unit: k.product.unit,
-              station: k.product.station,
-              notes: null,
-            })),
-          },
-        });
-      }
+      if (shouldDispatchKDS) {
+        const kitchenItems = sale.items.filter(
+          (i: any) => i.product.station === "KITCHEN" || i.product.station === "GENERAL"
+        );
+        const barItems = sale.items.filter((i: any) => i.product.station === "BAR");
 
-      if (barItems.length > 0) {
-        await tx.kDSOrder.create({
-          data: {
-            saleId: sale.id,
-            station: "BAR",
-            status: "QUEUED",
-            tableNo: sale.table?.tableNo || null,
-            orderType: data.orderType || "DINE_IN",
-            notes: data.notes || null,
-            itemsJson: barItems.map((b: any) => ({
-              productId: b.productId,
-              name: b.product.name,
-              quantity: b.quantity,
-              unit: b.product.unit,
-              station: b.product.station,
-              notes: null,
-            })),
-          },
-        });
+        if (kitchenItems.length > 0) {
+          await tx.kDSOrder.create({
+            data: {
+              saleId: sale.id,
+              station: "KITCHEN",
+              status: "QUEUED",
+              tableNo: sale.table?.tableNo || null,
+              orderType: data.orderType || "DINE_IN",
+              notes: data.notes || null,
+              itemsJson: kitchenItems.map((k: any) => ({
+                productId: k.productId,
+                name: k.product.name,
+                quantity: k.quantity,
+                unit: k.product.unit,
+                station: k.product.station,
+                notes: null,
+              })),
+            },
+          });
+        }
+
+        if (barItems.length > 0) {
+          await tx.kDSOrder.create({
+            data: {
+              saleId: sale.id,
+              station: "BAR",
+              status: "QUEUED",
+              tableNo: sale.table?.tableNo || null,
+              orderType: data.orderType || "DINE_IN",
+              notes: data.notes || null,
+              itemsJson: barItems.map((b: any) => ({
+                productId: b.productId,
+                name: b.product.name,
+                quantity: b.quantity,
+                unit: b.product.unit,
+                station: b.product.station,
+                notes: null,
+              })),
+            },
+          });
+        }
       }
 
       const saleCategoryId = await getSystemFinanceCategoryId(

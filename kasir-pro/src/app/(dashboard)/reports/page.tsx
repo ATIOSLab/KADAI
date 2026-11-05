@@ -7,6 +7,13 @@ import { ChartDateRangeFilter, ChartWeekFilter } from "@/components/dashboard/ch
 import { ChartFrame } from "@/components/dashboard/chart-frame";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatCurrency } from "@/lib/utils";
 import { apiFetch, ApiError } from "@/lib/api";
 import {
@@ -111,9 +118,20 @@ export default function ReportsPage() {
   const [weekRange, setWeekRange] = useState<DashboardDateRange>(
     getCurrentWeekRange()
   );
+  const [outlets, setOutlets] = useState<any[]>([]);
+  const [selectedOutletId, setSelectedOutletId] = useState<string>("ALL");
   const [report, setReport] = useState<ReportData | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    fetch("/api/outlets")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data) setOutlets(d.data);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +142,9 @@ export default function ReportsPage() {
         params.set("startDate", reportRange.startDate);
         params.set("endDate", reportRange.endDate);
         params.set("weekDate", getWeekAnchorDate(weekRange));
+        if (selectedOutletId && selectedOutletId !== "ALL") {
+          params.set("outletId", selectedOutletId);
+        }
 
         const response = await apiFetch<{ data: ReportData }>(
           `/api/reports?${params.toString()}`
@@ -151,7 +172,7 @@ export default function ReportsPage() {
     return () => {
       cancelled = true;
     };
-  }, [reportRange.endDate, reportRange.startDate, weekRange.startDate]);
+  }, [reportRange.endDate, reportRange.startDate, weekRange.startDate, selectedOutletId]);
 
   const loading = isPending || !hasLoaded;
   const rangeLabel = useMemo(
@@ -170,6 +191,30 @@ export default function ReportsPage() {
         description="Analisis penjualan & profitabilitas"
         icon={BarChart3}
       />
+
+      {outlets.length > 0 && (
+        <Card className="border border-border p-3.5 bg-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+          <div>
+            <span className="text-xs font-bold text-slate-900 block">Penyaringan Laporan Cabang</span>
+            <span className="text-[11px] text-muted-foreground">Pilih cabang gerai/booth untuk membedah omzet & HPP spesifik atau pantau seluruh jaringan</span>
+          </div>
+          <div className="w-full sm:w-64">
+            <Select value={selectedOutletId} onValueChange={setSelectedOutletId}>
+              <SelectTrigger className="h-9 text-xs font-bold">
+                <SelectValue placeholder="Pilih Cabang" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">🏢 Konsolidasi Semua Cabang</SelectItem>
+                {outlets.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.name} {o.isMain ? "(Pusat)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <Card>

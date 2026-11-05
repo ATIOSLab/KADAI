@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const year = Number(searchParams.get("year")) || new Date().getFullYear();
+    const outletId = searchParams.get("outletId");
 
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31, 23, 59, 59);
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
     const sales = await prisma.sale.findMany({
       where: {
         isVoided: false,
+        ...(outletId && outletId !== "ALL" ? { outletId } : {}),
         createdAt: { gte: startOfYear, lte: endOfYear },
       },
       select: {

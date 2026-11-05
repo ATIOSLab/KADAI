@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     const startDateParam = searchParams.get("startDate") ?? defaultRange.startDate;
     const endDateParam = searchParams.get("endDate") ?? defaultRange.endDate;
     const weekDateParam = searchParams.get("weekDate") ?? defaultWeek.startDate;
+    const outletIdParam = searchParams.get("outletId");
 
     if (startDateParam > endDateParam) {
       return NextResponse.json(
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
       startDate: startDateParam,
       endDate: endDateParam,
       weekDate: normalizedWeek.startDate,
+      outletId: outletIdParam,
     });
 
     return NextResponse.json({

@@ -20,22 +20,45 @@ export interface FIFOResult {
 type PrismaExecutor = PrismaClient | Prisma.TransactionClient;
 
 /**
- * Process FIFO deduction for a single product
+ * Process FIFO or Weighted Average deduction for a single product
  * Returns batch allocations and total HPP
  */
 export async function processFIFODeduction(
   db: PrismaExecutor,
   productId: string,
-  requestedQty: number
+  requestedQty: number,
+  options?: { outletId?: string | null; method?: "FIFO" | "AVERAGE" }
 ): Promise<FIFOResult> {
+  const method = options?.method ?? "FIFO";
+  const outletId = options?.outletId ?? null;
+
   // Get batches with remaining stock, ordered by purchase date (FIFO)
+  // If outletId is provided, look for batches specific to this outlet or global (null)
   const batches = await db.productBatch.findMany({
     where: {
       productId,
       remainingQty: { gt: 0 },
+      ...(outletId ? { OR: [{ outletId }, { outletId: null }] } : {}),
     },
     orderBy: { purchaseDate: "asc" },
   });
+
+  const totalAvailable = batches.reduce((acc, b) => acc + b.remainingQty, 0);
+  if (totalAvailable < requestedQty) {
+    throw new Error(
+      `Stok tidak cukup untuk produk ini. Tersedia ${totalAvailable} unit, diminta ${requestedQty} unit.`
+    );
+  }
+
+  // If method is AVERAGE, compute weighted average cost
+  let weightedAverageCost = new Decimal(0);
+  if (method === "AVERAGE" && totalAvailable > 0) {
+    const totalValue = batches.reduce(
+      (acc, b) => acc.add(b.costPrice.mul(b.remainingQty)),
+      new Decimal(0)
+    );
+    weightedAverageCost = totalValue.div(totalAvailable);
+  }
 
   let remainingQty = requestedQty;
   let totalCost = new Decimal(0);
@@ -46,23 +69,18 @@ export async function processFIFODeduction(
     if (remainingQty <= 0) break;
 
     const deductQty = Math.min(remainingQty, batch.remainingQty);
+    const assignedCost = method === "AVERAGE" ? weightedAverageCost : batch.costPrice;
 
     allocations.push({
       batchId: batch.id,
       quantity: deductQty,
-      costPrice: batch.costPrice,
+      costPrice: assignedCost,
       sellingPrice: batch.sellingPrice,
     });
 
-    totalCost = totalCost.add(batch.costPrice.mul(deductQty));
+    totalCost = totalCost.add(assignedCost.mul(deductQty));
     totalRevenue = totalRevenue.add(batch.sellingPrice.mul(deductQty));
     remainingQty -= deductQty;
-  }
-
-  if (remainingQty > 0) {
-    throw new Error(
-      `Stok tidak cukup untuk produk ini. Kurang ${remainingQty} unit.`
-    );
   }
 
   const averageCost = requestedQty > 0

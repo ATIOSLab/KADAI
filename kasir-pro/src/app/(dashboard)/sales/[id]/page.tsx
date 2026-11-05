@@ -22,6 +22,7 @@ import { formatCurrency } from "@/lib/utils";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { SupervisorPinDialog } from "@/components/shared/supervisor-pin-dialog";
+import { ThermalReceipt } from "@/components/shared/thermal-receipt";
 import { Receipt, ArrowLeft, XCircle, Loader2, Printer } from "lucide-react";
 import Link from "next/link";
 
@@ -447,6 +448,26 @@ export default function SaleDetailPage({
           setSupervisorPin(pin);
           setShowVoid(true);
         }}
+      />
+
+      {/* Hidden Isolated Thermal Print Engine */}
+      <ThermalReceipt
+        invoiceNumber={sale.invoiceNumber}
+        createdAt={sale.createdAt}
+        cashierName={sale.cashier?.name}
+        customerName={sale.customerName}
+        items={sale.items.map((i) => ({
+          name: i.product.name,
+          quantity: i.quantity,
+          unitPrice: Number(i.unitPrice),
+          totalPrice: Number(i.totalPrice),
+          discountAmount: Number(i.discountAmount),
+        }))}
+        subtotal={Number(sale.subtotal)}
+        discountAmount={Number(sale.discountAmount)}
+        totalAmount={Number(sale.totalAmount)}
+        paymentType={sale.paymentType}
+        paymentRef={sale.paymentRef}
       />
     </div>
   );

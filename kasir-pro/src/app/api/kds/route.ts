@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const station = searchParams.get("station"); // KITCHEN, BAR, or null for ALL
+    const outletId = searchParams.get("outletId");
 
     const whereClause: any = {
       status: { in: ["QUEUED", "COOKING", "READY"] },
@@ -26,6 +27,10 @@ export async function GET(req: NextRequest) {
 
     if (station && station !== "ALL") {
       whereClause.station = station;
+    }
+
+    if (outletId && outletId !== "ALL") {
+      whereClause.sale = { outletId };
     }
 
     const orders = await prisma.kDSOrder.findMany({
@@ -40,6 +45,14 @@ export async function GET(req: NextRequest) {
             customerName: true,
             totalAmount: true,
             createdAt: true,
+            outletId: true,
+            outlet: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+              },
+            },
           },
         },
       },

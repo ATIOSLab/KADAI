@@ -14,6 +14,7 @@ import {
   Truck,
   Users,
   Building,
+  ArrowLeftRight,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
@@ -94,6 +95,14 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Stok",
         description: "Pelacakan stok multi-batch, kartu mutasi, dan restock.",
         icon: Warehouse,
+        roles: ["ADMIN", "MANAGER", "INVENTORY"],
+      },
+      {
+        href: "/inventory/transfers",
+        label: "Transfer Stok Antar Cabang",
+        shortLabel: "Transfer",
+        description: "Distribusi stok dari gudang/dapur pusat ke cabang gerai & booth.",
+        icon: ArrowLeftRight,
         roles: ["ADMIN", "MANAGER", "INVENTORY"],
       },
       {
@@ -219,6 +228,12 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Pelacakan persediaan berbasis FIFO batch, kartu stok, dan peringatan restock.",
     section: "Katalog & Rantai Pasok",
     eyebrow: "Inventory Control",
+  },
+  "/inventory/transfers": {
+    title: "Transfer Stok Antar Cabang",
+    description: "Distribusi stok dari Gudang/Dapur Pusat ke gerai cabang & booth kaki lima.",
+    section: "Katalog & Rantai Pasok",
+    eyebrow: "Supply Distribution",
   },
   "/suppliers": {
     title: "Pemasok & Vendor",

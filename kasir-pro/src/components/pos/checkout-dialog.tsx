@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ThermalReceipt } from "@/components/shared/thermal-receipt";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 
 const paymentMethods = [
@@ -74,6 +75,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [completedSale, setCompletedSale] = useState<any | null>(null);
 
   useEffect(() => {
     fetch("/api/tables")
@@ -111,7 +113,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     try {
       const response = await apiFetch<{
         success: true;
-        data: { invoiceNumber: string };
+        data: any;
       }>("/api/sales", {
         method: "POST",
         body: {
@@ -135,6 +137,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       });
 
       setInvoiceNumber(response.data.invoiceNumber);
+      setCompletedSale(response.data);
       setSuccess(true);
       clearCart();
       bumpCatalogVersion();
@@ -149,6 +152,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
   const handleResetForm = () => {
     setSuccess(false);
+    setCompletedSale(null);
     setInvoiceNumber("");
     setPaymentType("CASH");
     setPaymentRef("");
@@ -206,6 +210,40 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               </Button>
             </div>
           </div>
+
+          {completedSale && (
+            <div className="hidden print:block">
+              <ThermalReceipt
+                storeName="KADAI Enterprise"
+                outletName={completedSale.outlet?.name || "KADAI"}
+                outletAddress={completedSale.outlet?.address || null}
+                outletPhone={completedSale.outlet?.phone || null}
+                invoiceNumber={completedSale.invoiceNumber}
+                createdAt={completedSale.createdAt}
+                cashierName={completedSale.cashier?.name || null}
+                customerName={completedSale.customerName || null}
+                tableNo={completedSale.table?.tableNo || null}
+                orderType={completedSale.orderType}
+                paymentType={completedSale.paymentType}
+                paymentRef={completedSale.paymentRef || null}
+                items={(completedSale.items || []).map((i: any) => ({
+                  name: i.product?.name || i.productName || "Item",
+                  quantity: i.quantity,
+                  unitPrice: Number(i.unitPrice),
+                  totalPrice: Number(i.subtotal),
+                  discountAmount: Number(i.discountAmount || 0),
+                }))}
+                subtotal={Number(completedSale.subtotal)}
+                discountAmount={Number(completedSale.discountAmount || 0)}
+                serviceCharge={Number(completedSale.serviceCharge || 0)}
+                taxAmount={Number(completedSale.taxAmount || 0)}
+                roundingAmount={Number(completedSale.roundingAmount || 0)}
+                totalAmount={Number(completedSale.totalAmount)}
+                cashReceived={cashAmount ? Number(cashAmount) : null}
+                changeAmount={changeAmount > 0 ? changeAmount : null}
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     );

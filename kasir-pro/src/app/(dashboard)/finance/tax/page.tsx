@@ -14,6 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface MonthlyData {
@@ -30,6 +37,8 @@ interface MonthlyData {
 
 export default function TaxSummaryPage() {
   const [year, setYear] = useState(new Date().getFullYear());
+  const [outlets, setOutlets] = useState<any[]>([]);
+  const [selectedOutletId, setSelectedOutletId] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
     summary: MonthlyData[];
@@ -37,10 +46,20 @@ export default function TaxSummaryPage() {
     store: any;
   } | null>(null);
 
+  useEffect(() => {
+    fetch("/api/outlets")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data) setOutlets(d.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const fetchTaxData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/finance/tax-summary?year=${year}`);
+      const outletParam = selectedOutletId !== "ALL" ? `&outletId=${selectedOutletId}` : "";
+      const res = await fetch(`/api/finance/tax-summary?year=${year}${outletParam}`);
       const json = await res.json();
       if (res.ok) {
         setData(json);
@@ -56,7 +75,7 @@ export default function TaxSummaryPage() {
 
   useEffect(() => {
     fetchTaxData();
-  }, [year]);
+  }, [year, selectedOutletId]);
 
   return (
     <div className="space-y-6">
@@ -71,7 +90,25 @@ export default function TaxSummaryPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {outlets.length > 0 && (
+            <div className="w-48">
+              <Select value={selectedOutletId} onValueChange={setSelectedOutletId}>
+                <SelectTrigger className="h-10 text-xs font-bold neo-border bg-card">
+                  <SelectValue placeholder="Pilih Cabang" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Cabang (Konsolidasi)</SelectItem>
+                  {outlets.map((o) => (
+                    <SelectItem key={o.id} value={o.id}>
+                      {o.name} {o.isMain ? "(Pusat)" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <select
             value={year}
             onChange={(e: any) => setYear(Number(e.target.value))}

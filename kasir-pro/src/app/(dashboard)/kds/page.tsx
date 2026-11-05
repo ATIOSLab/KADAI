@@ -15,6 +15,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface KDSItemSnapshot {
@@ -41,11 +48,19 @@ interface KDSOrder {
   sale: {
     invoiceNumber: string;
     customerName: string | null;
+    outletId?: string | null;
+    outlet?: {
+      id: string;
+      name: string;
+      code: string;
+    } | null;
   };
 }
 
 export default function KDSPage() {
   const [orders, setOrders] = useState<KDSOrder[]>([]);
+  const [outlets, setOutlets] = useState<any[]>([]);
+  const [selectedOutletId, setSelectedOutletId] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
   const [activeStation, setActiveStation] = useState<"ALL" | "KITCHEN" | "BAR">("ALL");
   const [cockpitMode, setCockpitMode] = useState(true);
@@ -57,10 +72,21 @@ export default function KDSPage() {
     return () => clearInterval(timerInterval);
   }, []);
 
+  // Fetch outlets once
+  useEffect(() => {
+    fetch("/api/outlets")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data) setOutlets(d.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const fetchOrders = async (quiet = false) => {
     try {
       if (!quiet) setLoading(true);
-      const res = await fetch(`/api/kds?station=${activeStation}`);
+      const outletParam = selectedOutletId !== "ALL" ? `&outletId=${selectedOutletId}` : "";
+      const res = await fetch(`/api/kds?station=${activeStation}${outletParam}`);
       const data = await res.json();
       if (res.ok) {
         setOrders(data.data || []);
@@ -76,7 +102,7 @@ export default function KDSPage() {
     fetchOrders();
     const interval = setInterval(() => fetchOrders(true), 6000);
     return () => clearInterval(interval);
-  }, [activeStation]);
+  }, [activeStation, selectedOutletId]);
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
@@ -123,6 +149,24 @@ export default function KDSPage() {
 
         {/* Station Filters */}
         <div className="flex flex-wrap items-center gap-2">
+          {outlets.length > 0 && (
+            <div className="w-44">
+              <Select value={selectedOutletId} onValueChange={setSelectedOutletId}>
+                <SelectTrigger className="h-9 text-xs font-bold">
+                  <SelectValue placeholder="Pilih Cabang" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Cabang</SelectItem>
+                  {outlets.map((o) => (
+                    <SelectItem key={o.id} value={o.id}>
+                      {o.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="flex bg-muted p-1 rounded-xl border border-border">
             <button
               onClick={() => setActiveStation("ALL")}
@@ -241,7 +285,14 @@ export default function KDSPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
-                    <span className="font-mono">#{ord.sale.invoiceNumber}</span>
+                    <div className="flex items-center gap-1.5 font-mono">
+                      <span>#{ord.sale.invoiceNumber}</span>
+                      {ord.sale.outlet?.name && (
+                        <Badge variant="outline" className="text-[10px] font-sans font-bold">
+                          {ord.sale.outlet.name}
+                        </Badge>
+                      )}
+                    </div>
                     <span className={`font-semibold ${cockpitMode ? "text-slate-200" : "text-foreground"}`}>
                       {ord.sale.customerName || "Pelanggan"}
                     </span>

@@ -9,7 +9,9 @@ import {
   Sparkles,
   Loader2,
   AlertCircle,
+  PackageCheck,
 } from "lucide-react";
+import { ProductionBatchDialog } from "./production-batch-dialog";
 import {
   Dialog,
   DialogContent,
@@ -52,6 +54,7 @@ export function RecipeDialog({
   const [rawMaterials, setRawMaterials] = useState<any[]>([]);
   const [recipeLines, setRecipeLines] = useState<RecipeLine[]>([]);
   const [calculatedHPP, setCalculatedHPP] = useState(0);
+  const [isProduceOpen, setIsProduceOpen] = useState(false);
 
   useEffect(() => {
     if (!open || !productId) return;
@@ -313,6 +316,16 @@ export function RecipeDialog({
         )}
 
         <DialogFooter className="pt-2 flex flex-col sm:flex-row gap-2">
+          {recipeLines.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsProduceOpen(true)}
+              className="w-full neo-border font-bold text-xs text-primary border-primary/40 hover:bg-primary/10"
+            >
+              <PackageCheck className="size-3.5 mr-1.5" /> Eksekusi Produksi Batch
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -336,6 +349,16 @@ export function RecipeDialog({
             )}
           </Button>
         </DialogFooter>
+
+        <ProductionBatchDialog
+          productId={productId}
+          productName={productName}
+          open={isProduceOpen}
+          onOpenChange={setIsProduceOpen}
+          onSuccess={() => {
+            if (onSaved) onSaved();
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

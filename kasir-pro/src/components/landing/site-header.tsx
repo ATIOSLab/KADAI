@@ -12,10 +12,8 @@ import {
   Layers,
   ChefHat,
   Receipt,
-  Building2,
   UtensilsCrossed,
   Warehouse,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -47,8 +45,8 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
       icon: ChefHat,
     },
     {
-      title: "Kepatuhan Pajak & SAK EMKM",
-      desc: "Pajak daerah PB1 10%, PPh Final PP 55/2022, dan buku jurnal laba rugi otomatis.",
+      title: "Pajak & Pembukuan",
+      desc: "Kelola pengaturan pajak dan laporan pembukuan usaha.",
       href: "#pajak-pembukuan",
       icon: Receipt,
     },
@@ -76,12 +74,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 pt-3 sm:pt-4 px-4 sm:px-6 w-full">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-50 w-full border-b border-white/70 bg-white/75 px-4 py-3 backdrop-blur-xl sm:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Left Modular Island: Brand Squircle */}
         <Link
           href="/"
-          className="luxury-glass-pill px-3.5 py-2 rounded-2xl flex items-center gap-2.5 shrink-0 group hover:border-slate-300 transition-all"
+          className="px-1 py-1 rounded-xl flex items-center gap-2.5 shrink-0 group hover:border-slate-300 transition-all"
         >
           <span className="flex size-8 items-center justify-center rounded-xl bg-slate-950 text-white shadow-2xs group-hover:scale-105 transition-transform">
             <Store className="size-4 text-primary" />
@@ -102,16 +100,21 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         {/* Center Modular Island: Minimalist Transparent Glass Menu with Mega Dropdown */}
         <nav
           aria-label="Navigasi Utama"
-          className="hidden sm:flex items-center gap-1 luxury-glass-pill px-3 py-1.5 rounded-full text-xs font-semibold text-slate-600 relative"
+          className="hidden xl:flex items-center gap-1 px-2 py-1.5 rounded-full text-xs font-semibold text-slate-600 relative"
           onMouseLeave={() => setActiveDropdown(null)}
+          onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null); }}
+          onKeyDown={(event) => { if (event.key === "Escape") { event.currentTarget.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')?.focus(); setActiveDropdown(null); } }}
         >
           {/* 1. Dropdown Kapabilitas */}
           <div
             className="relative"
             onMouseEnter={() => setActiveDropdown("kapabilitas")}
-          >
-            <button
-              type="button"
+                      >
+                        <button
+                          type="button"
+                          aria-expanded={activeDropdown === "kapabilitas"}
+                          aria-controls="nav-kapabilitas"
+                          onClick={() => setActiveDropdown(activeDropdown === "kapabilitas" ? null : "kapabilitas")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all font-medium whitespace-nowrap ${
                 activeDropdown === "kapabilitas"
                   ? "text-slate-950 bg-slate-100/90 font-bold"
@@ -128,7 +131,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
             {/* Glass Dropdown Panel: Kapabilitas */}
             {activeDropdown === "kapabilitas" && (
-              <div className="absolute top-full left-0 mt-3 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div id="nav-kapabilitas" className="absolute top-full left-0 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Modul Utama KADAI
                 </div>
@@ -163,9 +166,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           <div
             className="relative"
             onMouseEnter={() => setActiveDropdown("solusi")}
-          >
-            <button
-              type="button"
+                      >
+                        <button
+                          type="button"
+                          aria-expanded={activeDropdown === "solusi"}
+                          aria-controls="nav-solusi"
+                          onClick={() => setActiveDropdown(activeDropdown === "solusi" ? null : "solusi")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all font-medium whitespace-nowrap ${
                 activeDropdown === "solusi"
                   ? "text-slate-950 bg-slate-100/90 font-bold"
@@ -182,7 +188,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
             {/* Glass Dropdown Panel: Solusi Industri */}
             {activeDropdown === "solusi" && (
-              <div className="absolute top-full left-0 mt-3 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div id="nav-solusi" className="absolute top-full left-0 w-80 p-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-2xl space-y-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Sektor Industri
                 </div>
@@ -235,7 +241,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         </nav>
 
         {/* Right Modular Island: Auth & CTA Pill */}
-        <div className="hidden sm:flex items-center gap-2 shrink-0 luxury-glass-pill p-1.5 rounded-2xl">
+        <div className="hidden xl:flex items-center gap-2 shrink-0 p-1.5 rounded-2xl">
           {dashboardPath ? (
             <Button
               asChild
@@ -269,7 +275,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
         </div>
 
         {/* Mobile Hamburger Toggle */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex xl:hidden items-center gap-2">
           {dashboardPath ? (
             <Button asChild size="sm" className="h-8 text-xs font-bold px-3 rounded-xl bg-primary text-primary-foreground">
               <Link href={dashboardPath}>Dashboard</Link>
@@ -293,7 +299,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
       {/* Accessible Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="sm:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
+        <div className="xl:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">
             <a
               href="#kapabilitas"

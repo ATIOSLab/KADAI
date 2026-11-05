@@ -74,7 +74,7 @@ export function HeroBackgroundSlider({
 
   return (
     <div
-      className="absolute -top-12 sm:-top-16 inset-x-0 h-[580px] sm:h-[660px] md:h-[720px] overflow-hidden pointer-events-auto select-none rounded-[32px] sm:rounded-[40px] border border-slate-200/60 shadow-xs"
+      className="absolute inset-0 pointer-events-auto select-none overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -109,14 +109,14 @@ export function HeroBackgroundSlider({
 
       {/* Layer 1: Exquisite Dual-Gradient Scrim for 100% Typography Contrast */}
       {/* Radial soft spotlight behind center copy */}
-      <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(248,250,252,0.94)_0%,_rgba(248,250,252,0.85)_45%,_rgba(248,250,252,0.4)_75%,_rgba(248,250,252,0.15)_100%)]" />
+      <div className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(248,250,252,0.92)_0%,_rgba(248,250,252,0.82)_45%,_rgba(248,250,252,0.4)_75%,_rgba(248,250,252,0.2)_100%)]" />
 
       {/* Top and Bottom Linear Fade Masks into Page Background */}
-      <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-b from-[#F8FAFC]/90 via-transparent to-[#F8FAFC]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 z-20 pointer-events-none bg-gradient-to-t from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent" />
+      <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-b from-[#F8FAFC]/95 via-transparent to-[#F8FAFC]" />
+      <div className="absolute inset-x-0 bottom-0 h-48 z-20 pointer-events-none bg-gradient-to-t from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent" />
 
-      {/* Slide Navigation Overlay Controls (Positioned at bottom right of the slider frame) */}
-      <div className="absolute bottom-6 right-6 z-30 flex items-center gap-2">
+      {/* Slide Navigation Overlay Controls (Positioned at bottom right of the hero banner) */}
+      <div className="absolute bottom-6 right-6 sm:right-10 z-30 flex items-center gap-2">
         {/* Active Scene Badge */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 shadow-md text-[11px] font-semibold text-white">
           <Sparkles className="size-3 text-primary" />

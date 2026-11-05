@@ -149,12 +149,12 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               className="object-cover"
               sizes="25vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-            <div className="absolute bottom-3 left-3 right-3 text-white">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent" />
+            <div className="absolute bottom-2.5 left-3 right-3 text-white">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block leading-none mb-1">
                 Dashboard POS
               </span>
-              <span className="text-xs font-semibold leading-tight block">
+              <span className="text-xs font-semibold leading-tight block text-slate-100">
                 Realtime Analytics
               </span>
             </div>
@@ -237,12 +237,12 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               className="object-cover"
               sizes="25vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-            <div className="absolute bottom-3 left-3 right-3 text-white">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent" />
+            <div className="absolute bottom-2.5 left-3 right-3 text-white">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block leading-none mb-1">
                 SAK EMKM & Fiskal
               </span>
-              <span className="text-xs font-semibold leading-tight block">
+              <span className="text-xs font-semibold leading-tight block text-slate-100">
                 Audit & Kepatuhan Pajak
               </span>
             </div>

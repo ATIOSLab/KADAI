@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 
 export function FinalCTA() {
   return (
-    <section className="py-20 sm:py-28 px-4 sm:px-6 w-full relative overflow-hidden bg-white">
-      {/* Ambient Radial Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] glow-orange pointer-events-none -z-10" />
-      <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] glow-blue pointer-events-none -z-10" />
+    <section className="py-20 sm:py-28 px-4 sm:px-6 w-full relative overflow-hidden bg-slate-50/60 border-t border-slate-200/80">
+      {/* Magic UI Dot Pattern & Ambient Radial Glows */}
+      <div className="absolute inset-0 bg-dot-pattern opacity-50 pointer-events-none [mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_75%)] -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] glow-orange pointer-events-none -z-10 opacity-70" />
+      <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[300px] glow-blue pointer-events-none -z-10 opacity-70" />
 
-      <div className="max-w-4xl mx-auto rounded-3xl glass-surface-card p-8 sm:p-14 border border-white/90 shadow-2xl text-center space-y-6 relative">
+      <div className="max-w-4xl mx-auto rounded-3xl liquid-glass-card p-8 sm:p-14 shadow-2xl text-center space-y-6 relative border border-white/95">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200/90 text-primary text-xs font-bold shadow-2xs">
           <Sparkles className="size-3.5 shrink-0" />
           <span>Langkah Nyata Efisiensi Bisnis</span>

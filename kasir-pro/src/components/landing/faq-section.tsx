@@ -69,7 +69,7 @@ export function FAQSection() {
             return (
               <div
                 key={idx}
-                className="rounded-2xl glass-surface-card border border-white/90 overflow-hidden shadow-xs transition-all"
+                className="rounded-2xl liquid-glass-card overflow-hidden shadow-xs hover:shadow-md transition-all duration-200"
               >
                 <button
                   type="button"

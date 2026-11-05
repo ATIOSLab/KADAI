@@ -99,10 +99,10 @@ export function PricingSection() {
         {PLANS.map((plan) => (
           <div
             key={plan.name}
-            className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all relative ${
+            className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all duration-300 relative ${
               plan.featured
-                ? "bg-white border-2 border-primary shadow-xl shadow-primary/[0.08] ring-1 ring-primary/20"
-                : "glass-surface-card border border-slate-200/90 shadow-sm hover:shadow-md"
+                ? "bg-white border-2 border-primary shadow-2xl shadow-primary/[0.12] ring-2 ring-primary/20 scale-[1.02]"
+                : "liquid-glass-card hover:shadow-xl hover:scale-[1.01]"
             }`}
           >
             {plan.featured && (

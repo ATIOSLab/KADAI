@@ -68,7 +68,7 @@ export function AccountingTaxSection() {
             return (
               <div
                 key={idx}
-                className="rounded-3xl glass-surface-card p-6 sm:p-8 flex flex-col justify-between space-y-6 border border-white/90 shadow-sm hover:shadow-md transition-all"
+                className="rounded-3xl liquid-glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:shadow-xl transition-all duration-300"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">

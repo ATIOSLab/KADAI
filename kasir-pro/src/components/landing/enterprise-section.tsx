@@ -73,7 +73,7 @@ export function EnterpriseSection() {
             return (
               <div
                 key={idx}
-                className="rounded-3xl glass-surface-dark p-6 sm:p-7 flex flex-col justify-between space-y-4 border border-white/10 hover:border-white/20 transition-all shadow-xl"
+                className="rounded-3xl liquid-glass-dark p-6 sm:p-7 flex flex-col justify-between space-y-4 hover:border-white/30 transition-all duration-300"
               >
                 <div className="space-y-3">
                   <div className={`size-11 rounded-2xl flex items-center justify-center border shadow-xs ${cap.accent}`}>

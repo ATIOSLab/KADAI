@@ -8,6 +8,7 @@ import {
   Warehouse,
   ChefHat,
   Scale,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductShowcase } from "@/components/landing/product-showcase";
@@ -26,22 +27,28 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden pt-8 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 w-full">
-      {/* Soft Ambient Glows (Subtle Blue & Brand Orange Atmosphere) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[360px] glow-blue pointer-events-none -z-10" />
-      <div className="absolute top-24 right-1/4 w-[400px] h-[300px] glow-orange pointer-events-none -z-10" />
+      {/* Magic UI / Aceternity inspired Dot Pattern and Atmospheric Ambient Glows */}
+      <div className="absolute inset-0 bg-dot-pattern opacity-60 pointer-events-none [mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_75%)] -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] glow-blue pointer-events-none -z-10 animate-pulse-glow" />
+      <div className="absolute top-28 right-1/4 w-[450px] h-[350px] glow-orange pointer-events-none -z-10 opacity-75" />
 
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Hero Top Copy */}
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-slate-200/90 text-slate-800 text-xs font-semibold shadow-xs backdrop-blur-md">
+          {/* Eyebrow Pill with Shiny Highlight */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-nav text-slate-800 text-xs font-semibold shadow-xs">
             <span className="size-2 rounded-full bg-primary animate-pulse" />
-            <span className="font-mono text-[11px] text-slate-500 uppercase tracking-wider">
+            <span className="font-mono text-[11px] text-slate-600 uppercase tracking-wider font-bold">
               KADAI — Enterprise POS & ERP
+            </span>
+            <span className="text-slate-300">|</span>
+            <span className="text-[11px] text-primary font-bold flex items-center gap-1">
+              <Sparkles className="size-3" />
+              Sistem Operasi Bisnis Indonesia
             </span>
           </div>
 
-          {/* Headline */}
+          {/* Master Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.12] text-slate-950 text-balance">
             Satu Platform untuk Seluruh Operasional Bisnis Anda.
           </h1>
@@ -57,7 +64,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               <Button
                 asChild
                 size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-xs rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
               >
                 <Link href={dashboardPath} className="flex items-center gap-2">
                   <span>Buka Dashboard Operasional</span>
@@ -69,7 +76,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto font-bold text-sm h-12 px-7 shadow-xs rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full sm:w-auto font-bold text-sm h-12 px-7 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20 transition-all hover:scale-[1.02]"
                 >
                   <Link href="/register" className="flex items-center gap-2">
                     <span>Coba Gratis 14 Hari</span>
@@ -80,7 +87,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-slate-50 bg-white/90 text-slate-900 shadow-xs backdrop-blur-md"
+                  className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-xl border-slate-300 hover:bg-white bg-white/80 text-slate-900 shadow-xs backdrop-blur-md transition-all hover:border-slate-400"
                 >
                   <a href="#kapabilitas" className="flex items-center gap-2">
                     <span>Jelajahi Fitur</span>
@@ -92,13 +99,13 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           </div>
 
           {/* Verified Highlight Pills under CTA */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto text-xs font-semibold text-slate-700">
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 max-w-2xl mx-auto text-xs font-semibold text-slate-700">
             {highlights.map((h, i) => {
               const Icon = h.icon;
               return (
                 <div
                   key={i}
-                  className="px-3 py-1 rounded-full bg-white/80 border border-slate-200/80 shadow-2xs flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-full liquid-glass-nav flex items-center gap-1.5 text-slate-800 shadow-2xs hover:border-primary/40 transition-colors"
                 >
                   <Icon className="size-3.5 text-primary shrink-0" />
                   <span>{h.label}</span>

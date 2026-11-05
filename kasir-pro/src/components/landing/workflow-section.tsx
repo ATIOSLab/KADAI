@@ -71,7 +71,7 @@ export function WorkflowSection() {
           return (
             <div
               key={step.num}
-              className="rounded-2xl glass-surface-card p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-4 relative group hover:shadow-md transition-all"
+              className="rounded-2xl liquid-glass-card p-5 shadow-xs flex flex-col justify-between space-y-4 relative group hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

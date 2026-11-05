@@ -7,6 +7,7 @@ import {
   Store,
   Scissors,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -64,11 +65,12 @@ export function IndustrySolutions() {
   const active = INDUSTRIES.find((ind) => ind.id === activeId) || INDUSTRIES[0];
 
   return (
-    <section id="solusi-industri" className="py-20 sm:py-28 px-4 sm:px-6 bg-slate-50/70 border-y border-slate-200/80 w-full">
+    <section id="solusi-industri" className="py-20 sm:py-28 px-4 sm:px-6 bg-slate-50/70 border-y border-slate-200/80 w-full relative">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-nav text-slate-800 text-xs font-semibold shadow-2xs">
+            <Sparkles className="size-3 text-primary" />
             <span>Solusi Lintas Industri</span>
           </div>
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">
@@ -79,7 +81,7 @@ export function IndustrySolutions() {
           </p>
         </div>
 
-        {/* 3 Industry Segment Selector Tabs */}
+        {/* 3 Industry Segment Selector Tabs with Liquid Glass styling */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {INDUSTRIES.map((ind) => {
             const Icon = ind.icon;
@@ -91,13 +93,13 @@ export function IndustrySolutions() {
                 onClick={() => setActiveId(ind.id)}
                 className={`p-4 sm:p-5 rounded-2xl text-left transition-all border flex items-start gap-3.5 ${
                   isActive
-                    ? "bg-white border-primary shadow-md shadow-primary/[0.06] ring-1 ring-primary"
-                    : "bg-white/80 border-slate-200/80 hover:bg-white hover:border-slate-300"
+                    ? "bg-white border-primary shadow-md shadow-primary/[0.08] ring-1 ring-primary/30"
+                    : "liquid-glass-card hover:bg-white hover:border-slate-300"
                 }`}
               >
                 <div
-                  className={`size-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    isActive ? "bg-orange-50 text-primary border border-orange-200" : "bg-slate-100 text-slate-600"
+                  className={`size-10 rounded-xl flex items-center justify-center shrink-0 transition-transform ${
+                    isActive ? "bg-orange-50 text-primary border border-orange-200 scale-105" : "bg-slate-100 text-slate-600"
                   }`}
                 >
                   <Icon className="size-5" />
@@ -112,7 +114,7 @@ export function IndustrySolutions() {
         </div>
 
         {/* Selected Industry Deep Dive Showcase */}
-        <div className="rounded-3xl glass-surface-card p-6 sm:p-10 border border-white/90 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="rounded-3xl liquid-glass-card p-6 sm:p-10 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Text & Benefits (Col 7) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="space-y-2">

@@ -41,7 +41,7 @@ const TABS: TabItem[] = [
       { label: "Dukungan Cetak", value: "58mm & 80mm" },
     ],
     content: {
-      meta: { ref: "INV-20261105-0042 • MEJA 04 (DINE IN)", status: "KASIR LUNAS", statusClass: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+      meta: { ref: "INV-20261105-0042 • MEJA 04 (DINE IN)", status: "KASIR LUNAS", statusClass: "bg-emerald-50 text-emerald-800 border-emerald-300" },
       rows: [
         { label: "2x Nasi Goreng Spesial", sub: "BOM: Beras, Telur, Ayam Potong", val: "Rp 64.000" },
         { label: "2x Es Kopi Susu Aren Gayo", sub: "BOM: Arabica Gayo, Susu UHT, Aren", val: "Rp 36.000" },
@@ -64,7 +64,7 @@ const TABS: TabItem[] = [
       { label: "Akurasi Opname", value: "100% Tercatat" },
     ],
     content: {
-      meta: { ref: "SKU: BMF-ARABICA-01 • GUDANG PUSAT", status: "FIFO AKTIF", statusClass: "bg-blue-100 text-blue-800 border-blue-300" },
+      meta: { ref: "SKU: BMF-ARABICA-01 • GUDANG PUSAT", status: "FIFO AKTIF", statusClass: "bg-blue-50 text-blue-800 border-blue-300" },
       rows: [
         { label: "Batch #01 (Prioritas Keluar)", sub: "Tgl Beli: 01 Nov 2026 • Sisa 12 kg", val: "HPP Rp 140.000/kg" },
         { label: "Batch #02 (Stok Masuk Baru)", sub: "Tgl Beli: 04 Nov 2026 • Sisa 25 kg", val: "HPP Rp 145.000/kg" },
@@ -87,7 +87,7 @@ const TABS: TabItem[] = [
       { label: "Bypass Antrean", value: "Direct Serve" },
     ],
     content: {
-      meta: { ref: "BATCH-PROD-20261105-08 • STATUS: SIAP SAJI", status: "KDS TERHUBUNG", statusClass: "bg-amber-100 text-amber-900 border-amber-300" },
+      meta: { ref: "BATCH-PROD-20261105-08 • STATUS: SIAP SAJI", status: "KDS TERHUBUNG", statusClass: "bg-amber-50 text-amber-900 border-amber-300" },
       rows: [
         { label: "Eksekusi Batch 50 Porsi Saus Rendang", sub: "Komponen BOM: Daging, Santan, Bumbu Halus", val: "50 Porsi" },
         { label: "Debit Stok Bahan Mentah", sub: "FIFO Batch Gudang Pusat", val: "Rp 850.000" },
@@ -110,7 +110,7 @@ const TABS: TabItem[] = [
       { label: "Batas Bebas OP", value: "PTKP < Rp 500 Jt" },
     ],
     content: {
-      meta: { ref: "PERIODE: OKTOBER 2026 • BUKU PEREDARAN BRUTO", status: "AUDIT READY", statusClass: "bg-rose-100 text-rose-800 border-rose-300" },
+      meta: { ref: "PERIODE: OKTOBER 2026 • BUKU PEREDARAN BRUTO", status: "AUDIT READY", statusClass: "bg-rose-50 text-rose-800 border-rose-300" },
       rows: [
         { label: "Peredaran Bruto (Omzet Penjualan)", sub: "Total 480 Transaksi Kasir", val: "Rp 48.500.000", bold: true },
         { label: "Beban Pokok Penjualan (HPP FIFO)", sub: "Bahan Baku & Kemasan Terpakai", val: "-Rp 17.250.000" },
@@ -133,7 +133,7 @@ const TABS: TabItem[] = [
       { label: "Hak Akses Staf", value: "RBAC 6-Role" },
     ],
     content: {
-      meta: { ref: "TRF-20261105-0014 • GUDANG HQ → BOOTH THAMRIN", status: "IN TRANSIT", statusClass: "bg-purple-100 text-purple-800 border-purple-300" },
+      meta: { ref: "TRF-20261105-0014 • GUDANG HQ → BOOTH THAMRIN", status: "IN TRANSIT", statusClass: "bg-purple-50 text-purple-800 border-purple-300" },
       rows: [
         { label: "Biji Kopi Arabica Gayo (15 kg)", sub: "Batch #01 • Scoped HPP Rp 140.000", val: "Rp 2.100.000" },
         { label: "Susu Pasteurisasi Segar (30 liter)", sub: "Batch #04 • Scoped HPP Rp 20.000", val: "Rp 600.000" },
@@ -151,10 +151,10 @@ export function ProductShowcase() {
   const current = TABS.find((t) => t.id === activeTab) || TABS[0];
 
   return (
-    <div id="produk" className="max-w-5xl mx-auto w-full space-y-4">
-      {/* 5 Segmented Interactive Glass Tabs */}
+    <div id="produk" className="max-w-5xl mx-auto w-full space-y-4 relative">
+      {/* 5 Segmented Interactive Glass Tabs (Aceternity / Motion Primitives style) */}
       <div className="flex items-center justify-center overflow-x-auto pb-1 scrollbar-none">
-        <div className="inline-flex p-1.5 rounded-2xl glass-surface-subtle shadow-xs border border-slate-200/80 gap-1">
+        <div className="inline-flex p-1.5 rounded-2xl liquid-glass-nav shadow-sm border border-slate-200/80 gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.id === activeTab;
@@ -162,22 +162,29 @@ export function ProductShowcase() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all relative ${
                   isActive
-                    ? "bg-white text-slate-950 shadow-xs ring-1 ring-slate-900/[0.08]"
+                    ? "bg-white text-slate-950 shadow-sm ring-1 ring-slate-900/[0.08]"
                     : "text-slate-600 hover:text-slate-950 hover:bg-white/60"
                 }`}
               >
                 <Icon className={`size-3.5 shrink-0 ${isActive ? "text-primary" : "text-slate-500"}`} />
                 <span>{tab.name}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabIndicator"
+                    className="absolute inset-0 rounded-xl ring-2 ring-primary/20 pointer-events-none"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Floating Glass Showcase Window */}
-      <div className="rounded-3xl glass-surface-card border border-white/90 shadow-2xl shadow-slate-900/[0.06] overflow-hidden">
+      {/* Floating Glass Showcase Window with Specular Refraction */}
+      <div className="rounded-3xl liquid-glass-card shadow-2xl shadow-slate-900/[0.07] overflow-hidden relative">
         {/* Window Chrome Topbar */}
         <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
           <div className="flex items-center gap-2">
@@ -190,7 +197,7 @@ export function ProductShowcase() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-[10px] font-mono border-slate-700 text-slate-300">
+            <Badge variant="outline" className="text-[10px] font-mono border-slate-700 text-slate-300 bg-slate-900/60">
               {current.badge}
             </Badge>
           </div>
@@ -200,10 +207,10 @@ export function ProductShowcase() {
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="p-5 sm:p-8 space-y-6"
           >
             {/* Header Description */}
@@ -222,7 +229,7 @@ export function ProductShowcase() {
                 {current.metrics.map((m, idx) => (
                   <div
                     key={idx}
-                    className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center"
+                    className="p-2 sm:px-3 sm:py-2 rounded-xl bg-white border border-slate-200/90 shadow-2xs text-center"
                   >
                     <span className="text-[9px] font-mono font-bold text-slate-500 uppercase block">
                       {m.label}
@@ -236,7 +243,7 @@ export function ProductShowcase() {
             </div>
 
             {/* Live Operational Card Replica */}
-            <div className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-6 shadow-xs space-y-4">
+            <div className="rounded-2xl border border-slate-200/90 bg-white/95 backdrop-blur-sm p-4 sm:p-6 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                 <span className="font-mono text-xs font-bold text-slate-600">
                   {current.content.meta.ref}

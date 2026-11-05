@@ -22,6 +22,7 @@ import {
   DialogBody,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { soundEffects } from "@/lib/audio-effects";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -138,9 +139,11 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       setInvoiceNumber(response.data.invoiceNumber);
       setCompletedSale(response.data);
       setSuccess(true);
+      soundEffects.playCashRegisterDing();
       clearCart();
       bumpCatalogVersion();
     } catch (error) {
+      soundEffects.playWarningBuzz();
       const message =
         error instanceof ApiError ? error.message : "Checkout gagal diproses";
       toast.error(message);

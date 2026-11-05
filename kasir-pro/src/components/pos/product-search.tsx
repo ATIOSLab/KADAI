@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatCurrency } from "@/lib/utils";
+import { soundEffects } from "@/lib/audio-effects";
 import type { Category, ProductWithStock } from "@/types";
 
 export function ProductSearch() {
@@ -135,9 +136,11 @@ export function ProductSearch() {
     displayStock: number
   ) => {
     if (!product.currentSellingPrice || displayStock <= 0) {
+      soundEffects.playWarningBuzz();
       return;
     }
 
+    soundEffects.playScannerBeep();
     addItem({
       lineId: "",
       productId: product.id,
@@ -154,15 +157,31 @@ export function ProductSearch() {
     });
   };
 
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && filteredProducts.length === 1) {
+      event.preventDefault();
+      const matched = filteredProducts[0];
+      if (matched.displayStock > 0) {
+        handleAddToCart(matched, matched.displayStock);
+        setSearch("");
+      } else {
+        soundEffects.playWarningBuzz();
+        toast.error(`Stok ${matched.name} telah habis`);
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <Input
-            placeholder="Cari produk, SKU, atau barcode..."
+            id="pos-product-search-input"
+            placeholder="Cari produk, SKU, atau barcode (Tekan Enter)... [F2]"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
             className="pl-10"
             autoFocus
           />

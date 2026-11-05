@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { soundEffects } from "@/lib/audio-effects";
 import {
   ChefHat,
   Coffee,
@@ -9,6 +10,7 @@ import {
   Flame,
   RefreshCw,
   Bell,
+  Volume2,
   UtensilsCrossed,
   Filter,
 } from "lucide-react";
@@ -65,6 +67,7 @@ export default function KDSPage() {
   const [activeStation, setActiveStation] = useState<"ALL" | "KITCHEN" | "BAR">("ALL");
   const [cockpitMode, setCockpitMode] = useState(true);
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const prevOrderCountRef = useRef<number | null>(null);
 
   // Polling every second for timers and every 6 seconds for new orders
   useEffect(() => {
@@ -90,7 +93,12 @@ export default function KDSPage() {
       const res = await fetch(`/api/kds?station=${activeStation}${outletParam}`);
       const data = await res.json();
       if (res.ok) {
-        setOrders(data.data || []);
+        const newOrders: KDSOrder[] = data.data || [];
+        if (prevOrderCountRef.current !== null && newOrders.length > prevOrderCountRef.current) {
+          soundEffects.playKitchenChime();
+        }
+        prevOrderCountRef.current = newOrders.length;
+        setOrders(newOrders);
       }
     } catch {
       if (!quiet) toast.error("Gagal memperbarui antrean dapur");
@@ -209,6 +217,19 @@ export default function KDSPage() {
             title="Ubah Mode Layar"
           >
             {cockpitMode ? "🌙 Cockpit Dapur" : "☀️ Mode Terang"}
+          </Button>
+
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              soundEffects.playKitchenChime();
+              toast.info("Lonceng dapur berbunyi");
+            }}
+            className="size-8 text-amber-500 hover:text-amber-400"
+            title="Tes Suara Lonceng Dapur"
+          >
+            <Volume2 className="size-4" />
           </Button>
 
           <Button

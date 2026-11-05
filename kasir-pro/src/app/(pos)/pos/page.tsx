@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { ProductSearch } from "@/components/pos/product-search";
 import { Cart } from "@/components/pos/cart";
-import { ShoppingCart, ArrowLeft, ShoppingBag } from "lucide-react";
+import { ShiftDialog } from "@/components/pos/shift-dialog";
+import { ShoppingCart, ArrowLeft, ShoppingBag, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -13,6 +14,7 @@ import { formatCurrency, cn } from "@/lib/utils";
 export default function PosPage() {
   const { user } = useSessionUser();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isShiftOpen, setIsShiftOpen] = useState(false);
   const itemCount = useCart((state) => state.getItemCount());
   const grandTotal = useCart((state) => state.getGrandTotal());
 
@@ -46,6 +48,17 @@ export default function PosPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsShiftOpen(true)}
+            className="text-xs font-bold h-8 px-2.5 flex items-center gap-1.5 border-slate-300"
+            title="Laporan Kas & Tutup Shift"
+          >
+            <Calculator className="size-3.5 text-primary" />
+            <span className="hidden sm:inline">Kas & Tutup Shift</span>
+          </Button>
+
           <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block">
             {roleLabel}: {user?.name ?? "Memuat..."}
           </span>
@@ -91,6 +104,8 @@ export default function PosPage() {
           <Cart onClose={() => setIsCartOpen(false)} />
         </div>
       </div>
+
+      <ShiftDialog open={isShiftOpen} onOpenChange={setIsShiftOpen} />
     </div>
   );
 }

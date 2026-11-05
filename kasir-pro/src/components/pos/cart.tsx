@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { CartItemRow } from "@/components/pos/cart-item";
 import { CheckoutDialog } from "@/components/pos/checkout-dialog";
@@ -24,6 +24,27 @@ export function Cart({ onClose }: CartProps) {
   const subtotal = getSubtotal();
   const grandTotal = getGrandTotal();
   const itemCount = getItemCount();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F2") {
+        e.preventDefault();
+        const input = document.getElementById("pos-product-search-input") as HTMLInputElement | null;
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      } else if (e.key === "F4") {
+        e.preventDefault();
+        if (items.length > 0) {
+          setShowCheckout(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [items.length]);
 
   return (
     <>
@@ -103,10 +124,13 @@ export function Cart({ onClose }: CartProps) {
 
           <Button
             size="lg"
-            className="w-full font-bold text-sm h-11 rounded-xl shadow-sm"
+            className="w-full font-bold text-sm h-11 rounded-xl shadow-sm flex items-center justify-between"
             onClick={() => setShowCheckout(true)}
           >
-            Bayar ({formatCurrency(grandTotal)})
+            <span>Bayar ({formatCurrency(grandTotal)})</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-primary-foreground/20 text-primary-foreground text-[10px] font-mono">
+              F4
+            </kbd>
           </Button>
         </div>
       )}

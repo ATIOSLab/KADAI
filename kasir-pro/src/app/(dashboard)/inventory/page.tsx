@@ -14,7 +14,7 @@ import { formatCurrency, formatNumber } from "@/lib/utils";
 import { apiFetch, ApiError } from "@/lib/api";
 import { paginateItems } from "@/lib/pagination";
 import { useSessionUser } from "@/hooks/use-session-user";
-import { Warehouse, Search, AlertTriangle, Plus, Package } from "lucide-react";
+import { Warehouse, Search, AlertTriangle, Plus, Package, Clock } from "lucide-react";
 import Link from "next/link";
 
 interface InventoryItem {
@@ -29,6 +29,10 @@ interface InventoryItem {
   totalValue: number;
   isLowStock: boolean;
   batchCount: number;
+  hasExpiringBatch?: boolean;
+  criticalExpiringCount?: number;
+  warningExpiringCount?: number;
+  nearestExpiryDate?: string | null;
 }
 
 export default function InventoryPage() {
@@ -38,6 +42,7 @@ export default function InventoryPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showLowOnly, setShowLowOnly] = useState(false);
+  const [showExpiringOnly, setShowExpiringOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -62,6 +67,7 @@ export default function InventoryPage() {
         const params = new URLSearchParams();
         if (debouncedSearch) params.set("search", debouncedSearch);
         if (showLowOnly) params.set("lowStock", "true");
+        if (showExpiringOnly) params.set("expiring", "true");
 
         const res = await apiFetch<{ data: InventoryItem[] }>(
           `/api/inventory?${params.toString()}`
@@ -88,7 +94,7 @@ export default function InventoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearch, showLowOnly]);
+  }, [debouncedSearch, showLowOnly, showExpiringOnly]);
 
   const paginatedInventory = useMemo(
     () => paginateItems(inventory, page, pageSize),
@@ -105,6 +111,7 @@ export default function InventoryPage() {
   const totalProducts = inventory.length;
   const totalValue = inventory.reduce((sum, p) => sum + p.totalValue, 0);
   const lowStockCount = inventory.filter((p) => p.isLowStock).length;
+  const expiringCount = inventory.filter((p) => p.hasExpiringBatch).length;
 
   const canManageInventory =
     user?.role === "ADMIN" ||
@@ -115,7 +122,7 @@ export default function InventoryPage() {
     <div className="space-y-6 animate-slide-up">
       <PageHeader
         title="Inventori"
-        description="Overview stok semua produk"
+        description="Overview stok & radar kadaluwarsa semua produk"
         icon={Warehouse}
       >
         {canManageInventory && (
@@ -135,7 +142,7 @@ export default function InventoryPage() {
       </PageHeader>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="neo-hover">
           <CardContent className="p-4 text-center">
             <p className="text-xs font-bold text-text-muted uppercase">
@@ -164,7 +171,10 @@ export default function InventoryPage() {
         </Card>
         <Card
           className="neo-hover cursor-pointer"
-          onClick={() => setShowLowOnly(!showLowOnly)}
+          onClick={() => {
+            setShowLowOnly(!showLowOnly);
+            setShowExpiringOnly(false);
+          }}
         >
           <CardContent className="p-4 text-center">
             <p className="text-xs font-bold text-text-muted uppercase">
@@ -179,11 +189,31 @@ export default function InventoryPage() {
             )}
           </CardContent>
         </Card>
+        <Card
+          className="neo-hover cursor-pointer"
+          onClick={() => {
+            setShowExpiringOnly(!showExpiringOnly);
+            setShowLowOnly(false);
+          }}
+        >
+          <CardContent className="p-4 text-center">
+            <p className="text-xs font-bold text-text-muted uppercase">
+              Mendekati Expired
+            </p>
+            {loading ? (
+              <Skeleton className="h-8 w-12 mx-auto mt-1" />
+            ) : (
+              <p className="text-2xl font-black text-amber-600 flex items-center justify-center gap-1">
+                <Clock className="w-5 h-5" /> {expiringCount}
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Search & Filter */}
-      <div className="flex gap-2">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-wrap gap-2">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <Input
             placeholder="Cari produk..."
@@ -196,10 +226,21 @@ export default function InventoryPage() {
           variant={showLowOnly ? "danger" : "outline"}
           onClick={() => {
             setShowLowOnly(!showLowOnly);
+            setShowExpiringOnly(false);
             setPage(1);
           }}
         >
           <AlertTriangle className="w-4 h-4 mr-1" /> Low Stock
+        </Button>
+        <Button
+          variant={showExpiringOnly ? "danger" : "outline"}
+          onClick={() => {
+            setShowExpiringOnly(!showExpiringOnly);
+            setShowLowOnly(false);
+            setPage(1);
+          }}
+        >
+          <Clock className="w-4 h-4 mr-1" /> Mendekati Expired
         </Button>
       </div>
 
@@ -297,11 +338,22 @@ export default function InventoryPage() {
                     </td>
                     <td className="p-3 text-right">{item.batchCount}</td>
                     <td className="p-3 text-center">
-                      {item.isLowStock ? (
-                        <Badge variant="danger">Low Stock</Badge>
-                      ) : (
-                        <Badge variant="success">Aman</Badge>
-                      )}
+                      <div className="flex flex-col items-center gap-1">
+                        {item.isLowStock ? (
+                          <Badge variant="danger">Low Stock</Badge>
+                        ) : (
+                          <Badge variant="success">Aman</Badge>
+                        )}
+                        {item.criticalExpiringCount && item.criticalExpiringCount > 0 ? (
+                          <Badge variant="danger" className="text-[10px] px-1.5 py-0">
+                            Exp &lt; 7 Hari ({item.criticalExpiringCount})
+                          </Badge>
+                        ) : item.warningExpiringCount && item.warningExpiringCount > 0 ? (
+                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] px-1.5 py-0">
+                            Exp &lt; 30 Hari ({item.warningExpiringCount})
+                          </Badge>
+                        ) : null}
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
+import { PwaRegister } from "@/components/shared/pwa-register";
 import "./globals.css";
 
 const geist = Geist({
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={cn("font-sans", geist.variable)}>
       <body className="min-h-screen antialiased">
+        <PwaRegister />
         {children}
         <Toaster
           position="top-right"

@@ -38,7 +38,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               <span className="text-primary font-bold text-xl leading-none">.</span>
             </div>
             <span className="text-[9px] font-semibold text-slate-500 block leading-tight">
-              Enterprise POS & Rantai Pasok
+              Sistem Operasi Bisnis Indonesia
             </span>
           </div>
         </Link>

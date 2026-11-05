@@ -1,6 +1,7 @@
-# KADAI Operating System (https://kadai.asia)
+# KADAI (https://kadai.asia)
+> Sistem Operasi Bisnis Indonesia — Transaksi lancar, stok akurat, pajak tepat.
 
-> KADAI adalah Sistem Operasi Bisnis Indonesia yang mengintegrasikan Kasir POS Kilat, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, dan Kepatuhan Regulasi Pajak Daerah PB1 10% serta SAK EMKM.
+KADAI menyatukan Kasir POS Kilat, Inventori Multi-Batch FIFO (PSAK 14), Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, dan Kepatuhan Regulasi Pajak Daerah PB1 10% serta SAK EMKM.
 
 ## Modul & Kapabilitas Utama
 - [POS Kasir Kilat](https://kadai.asia/pos): Transaksi kilat dengan latensi < 0.2 detik, keyboard hotkeys F2/F4, multi-kasir, dan cetak struk thermal 58mm/80mm dengan QRIS dinamis.

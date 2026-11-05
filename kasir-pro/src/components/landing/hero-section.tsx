@@ -126,18 +126,18 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           >
             <span className="size-2 rounded-full bg-primary" />
             <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
-              KADAI OPERATING SYSTEM // ENTERPRISE POS & RANTAI PASOK ID
+              KADAI // TRANSAKSI LANCAR • STOK AKURAT • PAJAK TEPAT
             </span>
           </Badge>
 
           {/* Headline H1 */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold tracking-tight text-slate-950 leading-[1.12] text-balance">
-            Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.
+            Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda.
           </h1>
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance">
-            KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pelaporan pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
+            KADAI menyatukan kasir POS kilat, inventori multi-batch FIFO (PSAK 14), resep produksi Bill of Materials (BOM), Kitchen Display System (KDS), hingga rekonsiliasi pajak daerah PB1 10% & PPh Final 0.5% (PP 55/2022).
           </p>
 
           {/* CTA Buttons */}

@@ -20,14 +20,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://kadai.asia"),
   title: {
-    default: "KADAI - Enterprise POS & Rantai Pasok RI",
-    template: "%s | KADAI Enterprise",
+    default: "KADAI - Sistem Operasi Bisnis Indonesia",
+    template: "%s | KADAI",
   },
   description:
-    "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM.",
+    "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM.",
   keywords: [
     "POS",
-    "kasir online",
+    "aplikasi kasir online",
     "point of sale indonesia",
     "inventori FIFO",
     "BOM kuliner",
@@ -36,6 +36,7 @@ export const metadata: Metadata = {
     "pajak resto PB1",
     "PPh Final PP 55/2022",
     "multi-cabang",
+    "kadai pos",
   ],
   manifest: "/manifest.json",
   icons: {
@@ -43,9 +44,9 @@ export const metadata: Metadata = {
     apple: "/icon.svg",
   },
   openGraph: {
-    title: "KADAI - Enterprise POS & Rantai Pasok RI",
+    title: "KADAI - Sistem Operasi Bisnis Indonesia",
     description:
-      "Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda. Dilengkapi Kasir POS kilat, FIFO batch, dan kepatuhan fiskal RI.",
+      "Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda. Transaksi lancar, stok akurat, pajak tepat.",
     url: "https://kadai.asia",
     siteName: "KADAI Operating System",
     locale: "id_ID",
@@ -53,9 +54,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "KADAI - Enterprise POS & Rantai Pasok RI",
+    title: "KADAI - Sistem Operasi Bisnis Indonesia",
     description:
-      "Satu Sistem Terpadu untuk Gerai, Dapur Pusat, & Pembukuan Anda.",
+      "Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda. Transaksi lancar, stok akurat, pajak tepat.",
   },
   robots: {
     index: true,
@@ -95,7 +96,7 @@ const schemaGraph = {
     {
       "@type": "SoftwareApplication",
       "@id": "https://kadai.asia/#software",
-      "name": "KADAI Enterprise POS & ERP",
+      "name": "KADAI - Sistem Operasi Bisnis Indonesia",
       "operatingSystem": "Web, Windows, macOS, Android, iOS",
       "applicationCategory": "BusinessApplication",
       "applicationSubCategory": "Point of Sale & Supply Chain Management",
@@ -107,7 +108,7 @@ const schemaGraph = {
         "offerCount": "4",
       },
       "description":
-        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM.",
+        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM. Transaksi lancar, stok akurat, pajak tepat.",
     },
   ],
 };

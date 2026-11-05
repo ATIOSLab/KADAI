@@ -14,7 +14,7 @@ export function SiteFooter() {
             KADAI
           </span>
           <span>•</span>
-          <span>Platform Operasi Bisnis Terpadu UMKM Indonesia</span>
+          <span>Sistem Operasi Bisnis Indonesia</span>
         </div>
 
         <div className="text-slate-500 text-[11px]">

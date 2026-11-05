@@ -13,10 +13,11 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: "Solusi Industri", href: "#solusi-industri" },
-    { label: "Pajak & SAK EMKM", href: "#pajak-pembukuan" },
-    { label: "Paket Langganan", href: "#harga" },
-    { label: "FAQ", href: "#faq" },
+    { href: "#kapabilitas", label: "Kapabilitas" },
+    { href: "#solusi-industri", label: "Solusi Industri" },
+    { href: "#pajak-pembukuan", label: "Pajak & SAK EMKM" },
+    { href: "#harga", label: "Paket Langganan" },
+    { href: "#faq", label: "FAQ" },
   ];
 
   return (

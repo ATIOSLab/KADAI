@@ -2,6 +2,7 @@ import { getServerSessionUser } from "@/lib/session";
 import { getDefaultPathForRole } from "@/lib/rbac";
 import { SiteHeader } from "@/components/landing/site-header";
 import { HeroSection } from "@/components/landing/hero-section";
+import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid";
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
@@ -21,22 +22,25 @@ export default async function HomePage() {
       {/* 2. Hero Section & Interactive Cockpit Preview */}
       <HeroSection dashboardPath={dashboardPath} />
 
-      {/* 3. Solusi Lintas Industri (3 Kolom Sektor Usaha) */}
+      {/* 3. Kapabilitas Platform Terpadu (Pilar Inti KADAI: POS, FIFO, BOM, KDS, Transfer) */}
+      <CapabilityBentoGrid />
+
+      {/* 4. Solusi Lintas Industri (3 Kolom Sektor Usaha) */}
       <IndustrySolutions />
 
-      {/* 4. Pajak & Pembukuan Standar Keuangan RI */}
+      {/* 5. Pajak & Pembukuan Standar Keuangan RI */}
       <AccountingTaxSection />
 
-      {/* 5. Paket Langganan Komersial (4 Tier) */}
+      {/* 6. Paket Langganan Komersial (4 Tier) */}
       <PricingSection />
 
-      {/* 6. Tanya Jawab (FAQ) */}
+      {/* 7. Tanya Jawab (FAQ) */}
       <FAQSection />
 
-      {/* 7. Final Conversion Banner */}
+      {/* 8. Final Conversion Banner */}
       <FinalCTA />
 
-      {/* 8. Footer Resmi */}
+      {/* 9. Footer Resmi */}
       <SiteFooter />
     </div>
   );

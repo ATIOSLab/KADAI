@@ -35,8 +35,8 @@ const FAQS: FAQItem[] = [
     a: "Ya, Anda dapat memulai dengan paket Starter gratis tanpa biaya bulanan, atau mencoba fitur lengkap KADAI untuk merasakan kemudahan operasional multi-cabang secara langsung.",
   },
   {
-    q: "Perangkat hardware apa saja yang kompatibel dengan KADAI?",
-    a: "KADAI berjalan responsif di peramban web modern (Google Chrome, Safari, Edge) di PC Windows, Mac, iPad, dan tablet Android. KADAI mendukung printer thermal kasir 58mm & 80mm (USB, Bluetooth, Jaringan), barcode scanner USB/Bluetooth, dan laci kasir (cash drawer).",
+    q: "Perangkat keras (hardware) apa saja yang kompatibel dengan KADAI?",
+    a: "KADAI adalah software-agnostic (tidak mengunci pengguna pada merek tertentu). KADAI dapat diakses melalui laptop, PC Windows, Mac, iPad, tablet, atau smartphone Android. KADAI fleksibel terhubung dengan berbagai printer kasir thermal standar (58mm/80mm USB, Bluetooth, LAN) dan barcode scanner yang sudah Anda miliki tanpa perlu membeli paket hardware khusus.",
   },
 ];
 

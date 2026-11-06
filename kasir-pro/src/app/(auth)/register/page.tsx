@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { getStoredReferralCode } from "@/lib/referral-client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function RegisterPage() {
 
     try {
       setLoading(true);
+      const activeRef = getStoredReferralCode() || undefined;
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,6 +51,7 @@ export default function RegisterPage() {
           phone,
           email,
           password,
+          referralCode: activeRef,
         }),
       });
 

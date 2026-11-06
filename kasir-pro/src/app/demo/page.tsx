@@ -23,6 +23,7 @@ import { SiteFooter } from "@/components/landing/site-footer";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getStoredReferralCode } from "@/lib/referral-client";
 
 function RequestDemoForm() {
   const searchParams = useSearchParams();
@@ -43,9 +44,10 @@ function RequestDemoForm() {
   } | null>(null);
 
   useEffect(() => {
-    const refFromUrl = searchParams.get("ref");
-    if (refFromUrl) {
-      setReferralCode(refFromUrl.toUpperCase());
+    // Membaca kode referral baik dari URL saat ini maupun riwayat kunjungan 30 hari terakhir
+    const code = getStoredReferralCode();
+    if (code) {
+      setReferralCode(code);
     }
   }, [searchParams]);
 
@@ -53,6 +55,9 @@ function RequestDemoForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Ambil kode referral dari input atau memori persistent
+    const activeRefCode = referralCode.trim() || getStoredReferralCode() || undefined;
 
     try {
       const res = await fetch("/api/demo-requests", {
@@ -66,7 +71,7 @@ function RequestDemoForm() {
           email: email || undefined,
           outletCount: Number(outletCount),
           notes: notes || undefined,
-          referralCode: referralCode || undefined,
+          referralCode: activeRefCode,
         }),
       });
 

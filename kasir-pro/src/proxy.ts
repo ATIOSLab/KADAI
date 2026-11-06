@@ -41,14 +41,26 @@ export async function proxy(request: NextRequest) {
     return response;
   };
   const isApi = pathname.startsWith("/api/");
+  const refParam = request.nextUrl.searchParams.get("ref");
+  const attachRef = (res: NextResponse) => {
+    if (refParam && !request.cookies.has("kadai_ref")) {
+      res.cookies.set("kadai_ref", refParam.trim().toUpperCase(), {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 hari attribution window
+        sameSite: "lax",
+      });
+    }
+    return res;
+  };
+
   // Webhook and Seed have their own shared-secret authentication, not browser cookies.
   if (isApi && pathname !== "/api/telegram/webhook" && pathname !== "/api/admin/seed-demo" &&
       !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))) {
-    return secure(NextResponse.json({ error: "CSRF validation failed" }, { status: 403 }));
+    return secure(attachRef(NextResponse.json({ error: "CSRF validation failed" }, { status: 403 })));
   }
   if ((!isApi && publicPages.some(p => pathname === p || (p !== "/" && matches(pathname, p)))) ||
       (isApi && publicApis.some(p => matches(pathname, p)))) {
-    return secure(NextResponse.next());
+    return secure(attachRef(NextResponse.next()));
   }
   // Never bypass authentication merely because a path contains a dot.
   const user = parseSessionUser(request.cookies.get("session")?.value);

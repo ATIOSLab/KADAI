@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
+import { ReferralTracker } from "@/components/shared/referral-tracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -130,6 +131,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased bg-slate-50 text-slate-900 selection:bg-primary/20">
         <PwaRegister />
+        <ReferralTracker />
         {children}
         <Toaster
           position="top-right"

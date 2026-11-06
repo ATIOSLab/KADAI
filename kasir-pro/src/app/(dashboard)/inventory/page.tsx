@@ -119,7 +119,7 @@ export default function InventoryPage() {
     user?.role === "INVENTORY";
 
   return (
-    <div className="space-y-6 animate-slide-up">
+    <div className="space-y-6 animate-slide-up pb-24 lg:pb-8">
       <PageHeader
         title="Inventori"
         description="Overview stok & radar kadaluwarsa semua produk"
@@ -249,11 +249,15 @@ export default function InventoryPage() {
       {/* Inventory Table */}
       <Card>
         <div className="neo-table overflow-x-auto">
+<<<<<<< HEAD
           <table className="w-full min-w-[580px] sm:min-w-[640px] text-xs sm:text-sm">
+=======
+          <table className="w-full min-w-[680px] text-xs sm:text-sm">
+>>>>>>> 15fc88d (feat(referral-attribution): implement 30-day enterprise cookie & localStorage dual-persistence with first-touch attribution window)
             <thead>
               <tr>
-                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs">Produk</th>
-                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs">Kategori</th>
+                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs min-w-[180px] sm:min-w-[220px]">Produk</th>
+                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs min-w-[130px]">Kategori</th>
                 <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Stok</th>
                 <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Nilai Stok</th>
                 <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Batch</th>

@@ -10,6 +10,7 @@
     "bot:webhook:sync": "tsx src/bot/sync-webhook.ts",
     "test:bot": "tsx --test tests/bot/**/*.test.ts",
     "test:security": "tsx --test tests/security.test.ts tests/api-hardening.test.ts tests/enterprise-validators.test.ts",
+    "test:referral": "tsx --test tests/referral-billing.test.ts",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",

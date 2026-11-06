@@ -30,6 +30,7 @@ interface LeadItem {
   status: string;
   subscriptionAmount: number;
   commissionEarned: number;
+  commissionPaid?: number;
   createdAt: string;
 }
 
@@ -37,6 +38,7 @@ interface PayoutItem {
   id: string;
   amount: number;
   status: string;
+  period: string | null;
   paidAt: string | null;
   notes: string | null;
 }
@@ -62,6 +64,7 @@ export default function ReferralsAdminPage() {
   const [partners, setPartners] = useState<PartnerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [processingPayouts, setProcessingPayouts] = useState(false);
 
   const fetchPartners = async () => {
     try {
@@ -109,6 +112,24 @@ export default function ReferralsAdminPage() {
     }
   };
 
+  const handleProcessPayouts = async () => {
+    try {
+      setProcessingPayouts(true);
+      const res = await fetch("/api/referrals/payouts", { method: "POST" });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        toast.success(json.message || "Komisi bulanan berhasil diproses");
+        fetchPartners();
+      } else {
+        toast.error(json.error || "Gagal memproses komisi bulanan");
+      }
+    } catch {
+      toast.error("Terjadi gangguan jaringan");
+    } finally {
+      setProcessingPayouts(false);
+    }
+  };
+
   const getWaLink = (partner: PartnerItem) => {
     let cleanPhone = partner.phone.replace(/[^0-9]/g, "");
     if (cleanPhone.startsWith("0")) {
@@ -119,6 +140,14 @@ export default function ReferralsAdminPage() {
   };
 
   const totalLeads = partners.reduce((acc, p) => acc + (p.leads?.length || 0), 0);
+
+  const formatIdr = (value: number) => `Rp ${(value || 0).toLocaleString("id-ID")}`;
+
+  const outstandingCommission = (partner: PartnerItem) =>
+    (partner.leads || []).reduce(
+      (acc, lead) => acc + (Number(lead.commissionEarned) || 0) - (Number(lead.commissionPaid) || 0),
+      0
+    );
 
   return (
     <div className="space-y-6">
@@ -133,16 +162,28 @@ export default function ReferralsAdminPage() {
             Daftar partner pemasaran, kode referral aktif, dan pelacakan komisi bagi hasil.
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchPartners}
-          disabled={loading}
-          className="rounded-xl font-bold text-xs flex items-center gap-1.5"
-        >
-          <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-          <span>Segarkan Data</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleProcessPayouts}
+            disabled={loading || processingPayouts}
+            className="rounded-xl font-bold text-xs flex items-center gap-1.5"
+          >
+            <Wallet className={`size-3.5 ${processingPayouts ? "animate-pulse" : ""}`} />
+            <span>{processingPayouts ? "Memproses..." : "Proses Komisi Bulanan"}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchPartners}
+            disabled={loading}
+            className="rounded-xl font-bold text-xs flex items-center gap-1.5"
+          >
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Segarkan Data</span>
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -243,6 +284,19 @@ export default function ReferralsAdminPage() {
                         <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-full">
                           {partner.leads?.length || 0} Klien
                         </span>
+                        <div className="mt-1.5 space-y-0.5">
+                          {outstandingCommission(partner) > 0 && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                              <Wallet className="size-2.5" />
+                              Komisi terhutang: {formatIdr(outstandingCommission(partner))}
+                            </span>
+                          )}
+                          {partner.payouts?.some((p) => p.status === "PAID") && (
+                            <span className="block text-[10px] font-semibold text-emerald-700">
+                              ✓ {partner.payouts.filter((p) => p.status === "PAID").length} payout dibayar
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4">
                         {partner.status === "ACTIVE" ? (

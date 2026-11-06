@@ -224,6 +224,10 @@ model Store {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
+  // Relations
+  subscriptions     StoreSubscription[]
+  invoices          PaymentInvoice[]
+
   @@map("stores")
 }
 
@@ -815,8 +819,12 @@ model ReferralLead {
   status             ReferralLeadStatus @default(LEAD)
   subscriptionAmount Decimal            @default(0) @db.Decimal(15, 2)
   commissionEarned   Decimal            @default(0) @db.Decimal(15, 2)
+  commissionPaid     Decimal            @default(0) @db.Decimal(15, 2)
+  linkedStoreId      String?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+
+  invoices           PaymentInvoice[]
 
   @@index([partnerId])
   @@index([phone])
@@ -829,6 +837,7 @@ model ReferralPayout {
   partnerId    String
   partner      ReferralPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   amount       Decimal         @db.Decimal(15, 2)
+  period       String?
   status       PayoutStatus    @default(PENDING)
   paymentProof String?
   paidAt       DateTime?
@@ -836,8 +845,91 @@ model ReferralPayout {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
+  @@unique([partnerId, period])
   @@index([partnerId])
   @@index([status])
   @@map("referral_payouts")
+}
+
+// ============================================================
+// BILLING ENGINE: LANGGANAN & TAGIHAN RESMI KADAI
+// Sumber komisi berulang program mitra referral.
+// ============================================================
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum PaymentProvider {
+  MANUAL
+  MIDTRANS
+  XENDIT
+}
+
+enum PaymentStatus {
+  PENDING
+  SETTLED
+  FAILED
+  REFUNDED
+}
+
+model StoreSubscription {
+  id        String             @id @default(cuid())
+  storeId   String
+  store     Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  tier      SubscriptionTier   @default(PRO_BUSINESS)
+  cycle     BillingCycle       @default(MONTHLY)
+  status    SubscriptionStatus @default(ACTIVE)
+  startedAt DateTime           @default(now())
+  expiresAt DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  invoices  PaymentInvoice[]
+
+  @@index([storeId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("store_subscriptions")
+}
+
+model PaymentInvoice {
+  id               String             @id @default(cuid())
+  storeId          String
+  store            Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  subscriptionId   String?
+  subscription     StoreSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  invoiceNumber    String             @unique
+  description      String
+  tier             SubscriptionTier   @default(PRO_BUSINESS)
+  cycle            BillingCycle       @default(MONTHLY)
+  amount           Decimal            @db.Decimal(15, 2)
+  provider         PaymentProvider    @default(MANUAL)
+  providerRef      String?
+  status           PaymentStatus      @default(PENDING)
+  paidAt           DateTime?
+  paidBy           String?
+  paymentProof     String?
+  notes            String?
+  referralLeadId   String?
+  referralLead     ReferralLead?      @relation(fields: [referralLeadId], references: [id], onDelete: SetNull)
+  commissionEarned Decimal            @default(0) @db.Decimal(15, 2)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([storeId])
+  @@index([status])
+  @@index([invoiceNumber])
+  @@index([referralLeadId])
+  @@map("payment_invoices")
 }
 

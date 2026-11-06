@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError } from "@/lib/api-response";
+import { logger } from "@/lib/logger";
 
 const updateSchema = z.object({
   status: z.enum(["PENDING", "APPROVED", "CONTACTED", "REJECTED"]),
@@ -38,6 +39,23 @@ export async function PATCH(
         approvedBy: validated.status === "APPROVED" ? sessionUser.name : undefined,
       },
     });
+
+    // Lifecycle referral: demo disetujui -> lead naik ke TRIAL (attribution by phone)
+    if (validated.status === "APPROVED" && updated.phone) {
+      const phoneTail = updated.phone.replace(/[^0-9]/g, "").slice(-10);
+      if (phoneTail.length >= 6) {
+        const transition = await prisma.referralLead.updateMany({
+          where: { phone: { contains: phoneTail }, status: "LEAD" },
+          data: { status: "TRIAL", packageTier: "DEMO" },
+        });
+        if (transition.count > 0) {
+          logger.info("Lead referral naik ke TRIAL dari persetujuan demo", "referral", {
+            demoRequestId: id,
+            phone: phoneTail.slice(-4),
+          });
+        }
+      }
+    }
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {

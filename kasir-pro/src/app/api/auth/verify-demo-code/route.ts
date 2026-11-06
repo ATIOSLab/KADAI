@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/security";
 
 const verifyCodeSchema = z.object({
   code: z.string().min(3, "Kode demo minimal 3 karakter"),
@@ -10,6 +11,19 @@ const MASTER_CODES = ["KADAI2026", "DEMO-KADAI", "NETKRIDA", "KADAI-DEMO"];
 
 export async function POST(request: NextRequest) {
   try {
+    // Endpoint publik tanpa sesi: batasi percobaan untuk mencegah brute-force kode demo.
+    const clientKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limit = checkRateLimit(`verify-demo-code:${clientKey}`, 10, 10 * 60 * 1000, 15 * 60 * 1000);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          valid: false,
+          error: `Terlalu banyak percobaan kode. Coba lagi dalam ${limit.retryAfterSeconds} detik.`,
+        },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const validated = verifyCodeSchema.parse(body);
     const cleanCode = validated.code.trim().toUpperCase();

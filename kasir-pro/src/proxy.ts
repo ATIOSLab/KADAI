@@ -44,7 +44,10 @@ const publicApis = [
   "/api/auth/login",
   "/api/auth/logout",
   "/api/auth/register",
+  "/api/auth/verify-demo-code",
   "/api/order",
+  "/api/demo-requests",
+  "/api/referrals/register",
   ...serverToServerApis,
 ];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);

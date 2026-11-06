@@ -18,6 +18,7 @@ const publicPages = [
   "/solusi",
   "/blog",
   "/pricing",
+  "/kebijakan-privasi",
   "/order",
   "/robots.txt",
   "/sitemap.xml",
@@ -48,6 +49,7 @@ const publicApis = [
   "/api/order",
   "/api/demo-requests",
   "/api/referrals/register",
+  "/api/health",
   ...serverToServerApis,
 ];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);

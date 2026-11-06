@@ -60,6 +60,11 @@ export function SiteFooter() {
               <li>PPh Final UMKM 0.5% (PP 55/2022)</li>
               <li>Standar Persediaan PSAK 14 / IAS 2</li>
               <li>Laporan Keuangan SAK EMKM</li>
+              <li>
+                <Link href="/kebijakan-privasi" className="hover:text-white transition-colors text-primary font-semibold">
+                  Kebijakan Privasi (UU PDP)
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

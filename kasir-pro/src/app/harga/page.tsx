@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+
+export const revalidate = 300;
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { SiteHeader } from "@/components/landing/site-header";

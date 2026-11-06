@@ -3,8 +3,17 @@ set -eu
 
 node ./docker/wait-for-db.cjs
 
-echo "Applying Prisma schema..."
-npx prisma db push --accept-data-loss
+echo "Applying Prisma schema (versioned, non-destructive)..."
+if [ -d prisma/migrations ] && [ -n "$(ls -A prisma/migrations 2>/dev/null)" ]; then
+  # Baseline database produksi yang sudah ada sekali saja (tandai 0_baseline sebagai
+  # 'applied' tanpa menjalankan ulang SQL-nya), lalu terapkan HANYA migrasi berversi.
+  # Tidak pernah drop kolom/tabel secara otomatis.
+  npx prisma migrate resolve --applied 0_baseline >/dev/null 2>&1 || true
+  npx prisma migrate deploy
+else
+  # Belum ada migrasi berversi: bootstrap aman (gagal keras alih-alih menghapus data).
+  npx prisma db push --skip-generate
+fi
 
 echo "Running multi-vertical demo clusters seed..."
 node prisma/seed-demo-clusters.js || echo "Demo seed completed with warnings/skipped"

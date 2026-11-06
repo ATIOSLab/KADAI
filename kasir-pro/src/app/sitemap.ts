@@ -55,6 +55,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/kebijakan-privasi`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
       url: `${baseUrl}/blog`,
       lastModified: now,
       changeFrequency: "daily",

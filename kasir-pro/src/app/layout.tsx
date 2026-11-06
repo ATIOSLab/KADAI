@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
-import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
+
 import { ReferralTracker } from "@/components/shared/referral-tracker";
 import "./globals.css";
 
@@ -140,7 +140,7 @@ export default function RootLayout({
             className: "font-sans text-xs border border-slate-200/90 shadow-md rounded-xl bg-white text-slate-900",
           }}
         />
-        <FloatingWhatsApp />
+
       </body>
     </html>
   );

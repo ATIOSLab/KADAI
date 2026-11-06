@@ -9,6 +9,7 @@ import { PricingSection } from "@/components/landing/pricing-section";
 import { FAQSection } from "@/components/landing/faq-section";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
+import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
 
 export default async function HomePage() {
   const sessionUser = await getServerSessionUser();
@@ -42,6 +43,7 @@ export default async function HomePage() {
 
       {/* 9. Footer Resmi */}
       <SiteFooter />
+      <FloatingWhatsApp />
     </div>
   );
 }

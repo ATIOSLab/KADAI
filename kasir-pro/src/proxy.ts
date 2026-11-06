@@ -30,6 +30,16 @@ const publicPages = [
   "/uploads",
 ];
 const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook", "/api/admin/seed-demo"];
+// Server-to-server endpoints: authenticate with a shared secret or provider
+// signature (never browser cookies), so browser CSRF origin verification does
+// not apply. Every one of these verifies its own secret BEFORE any database read.
+const serverToServerApis = [
+  "/api/telegram/webhook",
+  "/api/admin/seed-demo",
+  "/api/cron/billing-referral",
+  "/api/webhooks/payment/midtrans",
+  "/api/webhooks/payment/xendit",
+];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 
 export async function proxy(request: NextRequest) {
@@ -53,8 +63,8 @@ export async function proxy(request: NextRequest) {
     return res;
   };
 
-  // Webhook and Seed have their own shared-secret authentication, not browser cookies.
-  if (isApi && pathname !== "/api/telegram/webhook" && pathname !== "/api/admin/seed-demo" &&
+  // Webhook, Cron and Seed have their own shared-secret authentication, not browser cookies.
+  if (isApi && !serverToServerApis.some(p => matches(pathname, p)) &&
       !isCsrfSafe(request.method, request.headers.get("origin"), request.headers.get("host"))) {
     return secure(attachRef(NextResponse.json({ error: "CSRF validation failed" }, { status: 403 })));
   }

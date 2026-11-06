@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Panduan Hardware & Kompatibilitas Printer | KADAI",
+  title: "Panduan Hardware & Kompatibilitas Printer",
   description:
     "KADAI bebas perangkat keras (hardware-agnostic). Gunakan printer thermal Bluetooth/USB ESC/POS 58mm/80mm, scanner barcode USB, dan tablet Android/iPad yang telah Anda miliki tanpa biaya sewa tambahan.",
   alternates: {

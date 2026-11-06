@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Solusi Industri: F&B, Ritel, & Dapur Pusat | KADAI",
+  title: "Solusi Industri: F&B, Ritel, & Dapur Pusat",
   description:
     "Solusi sistem operasional kasir dan rantai pasok terarah untuk kafe, restoran, toko ritel, minimarket, serta sentra dapur pusat dan gudang distribusi.",
   alternates: {

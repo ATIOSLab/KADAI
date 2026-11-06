@@ -6,6 +6,7 @@ import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid"
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { ReferralSection } from "@/components/landing/referral-section";
 import { FAQSection } from "@/components/landing/faq-section";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
@@ -35,13 +36,16 @@ export default async function HomePage() {
       {/* 6. Paket Langganan Komersial (4 Tier) */}
       <PricingSection />
 
-      {/* 7. Tanya Jawab (FAQ) */}
+      {/* 7. Program Kemitraan & Referral Resmi KADAI */}
+      <ReferralSection />
+
+      {/* 8. Tanya Jawab (FAQ) */}
       <FAQSection />
 
-      {/* 8. Final Conversion Banner */}
+      {/* 9. Final Conversion Banner */}
       <FinalCTA />
 
-      {/* 9. Footer Resmi */}
+      {/* 10. Footer Resmi */}
       <SiteFooter />
       <FloatingWhatsApp />
     </div>

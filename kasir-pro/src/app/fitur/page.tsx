@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Fitur & Kapabilitas Sistem Operasi Bisnis | KADAI",
+  title: "Fitur & Kapabilitas Sistem Operasi Bisnis",
   description:
     "Jelajahi kapabilitas terpadu KADAI: kasir POS kilat, inventori multi-batch FIFO (PSAK 14), dapur KDS, resep BOM, kepatuhan pajak daerah PB1 10%, dan integrasi multi-cabang.",
   alternates: {

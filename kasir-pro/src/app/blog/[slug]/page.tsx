@@ -159,7 +159,7 @@ export async function generateMetadata({
 
   if (!article) {
     return {
-      title: "Artikel Tidak Ditemukan | KADAI",
+      title: "Artikel Tidak Ditemukan",
     };
   }
 

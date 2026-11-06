@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Paket Langganan & Harga Resmi | KADAI",
+  title: "Paket Langganan & Harga Resmi",
   description:
     "Pilihan paket langganan resmi KADAI mulai dari Starter (Rp 0/bln), Professional (Rp 99.000/bln), Business Pro (Rp 249.000/bln), hingga Enterprise (Rp 599.000/bln). Transparan tanpa biaya tersembunyi.",
   alternates: {

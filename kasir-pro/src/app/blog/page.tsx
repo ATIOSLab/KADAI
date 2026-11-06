@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Pusat Panduan & Edukasi Operasional Bisnis | Blog KADAI",
+  title: "Pusat Panduan & Edukasi Operasional Bisnis",
   description:
     "Wawasan praktis seputar tata kelola restoran, ritel modern, metode stok FIFO PSAK 14, dan panduan kepatuhan pajak daerah PB1 10% untuk pengusaha Indonesia.",
   alternates: {

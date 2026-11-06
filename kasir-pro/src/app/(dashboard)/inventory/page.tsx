@@ -249,7 +249,7 @@ export default function InventoryPage() {
       {/* Inventory Table */}
       <Card>
         <div className="neo-table overflow-x-auto">
-          <table className="w-full text-xs sm:text-sm">
+          <table className="w-full min-w-[580px] sm:min-w-[640px] text-xs sm:text-sm">
             <thead>
               <tr>
                 <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs">Produk</th>

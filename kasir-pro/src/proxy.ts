@@ -29,16 +29,23 @@ const publicPages = [
   "/images",
   "/uploads",
 ];
-const publicApis = ["/api/auth/login", "/api/auth/logout", "/api/auth/register", "/api/order", "/api/telegram/webhook", "/api/admin/seed-demo"];
 // Server-to-server endpoints: authenticate with a shared secret or provider
-// signature (never browser cookies), so browser CSRF origin verification does
-// not apply. Every one of these verifies its own secret BEFORE any database read.
+// signature (never browser cookies), so they are exempt from both the browser
+// CSRF origin check and the session gate. Every one of these verifies its own
+// secret BEFORE any database read.
 const serverToServerApis = [
   "/api/telegram/webhook",
   "/api/admin/seed-demo",
   "/api/cron/billing-referral",
   "/api/webhooks/payment/midtrans",
   "/api/webhooks/payment/xendit",
+];
+const publicApis = [
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/api/auth/register",
+  "/api/order",
+  ...serverToServerApis,
 ];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 

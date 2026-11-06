@@ -142,28 +142,28 @@ export default function InventoryPage() {
       </PageHeader>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <Card className="neo-hover">
-          <CardContent className="p-4 text-center">
-            <p className="text-xs font-bold text-text-muted uppercase">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs font-bold text-text-muted uppercase tracking-wider">
               Total Produk
             </p>
             {loading ? (
-              <Skeleton className="h-8 w-12 mx-auto mt-1" />
+              <Skeleton className="h-6 sm:h-8 w-12 mx-auto mt-1" />
             ) : (
-              <p className="text-2xl font-black">{totalProducts}</p>
+              <p className="text-lg sm:text-2xl font-black mt-0.5">{totalProducts}</p>
             )}
           </CardContent>
         </Card>
         <Card className="neo-hover">
-          <CardContent className="p-4 text-center">
-            <p className="text-xs font-bold text-text-muted uppercase">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs font-bold text-text-muted uppercase tracking-wider">
               Nilai Stok
             </p>
             {loading ? (
-              <Skeleton className="h-8 w-32 mx-auto mt-1" />
+              <Skeleton className="h-6 sm:h-8 w-24 sm:w-32 mx-auto mt-1" />
             ) : (
-              <p className="text-2xl font-black text-accent-primary">
+              <p className="text-base sm:text-2xl font-black text-accent-primary truncate mt-0.5">
                 {formatCurrency(totalValue)}
               </p>
             )}
@@ -176,15 +176,15 @@ export default function InventoryPage() {
             setShowExpiringOnly(false);
           }}
         >
-          <CardContent className="p-4 text-center">
-            <p className="text-xs font-bold text-text-muted uppercase">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs font-bold text-text-muted uppercase tracking-wider">
               Low Stock
             </p>
             {loading ? (
-              <Skeleton className="h-8 w-12 mx-auto mt-1" />
+              <Skeleton className="h-6 sm:h-8 w-12 mx-auto mt-1" />
             ) : (
-              <p className="text-2xl font-black text-accent-danger flex items-center justify-center gap-1">
-                <AlertTriangle className="w-5 h-5" /> {lowStockCount}
+              <p className="text-lg sm:text-2xl font-black text-accent-danger flex items-center justify-center gap-1 mt-0.5">
+                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" /> {lowStockCount}
               </p>
             )}
           </CardContent>
@@ -196,15 +196,15 @@ export default function InventoryPage() {
             setShowLowOnly(false);
           }}
         >
-          <CardContent className="p-4 text-center">
-            <p className="text-xs font-bold text-text-muted uppercase">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs font-bold text-text-muted uppercase tracking-wider">
               Mendekati Expired
             </p>
             {loading ? (
-              <Skeleton className="h-8 w-12 mx-auto mt-1" />
+              <Skeleton className="h-6 sm:h-8 w-12 mx-auto mt-1" />
             ) : (
-              <p className="text-2xl font-black text-amber-600 flex items-center justify-center gap-1">
-                <Clock className="w-5 h-5" /> {expiringCount}
+              <p className="text-lg sm:text-2xl font-black text-amber-600 flex items-center justify-center gap-1 mt-0.5">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5" /> {expiringCount}
               </p>
             )}
           </CardContent>
@@ -212,17 +212,18 @@ export default function InventoryPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex flex-wrap gap-2">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[180px] sm:min-w-[220px] max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-muted" />
           <Input
-            placeholder="Cari produk..."
+            placeholder="Cari nama produk, SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-9 sm:pl-10 text-xs sm:text-sm h-9 sm:h-10"
           />
         </div>
         <Button
+          size="sm"
           variant={showLowOnly ? "danger" : "outline"}
           onClick={() => {
             setShowLowOnly(!showLowOnly);
@@ -230,9 +231,10 @@ export default function InventoryPage() {
             setPage(1);
           }}
         >
-          <AlertTriangle className="w-4 h-4 mr-1" /> Low Stock
+          <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Low Stock
         </Button>
         <Button
+          size="sm"
           variant={showExpiringOnly ? "danger" : "outline"}
           onClick={() => {
             setShowExpiringOnly(!showExpiringOnly);
@@ -240,46 +242,46 @@ export default function InventoryPage() {
             setPage(1);
           }}
         >
-          <Clock className="w-4 h-4 mr-1" /> Mendekati Expired
+          <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Mendekati Expired
         </Button>
       </div>
 
       {/* Inventory Table */}
       <Card>
         <div className="neo-table overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr>
-                <th className="text-left p-3">Produk</th>
-                <th className="text-left p-3">Kategori</th>
-                <th className="text-right p-3">Stok</th>
-                <th className="text-right p-3">Nilai Stok</th>
-                <th className="text-right p-3">Batch</th>
-                <th className="text-center p-3">Status</th>
+                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs">Produk</th>
+                <th className="text-left p-2.5 sm:p-3 text-[11px] sm:text-xs">Kategori</th>
+                <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Stok</th>
+                <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Nilai Stok</th>
+                <th className="text-right p-2.5 sm:p-3 text-[11px] sm:text-xs">Batch</th>
+                <th className="text-center p-2.5 sm:p-3 text-[11px] sm:text-xs">Status</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={`skel-${i}`}>
-                    <td className="p-3">
-                      <Skeleton className="h-4 w-32 mb-1" />
-                      <Skeleton className="h-3 w-20" />
+                    <td className="p-2.5 sm:p-3">
+                      <Skeleton className="h-4 w-28 sm:w-36 mb-1" />
+                      <Skeleton className="h-3 w-16 sm:w-20" />
                     </td>
-                    <td className="p-3">
-                      <Skeleton className="h-5 w-20 rounded-full" />
+                    <td className="p-2.5 sm:p-3">
+                      <Skeleton className="h-5 w-16 sm:w-20 rounded-md" />
                     </td>
-                    <td className="p-3 text-right">
-                      <Skeleton className="h-4 w-16 ml-auto" />
+                    <td className="p-2.5 sm:p-3 text-right">
+                      <Skeleton className="h-4 w-12 sm:w-16 ml-auto" />
                     </td>
-                    <td className="p-3 text-right">
-                      <Skeleton className="h-4 w-24 ml-auto" />
+                    <td className="p-2.5 sm:p-3 text-right">
+                      <Skeleton className="h-4 w-20 sm:w-24 ml-auto" />
                     </td>
-                    <td className="p-3 text-right">
-                      <Skeleton className="h-4 w-8 ml-auto" />
+                    <td className="p-2.5 sm:p-3 text-right">
+                      <Skeleton className="h-4 w-6 sm:w-8 ml-auto" />
                     </td>
-                    <td className="p-3 text-center">
-                      <Skeleton className="h-5 w-20 mx-auto rounded-full" />
+                    <td className="p-2.5 sm:p-3 text-center">
+                      <Skeleton className="h-5 w-16 sm:w-20 mx-auto rounded-md" />
                     </td>
                   </tr>
                 ))
@@ -303,25 +305,26 @@ export default function InventoryPage() {
                 </tr>
               ) : (
                 paginatedInventory.data.map((item) => (
-                  <tr key={item.id} className="hover:bg-bg-main/50">
-                    <td className="p-3">
+                  <tr key={item.id} className="hover:bg-bg-main/50 transition-colors">
+                    <td className="p-2.5 sm:p-3">
                       {canManageInventory ? (
                         <Link
                           href={`/products/${item.id}`}
                           className="hover:underline"
                         >
-                          <p className="font-bold">{item.name}</p>
+                          <p className="font-bold text-xs sm:text-sm text-text-primary">{item.name}</p>
                         </Link>
                       ) : (
-                        <p className="font-bold">{item.name}</p>
+                        <p className="font-bold text-xs sm:text-sm text-text-primary">{item.name}</p>
                       )}
-                      <p className="text-xs text-text-muted font-mono">
+                      <p className="text-[10px] sm:text-xs text-text-muted font-mono">
                         {item.sku}
                       </p>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2.5 sm:p-3">
                       <Badge
                         variant="outline"
+                        className="text-[10px] sm:text-xs px-2 py-0.5 rounded-md"
                         style={{
                           borderColor: item.category?.color || undefined,
                           color: item.category?.color || undefined,
@@ -330,26 +333,30 @@ export default function InventoryPage() {
                         {item.category?.name || "-"}
                       </Badge>
                     </td>
-                    <td className="p-3 text-right font-bold">
-                      {formatNumber(item.totalStock)} {item.unit}
+                    <td className="p-2.5 sm:p-3 text-right font-bold text-xs sm:text-sm tabular-nums">
+                      {formatNumber(item.totalStock)} <span className="text-[10px] sm:text-xs font-normal text-text-muted">{item.unit}</span>
                     </td>
-                    <td className="p-3 text-right font-bold">
+                    <td className="p-2.5 sm:p-3 text-right font-bold text-xs sm:text-sm tabular-nums">
                       {formatCurrency(item.totalValue)}
                     </td>
-                    <td className="p-3 text-right">{item.batchCount}</td>
-                    <td className="p-3 text-center">
+                    <td className="p-2.5 sm:p-3 text-right text-xs sm:text-sm tabular-nums text-text-secondary">{item.batchCount}</td>
+                    <td className="p-2.5 sm:p-3 text-center">
                       <div className="flex flex-col items-center gap-1">
                         {item.isLowStock ? (
-                          <Badge variant="danger">Low Stock</Badge>
+                          <Badge variant="danger" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-md">
+                            Low Stock
+                          </Badge>
                         ) : (
-                          <Badge variant="success">Aman</Badge>
+                          <Badge variant="success" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-md">
+                            Aman
+                          </Badge>
                         )}
                         {item.criticalExpiringCount && item.criticalExpiringCount > 0 ? (
-                          <Badge variant="danger" className="text-[10px] px-1.5 py-0">
+                          <Badge variant="danger" className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-md">
                             Exp &lt; 7 Hari ({item.criticalExpiringCount})
                           </Badge>
                         ) : item.warningExpiringCount && item.warningExpiringCount > 0 ? (
-                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] px-1.5 py-0">
+                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-md">
                             Exp &lt; 30 Hari ({item.warningExpiringCount})
                           </Badge>
                         ) : null}

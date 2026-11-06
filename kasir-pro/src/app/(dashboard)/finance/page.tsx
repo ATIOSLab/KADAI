@@ -864,12 +864,12 @@ export default function FinancePage() {
                   <tr key={index}>
                     <td className="p-3"><Skeleton className="h-4 w-24" /></td>
                     <td className="p-3"><Skeleton className="h-4 w-56" /></td>
-                    <td className="p-3"><Skeleton className="h-5 w-28 rounded-full" /></td>
-                    <td className="p-3"><Skeleton className="mx-auto h-5 w-20 rounded-full" /></td>
-                    <td className="p-3"><Skeleton className="mx-auto h-5 w-16 rounded-full" /></td>
+                    <td className="p-3"><Skeleton className="h-5 w-28 rounded-md" /></td>
+                    <td className="p-3"><Skeleton className="mx-auto h-5 w-20 rounded-md" /></td>
+                    <td className="p-3"><Skeleton className="mx-auto h-5 w-16 rounded-md" /></td>
                     <td className="p-3"><Skeleton className="ml-auto h-4 w-28" /></td>
-                    <td className="p-3"><Skeleton className="mx-auto h-5 w-16 rounded-full" /></td>
-                    <td className="p-3"><Skeleton className="mx-auto h-8 w-20" /></td>
+                    <td className="p-3"><Skeleton className="mx-auto h-5 w-16 rounded-md" /></td>
+                    <td className="p-3"><Skeleton className="mx-auto h-8 w-20 rounded-md" /></td>
                   </tr>
                 ))
               ) : fetchError ? (

@@ -892,10 +892,10 @@ export default function SettingsPage() {
                         <Skeleton className="h-4 w-36" />
                       </td>
                       <td className="p-3 text-center">
-                        <Skeleton className="h-5 w-16 mx-auto rounded-full" />
+                        <Skeleton className="h-5 w-16 mx-auto rounded-md" />
                       </td>
                       <td className="p-3 text-center">
-                        <Skeleton className="h-5 w-12 mx-auto rounded-full" />
+                        <Skeleton className="h-5 w-12 mx-auto rounded-md" />
                       </td>
                       <td className="p-3 text-center">
                         <Skeleton className="h-8 w-16 mx-auto" />

@@ -46,7 +46,7 @@ export function CardGridSkeleton({
         <Card key={i} className="border border-border p-5 space-y-4">
           <div className="flex justify-between items-center">
             <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-16 rounded-full" />
+            <Skeleton className="h-4 w-16 rounded-md" />
           </div>
           <Skeleton className="h-3 w-48" />
           <div className="pt-2 border-t border-border flex justify-between items-center">

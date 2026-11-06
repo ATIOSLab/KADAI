@@ -154,8 +154,8 @@ export default function SalesPage() {
                     <td className="p-3"><Skeleton className="h-4 w-20" /></td>
                     <td className="p-3 text-right"><Skeleton className="h-4 w-24 ml-auto" /></td>
                     <td className="p-3 text-center"><Skeleton className="h-4 w-8 mx-auto" /></td>
-                    <td className="p-3 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></td>
-                    <td className="p-3 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></td>
+                    <td className="p-3 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-md" /></td>
+                    <td className="p-3 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-md" /></td>
                     <td className="p-3"><Skeleton className="h-4 w-28" /></td>
                     <td className="p-3 text-center"><Skeleton className="h-8 w-8 mx-auto" /></td>
                   </tr>

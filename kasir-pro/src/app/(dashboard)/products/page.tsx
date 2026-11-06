@@ -184,7 +184,7 @@ export default function ProductsPage() {
                   <Skeleton className="h-5 w-32" />
                   <Skeleton className="h-3 w-16" />
                 </div>
-                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-20 rounded-md" />
               </div>
               <Skeleton className="h-4 w-24" />
               <div className="flex justify-between items-center pt-2">
@@ -308,13 +308,13 @@ export default function ProductsPage() {
                       <Skeleton className="h-4 w-20" />
                     </td>
                     <td className="p-3">
-                      <Skeleton className="h-5 w-24 rounded-full" />
+                      <Skeleton className="h-5 w-24 rounded-md" />
                     </td>
                     <td className="p-3 text-right">
                       <Skeleton className="h-4 w-20 ml-auto" />
                     </td>
                     <td className="p-3 text-right">
-                      <Skeleton className="h-5 w-16 ml-auto rounded-full" />
+                      <Skeleton className="h-5 w-16 ml-auto rounded-md" />
                     </td>
                     <td className="p-3">
                       <Skeleton className="h-8 w-24 mx-auto" />

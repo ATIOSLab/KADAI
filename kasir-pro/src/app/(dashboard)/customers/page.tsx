@@ -224,7 +224,7 @@ export default function CustomersPage() {
                   <tr key={i}>
                     <td className="py-3.5 px-4"><Skeleton className="h-4 w-32" /></td>
                     <td className="py-3.5 px-4"><Skeleton className="h-4 w-28" /></td>
-                    <td className="py-3.5 px-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-full" /></td>
+                    <td className="py-3.5 px-4 text-center"><Skeleton className="h-5 w-16 mx-auto rounded-md" /></td>
                     <td className="py-3.5 px-4 text-right"><Skeleton className="h-4 w-12 ml-auto" /></td>
                     <td className="py-3.5 px-4 text-right"><Skeleton className="h-4 w-20 ml-auto" /></td>
                     <td className="py-3.5 px-4 text-center"><Skeleton className="h-4 w-8 mx-auto" /></td>

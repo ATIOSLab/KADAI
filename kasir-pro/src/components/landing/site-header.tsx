@@ -228,6 +228,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
             {/* Direct Links */}
             <Link
+              href="/referral"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Mitra
+            </Link>
+            <Link
               href="/hardware"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
@@ -350,6 +356,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Panduan Hardware
+            </Link>
+            <Link
+              href="/referral"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+            >
+              Program Mitra Referral
             </Link>
             <Link
               href="/harga"

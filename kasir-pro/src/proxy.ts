@@ -10,6 +10,8 @@ const publicPages = [
   "/register",
   "/demo",
   "/request-demo",
+  "/referral",
+  "/mitra",
   "/harga",
   "/hardware",
   "/fitur",

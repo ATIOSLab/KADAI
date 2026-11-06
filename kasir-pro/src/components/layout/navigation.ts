@@ -193,6 +193,14 @@ export const navigationSections: NavigationSection[] = [
         roles: ["ADMIN"],
       },
       {
+        href: "/referrals",
+        label: "Mitra Referral & Afiliasi",
+        shortLabel: "Mitra Referral",
+        description: "Kelola mitra marketing, kode referral, dan komisi.",
+        icon: ArrowLeftRight,
+        roles: ["ADMIN"],
+      },
+      {
         href: "/settings",
         label: "Pengaturan Sistem",
         shortLabel: "Pengaturan",

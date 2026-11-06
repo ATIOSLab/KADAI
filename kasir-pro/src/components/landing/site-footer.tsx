@@ -41,6 +41,7 @@ export function SiteFooter() {
             </span>
             <ul className="space-y-2 text-slate-400">
               <li><Link href="/demo" className="hover:text-white transition-colors text-primary font-bold">Request Demo KADAI</Link></li>
+              <li><Link href="/referral" className="hover:text-white transition-colors">Program Mitra Referral</Link></li>
               <li><Link href="/hardware" className="hover:text-white transition-colors">Panduan Hardware</Link></li>
               <li><Link href="/harga" className="hover:text-white transition-colors">Paket Langganan</Link></li>
               <li><Link href="/blog" className="hover:text-white transition-colors">Pusat Edukasi & Blog</Link></li>

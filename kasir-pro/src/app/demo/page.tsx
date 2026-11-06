@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Store,
@@ -15,6 +16,7 @@ import {
   Layers,
   ChefHat,
   Receipt,
+  Gift,
 } from "lucide-react";
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
@@ -22,7 +24,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export default function RequestDemoPage() {
+function RequestDemoForm() {
+  const searchParams = useSearchParams();
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState("FNB_RESTO");
@@ -30,6 +33,7 @@ export default function RequestDemoPage() {
   const [email, setEmail] = useState("");
   const [outletCount, setOutletCount] = useState(1);
   const [notes, setNotes] = useState("");
+  const [referralCode, setReferralCode] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +41,13 @@ export default function RequestDemoPage() {
     accessCode: string;
     businessName: string;
   } | null>(null);
+
+  useEffect(() => {
+    const refFromUrl = searchParams.get("ref");
+    if (refFromUrl) {
+      setReferralCode(refFromUrl.toUpperCase());
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +66,7 @@ export default function RequestDemoPage() {
           email: email || undefined,
           outletCount: Number(outletCount),
           notes: notes || undefined,
+          referralCode: referralCode || undefined,
         }),
       });
 
@@ -275,6 +287,25 @@ export default function RequestDemoPage() {
                     />
                   </div>
 
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Gift className="size-3.5 text-primary" />
+                        Kode Referral Mitra (Opsional)
+                      </span>
+                      <Link href="/referral" className="text-[10px] text-primary hover:underline font-normal">
+                        Ingin Jadi Mitra Referral?
+                      </Link>
+                    </label>
+                    <input
+                      type="text"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                      placeholder="Contoh: REF-88A2B"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs uppercase font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+
                   <Button
                     type="submit"
                     disabled={loading}
@@ -353,5 +384,13 @@ export default function RequestDemoPage() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+export default function RequestDemoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xs text-slate-400">Memuat...</div>}>
+      <RequestDemoForm />
+    </Suspense>
   );
 }

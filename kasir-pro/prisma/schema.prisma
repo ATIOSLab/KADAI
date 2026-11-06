@@ -744,6 +744,7 @@ model DemoRequest {
   outletCount  Int               @default(1)
   notes        String?
   accessCode   String            @unique
+  referralCode String?
   status       DemoRequestStatus @default(PENDING)
   approvedAt   DateTime?
   approvedBy   String?
@@ -753,6 +754,90 @@ model DemoRequest {
   @@index([status])
   @@index([phone])
   @@index([accessCode])
+  @@index([referralCode])
   @@map("demo_requests")
+}
+
+// ============================================================
+// PROGRAM MITRA REFERRAL & AFILIASI MARKETING KADAI
+// ============================================================
+
+enum PartnerStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ReferralLeadStatus {
+  LEAD
+  TRIAL
+  SUBSCRIBED
+  CHURNED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  REJECTED
+}
+
+model ReferralPartner {
+  id                String          @id @default(cuid())
+  fullName          String
+  phone             String
+  email             String
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+  referralCode      String          @unique
+  commissionRate    Decimal         @default(20.00) @db.Decimal(5, 2)
+  status            PartnerStatus   @default(ACTIVE)
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  leads             ReferralLead[]
+  payouts           ReferralPayout[]
+
+  @@index([phone])
+  @@index([referralCode])
+  @@index([status])
+  @@map("referral_partners")
+}
+
+model ReferralLead {
+  id                 String             @id @default(cuid())
+  partnerId          String
+  partner            ReferralPartner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  leadName           String
+  businessName       String
+  phone              String
+  packageTier        String?
+  status             ReferralLeadStatus @default(LEAD)
+  subscriptionAmount Decimal            @default(0) @db.Decimal(15, 2)
+  commissionEarned   Decimal            @default(0) @db.Decimal(15, 2)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([partnerId])
+  @@index([phone])
+  @@index([status])
+  @@map("referral_leads")
+}
+
+model ReferralPayout {
+  id           String          @id @default(cuid())
+  partnerId    String
+  partner      ReferralPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  amount       Decimal         @db.Decimal(15, 2)
+  status       PayoutStatus    @default(PENDING)
+  paymentProof String?
+  paidAt       DateTime?
+  notes        String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([partnerId])
+  @@index([status])
+  @@map("referral_payouts")
 }
 

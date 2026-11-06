@@ -13,6 +13,7 @@ const createDemoRequestSchema = z.object({
   email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
   outletCount: z.number().int().min(1).default(1),
   notes: z.string().max(500).optional().or(z.literal("")),
+  referralCode: z.string().max(50).optional().or(z.literal("")),
 });
 
 // POST /api/demo-requests - Publik untuk calon klien request demo
@@ -25,6 +26,8 @@ export async function POST(request: NextRequest) {
     const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
     const accessCode = `DEMO-${randomSuffix}`;
 
+    const cleanRefCode = validated.referralCode?.trim().toUpperCase() || null;
+
     const demoRequest = await prisma.demoRequest.create({
       data: {
         fullName: validated.fullName,
@@ -35,9 +38,28 @@ export async function POST(request: NextRequest) {
         outletCount: validated.outletCount,
         notes: validated.notes || null,
         accessCode,
+        referralCode: cleanRefCode,
         status: "PENDING",
       },
     });
+
+    // Jika membawa kode referral valid, tautkan ke mitra referral
+    if (cleanRefCode) {
+      const partner = await prisma.referralPartner.findFirst({
+        where: { referralCode: { equals: cleanRefCode, mode: "insensitive" } },
+      });
+      if (partner) {
+        await prisma.referralLead.create({
+          data: {
+            partnerId: partner.id,
+            leadName: validated.fullName,
+            businessName: validated.businessName,
+            phone: validated.phone,
+            status: "LEAD",
+          },
+        });
+      }
+    }
 
     return NextResponse.json(
       {

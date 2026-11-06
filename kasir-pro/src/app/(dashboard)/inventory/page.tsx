@@ -126,18 +126,18 @@ export default function InventoryPage() {
         icon={Warehouse}
       >
         {canManageInventory && (
-          <>
-            <Button asChild>
+          <div className="flex items-center gap-2">
+            <Button asChild size="sm">
               <Link href="/inventory/restock">
-                <Plus className="w-4 h-4 mr-1" /> Restock
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Restock
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="sm">
               <Link href="/inventory/adjustments">
-                <AlertTriangle className="w-4 h-4 mr-1" /> Penyesuaian
+                <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Penyesuaian
               </Link>
             </Button>
-          </>
+          </div>
         )}
       </PageHeader>
 

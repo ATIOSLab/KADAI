@@ -185,6 +185,14 @@ export const navigationSections: NavigationSection[] = [
         roles: ["ADMIN", "MANAGER"],
       },
       {
+        href: "/demo-requests",
+        label: "Permohonan Demo (Leads)",
+        shortLabel: "Demo Leads",
+        description: "Kelola & setujui permohonan demo dari calon klien.",
+        icon: Users,
+        roles: ["ADMIN"],
+      },
+      {
         href: "/settings",
         label: "Pengaturan Sistem",
         shortLabel: "Pengaturan",

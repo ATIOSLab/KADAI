@@ -260,7 +260,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           </nav>
 
           {/* Right Action: Clean Moka-style Login + Rounded Solid CTA */}
-          <div className="hidden xl:flex items-center gap-4 shrink-0">
+          <div className="hidden xl:flex items-center gap-3 shrink-0">
             {dashboardPath ? (
               <Button
                 asChild
@@ -274,8 +274,14 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             ) : (
               <>
                 <Link
+                  href="/demo"
+                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2.5 py-1"
+                >
+                  Request Demo
+                </Link>
+                <Link
                   href="/login"
-                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1"
+                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2.5 py-1"
                 >
                   Masuk
                 </Link>
@@ -317,6 +323,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
       {mobileMenuOpen && (
         <div className="xl:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">
+            <Link
+              href="/demo"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-primary bg-orange-50/80 font-bold hover:bg-orange-100 transition-colors"
+            >
+              Request Demo & Konsultasi
+            </Link>
             <Link
               href="/fitur"
               onClick={() => setMobileMenuOpen(false)}

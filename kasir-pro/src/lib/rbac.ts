@@ -35,6 +35,7 @@ type RouteAccessRule = {
 const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/profile", roles: ALL_AUTHENTICATED_ROLES },
   { path: "/settings", roles: ADMIN_ONLY_ROLES },
+  { path: "/demo-requests", roles: ADMIN_ONLY_ROLES },
   { path: "/finance/tax", roles: FINANCE_ROLES },
   { path: "/finance", roles: FINANCE_ROLES },
   { path: "/reports", roles: FINANCE_ROLES },

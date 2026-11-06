@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-bold transition-all duration-150 cursor-pointer disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 rounded-xl",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-all duration-150 cursor-pointer disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 rounded-lg",
   {
     variants: {
       variant: {
@@ -28,14 +28,14 @@ const buttonVariants = cva(
           "border-transparent bg-transparent p-0 text-accent-secondary shadow-none underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 md:h-10 px-5 py-2",
-        xs: "h-8 md:h-7 px-2.5 text-xs rounded-lg",
-        sm: "h-10 md:h-8 px-3 text-sm md:text-xs rounded-lg",
-        lg: "h-12 px-8 text-base",
-        xl: "h-14 px-10 text-lg",
-        icon: "h-11 w-11 md:h-10 md:w-10",
-        "icon-sm": "h-9 w-9 md:h-8 md:w-8 rounded-lg",
-        "icon-lg": "h-12 w-12",
+        default: "h-9 sm:h-10 px-3.5 sm:px-4 text-xs sm:text-sm rounded-lg",
+        xs: "h-7 px-2 text-[11px] sm:text-xs rounded-md",
+        sm: "h-8 px-2.5 sm:px-3 text-xs rounded-md",
+        lg: "h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base rounded-lg",
+        xl: "h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg rounded-xl",
+        icon: "h-9 w-9 sm:h-10 sm:w-10 rounded-lg",
+        "icon-sm": "h-7 w-7 sm:h-8 sm:w-8 rounded-md",
+        "icon-lg": "h-11 w-11 sm:h-12 sm:w-12 rounded-lg",
       },
     },
     defaultVariants: {

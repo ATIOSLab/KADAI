@@ -167,7 +167,16 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto font-semibold text-sm h-12 px-8 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
+                  className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
+                >
+                  <Link href="/demo">Jadwalkan Demo</Link>
+                </Button>
+
+                <Button
+                  asChild
+                  size="lg"
+                  variant="ghost"
+                  className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-full text-slate-700 hover:text-slate-950 hover:bg-white/80"
                 >
                   <Link href="/login">Masuk ke Toko Anda</Link>
                 </Button>

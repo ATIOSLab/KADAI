@@ -324,7 +324,7 @@ export default function InventoryPage() {
                     <td className="p-2.5 sm:p-3">
                       <Badge
                         variant="outline"
-                        className="text-[10px] sm:text-xs px-2 py-0.5 rounded-md"
+                        className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-lg font-medium"
                         style={{
                           borderColor: item.category?.color || undefined,
                           color: item.category?.color || undefined,
@@ -343,20 +343,20 @@ export default function InventoryPage() {
                     <td className="p-2.5 sm:p-3 text-center">
                       <div className="flex flex-col items-center gap-1">
                         {item.isLowStock ? (
-                          <Badge variant="danger" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-md">
+                          <Badge variant="danger" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-lg font-semibold">
                             Low Stock
                           </Badge>
                         ) : (
-                          <Badge variant="success" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-md">
+                          <Badge variant="success" className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-lg font-semibold">
                             Aman
                           </Badge>
                         )}
                         {item.criticalExpiringCount && item.criticalExpiringCount > 0 ? (
-                          <Badge variant="danger" className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-md">
+                          <Badge variant="danger" className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-lg">
                             Exp &lt; 7 Hari ({item.criticalExpiringCount})
                           </Badge>
                         ) : item.warningExpiringCount && item.warningExpiringCount > 0 ? (
-                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-md">
+                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-lg">
                             Exp &lt; 30 Hari ({item.warningExpiringCount})
                           </Badge>
                         ) : null}

@@ -119,7 +119,7 @@ export function Navbar({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground lg:flex">
+            <div className="hidden items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground lg:flex">
               <CalendarDays className="size-3.5 text-primary" />
               <span>{todayLabel}</span>
             </div>

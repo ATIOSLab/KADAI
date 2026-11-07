@@ -16,6 +16,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KadaiWordmark } from "@/components/shared/kadai-logo";
 
 interface SiteHeaderProps {
   dashboardPath: string | null;
@@ -105,18 +106,8 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               </svg>
             </span>
             <div className="flex flex-col justify-center">
-              <span
-                className="text-2xl font-bold tracking-tight text-slate-950 leading-none inline-flex items-baseline lowercase select-none"
-                style={{ fontFamily: "var(--font-heading)" }}
-                aria-label="kadai"
-              >
-                <span>kada</span>
-                <span className="relative inline-flex items-baseline">
-                  <span>ı</span>
-                  <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
-                </span>
-              </span>
-              <span className="text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-1 font-sans">
+              <KadaiWordmark size="text-2xl" />
+              <span className="text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-0.5 font-sans">
                 SISTEM OPERASI BISNIS
               </span>
             </div>

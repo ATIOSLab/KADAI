@@ -116,11 +116,16 @@ export function KadaiWordmark({
   return (
     <span
       className={cn(
-        "font-bold tracking-tight inline-flex items-baseline lowercase select-none font-heading",
+        "font-bold inline-flex items-baseline lowercase select-none font-wordmark",
         size,
-        textColor
+        textColor,
+        className
       )}
-      style={{ fontFamily: "var(--font-heading)" }}
+      style={{
+        fontFamily: "'Bahnschrift', var(--font-saira), 'Segoe UI', 'DIN Alternate', -apple-system, sans-serif",
+        letterSpacing: "-0.045em",
+        fontWeight: 700,
+      }}
       aria-label="kadai"
     >
       <span>kada</span>

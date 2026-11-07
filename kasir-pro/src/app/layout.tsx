@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Quicksand, Poppins, Geist_Mono } from "next/font/google";
+import { Quicksand, Poppins, Geist_Mono, Saira } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
@@ -25,6 +25,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+});
+
+const saira = Saira({
+  subsets: ["latin"],
+  variable: "--font-saira",
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -219,7 +226,8 @@ export default function RootLayout({
         "font-sans antialiased",
         quicksand.variable,
         poppins.variable,
-        geistMono.variable
+        geistMono.variable,
+        saira.variable
       )}
     >
       <head>

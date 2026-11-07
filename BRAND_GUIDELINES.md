@@ -55,21 +55,33 @@ Huruf **"K"** kustom dirancang secara geometris dengan 4 komponen bermakna:
 
 ## 4. Standar Tipografi
 
-1. **Font Judul, Headings & Wordmark (Geometric Rounded):**
-   * Font: **`Quicksand`** & **`Poppins`** (Google Fonts).
+1. **Font Wordmark Resmi `kadaı` (DIN Geometric):**
+   * Font Utama: **`Bahnschrift Bold`** (Font bawaan Windows, gaya DIN geometris modern).
+   * Bobot: **700 (Bold)**, Huruf Kecil (*lowercase*).
+   * Spasi (*Tracking*): **−4.5%** (`tracking-[-0.045em]`).
+   * Aksen Huruf **ı**: Menggunakan huruf `ı` (dotless i), titik aslinya digantikan lingkaran solid **Amber `#F59E0B`** (*spark dot*).
+   * Fallback Web & Multi-Platform:
+     * Windows Alternate: **`Segoe UI Bold`**
+     * Web & Non-Windows (macOS, iOS, Android, Linux): **`Saira Bold`** / **`Rajdhani Bold`** (Open-source Google Fonts, DIN geometric style bebas lisensi).
+   * Variabel CSS: `--font-wordmark`.
+
+2. **Font Judul & Headings (Geometric Rounded):**
+   * Font: **`Quicksand`** (Google Fonts).
    * Variabel CSS: `--font-heading`.
-   * Karakteristik: Geometris bulat (*geometric rounded*), huruf 'a' bertingkat tunggal (*single-story 'a'*), kurva lembut yang selaras 1:1 dengan kapsul silindris dan lengkung wajan logo K.
-   * Diterapkan pada: Semua judul H1, H2, H3, H4, nama modul, judul kartu, dan wordmark `kadai`.
-2. **Font Teks Utama & Antarmuka Aplikasi (Body Sans):**
+   * Karakteristik: Geometris bulat (*geometric rounded*), kurva lembut yang selaras dengan kapsul silindris dan lengkung wajan logo K.
+   * Diterapkan pada: Semua judul H1, H2, H3, H4, nama modul, dan judul kartu.
+
+3. **Font Teks Utama & Antarmuka Aplikasi (Body Sans):**
    * Font: **`Poppins`** (Google Fonts).
    * Variabel CSS: `--font-sans`.
    * Karakteristik: Geometris modern, sangat jernih dan nyaman dibaca pada layar kasir POS, tablet, dan smartphone di segala kondisi pencahayaan.
-3. **Font Finansial & Kasir (Monospace / Tabular):**
+
+4. **Font Finansial & Kasir (Monospace / Tabular):**
    * Font: **`Geist Mono`** / Tabular Numbers (`tabular-nums`).
    * Variabel CSS: `--font-mono`.
    * Digunakan pada: Angka rupiah, struk thermal kasir, tabel stok inventori FIFO, barcode, dan laporan laba rugi.
-4. **Wordmark & Lockup:**
-   * Teks `kadai` dalam huruf kecil (*lowercase*) dengan titik huruf "i" menggunakan warna **Amber `#F59E0B`** (*spark dot*).
+
+5. **Tagline Lockup:**
    * Tagline **`SISTEM OPERASI BISNIS`** menggunakan huruf kapital (*all caps*), bobot *Bold*, dan spasi antar-huruf lebar (`tracking-[0.18em]`).
 
 ---

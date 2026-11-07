@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Store } from "lucide-react";
+import { KadaiWordmark } from "@/components/shared/kadai-logo";
 
 export function SiteFooter() {
   return (
@@ -99,17 +100,7 @@ export function SiteFooter() {
                 <circle cx="408" cy="150" r="22" fill="#F59E0B" />
               </svg>
             </span>
-            <span
-              className="font-bold text-slate-200 lowercase inline-flex items-baseline text-lg select-none"
-              style={{ fontFamily: "var(--font-heading)" }}
-              aria-label="kadai"
-            >
-              <span>kada</span>
-              <span className="relative inline-flex items-baseline">
-                <span>ı</span>
-                <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
-              </span>
-            </span>
+            <KadaiWordmark size="text-lg" textColor="text-slate-200" />
             <span className="text-slate-600">•</span>
             <span className="tracking-[0.16em] uppercase text-xs font-bold text-slate-400">SISTEM OPERASI BISNIS</span>
           </div>

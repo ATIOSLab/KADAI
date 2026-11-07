@@ -291,39 +291,60 @@ export function BrandIdentitySection() {
           <span>Sistem Tipografi Resmi KADAI</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          {/* Typo 1: Headings */}
-          <div className="space-y-2 md:pr-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          {/* Typo 1: Wordmark */}
+          <div className="space-y-2 lg:pr-3">
             <span className="text-[10px] font-bold text-primary uppercase tracking-widest block">
-              1. Judul &amp; Wordmark
+              1. Wordmark kadaı
+            </span>
+            <h4
+              className="text-xl font-bold text-slate-950"
+              style={{
+                fontFamily: "'Bahnschrift', var(--font-saira), 'Segoe UI', sans-serif",
+                letterSpacing: "-0.045em",
+                fontWeight: 700,
+              }}
+            >
+              Bahnschrift Bold
+            </h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              DIN geometris modern, bobot 700 (bold), tracking −4.5%, huruf kecil dengan aksen titik lingkaran amber pada huruf <span className="font-mono font-bold">ı</span>. Fallback: <span className="font-medium text-slate-900">Saira Bold</span> / <span className="font-medium text-slate-900">Segoe UI</span>.
+            </p>
+            <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-wordmark</div>
+          </div>
+
+          {/* Typo 2: Headings */}
+          <div className="space-y-2 sm:px-3 pt-4 sm:pt-0">
+            <span className="text-[10px] font-bold text-[#EA580C] uppercase tracking-widest block">
+              2. Judul &amp; Headline
             </span>
             <h4 className="text-xl font-black text-slate-950" style={{ fontFamily: "var(--font-heading)" }}>
-              Quicksand &amp; Poppins
+              Quicksand
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Geometris bulat (*rounded*), kurva lembut yang selaras 1:1 dengan kapsul silindris dan lengkung wajan logo K.
+              Geometris bulat (*rounded*), kurva lembut yang selaras dengan kapsul silindris dan lengkung wajan logo K.
             </p>
-            <div className="pt-2 text-[11px] font-mono text-slate-400">CSS: --font-heading</div>
+            <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-heading</div>
           </div>
 
-          {/* Typo 2: Body */}
-          <div className="space-y-2 md:px-4 pt-4 md:pt-0">
-            <span className="text-[10px] font-bold text-[#EA580C] uppercase tracking-widest block">
-              2. Antarmuka &amp; Body
+          {/* Typo 3: Body */}
+          <div className="space-y-2 sm:px-3 pt-4 sm:pt-0">
+            <span className="text-[10px] font-bold text-[#FB923C] uppercase tracking-widest block">
+              3. Antarmuka &amp; Body
             </span>
             <h4 className="text-xl font-bold text-slate-950 font-sans">
-              Poppins / Plus Jakarta Sans
+              Poppins
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Jernih, modern, dan ergonomis untuk layar kasir POS, tablet kasir, maupun mobile display di segala kondisi.
+              Jernih, modern, dan ergonomis untuk layar kasir POS, tablet kasir, maupun mobile display di segala kondisi pencahayaan.
             </p>
-            <div className="pt-2 text-[11px] font-mono text-slate-400">CSS: --font-sans</div>
+            <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-sans</div>
           </div>
 
-          {/* Typo 3: Financial & Monospace */}
-          <div className="space-y-2 md:pl-4 pt-4 md:pt-0">
+          {/* Typo 4: Financial & Monospace */}
+          <div className="space-y-2 lg:pl-3 pt-4 sm:pt-0">
             <span className="text-[10px] font-bold text-[#F59E0B] uppercase tracking-widest block">
-              3. Kasir &amp; Finansial
+              4. Kasir &amp; Finansial
             </span>
             <h4 className="text-xl font-bold text-slate-950 font-mono">
               Geist Mono
@@ -331,7 +352,7 @@ export function BrandIdentitySection() {
             <p className="text-xs text-slate-600 leading-relaxed">
               Presisi monospace tinggi untuk struk thermal kasir, nominal rupiah, kalkulasi FIFO, dan laporan laba rugi.
             </p>
-            <div className="pt-2 text-[11px] font-mono text-slate-400">CSS: --font-mono</div>
+            <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-mono</div>
           </div>
         </div>
       </div>

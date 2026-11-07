@@ -13,36 +13,36 @@ import { Badge } from "@/components/ui/badge";
 export function IndustrySolutions() {
   const industries = [
     {
-      title: "Ritel & Distribusi Komersial",
-      icon: ShoppingCart,
-      subtitle: "Minimarket modern, supermarket, fashion, farmasi/apotek, elektronik, toko bangunan, dan grosir.",
+      title: "Kuliner, Kafe & Restoran (F&B)",
+      icon: UtensilsCrossed,
+      subtitle: "Kedai kopi, kafe modern, restoran dine-in, bakery, fast food, hingga cloud kitchen.",
       features: [
-        "Pelacakan persediaan multi-batch FIFO & expired date.",
-        "Scan barcode scanner USB, Bluetooth & kamera HP.",
-        "Kartu stok mutasi otomatis & batas minimum restock.",
-        "Cetak struk kasir thermal 58mm/80mm & label barcode.",
+        "Takaran resep bahan baku terpotong otomatis saat pesanan dibuat.",
+        "Layar monitor dapur (KDS) memisahkan tiket stasiun koki dan barista.",
+        "Pengaturan nomor meja kasir, pesanan mandiri QR, dan split-bill.",
+        "Hitung otomatis Pajak Restoran (PB1 10%) dan biaya layanan.",
       ],
     },
     {
-      title: "Kuliner, F&B & Hospitality",
-      icon: UtensilsCrossed,
-      subtitle: "Restoran casual dining, kafe modern, fast food (QSR), bakery, dan cloud kitchen.",
+      title: "Toko Ritel & Minimarket",
+      icon: ShoppingCart,
+      subtitle: "Minimarket, toko kelontong sembako, apotek, butik fashion, dan grosir.",
       features: [
-        "Bill of Materials: Potong bahan baku otomatis saat menu laku.",
-        "Meja & Self-Order QR: Pelanggan pesan langsung dari HP.",
-        "Kitchen Display (KDS): Tiket real-time ke monitor dapur & bar.",
-        "Otomatisasi Pajak Restoran (PB1 10%) & Service Charge.",
+        "Scan barcode cepat dengan scanner USB, Bluetooth, atau kamera HP.",
+        "Metode FIFO memastikan barang dagangan batch lama terjual lebih dulu.",
+        "Radar peringatan stok menipis dan tanggal kadaluwarsa produk masuk.",
+        "Cetak struk kasir thermal 58mm/80mm dan label harga barcode.",
       ],
     },
     {
       title: "Layanan Jasa & Multi-Cabang",
       icon: Building2,
-      subtitle: "Barbershop, salon kecantikan, bengkel otomotif, cuci mobil/motor, laundry, dan franchise.",
+      subtitle: "Barbershop, salon kecantikan, bengkel otomotif, laundry, dan jaringan franchise.",
       features: [
-        "Pencatatan invoice billing jasa & produk dalam 1 transaksi.",
-        "Database pelanggan CRM, riwayat kunjungan & poin member.",
-        "Manajemen multi-cabang terpusat dari satu dashboard akun.",
-        "Kontrol hak akses staf RBAC 6 role & PIN supervisor.",
+        "Pencatatan nota jasa servis dan penjualan produk dalam 1 transaksi.",
+        "Database pelanggan CRM, nomor kontak, dan riwayat kunjungan rutin.",
+        "Pantau seluruh cabang toko secara terpusat dari satu akun pemilik.",
+        "Kontrol hak akses kasir, manajer, dan pembukuan dengan PIN aman.",
       ],
     },
   ];
@@ -56,13 +56,13 @@ export function IndustrySolutions() {
             variant="outline"
             className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
           >
-            Solusi Sesuai Karakter Toko
+            Fleksibel Lintas Sektor
           </Badge>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
-            Dibuat Pas untuk Apapun Usaha Anda
+            Dibuat Khusus untuk Karakter Usaha Anda
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-            KADAI otomatis menyesuaikan cara kerja bisnis Anda — cepat melayani scan barcode di toko ritel, langsung membagi pesanan ke layar dapur restoran, hingga mengatur transaksi jasa.
+            Setiap model bisnis punya tantangan berbeda. KADAI menyediakan alur operasional yang langsung pas sejak hari pertama tanpa perlu kustomisasi mahal.
           </p>
         </div>
 

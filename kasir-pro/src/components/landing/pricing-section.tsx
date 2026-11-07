@@ -30,7 +30,7 @@ const PLANS = [
   },
   {
     name: "Professional",
-    subtitle: "Untuk unit usaha ritel, F&B, dan jasa mandiri yang berkembang.",
+    subtitle: "Untuk toko ritel mandiri, kafe, dan unit usaha berkembang.",
     price: "Rp 99.000",
     period: "/ bln",
     features: [
@@ -45,8 +45,8 @@ const PLANS = [
   },
   {
     name: "Business Pro",
-    badge: "Paling Populer",
-    subtitle: "Kafe, resto & gerai ritel modern dengan operasional penuh.",
+    badge: "Paling Banyak Dipilih",
+    subtitle: "Kafe, resto & ritel modern dengan operasional resep dan dapur.",
     price: "Rp 249.000",
     period: "/ bln",
     features: [
@@ -62,7 +62,7 @@ const PLANS = [
   },
   {
     name: "Enterprise",
-    subtitle: "Jaringan multi-cabang & central kitchen korporasi.",
+    subtitle: "Jaringan multi-cabang waralaba dan dapur pusat.",
     price: "Rp 599.000",
     period: "/ bln",
     features: [
@@ -87,13 +87,13 @@ export function PricingSection() {
             variant="outline"
             className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
           >
-            Paket Komersial
+            Harga Transparan
           </Badge>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
-            Pilihan Paket Langganan Sesuai Skala Bisnis Anda
+            Biaya Langganan Jujur Tanpa Biaya Tersembunyi
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-            Semua paket dilengkapi garansi update fitur berkala dan penyimpanan database cloud yang aman.
+            Pilih paket yang paling pas untuk skala usaha Anda. Bebas upgrade atau batalkan kapan saja tanpa ikatan kontrak rumit.
           </p>
         </div>
 

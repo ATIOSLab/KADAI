@@ -14,17 +14,17 @@ export function AccountingTaxSection() {
     {
       title: "Fleksibel untuk Non-PKP & PKP",
       icon: Percent,
-      desc: "Usaha mikro & toko kelontong Non-PKP bebas bertransaksi tanpa pungutan pajak (0%). Bagi restoran atau badan usaha PKP, sistem otomatis menghitung PB1 10% atau PPN 11% secara rapi.",
+      desc: "Warung, toko kelontong, dan UMKM mikro Non-PKP bebas bertransaksi tanpa pungutan pajak (0%). Bagi restoran dan badan usaha PKP, sistem otomatis memisahkan PB1 10% atau PPN 11% secara transparan di setiap struk kasir.",
     },
     {
       title: "Rekap PPh Final UMKM 0,5%",
       icon: Scale,
-      desc: "Sesuai PP 55/2022 (pengganti PP 23/2018). Sistem merangkum otomatis Buku Peredaran Bruto Bulanan dan memonitor batas pembebasan omzet Rp 500 Juta bagi Wajib Pajak Orang Pribadi.",
+      desc: "Sesuai regulasi PP 55/2022. KADAI merangkum omzet peredaran bruto bulanan otomatis dan memantau batas pembebasan omzet Rp 500 Juta untuk Wajib Pajak Orang Pribadi.",
     },
     {
-      title: "Legalitas Usaha & SAK EMKM",
+      title: "Legalitas Badan Usaha & SAK EMKM",
       icon: BarChart3,
-      desc: "Mendukung pencatatan NIB OSS 13 digit, NIK Pemilik, dan NPWP untuk PT Perorangan (PP 8/2021), CV, maupun PT. Dilengkapi laporan laba rugi berbasis HPP FIFO dan arus kas siap saji.",
+      desc: "Tercatat rapi dengan dukungan nomor NIB OSS 13 digit, NIK Pemilik, dan NPWP untuk PT Perorangan, CV, maupun PT. Dilengkapi laporan laba rugi riil dan arus kas siap saji untuk perbankan.",
     },
   ];
 
@@ -36,13 +36,13 @@ export function AccountingTaxSection() {
           variant="outline"
           className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
         >
-          Pajak & Legalitas Resmi RI
+          Pajak & Kepatuhan Resmi
         </Badge>
         <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
-          Pajak Beres, Pembukuan Rapi Tanpa Ribet
+          Urusan Pajak Beres, Pembukuan Rapi Tanpa Pusing
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Cocok untuk warung & toko kelontong Non-PKP (bebas pajak 0%) hingga badan usaha PKP (PB1 10% & PPN 11%). Rekap omzet PPh final UMKM 0,5% dan pembukuan resmi SAK EMKM siap unduh kapan saja.
+          KADAI memberi kebebasan penuh: usaha Non-PKP dapat bertransaksi 0% tanpa potongan pajak, sementara badan usaha PKP siap dengan hitungan PB1 10% atau PPN 11% yang akurat.
         </p>
       </div>
 

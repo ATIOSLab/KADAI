@@ -19,15 +19,15 @@ export function CapabilityBentoGrid() {
     <section id="kapabilitas" className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
           <Layers className="size-3 text-primary" />
-          <span>Fitur Lengkap Bisnis</span>
+          <span>Empat Pilar Operasional</span>
         </div>
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">
           Semua yang Dibutuhkan Usaha Anda. Rapi dalam Satu Tempat.
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Mulai dari melayani antrean pembeli di kasir, memotong stok bahan di gudang, sampai mengecek laporan laba bersih harian dari ponsel Anda.
+          Mulai dari melayani antrean pembeli di kasir, memotong stok bahan baku di gudang, sampai mengecek keuntungan bersih harian langsung dari ponsel Anda.
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export function CapabilityBentoGrid() {
                 <ShoppingCart className="size-5" />
               </div>
               <Badge variant="outline" className="border-orange-200 bg-orange-50/70 text-primary text-[10px] font-bold">
-                Kasir Kilat & Cepat
+                Kasir Kilat
               </Badge>
             </div>
             <div>
@@ -49,11 +49,11 @@ export function CapabilityBentoGrid() {
                 Point of Sale
               </span>
               <h3 className="text-xl font-black text-slate-950 mt-0.5">
-                POS Kasir Kilat & Cetak Struk
+                POS Cepat & Pembayaran Lengkap
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Transaksi kasir instan tanpa loading lama. Mendukung pembayaran Tunai, QRIS Dinamis otomatis, kartu debit, hingga cetak struk thermal 58mm/80mm dalam hitungan detik.
+              Transaksi instan tanpa loading lama. Mendukung pembayaran Tunai, QRIS Dinamis otomatis, kartu debit, hingga cetak struk thermal 58mm/80mm dalam hitungan detik.
             </p>
           </div>
 
@@ -96,11 +96,11 @@ export function CapabilityBentoGrid() {
                 Manajemen Persediaan
               </span>
               <h3 className="text-xl font-black text-slate-950 mt-0.5">
-                Stok Otomatis & Radar Kedaluwarsa
+                Stok Otomatis & Anti-Barang Basi
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Bahan lama otomatis keluar duluan (FIFO), sisa stok dihitung otomatis setiap kasir mencetak struk, dan ada peringatan dini sebelum barang basi atau habis.
+              Bahan lama otomatis keluar duluan (FIFO). Sisa stok di gudang berkurang otomatis setiap kasir mencetak struk, lengkap dengan radar peringatan tanggal kadaluwarsa.
             </p>
           </div>
 
@@ -138,11 +138,11 @@ export function CapabilityBentoGrid() {
                 Operasional Dapur
               </span>
               <h3 className="text-xl font-black text-slate-950 mt-0.5">
-                Resep Otomatis & Monitor Dapur
+                Pesanan Masuk Layar Dapur Seketika
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Pesanan di kasir otomatis tampil di layar dapur (KDS) tanpa lempar kertas nota. Takaran bumbu dan bahan baku langsung terpotong akurat per porsi.
+              Hilangkan nota kertas yang rawan tercecer. Pesanan kasir langsung berbunyi di monitor dapur (KDS) koki dan barista sesuai takaran resep yang sudah ditentukan.
             </p>
           </div>
 
@@ -173,11 +173,11 @@ export function CapabilityBentoGrid() {
                 Jaringan Gerai
               </span>
               <h3 className="text-xl font-black text-slate-950 mt-0.5">
-                Kelola Banyak Toko & Kirim Stok
+                Kontrol Banyak Cabang & Surat Jalan
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Pantau seluruh cabang toko dari satu akun. Kirim barang antar-gerai dengan surat jalan digital rapi tanpa risiko barang tercecer atau data selisih.
+              Kirim barang dari gudang ke cabang gerai dengan surat jalan digital yang terlacak. Pantau omzet seluruh toko secara terpusat tanpa harus datang langsung ke lokasi.
             </p>
           </div>
 

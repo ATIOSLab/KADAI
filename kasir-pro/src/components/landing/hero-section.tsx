@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, TrendingUp } from "lucide-react";
+import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -123,57 +123,78 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           <div className="inline-flex max-w-full justify-center">
             <Badge
               variant="outline"
-              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
+              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
             >
               <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
-              <span className="text-[10px] sm:text-[11px] text-slate-800 uppercase tracking-wider font-bold leading-tight">
-                Sistem Operasi Bisnis Indonesia • Non-PKP & PKP • POS, Stok & Legalitas
+              <span className="text-[11px] sm:text-xs text-slate-900 uppercase tracking-wider font-extrabold leading-tight">
+                Sistem Operasi Bisnis Indonesia
               </span>
             </Badge>
           </div>
 
           {/* Headline H1 */}
           <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance px-2 sm:px-0">
-            Satu Aplikasi Kasir untuk Gerai, Dapur, dan Pembukuan Anda.
+            Satu Aplikasi untuk Kasir, Stok Bahan, dan Pembukuan Anda.
           </h1>
 
           {/* Subtitle */}
           <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance px-3 sm:px-0">
-            KADAI membantu pemilik usaha mencatat penjualan kilat, melacak sisa stok bahan otomatis (metode FIFO), membagi pesanan ke layar dapur, hingga mengatur status Non-PKP (0% bebas pajak) maupun PKP (PB1/PPN) dan legalitas NIB OSS tanpa ribet.
+            KADAI mencatat transaksi kasir dalam hitungan detik, memotong stok bahan baku otomatis saat pesanan dibuat, dan menyusun laporan pembukuan rapi setiap hari. Fleksibel untuk usaha Non-PKP hingga jaringan multi-cabang.
           </p>
 
           {/* CTA Buttons (Clean Focused Action) */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-xs sm:max-w-none mx-auto w-full px-4 sm:px-0">
-            {dashboardPath ? (
-              <Button
-                asChild
-                size="lg"
-                className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md"
-              >
-                <Link href={dashboardPath} className="flex items-center gap-2">
-                  <span>Buka Dashboard Operasional</span>
-                  <ArrowUpRight className="size-4 shrink-0" />
-                </Link>
-              </Button>
-            ) : (
-              <>
+          <div className="flex flex-col items-center justify-center gap-3.5 pt-2 max-w-md sm:max-w-none mx-auto w-full px-4 sm:px-0">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+              {dashboardPath ? (
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
+                  className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md"
                 >
-                  <Link href="/register">Coba Gratis 14 Hari</Link>
+                  <Link href={dashboardPath} className="flex items-center gap-2">
+                    <span>Buka Dashboard Operasional</span>
+                    <ArrowUpRight className="size-4 shrink-0" />
+                  </Link>
                 </Button>
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
+                  >
+                    <Link href="/register">Coba Gratis 14 Hari</Link>
+                  </Button>
 
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
-                >
-                  <Link href="/demo">Jadwalkan Demo</Link>
-                </Button>
-              </>
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
+                  >
+                    <Link href="/demo">Jadwalkan Demo</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {!dashboardPath && (
+              <div className="flex items-center justify-center gap-3 sm:gap-4 text-[11px] sm:text-xs text-slate-500 font-medium pt-1 flex-wrap">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  Gratis 14 hari
+                </span>
+                <span className="hidden sm:inline text-slate-300">•</span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  Tanpa kartu kredit
+                </span>
+                <span className="hidden sm:inline text-slate-300">•</span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  Siap untuk Non-PKP & PKP
+                </span>
+              </div>
             )}
           </div>
         </div>

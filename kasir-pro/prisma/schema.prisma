@@ -57,6 +57,23 @@ enum TaxType {
   CUSTOM
 }
 
+enum TaxStatus {
+  NON_PKP // Pengusaha Non-PKP (Bebas PPN / Tanpa Pungutan Pajak)
+  PKP     // Pengusaha Kena Pajak (Wajib Pungut Pajak / PPN)
+}
+
+enum LegalEntityType {
+  PERORANGAN    // Usaha Perorangan / Toko Kelontong / Warung
+  PT_PERORANGAN // Perseroan Perorangan (UMK - PP No. 8/2021)
+  CV            // Commanditaire Vennootschap (Persekutuan Komanditer)
+  PT            // Perseroan Terbatas
+  UD            // Usaha Dagang
+  KOPERASI      // Koperasi Indonesia
+  FIRMA         // Firma
+  YAYASAN       // Yayasan / Lembaga Non-Profit
+  LAINNYA       // Bentuk Usaha Lainnya
+}
+
 enum OrderType {
   DINE_IN
   TAKEAWAY
@@ -215,10 +232,19 @@ model Store {
   phone             String?
   email             String?
   logo              String?
-  taxType           TaxType          @default(PB1_10)
-  taxRate           Decimal          @default(10) @db.Decimal(5, 2)
+  
+  // Status Perpajakan & Legalitas Badan Usaha RI
+  taxStatus         TaxStatus        @default(NON_PKP)
+  legalEntityType   LegalEntityType  @default(PERORANGAN)
+  legalName         String?          // Nama resmi badan usaha terdaftar (PT / CV / Koperasi)
+  nib               String?          // Nomor Induk Berusaha (13 digit OSS-RBA)
+  npwp              String?          // NPWP Badan / Usaha (15 / 16 digit NIK-NPWP)
+  ownerNik          String?          // NIK KTP Pemilik (16 digit) jika usaha perorangan
+
+  taxType           TaxType          @default(NONE)
+  taxRate           Decimal          @default(0) @db.Decimal(5, 2)
   taxInclusive      Boolean          @default(false)
-  serviceChargeRate Decimal          @default(5) @db.Decimal(5, 2)
+  serviceChargeRate Decimal          @default(0) @db.Decimal(5, 2)
   enableRounding    Boolean          @default(true)
   defaultMarkup     Decimal          @default(30) @db.Decimal(5, 2)
   currency          String           @default("IDR")
@@ -740,21 +766,30 @@ enum DemoRequestStatus {
 }
 
 model DemoRequest {
-  id           String            @id @default(cuid())
-  fullName     String
-  businessName String
-  businessType String
-  phone        String
-  email        String?
-  outletCount  Int               @default(1)
-  notes        String?
-  accessCode   String            @unique
-  referralCode String?
-  status       DemoRequestStatus @default(PENDING)
-  approvedAt   DateTime?
-  approvedBy   String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id              String            @id @default(cuid())
+  fullName        String
+  businessName    String
+  businessType    String
+  phone           String
+  email           String?
+  outletCount     Int               @default(1)
+  notes           String?
+  accessCode      String            @unique
+  referralCode    String?
+  status          DemoRequestStatus @default(PENDING)
+  approvedAt      DateTime?
+  approvedBy      String?
+
+  // Kepatuhan Pajak & Legalitas UMKM RI
+  taxStatus       String?           // NON_PKP | PKP
+  legalEntityType String?           // PERORANGAN | PT_PERORANGAN | CV | PT | UD | KOPERASI | dll
+  legalName       String?
+  nib             String?           // 13 digit OSS
+  npwp            String?
+  ownerNik        String?           // NIK KTP jika perorangan
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([status])
   @@index([phone])
@@ -822,6 +857,15 @@ model ReferralLead {
   commissionEarned   Decimal            @default(0) @db.Decimal(15, 2)
   commissionPaid     Decimal            @default(0) @db.Decimal(15, 2)
   linkedStoreId      String?
+
+  // Kepatuhan Pajak & Legalitas UMKM RI
+  taxStatus          String?
+  legalEntityType    String?
+  legalName          String?
+  nib                String?
+  npwp               String?
+  ownerNik           String?
+
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 

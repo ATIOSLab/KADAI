@@ -39,6 +39,13 @@ interface StoreData {
   name: string;
   address: string | null;
   phone: string | null;
+  email: string | null;
+  taxStatus: "NON_PKP" | "PKP";
+  legalEntityType: string;
+  legalName: string | null;
+  nib: string | null;
+  npwp: string | null;
+  ownerNik: string | null;
   taxType: string;
   taxRate: number;
   taxInclusive: boolean;
@@ -87,10 +94,17 @@ export default function SettingsPage() {
     name: "",
     address: "",
     phone: "",
-    taxType: "PB1_10",
-    taxRate: 10,
+    email: "",
+    taxStatus: "NON_PKP" as "NON_PKP" | "PKP",
+    legalEntityType: "PERORANGAN",
+    legalName: "",
+    nib: "",
+    npwp: "",
+    ownerNik: "",
+    taxType: "NONE",
+    taxRate: 0,
     taxInclusive: false,
-    serviceChargeRate: 5,
+    serviceChargeRate: 0,
     enableRounding: true,
     costingMethod: "FIFO" as "FIFO" | "FEFO" | "AVERAGE",
   });
@@ -152,10 +166,17 @@ export default function SettingsPage() {
         name: res.data.name || "",
         address: res.data.address || "",
         phone: res.data.phone || "",
-        taxType: res.data.taxType || "PB1_10",
-        taxRate: res.data.taxRate ?? 10,
+        email: res.data.email || "",
+        taxStatus: (res.data.taxStatus as "NON_PKP" | "PKP") || "NON_PKP",
+        legalEntityType: res.data.legalEntityType || "PERORANGAN",
+        legalName: res.data.legalName || "",
+        nib: res.data.nib || "",
+        npwp: res.data.npwp || "",
+        ownerNik: res.data.ownerNik || "",
+        taxType: res.data.taxType || "NONE",
+        taxRate: res.data.taxRate ?? 0,
         taxInclusive: Boolean(res.data.taxInclusive),
-        serviceChargeRate: res.data.serviceChargeRate ?? 5,
+        serviceChargeRate: res.data.serviceChargeRate ?? 0,
         enableRounding: Boolean(res.data.enableRounding),
         costingMethod: (res.data.costingMethod as any) || "FIFO",
       });
@@ -235,6 +256,13 @@ export default function SettingsPage() {
           name: storeForm.name,
           address: storeForm.address || null,
           phone: storeForm.phone || null,
+          email: storeForm.email || null,
+          taxStatus: storeForm.taxStatus,
+          legalEntityType: storeForm.legalEntityType,
+          legalName: storeForm.legalName || null,
+          nib: storeForm.nib || null,
+          npwp: storeForm.npwp || null,
+          ownerNik: storeForm.ownerNik || null,
           taxType: storeForm.taxType,
           taxRate: storeForm.taxRate,
           taxInclusive: storeForm.taxInclusive,
@@ -470,6 +498,110 @@ export default function SettingsPage() {
             </div>
           ) : (
             <>
+              {/* Profil Legalitas & Status Pajak RI */}
+              <div className="p-4 rounded-xl border border-primary/20 bg-orange-50/40 space-y-3.5 mb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                      <Store className="size-4 text-primary" />
+                      Status Pajak & Legalitas Badan Usaha RI
+                    </h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      Sesuai regulasi perpajakan & perizinan berusaha OSS Republik Indonesia.
+                    </p>
+                  </div>
+                  <Badge variant="outline" className={storeForm.taxStatus === "NON_PKP" ? "bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold" : "bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-bold"}>
+                    {storeForm.taxStatus === "NON_PKP" ? "Badan Usaha Non-PKP" : "Pengusaha Kena Pajak (PKP)"}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">Status Pajak Usaha</Label>
+                    <select
+                      value={storeForm.taxStatus}
+                      onChange={(e: any) => {
+                        const val = e.target.value as "NON_PKP" | "PKP";
+                        setStoreForm((prev) => ({
+                          ...prev,
+                          taxStatus: val,
+                          ...(val === "NON_PKP" && (prev.taxType === "PPN_11" || prev.taxType === "PPN_12") ? { taxType: "NONE", taxRate: 0 } : {}),
+                        }));
+                      }}
+                      className="w-full h-10 px-3 rounded-lg neo-border bg-card text-xs font-bold"
+                    >
+                      <option value="NON_PKP">Non-PKP (Bebas PPN / Usaha Mikro & Kecil)</option>
+                      <option value="PKP">PKP (Pengusaha Kena Pajak - Wajib Pungut PPN)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">Bentuk Badan Usaha</Label>
+                    <select
+                      value={storeForm.legalEntityType}
+                      onChange={(e: any) =>
+                        setStoreForm({ ...storeForm, legalEntityType: e.target.value })
+                      }
+                      className="w-full h-10 px-3 rounded-lg neo-border bg-card text-xs font-bold"
+                    >
+                      <option value="PERORANGAN">Usaha Perorangan (Warung / Toko Kelontong)</option>
+                      <option value="PT_PERORANGAN">PT Perorangan (UMK Sesuai PP 8/2021)</option>
+                      <option value="CV">CV (Persekutuan Komanditer)</option>
+                      <option value="PT">PT (Perseroan Terbatas)</option>
+                      <option value="UD">UD (Usaha Dagang)</option>
+                      <option value="KOPERASI">Koperasi Indonesia</option>
+                      <option value="FIRMA">Firma</option>
+                      <option value="YAYASAN">Yayasan / Lembaga</option>
+                      <option value="LAINNYA">Bentuk Lainnya / Informal</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">Nama Resmi Badan Usaha</Label>
+                    <Input
+                      placeholder="Contoh: PT Kopi Indonesia Makmur"
+                      value={storeForm.legalName}
+                      onChange={(e) =>
+                        setStoreForm({ ...storeForm, legalName: e.target.value })
+                      }
+                      className="text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">NIB OSS-RBA (13 Digit)</Label>
+                    <Input
+                      placeholder="Contoh: 0123456789123"
+                      value={storeForm.nib}
+                      onChange={(e) =>
+                        setStoreForm({ ...storeForm, nib: e.target.value })
+                      }
+                      className="text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">
+                      {storeForm.legalEntityType === "PERORANGAN" ? "NIK KTP Pemilik (16 Digit)" : "NPWP Badan Usaha (15/16 Digit)"}
+                    </Label>
+                    <Input
+                      placeholder={storeForm.legalEntityType === "PERORANGAN" ? "NIK KTP Pemilik Usaha" : "NPWP Terdaftar"}
+                      value={storeForm.legalEntityType === "PERORANGAN" ? storeForm.ownerNik : storeForm.npwp}
+                      onChange={(e) => {
+                        if (storeForm.legalEntityType === "PERORANGAN") {
+                          setStoreForm({ ...storeForm, ownerNik: e.target.value });
+                        } else {
+                          setStoreForm({ ...storeForm, npwp: e.target.value });
+                        }
+                      }}
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nama Toko</Label>

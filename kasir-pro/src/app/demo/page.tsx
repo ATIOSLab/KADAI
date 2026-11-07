@@ -36,6 +36,14 @@ function RequestDemoForm() {
   const [notes, setNotes] = useState("");
   const [referralCode, setReferralCode] = useState("");
 
+  // Legalitas Usaha & Status Perpajakan RI (Opsional)
+  const [taxStatus, setTaxStatus] = useState<"NON_PKP" | "PKP">("NON_PKP");
+  const [legalEntityType, setLegalEntityType] = useState("PERORANGAN");
+  const [legalName, setLegalName] = useState("");
+  const [nib, setNib] = useState("");
+  const [npwp, setNpwp] = useState("");
+  const [ownerNik, setOwnerNik] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -72,6 +80,12 @@ function RequestDemoForm() {
           outletCount: Number(outletCount),
           notes: notes || undefined,
           referralCode: activeRefCode,
+          taxStatus,
+          legalEntityType,
+          legalName: legalName.trim() || undefined,
+          nib: nib.trim() || undefined,
+          npwp: npwp.trim() || undefined,
+          ownerNik: ownerNik.trim() || undefined,
         }),
       });
 
@@ -290,6 +304,94 @@ function RequestDemoForm() {
                       placeholder="Contoh: Butuh integrasi printer Bluetooth dan resep BOM bahan baku..."
                       className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     />
+                  </div>
+
+                  {/* Bagian Legalitas Usaha & Status Pajak RI (Opsional untuk UMKM) */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="size-4 text-primary" />
+                        <span className="text-xs font-bold text-slate-900">
+                          Profil Legalitas & Pajak RI (Opsional)
+                        </span>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] bg-white text-slate-600 border-slate-200 font-semibold">
+                        Bisa Dilengkapi Nanti
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                      KADAI mendukung usaha <strong>Non-PKP</strong> (bebas pungutan PPN) maupun <strong>PKP</strong>. Anda dapat mengisi NIB OSS atau NIK pemilik jika berbentuk perseorangan.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">
+                          Status Pajak Usaha
+                        </label>
+                        <select
+                          value={taxStatus}
+                          onChange={(e) => setTaxStatus(e.target.value as "NON_PKP" | "PKP")}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        >
+                          <option value="NON_PKP">Non-PKP (Bebas PPN / Usaha Mikro)</option>
+                          <option value="PKP">PKP (Pengusaha Kena Pajak / Wajib PPN)</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">
+                          Bentuk Badan Usaha
+                        </label>
+                        <select
+                          value={legalEntityType}
+                          onChange={(e) => setLegalEntityType(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        >
+                          <option value="PERORANGAN">Usaha Perorangan (Warung / Toko)</option>
+                          <option value="PT_PERORANGAN">PT Perorangan (UMK PP 8/2021)</option>
+                          <option value="CV">CV (Persekutuan Komanditer)</option>
+                          <option value="PT">PT (Perseroan Terbatas)</option>
+                          <option value="UD">UD (Usaha Dagang)</option>
+                          <option value="KOPERASI">Koperasi Indonesia</option>
+                          <option value="FIRMA">Firma</option>
+                          <option value="LAINNYA">Lainnya / Informal</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">
+                          NIB (Nomor Induk Berusaha OSS)
+                        </label>
+                        <input
+                          type="text"
+                          value={nib}
+                          onChange={(e) => setNib(e.target.value)}
+                          placeholder="13 digit NIB (jika ada)"
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">
+                          {legalEntityType === "PERORANGAN" ? "NIK KTP Pemilik (16 Digit)" : "NPWP Badan Usaha"}
+                        </label>
+                        <input
+                          type="text"
+                          value={legalEntityType === "PERORANGAN" ? ownerNik : npwp}
+                          onChange={(e) => {
+                            if (legalEntityType === "PERORANGAN") {
+                              setOwnerNik(e.target.value);
+                            } else {
+                              setNpwp(e.target.value);
+                            }
+                          }}
+                          placeholder={legalEntityType === "PERORANGAN" ? "16 digit NIK Pemilik" : "15/16 digit NPWP"}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5 pt-1">

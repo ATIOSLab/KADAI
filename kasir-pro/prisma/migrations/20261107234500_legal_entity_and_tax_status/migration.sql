@@ -1,0 +1,40 @@
+-- CreateEnum
+DO $$ BEGIN
+    CREATE TYPE "TaxStatus" AS ENUM ('NON_PKP', 'PKP');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+-- CreateEnum
+DO $$ BEGIN
+    CREATE TYPE "LegalEntityType" AS ENUM ('PERORANGAN', 'PT_PERORANGAN', 'CV', 'PT', 'UD', 'KOPERASI', 'FIRMA', 'YAYASAN', 'LAINNYA');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+-- AlterTable stores
+ALTER TABLE "stores" 
+ADD COLUMN IF NOT EXISTS "taxStatus" "TaxStatus" NOT NULL DEFAULT 'NON_PKP',
+ADD COLUMN IF NOT EXISTS "legalEntityType" "LegalEntityType" NOT NULL DEFAULT 'PERORANGAN',
+ADD COLUMN IF NOT EXISTS "legalName" TEXT,
+ADD COLUMN IF NOT EXISTS "nib" TEXT,
+ADD COLUMN IF NOT EXISTS "npwp" TEXT,
+ADD COLUMN IF NOT EXISTS "ownerNik" TEXT;
+
+-- AlterTable demo_requests
+ALTER TABLE "demo_requests"
+ADD COLUMN IF NOT EXISTS "taxStatus" TEXT,
+ADD COLUMN IF NOT EXISTS "legalEntityType" TEXT,
+ADD COLUMN IF NOT EXISTS "legalName" TEXT,
+ADD COLUMN IF NOT EXISTS "nib" TEXT,
+ADD COLUMN IF NOT EXISTS "npwp" TEXT,
+ADD COLUMN IF NOT EXISTS "ownerNik" TEXT;
+
+-- AlterTable referral_leads
+ALTER TABLE "referral_leads"
+ADD COLUMN IF NOT EXISTS "taxStatus" TEXT,
+ADD COLUMN IF NOT EXISTS "legalEntityType" TEXT,
+ADD COLUMN IF NOT EXISTS "legalName" TEXT,
+ADD COLUMN IF NOT EXISTS "nib" TEXT,
+ADD COLUMN IF NOT EXISTS "npwp" TEXT,
+ADD COLUMN IF NOT EXISTS "ownerNik" TEXT;

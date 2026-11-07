@@ -30,6 +30,12 @@ interface DemoRequestItem {
   status: "PENDING" | "APPROVED" | "CONTACTED" | "REJECTED";
   approvedAt: string | null;
   approvedBy: string | null;
+  taxStatus: string | null;
+  legalEntityType: string | null;
+  legalName: string | null;
+  nib: string | null;
+  npwp: string | null;
+  ownerNik: string | null;
   createdAt: string;
 }
 
@@ -212,8 +218,25 @@ export default function DemoRequestsAdminPage() {
                         })}
                       </td>
                       <td className="py-3.5 px-4 font-medium">
-                        <div className="font-bold text-slate-950">{item.businessName}</div>
-                        <div className="text-[11px] text-slate-500">{item.fullName}</div>
+                        <div className="font-bold text-slate-950 flex items-center gap-1.5 flex-wrap">
+                          <span>{item.businessName}</span>
+                          {item.taxStatus && (
+                            <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${item.taxStatus === "NON_PKP" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-orange-50 text-orange-700 border-orange-200"}`}>
+                              {item.taxStatus === "NON_PKP" ? "Non-PKP" : "PKP"}
+                            </span>
+                          )}
+                          {item.legalEntityType && (
+                            <span className="text-[9px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                              {item.legalEntityType}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          {item.fullName}
+                          {item.nib && <span className="font-mono text-[10px] text-slate-400 ml-1.5">NIB: {item.nib}</span>}
+                          {item.ownerNik && <span className="font-mono text-[10px] text-slate-400 ml-1.5">NIK: {item.ownerNik}</span>}
+                          {item.npwp && <span className="font-mono text-[10px] text-slate-400 ml-1.5">NPWP: {item.npwp}</span>}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="font-mono text-slate-900">{item.phone}</div>

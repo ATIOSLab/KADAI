@@ -14,6 +14,14 @@ const createDemoRequestSchema = z.object({
   outletCount: z.number().int().min(1).default(1),
   notes: z.string().max(500).optional().or(z.literal("")),
   referralCode: z.string().max(50).optional().or(z.literal("")),
+
+  // Legalitas & Status Pajak (Opsional untuk onboarding terverifikasi)
+  taxStatus: z.enum(["NON_PKP", "PKP"]).optional(),
+  legalEntityType: z.string().max(50).optional().or(z.literal("")),
+  legalName: z.string().max(150).optional().or(z.literal("")),
+  nib: z.string().max(30).optional().or(z.literal("")),
+  npwp: z.string().max(30).optional().or(z.literal("")),
+  ownerNik: z.string().max(20).optional().or(z.literal("")),
 });
 
 // POST /api/demo-requests - Publik untuk calon klien request demo
@@ -40,6 +48,12 @@ export async function POST(request: NextRequest) {
         accessCode,
         referralCode: cleanRefCode,
         status: "PENDING",
+        taxStatus: validated.taxStatus || "NON_PKP",
+        legalEntityType: validated.legalEntityType || null,
+        legalName: validated.legalName || null,
+        nib: validated.nib || null,
+        npwp: validated.npwp || null,
+        ownerNik: validated.ownerNik || null,
       },
     });
 
@@ -56,6 +70,12 @@ export async function POST(request: NextRequest) {
             businessName: validated.businessName,
             phone: validated.phone,
             status: "LEAD",
+            taxStatus: validated.taxStatus || "NON_PKP",
+            legalEntityType: validated.legalEntityType || null,
+            legalName: validated.legalName || null,
+            nib: validated.nib || null,
+            npwp: validated.npwp || null,
+            ownerNik: validated.ownerNik || null,
           },
         });
       }

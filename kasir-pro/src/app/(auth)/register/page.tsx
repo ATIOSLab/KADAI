@@ -30,6 +30,14 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Status Pajak & Legalitas Usaha
+  const [taxStatus, setTaxStatus] = useState("NON_PKP");
+  const [legalEntityType, setLegalEntityType] = useState("PERORANGAN");
+  const [legalName, setLegalName] = useState("");
+  const [nib, setNib] = useState("");
+  const [npwp, setNpwp] = useState("");
+  const [ownerNik, setOwnerNik] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!storeName.trim() || !ownerName.trim() || !email.trim() || !password) {
@@ -52,6 +60,12 @@ export default function RegisterPage() {
           email,
           password,
           referralCode: activeRef,
+          taxStatus,
+          legalEntityType,
+          legalName: legalName.trim() || undefined,
+          nib: nib.trim() || undefined,
+          npwp: npwp.trim() || undefined,
+          ownerNik: ownerNik.trim() || undefined,
         }),
       });
 
@@ -167,6 +181,75 @@ export default function RegisterPage() {
                   required
                   className="neo-border text-xs"
                 />
+              </div>
+            </div>
+
+            {/* Profil Legalitas & Status Pajak UMKM (Opsional) */}
+            <div className="p-3 rounded-xl border border-border bg-muted/40 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-foreground">
+                  Status Pajak & Bentuk Usaha (Opsional)
+                </span>
+                <span className="text-[10px] text-muted-foreground font-medium">Bisa Diisi Nanti</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-semibold">Status Pajak</Label>
+                  <select
+                    value={taxStatus}
+                    onChange={(e) => setTaxStatus(e.target.value)}
+                    className="w-full text-xs p-1.5 rounded-lg border border-border bg-background"
+                  >
+                    <option value="NON_PKP">Non-PKP (Bebas PPN / Mikro)</option>
+                    <option value="PKP">PKP (Wajib Pungut PPN)</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-semibold">Badan Usaha</Label>
+                  <select
+                    value={legalEntityType}
+                    onChange={(e) => setLegalEntityType(e.target.value)}
+                    className="w-full text-xs p-1.5 rounded-lg border border-border bg-background"
+                  >
+                    <option value="PERORANGAN">Perorangan (Toko / Warung)</option>
+                    <option value="PT_PERORANGAN">PT Perorangan (PP 8/2021)</option>
+                    <option value="CV">CV</option>
+                    <option value="PT">PT</option>
+                    <option value="UD">UD</option>
+                    <option value="KOPERASI">Koperasi</option>
+                    <option value="LAINNYA">Lainnya</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-semibold">NIB OSS (Opsional)</Label>
+                  <Input
+                    value={nib}
+                    onChange={(e) => setNib(e.target.value)}
+                    placeholder="13 digit NIB OSS"
+                    className="h-8 text-xs font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-semibold">
+                    {legalEntityType === "PERORANGAN" ? "NIK KTP Pemilik" : "NPWP Badan"}
+                  </Label>
+                  <Input
+                    value={legalEntityType === "PERORANGAN" ? ownerNik : npwp}
+                    onChange={(e) => {
+                      if (legalEntityType === "PERORANGAN") {
+                        setOwnerNik(e.target.value);
+                      } else {
+                        setNpwp(e.target.value);
+                      }
+                    }}
+                    placeholder={legalEntityType === "PERORANGAN" ? "16 digit NIK KTP" : "15/16 digit NPWP"}
+                    className="h-8 text-xs font-mono"
+                  />
+                </div>
               </div>
             </div>
 

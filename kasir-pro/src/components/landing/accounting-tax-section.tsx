@@ -12,9 +12,9 @@ import { Badge } from "@/components/ui/badge";
 export function AccountingTaxSection() {
   const cards = [
     {
-      title: "Perhitungan Pajak Fleksibel",
+      title: "Fleksibel untuk Non-PKP & PKP",
       icon: Percent,
-      desc: "Mendukung PPN 11%/12% (Inklusif & Eksklusif) untuk ritel umum, dan PB1 (Pajak Restoran 10%) untuk usaha kuliner. Bisa diaktifkan atau dinonaktifkan sesuai status wajib pajak.",
+      desc: "Usaha mikro & toko kelontong Non-PKP bebas bertransaksi tanpa pungutan pajak (0%). Bagi restoran atau badan usaha PKP, sistem otomatis menghitung PB1 10% atau PPN 11% secara rapi.",
     },
     {
       title: "Rekap PPh Final UMKM 0,5%",

@@ -27,8 +27,8 @@ const FAQS: FAQItem[] = [
     a: "Anda tinggal masukkan takaran bahan per menu (misalnya: 18 gram kopi bubuk + 120 ml susu cair). Setiap kali menu itu terjual di kasir, stok kopi dan susu di gudang otomatis berkurang sesuai takaran, dan modal harga pokok per porsi langsung terhitung otomatis.",
   },
   {
-    q: "Apakah KADAI bisa mengurus Pajak Restoran (PB1) dan PPN?",
-    a: "Bisa. Anda cukup mengaktifkan opsi pajak di menu pengaturan. Untuk restoran atau kafe, sistem otomatis menghitung Pajak Restoran (PB1 10%) di struk. Untuk toko ritel, bisa diatur PPN 11%. Rekap omzet bulanan juga sudah rapi jika Anda ingin menghitung PPh final UMKM 0,5%.",
+    q: "Apakah KADAI bisa untuk usaha Non-PKP (tanpa pungutan pajak) maupun PKP?",
+    a: "Sangat bisa. Jika usaha Anda berstatus Non-PKP (warung, toko kelontong, atau UMKM mikro), sistem otomatis menonaktifkan pungutan pajak (0%) sehingga nota kasir bersih tanpa potongan pajak. Jika usaha Anda berstatus PKP atau restoran yang memungut Pajak Restoran (PB1 10%), Anda tinggal memilih statusnya di menu pengaturan.",
   },
   {
     q: "Apakah tersedia masa uji coba sebelum berlangganan berbayar?",

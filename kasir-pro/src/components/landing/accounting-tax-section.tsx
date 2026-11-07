@@ -36,13 +36,13 @@ export function AccountingTaxSection() {
           variant="outline"
           className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
         >
-          Standar Keuangan Indonesia
+          Pajak & Laporan Resmi
         </Badge>
         <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
-          Pajak & Pembukuan Resmi Sesuai Regulasi Republik Indonesia
+          Pajak Beres, Pembukuan Rapi Tanpa Ribet
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Tak perlu pusing menghitung pajak manual atau menyusun laporan pembukuan akuntansi dari nol saat pemeriksaan pajak.
+          Setiap struk penjualan otomatis memisahkan pajak restoran PB1 10% atau PPN, plus rekap omzet PPh final UMKM 0,5% yang siap diunduh kapan saja.
         </p>
       </div>
 

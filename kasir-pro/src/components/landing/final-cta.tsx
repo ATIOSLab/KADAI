@@ -21,11 +21,11 @@ export function FinalCTA() {
         </Badge>
 
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-950 text-balance leading-tight">
-          Saatnya Operasional Bisnis Anda Lebih Terhubung.
+          Saatnya Bisnis Anda Berjalan Lebih Rapi dan Tenang.
         </h2>
 
         <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed text-balance">
-          Mulai kelola operasional kasir, inventori multi-batch, dan laporan pembukuan usaha Anda dalam satu sistem terintegrasi yang dirancang untuk Indonesia.
+          Mulai kelola antrean kasir, pantau sisa stok bahan otomatis, dan nikmati laporan pembukuan yang siap saji setiap malam tanpa lembur hitung nota.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 max-w-sm sm:max-w-none mx-auto w-full">

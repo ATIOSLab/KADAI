@@ -21,13 +21,13 @@ export function CapabilityBentoGrid() {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
           <Layers className="size-3 text-primary" />
-          <span>Kapabilitas Platform Terpadu</span>
+          <span>Fitur Lengkap Bisnis</span>
         </div>
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">
-          Semua yang Dibutuhkan Bisnis Anda. Dalam Satu Platform.
+          Semua yang Dibutuhkan Usaha Anda. Rapi dalam Satu Tempat.
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Dari transaksi harian hingga pengelolaan operasional dan keuangan, KADAI menyatukan proses bisnis dalam satu ekosistem terpadu.
+          Mulai dari melayani antrean pembeli di kasir, memotong stok bahan di gudang, sampai mengecek laporan laba bersih harian dari ponsel Anda.
         </p>
       </div>
 

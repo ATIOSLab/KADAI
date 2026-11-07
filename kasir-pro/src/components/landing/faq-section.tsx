@@ -11,8 +11,8 @@ interface FAQItem {
 
 const FAQS: FAQItem[] = [
   {
-    q: "Apa itu KADAI dan apa perbedaannya dengan aplikasi kasir konvensional?",
-    a: "KADAI adalah platform operasi bisnis terpadu yang menggabungkan kasir POS kilat, inventori multi-batch FIFO, resep Bill of Materials (BOM), Kitchen Display System (KDS), hingga pembukuan standar SAK EMKM dalam satu sistem terintegrasi. KADAI tidak hanya mencatat transaksi penjualan, tetapi juga mengotomatisasi pemotongan stok bahan mentah per porsi dan rekonsiliasi kas shift harian.",
+    q: "Apa itu KADAI dan apa bedanya dengan kasir biasa?",
+    a: "Aplikasi kasir biasa umumnya hanya mencatat transaksi bayar. KADAI menghubungkan meja kasir, dapur, dan stok gudang: saat pesanan dibuat, layar dapur langsung membunyikan lonceng pesanan, stok bahan baku terpotong otomatis, dan rekap laba kotor hari itu langsung dihitung tanpa perlu rekap nota manual.",
   },
   {
     q: "Model bisnis apa saja yang dapat menggunakan KADAI?",
@@ -23,20 +23,20 @@ const FAQS: FAQItem[] = [
     a: "Ya. KADAI mendukung topologi Hub-and-Spoke, di mana Gudang atau Dapur Pusat (HQ) dapat mendistribusikan bahan baku ke cabang-cabang satelit menggunakan Surat Jalan Digital otomatis. Mutasi stok asal terpotong seketika dan cabang tujuan menerima stok melalui konfirmasi 1-klik.",
   },
   {
-    q: "Bagaimana cara kerja perhitungan HPP resep makanan/minuman (BOM)?",
-    a: "Setiap menu dapat memiliki formula Bill of Materials (BOM) berupa komposisi bahan mentah (contoh: 18g biji kopi + 120ml susu). Saat kasir menjual menu tersebut, stok bahan baku otomatis terdebit dari batch pembelian tertua (FIFO), dan nilai HPP per porsi dihitung presisi mengikuti standar PSAK 14 / SAK EMKM.",
+    q: "Bagaimana cara kerja hitungan resep makanan atau minuman?",
+    a: "Anda tinggal masukkan takaran bahan per menu (misalnya: 18 gram kopi bubuk + 120 ml susu cair). Setiap kali menu itu terjual di kasir, stok kopi dan susu di gudang otomatis berkurang sesuai takaran, dan modal harga pokok per porsi langsung terhitung otomatis.",
   },
   {
-    q: "Bagaimana KADAI mengelola Pajak Restoran (PB1) dan PPN 11%?",
-    a: "Anda dapat memilih skema perpajakan per outlet: Pajak Barang dan Jasa Tertentu (PB1 / PBJT 10%) untuk usaha restoran/kafe sesuai Perda setempat, atau PPN 11% untuk perdagangan ritel. KADAI juga menyusun buku peredaran bruto untuk mempermudah perhitungan setoran PPh Final UMKM 0.5% (PP 55/2022).",
+    q: "Apakah KADAI bisa mengurus Pajak Restoran (PB1) dan PPN?",
+    a: "Bisa. Anda cukup mengaktifkan opsi pajak di menu pengaturan. Untuk restoran atau kafe, sistem otomatis menghitung Pajak Restoran (PB1 10%) di struk. Untuk toko ritel, bisa diatur PPN 11%. Rekap omzet bulanan juga sudah rapi jika Anda ingin menghitung PPh final UMKM 0,5%.",
   },
   {
     q: "Apakah tersedia masa uji coba sebelum berlangganan berbayar?",
     a: "Ya, Anda dapat memulai dengan paket Starter gratis tanpa biaya bulanan, atau mencoba fitur lengkap KADAI untuk merasakan kemudahan operasional multi-cabang secara langsung.",
   },
   {
-    q: "Perangkat keras (hardware) apa saja yang kompatibel dengan KADAI?",
-    a: "KADAI adalah software-agnostic (tidak mengunci pengguna pada merek tertentu). KADAI dapat diakses melalui laptop, PC Windows, Mac, iPad, tablet, atau smartphone Android. KADAI fleksibel terhubung dengan berbagai printer kasir thermal standar (58mm/80mm USB, Bluetooth, LAN) dan barcode scanner yang sudah Anda miliki tanpa perlu membeli paket hardware khusus.",
+    q: "Alat apa saja yang bisa dipakai untuk menjalankan KADAI?",
+    a: "KADAI bisa dibuka di laptop, komputer Windows, Mac, iPad, tablet, maupun HP Android biasa tanpa perlu beli alat baru. Printer struk kasir yang sudah Anda punya (tipe 58mm atau 80mm USB, Bluetooth, LAN) dan scanner barcode bisa langsung dicolok atau dihubungkan.",
   },
 ];
 

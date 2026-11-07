@@ -4,12 +4,12 @@ import { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-interface FAQItem {
+export interface FAQItem {
   q: string;
   a: string;
 }
 
-const FAQS: FAQItem[] = [
+export const FAQS: FAQItem[] = [
   {
     q: "Apa itu KADAI dan apa bedanya dengan kasir biasa?",
     a: "Aplikasi kasir biasa umumnya hanya mencatat transaksi bayar. KADAI menghubungkan meja kasir, dapur, dan stok gudang: saat pesanan dibuat, layar dapur langsung membunyikan lonceng pesanan, stok bahan baku terpotong otomatis, dan rekap laba kotor hari itu langsung dihitung tanpa perlu rekap nota manual.",
@@ -29,6 +29,10 @@ const FAQS: FAQItem[] = [
   {
     q: "Apakah KADAI bisa untuk usaha Non-PKP (tanpa pungutan pajak) maupun PKP?",
     a: "Sangat bisa. Jika usaha Anda berstatus Non-PKP (warung, toko kelontong, atau UMKM mikro), sistem otomatis menonaktifkan pungutan pajak (0%) sehingga nota kasir bersih tanpa potongan pajak. Jika usaha Anda berstatus PKP atau restoran yang memungut Pajak Restoran (PB1 10%), Anda tinggal memilih statusnya di menu pengaturan.",
+  },
+  {
+    q: "Apakah KADAI mendukung legalitas badan usaha Indonesia seperti NIB OSS, PT Perorangan, atau CV?",
+    a: "Ya, 100% mendukung regulasi perizinan Indonesia. KADAI menyediakan profil usaha yang dapat mencantumkan NIB OSS-RBA (13 digit), NIK KTP untuk Usaha Perorangan, serta NPWP untuk PT Perorangan (sesuai PP No. 8/2021), CV, PT, Koperasi, dan UD sehingga database legalitas UMKM Anda rapi dan sah.",
   },
   {
     q: "Apakah tersedia masa uji coba sebelum berlangganan berbayar?",

@@ -68,7 +68,7 @@ const SEGMENTS = [
       total: "Rp 355.300",
       footer: "Struk Thermal 80mm • Kartu Stok Mutasi Terpotong",
     },
-    metric1: { label: "PAJAK PERTAMBAHAN NILAI", val: "PPN 11% Otomatis" },
+    metric1: { label: "PAJAK & LEGALITAS", val: "Non-PKP / PPN / PB1" },
     metric2: { label: "SCANNER BARCODE", val: "USB & Bluetooth" },
     metric3: { label: "PENILAIAN STOK", val: "FIFO Terverifikasi" },
   },
@@ -127,7 +127,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             >
               <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
               <span className="text-[10px] sm:text-[11px] text-slate-800 uppercase tracking-wider font-bold leading-tight">
-                Sistem Operasi Bisnis Indonesia • POS, Stok & Pajak
+                Sistem Operasi Bisnis Indonesia • Non-PKP & PKP • POS, Stok & Legalitas
               </span>
             </Badge>
           </div>
@@ -139,7 +139,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
           {/* Subtitle */}
           <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance px-3 sm:px-0">
-            KADAI membantu pemilik usaha mencatat penjualan kilat, melacak sisa stok bahan otomatis (metode FIFO), membagi pesanan ke layar dapur, hingga menyiapkan rekap pajak restoran PB1 dan PPh final tanpa rumus ribet.
+            KADAI membantu pemilik usaha mencatat penjualan kilat, melacak sisa stok bahan otomatis (metode FIFO), membagi pesanan ke layar dapur, hingga mengatur status Non-PKP (0% bebas pajak) maupun PKP (PB1/PPN) dan legalitas NIB OSS tanpa ribet.
           </p>
 
           {/* CTA Buttons (Clean Focused Action) */}

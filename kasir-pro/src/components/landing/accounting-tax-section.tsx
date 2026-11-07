@@ -22,9 +22,9 @@ export function AccountingTaxSection() {
       desc: "Sesuai PP 55/2022 (pengganti PP 23/2018). Sistem merangkum otomatis Buku Peredaran Bruto Bulanan dan memonitor batas pembebasan omzet Rp 500 Juta bagi Wajib Pajak Orang Pribadi.",
     },
     {
-      title: "Laporan Standar SAK EMKM",
+      title: "Legalitas Usaha & SAK EMKM",
       icon: BarChart3,
-      desc: "Laporan Laba Rugi real-time berbasis HPP FIFO, Laporan Posisi Keuangan (Neraca Sederhana), dan Laporan Arus Kas (Cash Flow) yang siap dicetak untuk pelaporan perbankan.",
+      desc: "Mendukung pencatatan NIB OSS 13 digit, NIK Pemilik, dan NPWP untuk PT Perorangan (PP 8/2021), CV, maupun PT. Dilengkapi laporan laba rugi berbasis HPP FIFO dan arus kas siap saji.",
     },
   ];
 
@@ -36,13 +36,13 @@ export function AccountingTaxSection() {
           variant="outline"
           className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
         >
-          Pajak & Laporan Resmi
+          Pajak & Legalitas Resmi RI
         </Badge>
         <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
           Pajak Beres, Pembukuan Rapi Tanpa Ribet
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-          Setiap struk penjualan otomatis memisahkan pajak restoran PB1 10% atau PPN, plus rekap omzet PPh final UMKM 0,5% yang siap diunduh kapan saja.
+          Cocok untuk warung & toko kelontong Non-PKP (bebas pajak 0%) hingga badan usaha PKP (PB1 10% & PPN 11%). Rekap omzet PPh final UMKM 0,5% dan pembukuan resmi SAK EMKM siap unduh kapan saja.
         </p>
       </div>
 

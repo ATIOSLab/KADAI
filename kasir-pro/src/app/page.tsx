@@ -7,7 +7,7 @@ import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ReferralSection } from "@/components/landing/referral-section";
-import { FAQSection } from "@/components/landing/faq-section";
+import { FAQSection, FAQS } from "@/components/landing/faq-section";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
@@ -16,8 +16,28 @@ export default async function HomePage() {
   const sessionUser = await getServerSessionUser();
   const dashboardPath = sessionUser ? getDefaultPathForRole(sessionUser.role) : null;
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col overflow-x-hidden w-full max-w-full font-sans selection:bg-primary/20">
+      {/* FAQPage Structured Data for Google SERP Rich Snippets */}
+      <script
+        type="application/ld+json"
+      >
+        {JSON.stringify(faqSchema)}
+      </script>
+
       {/* 1. Header Navigation Bar */}
       <SiteHeader dashboardPath={dashboardPath} />
 

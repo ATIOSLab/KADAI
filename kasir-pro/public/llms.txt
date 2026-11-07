@@ -1,20 +1,24 @@
 # KADAI (https://kadai.asia)
-> Sistem Operasi Bisnis Indonesia — Transaksi lancar, stok akurat, pajak tepat.
+> Sistem Operasi Bisnis Indonesia — Kasir POS Kilat, Inventori FIFO, Fleksibel Non-PKP & PKP, Resep BOM Dapur & Legalitas OSS.
 
-KADAI menyatukan Kasir POS Kilat, Inventori Multi-Batch FIFO (PSAK 14), Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, dan Kepatuhan Regulasi Pajak Daerah PB1 10% serta SAK EMKM.
+KADAI menyatukan Kasir POS Kilat, Fleksibilitas Perpajakan (Non-PKP 0% bebas pajak & PKP PB1 10%/PPN 11%), Inventori Multi-Batch FIFO (PSAK 14 / SAK EMKM), Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, Multi-Cabang Surat Jalan In-Transit, serta Legalitas Usaha RI (NIB OSS 13 digit, PT Perorangan PP 8/2021, CV, PT, Koperasi, UD).
 
 ## Modul & Kapabilitas Utama
-- [POS Kasir Kilat](https://kadai.asia/pos): Transaksi kilat dengan latensi < 0.2 detik, keyboard hotkeys F2/F4, multi-kasir, dan cetak struk thermal 58mm/80mm dengan QRIS dinamis.
-- [Inventori Multi-Batch FIFO](https://kadai.asia/inventory): Penilaian persediaan berstandar PSAK 14, pelacakan tanggal kadaluwarsa per-batch stok masuk, serta radar visual peringatan dini.
-- [Dapur Pusat & KDS](https://kadai.asia/kds): Routing pesanan otomatis per-stasiun kerja, notifikasi audio Web Audio API, dan resep produksi bahan baku (Bill of Materials).
-- [Kepatuhan Fiskal & SAK EMKM](https://kadai.asia/finance/tax): Rekonsiliasi PPh Final PP 55/2022 tarif 0.5%, perhitungan pajak restoran daerah PB1 10%, dan jurnal pembukuan otomatis.
+- [POS Kasir Kilat](https://kadai.asia/pos): Transaksi kilat dengan latensi < 0.2 detik, multi-kasir, split-bill, dan cetak struk thermal 58mm/80mm dengan QRIS dinamis & tunai.
+- [Fleksibilitas Fiskal Non-PKP & PKP](https://kadai.asia/#pajak-pembukuan): Bebas pajak untuk toko kelontong/warung Non-PKP (0%), atau hitung otomatis PB1 10% & PPN 11% untuk restoran & badan usaha PKP.
+- [Legalitas Usaha RI](https://kadai.asia/demo): Dukungan format hukum resmi (PT Perorangan UMK PP 8/2021, CV, PT, Koperasi, UD, Usaha Perorangan), NIB OSS-RBA, NIK KTP, dan NPWP.
+- [Inventori Multi-Batch FIFO](https://kadai.asia/inventory): Penilaian persediaan berstandar PSAK 14 / SAK EMKM, pelacakan tanggal kadaluwarsa per-batch stok masuk, serta radar visual peringatan dini.
+- [Dapur Pusat & KDS](https://kadai.asia/kds): Routing pesanan otomatis per-stasiun kerja dapur/bar, notifikasi audio, dan resep produksi bahan baku (Bill of Materials).
+- [Multi-Cabang & Transfer Stok](https://kadai.asia/inventory/transfers): Distribusi stok dari gudang pusat ke cabang satelit dengan Surat Jalan Digital status In-Transit.
+- [Kepatuhan Fiskal & SAK EMKM](https://kadai.asia/finance/tax): Rekonsiliasi PPh Final PP 55/2022 tarif 0.5%, monitoring batas omzet Rp 500 Juta, dan laporan laba rugi real-time.
+- [Program Kemitraan & Referral](https://kadai.asia/referral): Komisi mitra 20% berkelanjutan per pembayaran langganan terverifikasi.
 
 ## Struktur Paket Langganan Resmi (IDR)
-- [Starter](https://kadai.asia/#pricing): Rp 0/bulan (1 Gerai, 50 SKU Produk, Kasir POS Dasar).
-- [Professional](https://kadai.asia/#pricing): Rp 99.000/bulan (Multi-User, KDS Dapur Realtime, Rekapitulasi Shift Kasir).
-- [Business Pro](https://kadai.asia/#pricing): Rp 249.000/bulan (BOM Resep, Transfer Stok Cabang, Integrasi Fiskal). Paling Populer.
-- [Enterprise](https://kadai.asia/#pricing): Rp 599.000/bulan (Cabang Tanpa Batas, SLA 99.9%, Dedicated Database Instance).
+- [Starter](https://kadai.asia/#harga): Rp 0/bulan (1 Gerai, 50 SKU Produk, Kasir POS Standar).
+- [Professional](https://kadai.asia/#harga): Rp 99.000/bulan (1 Outlet & 3 Kasir, Unlimited Produk, Inventori FIFO, PPN/PB1).
+- [Business Pro](https://kadai.asia/#harga): Rp 249.000/bulan (3 Cabang, Unlimited Kasir, Resep BOM, Meja QR, KDS Dapur, SAK EMKM). Paling Populer.
+- [Enterprise](https://kadai.asia/#harga): Rp 599.000/bulan (Cabang & Gudang Unlimited, Central Kitchen Routing, Transfer Stok, SLA 99.9%).
 
 ## Entitas Pengembang
-- Pengembang: ATIOSLab (https://github.com/ATIOSLab/KADAI)
-- Lisensi & Wilayah: Indonesia (IDR / Rupiah, Zona Waktu WIB/WITA/WIT).
+- Pengembang: PT Netkrida Nusantara / ATIOSLab (https://github.com/ATIOSLab/KADAI)
+- Lisensi & Wilayah Kedaulatan: Republik Indonesia (Mata Uang IDR / Rupiah, Zona Waktu WIB/WITA/WIT).

@@ -23,23 +23,31 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://kadai.asia"),
   title: {
-    default: "KADAI - Sistem Operasi Bisnis Indonesia",
+    default: "KADAI - Sistem Operasi Bisnis Indonesia | Aplikasi Kasir POS, Inventori FIFO, Non-PKP & PKP",
     template: "%s | KADAI",
   },
   description:
-    "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM.",
+    "Aplikasi kasir POS dan sistem operasi bisnis terlengkap di Indonesia. Cocok untuk usaha Non-PKP (bebas pajak 0%) maupun PKP (PB1 10%, PPN 11%). Kelola penjualan kilat, inventori multi-batch FIFO, resep dapur BOM, multi-cabang, dan legalitas NIB OSS.",
   keywords: [
     "POS",
     "aplikasi kasir online",
+    "kasir non pkp",
     "point of sale indonesia",
-    "inventori FIFO",
-    "BOM kuliner",
-    "KDS restoran",
+    "aplikasi kasir toko",
+    "aplikasi kasir restoran",
+    "sistem operasi bisnis",
+    "aplikasi kasir pb1",
+    "inventori fifo indonesia",
+    "resep bom kuliner",
+    "kds dapur",
+    "pt perorangan pos",
+    "nib oss rba",
+    "kadai pos",
+    "aplikasi kasir offline",
+    "qris dinamis pos",
     "SAK EMKM",
-    "pajak resto PB1",
     "PPh Final PP 55/2022",
     "multi-cabang",
-    "kadai pos",
   ],
   manifest: "/site.webmanifest",
   icons: {
@@ -57,9 +65,9 @@ export const metadata: Metadata = {
     shortcut: ["/favicon.ico"],
   },
   openGraph: {
-    title: "KADAI - Sistem Operasi Bisnis Indonesia",
+    title: "KADAI - Sistem Operasi Bisnis Indonesia (Non-PKP & PKP)",
     description:
-      "Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda. Transaksi lancar, stok akurat, pajak tepat.",
+      "Satu aplikasi kasir terpadu untuk gerai, dapur, & pembukuan Anda. Cocok untuk usaha Non-PKP (0% pajak) & PKP. Kasir kilat, inventori FIFO, dan kepatuhan fiskal RI.",
     url: "https://kadai.asia",
     siteName: "KADAI Operating System",
     locale: "id_ID",
@@ -69,15 +77,17 @@ export const metadata: Metadata = {
         url: "https://kadai.asia/og-image.png",
         width: 1200,
         height: 630,
-        alt: "KADAI - Sistem Operasi Bisnis Indonesia",
+        alt: "KADAI - Sistem Operasi Bisnis Indonesia | Aplikasi Kasir POS Non-PKP & PKP",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "KADAI - Sistem Operasi Bisnis Indonesia",
+    title: "KADAI - Sistem Operasi Bisnis Indonesia (Non-PKP & PKP)",
     description:
-      "Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda. Transaksi lancar, stok akurat, pajak tepat.",
+      "Satu aplikasi kasir terpadu untuk gerai, dapur, & pembukuan Anda. Cocok untuk usaha Non-PKP (0% pajak) & PKP. Kasir kilat, inventori FIFO, dan kepatuhan fiskal RI.",
+    site: "@kadai_asia",
+    creator: "@kadai_asia",
     images: ["https://kadai.asia/og-image.png"],
   },
   alternates: {
@@ -118,16 +128,25 @@ const schemaGraph = {
       "@id": "https://kadai.asia/#website",
       "url": "https://kadai.asia",
       "name": "KADAI",
-      "description": "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM",
+      "description": "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibilitas Non-PKP & PKP, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM",
       "inLanguage": "id-ID",
       "publisher": {
         "@id": "https://kadai.asia/#organization",
       },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://kadai.asia/blog?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     },
     {
       "@type": "Organization",
       "@id": "https://kadai.asia/#organization",
       "name": "KADAI",
+      "legalName": "PT Netkrida Nusantara",
       "url": "https://kadai.asia",
       "logo": "https://kadai.asia/favicon.svg",
       "image": "https://kadai.asia/og-image.png",
@@ -138,6 +157,10 @@ const schemaGraph = {
       "areaServed": {
         "@type": "Country",
         "name": "Indonesia",
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "ID"
       },
       "founder": {
         "@type": "Organization",
@@ -159,17 +182,20 @@ const schemaGraph = {
         "offerCount": "4",
       },
       "featureList": [
-        "Kasir POS Kilat Latensi Rendah",
-        "Inventori Multi-Batch FIFO (PSAK 14 / IAS 2)",
-        "Kitchen Display System (KDS) Realtime",
-        "Resep Bill of Materials (BOM) Produksi",
-        "Kepatuhan Pajak Restoran PB1 10% (UU HKPD)",
-        "PPh Final UMKM 0.5% (PP 55/2022)",
-        "Laporan Keuangan SAK EMKM Terstandarisasi",
-        "QRIS Dinamis & EDC Multi-Bank"
+        "Kasir POS Kilat Latensi Rendah & Struk Thermal 58mm/80mm",
+        "Fleksibel untuk Usaha Non-PKP (0% Bebas PPN) maupun PKP",
+        "Legalitas Usaha RI: PT Perorangan (PP 8/2021), CV, PT, Koperasi, NIB OSS & NIK Pemilik",
+        "Inventori Multi-Batch FIFO & FEFO (PSAK 14 / SAK EMKM)",
+        "Kitchen Display System (KDS) & Routing Dapur Realtime",
+        "Resep Bill of Materials (BOM) Produksi Kuliner",
+        "Pajak Restoran PB1 10% (UU HKPD) & PPN 11%",
+        "Rekap PPh Final UMKM 0.5% (PP 55/2022) Batas Omzet Bebas Pajak",
+        "Multi-Cabang & Surat Jalan Transfer Stok Digital In-Transit",
+        "Program Kemitraan & Referral Berkelanjutan 20% Komisi",
+        "Pembayaran QRIS Dinamis & EDC Multi-Bank"
       ],
       "description":
-        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM. Transaksi lancar, stok akurat, pajak tepat.",
+        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibel Non-PKP & PKP, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM.",
     },
   ],
 };

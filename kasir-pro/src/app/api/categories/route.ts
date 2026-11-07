@@ -14,7 +14,14 @@ export async function GET() {
       include: { _count: { select: { products: true } } },
       orderBy: { name: "asc" },
     });
-    return NextResponse.json({ data: categories });
+    return NextResponse.json(
+      { data: categories },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("GET /api/categories error:", error);
     return NextResponse.json({ error: "Gagal memuat kategori" }, { status: 500 });

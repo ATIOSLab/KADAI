@@ -20,6 +20,7 @@ export const checkoutSchema = z.object({
   customerId: z.string().optional().nullable(),
   discountAmount: z.number().min(0).default(0),
   notes: z.string().max(500).optional().nullable(),
+  idempotencyKey: z.string().max(128).optional().nullable(),
 });
 
 export const saleFilterSchema = z.object({

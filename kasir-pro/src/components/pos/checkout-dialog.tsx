@@ -111,11 +111,19 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const handleCheckout = async () => {
     setLoading(true);
     try {
+      const clientAttemptKey =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `sale-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
       const response = await apiFetch<{
         success: true;
         data: any;
       }>("/api/sales", {
         method: "POST",
+        headers: {
+          "x-idempotency-key": clientAttemptKey,
+        },
         body: {
           items: items.map((item) => ({
             productId: item.productId,
@@ -133,6 +141,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           customerId: customerId || null,
           discountAmount: 0,
           notes: notes || null,
+          idempotencyKey: clientAttemptKey,
         },
       });
 

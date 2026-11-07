@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { CartItem } from "@/types";
 import {
   getAvailablePricingBatchesForLine,
@@ -67,10 +68,12 @@ function recalculateItems(items: Omit<CartItem, "subtotal">[]): CartItem[] {
   return items.map((item) => buildCartItem(item, items));
 }
 
-export const useCart = create<CartStore>((set, get) => ({
-  items: [],
-  discountTotal: 0,
-  catalogVersion: 0,
+export const useCart = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      discountTotal: 0,
+      catalogVersion: 0,
 
   setDiscountTotal: (amount) => set({ discountTotal: amount }),
 
@@ -180,4 +183,13 @@ export const useCart = create<CartStore>((set, get) => ({
 
     return getAvailablePricingBatchesForLine(item, get().items);
   },
-}));
+}),
+    {
+      name: "kadai-pos-active-cart",
+      partialize: (state) => ({
+        items: state.items,
+        discountTotal: state.discountTotal,
+      }),
+    }
+  )
+);

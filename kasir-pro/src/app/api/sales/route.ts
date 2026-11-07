@@ -99,6 +99,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// In-memory Idempotency Cache (TTL 60 detik) untuk mencegah double-deduction transaksi kasir
+interface SaleIdempotencyRecord {
+  timestamp: number;
+  response: unknown;
+}
+const salesIdempotencyMap = new Map<string, SaleIdempotencyRecord>();
+const IDEMPOTENCY_TTL_MS = 60 * 1000;
+
+function pruneSalesIdempotency() {
+  const now = Date.now();
+  for (const [key, val] of salesIdempotencyMap.entries()) {
+    if (now - val.timestamp > IDEMPOTENCY_TTL_MS) {
+      salesIdempotencyMap.delete(key);
+    }
+  }
+}
+
 // POST /api/sales — Create sale with FIFO deduction
 export async function POST(request: NextRequest) {
   try {
@@ -116,6 +133,23 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const data = checkoutSchema.parse(body);
+
+    const idempotencyKey =
+      request.headers.get("x-idempotency-key")?.trim() ||
+      data.idempotencyKey?.trim() ||
+      null;
+
+    if (idempotencyKey) {
+      pruneSalesIdempotency();
+      const existing = salesIdempotencyMap.get(idempotencyKey);
+      if (existing && Date.now() - existing.timestamp <= IDEMPOTENCY_TTL_MS) {
+        return NextResponse.json(existing.response, {
+          status: 201,
+          headers: { "X-Idempotent-Replay": "true" },
+        });
+      }
+    }
+
     if (data.items.length > 100 || data.items.some((item) => item.quantity > 10000 ||
         item.discountAmount > 1e12) || data.discountAmount > 1e12) {
       return NextResponse.json({ error: "Batas transaksi terlampaui" }, { status: 400 });
@@ -478,7 +512,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, data: redactCosts(result, sessionUser.role) }, { status: 201 });
+    const finalPayload = { success: true, data: redactCosts(result, sessionUser.role) };
+    if (idempotencyKey) {
+      salesIdempotencyMap.set(idempotencyKey, {
+        timestamp: Date.now(),
+        response: finalPayload,
+      });
+    }
+
+    return NextResponse.json(finalPayload, { status: 201 });
   } catch (error) {
     console.error("POST /api/sales error:", error);
     if (error instanceof ZodError) {

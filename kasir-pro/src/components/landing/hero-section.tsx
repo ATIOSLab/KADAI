@@ -118,30 +118,32 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[360px] studio-keylight pointer-events-none z-10" />
 
         {/* Hero Header Copy (Positioned with high-contrast backdrop legibility) */}
-        <div className="relative z-30 max-w-4xl mx-auto text-center space-y-6">
+        <div className="relative z-30 max-w-4xl mx-auto text-center space-y-6 w-full px-2 sm:px-0">
           {/* Eyebrow Pill */}
-          <Badge
-            variant="outline"
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80"
-          >
-            <span className="size-2 rounded-full bg-primary" />
-            <span className="text-[11px] text-slate-700 uppercase tracking-wider font-semibold">
-              KADAI // TRANSAKSI LANCAR • STOK AKURAT • PAJAK TEPAT
-            </span>
-          </Badge>
+          <div className="inline-flex max-w-full justify-center">
+            <Badge
+              variant="outline"
+              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
+            >
+              <span className="size-2 rounded-full bg-primary shrink-0" />
+              <span className="text-[10px] sm:text-[11px] text-slate-700 uppercase tracking-wider font-semibold leading-tight">
+                KADAI // TRANSAKSI LANCAR • STOK AKURAT • PAJAK TEPAT
+              </span>
+            </Badge>
+          </div>
 
           {/* Headline H1 */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance">
+          <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance px-2 sm:px-0">
             Satu Aplikasi Kasir untuk Gerai, Dapur, dan Pembukuan Anda.
           </h1>
 
           {/* Subtitle */}
-          <p className="text-sm sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance">
+          <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance px-3 sm:px-0">
             KADAI membantu pemilik usaha mencatat penjualan kilat, melacak sisa stok bahan otomatis (metode FIFO), membagi pesanan ke layar dapur, hingga menyiapkan rekap pajak restoran PB1 dan PPh final tanpa rumus ribet.
           </p>
 
           {/* CTA Buttons (Clean Enterprise Action) */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-xs sm:max-w-none mx-auto w-full px-4 sm:px-0">
             {dashboardPath ? (
               <Button
                 asChild

@@ -321,13 +321,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex xl:hidden items-center gap-3">
+          <div className="flex xl:hidden items-center gap-1.5 sm:gap-3 shrink-0">
             {dashboardPath ? (
-              <Button asChild size="sm" className="h-9 text-xs font-bold px-3 rounded-full bg-primary text-white">
+              <Button asChild size="sm" className="h-8 sm:h-9 text-xs font-bold px-2.5 sm:px-3 rounded-full bg-primary text-white">
                 <Link href={dashboardPath}>Dashboard</Link>
               </Button>
             ) : (
-              <Button asChild size="sm" className="h-9 text-xs font-bold px-4 rounded-full bg-primary text-white">
+              <Button asChild size="sm" className="hidden min-[380px]:inline-flex h-8 sm:h-9 text-xs font-bold px-3 sm:px-4 rounded-full bg-primary text-white">
                 <Link href="/register">Coba Gratis</Link>
               </Button>
             )}
@@ -336,7 +336,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-expanded={mobileMenuOpen}
               aria-label="Toggle Menu"
-              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>

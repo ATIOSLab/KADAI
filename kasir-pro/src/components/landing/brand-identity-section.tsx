@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, ArrowUpRight, Monitor, Smartphone, Tablet, Printer, Tv } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { KadaiLogoMark, KadaiWordmark, KadaiPrimaryLogo } from "@/components/shared/kadai-logo";
+import { KadaiLogoMark, KadaiWordmark, KadaiPrimaryLogo, KadaiLockup } from "@/components/shared/kadai-logo";
 
 const PALETTE_TOKENS = [
   {
@@ -232,8 +232,8 @@ export function BrandIdentitySection() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#EA580C]/20 via-[#F59E0B]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 space-y-6">
-              {/* Header Lockup (Logo Utama: Simbol K + kadaı) */}
-              <KadaiPrimaryLogo layout="horizontal" showTagline={true} size="lg" variant="on-dark" />
+              {/* Header Lockup (Official Lockup from /png/lockup/) */}
+              <KadaiLockup variant="on-dark" height={44} className="h-10 sm:h-11 w-auto" />
 
               {/* Core Slogan Headline */}
               <div className="space-y-3 pt-4">

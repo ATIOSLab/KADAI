@@ -18,7 +18,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { NotificationMenu } from "@/components/layout/notification-menu";
-import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -206,14 +206,12 @@ export function Navbar({
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-card shadow-2xl border-r border-border">
             {/* Drawer Header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <div className="flex items-center gap-2.5">
-                <KadaiLogoMark size={28} variant="on-light" className="shrink-0" />
-                <div>
-                  <KadaiWordmark size="text-base" />
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-[0.16em] font-sans">
-                    {roleLabel}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2">
+                <KadaiLockup variant="on-light" height={26} className="h-6 w-auto" />
+                <span className="text-slate-300">•</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider font-sans">
+                  {roleLabel}
+                </span>
               </div>
               <button
                 type="button"

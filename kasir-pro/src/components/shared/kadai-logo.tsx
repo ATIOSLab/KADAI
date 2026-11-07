@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type KadaiLogoVariant =
@@ -345,89 +346,83 @@ export function KadaiBrandHeader({
 }
 
 /**
+ * Official Brand Lockup from /png/lockup/
+ * Pixel-perfect original master render with native Bahnschrift Bold kerning & colors.
+ */
+export function KadaiLockup({
+  variant = "on-light",
+  layout = "horizontal",
+  className,
+  priority = false,
+  height = 36,
+  alt = "kadai - SISTEM OPERASI BISNIS",
+}: {
+  variant?: "on-light" | "on-dark";
+  layout?: "horizontal" | "stacked";
+  className?: string;
+  priority?: boolean;
+  height?: number;
+  alt?: string;
+}) {
+  const isHorizontal = layout === "horizontal";
+  const src = isHorizontal
+    ? variant === "on-dark"
+      ? "/brand/kadai-lockup-horizontal-on-dark-transparent.png"
+      : "/brand/kadai-lockup-horizontal-on-light-transparent.png"
+    : variant === "on-dark"
+      ? "/brand/kadai-lockup-stacked-on-dark-transparent.png"
+      : "/brand/kadai-lockup-stacked-on-light-transparent.png";
+
+  const calculatedWidth = isHorizontal
+    ? Math.round(height * (1600 / 460))
+    : height;
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={calculatedWidth}
+      height={height}
+      priority={priority}
+      className={cn("object-contain shrink-0 select-none", className)}
+    />
+  );
+}
+
+/**
  * KADAI PRIMARY LOGO (Logo Utama)
- * Mandat Brand: Logo utama BUKAN hanya simbol K sendirian,
- * melainkan kombinasi utuh Simbol Huruf K + Wordmark "kadaı" secara bersamaan.
- * Bersifat free-standing (berdiri bebas tanpa kotak pembungkus) sesuai master lockup resmi.
+ * Menggunakan aset resmi master lockup dari folder /png/lockup/
  */
 export function KadaiPrimaryLogo({
   className,
   size = "md",
   variant = "on-light",
   layout = "horizontal",
-  showTagline = false,
-  taglineText = "SISTEM OPERASI BISNIS",
+  priority = false,
 }: {
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
-  variant?: "on-light" | "on-dark" | "mono-black" | "mono-white";
+  variant?: "on-light" | "on-dark";
   layout?: "horizontal" | "stacked";
+  priority?: boolean;
   showTagline?: boolean;
   taglineText?: string;
 }) {
-  const isDark = variant === "on-dark" || variant === "mono-white";
-
-  const sizeConfig = {
-    sm: { markSize: 26, wordmarkSize: "text-lg", taglineSize: "text-[7.5px]" },
-    md: { markSize: 34, wordmarkSize: "text-2xl", taglineSize: "text-[8.5px]" },
-    lg: { markSize: 44, wordmarkSize: "text-3xl", taglineSize: "text-[10px]" },
-    xl: { markSize: 58, wordmarkSize: "text-4xl", taglineSize: "text-[12px]" },
+  const heightMap = {
+    sm: layout === "horizontal" ? 28 : 60,
+    md: layout === "horizontal" ? 36 : 80,
+    lg: layout === "horizontal" ? 48 : 110,
+    xl: layout === "horizontal" ? 64 : 140,
   }[size];
 
-  const logoMarkVariant =
-    variant === "mono-black"
-      ? "mono-black"
-      : variant === "mono-white"
-        ? "mono-white"
-        : variant === "on-dark"
-          ? "on-dark"
-          : "on-light";
-
-  if (layout === "stacked") {
-    return (
-      <div className={cn("inline-flex flex-col items-center text-center gap-2", className)}>
-        <KadaiLogoMark size={sizeConfig.markSize} variant={logoMarkVariant} />
-        <div className="flex flex-col items-center">
-          <KadaiWordmark
-            size={sizeConfig.wordmarkSize}
-            textColor={isDark ? "text-white" : "text-slate-950"}
-          />
-          {showTagline && (
-            <span
-              className={cn(
-                "font-bold tracking-[0.2em] uppercase font-sans mt-0.5",
-                sizeConfig.taglineSize,
-                isDark ? "text-slate-400" : "text-slate-500"
-              )}
-            >
-              {taglineText}
-            </span>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={cn("inline-flex items-center gap-2.5 sm:gap-3", className)}>
-      <KadaiLogoMark size={sizeConfig.markSize} variant={logoMarkVariant} className="shrink-0" />
-      <div className="flex flex-col justify-center min-w-0 text-left">
-        <KadaiWordmark
-          size={sizeConfig.wordmarkSize}
-          textColor={isDark ? "text-white" : "text-slate-950"}
-        />
-        {showTagline && (
-          <span
-            className={cn(
-              "font-bold tracking-[0.18em] uppercase font-sans truncate",
-              sizeConfig.taglineSize,
-              isDark ? "text-slate-400" : "text-slate-500"
-            )}
-          >
-            {taglineText}
-          </span>
-        )}
-      </div>
+    <div className={cn("inline-flex items-center", className)}>
+      <KadaiLockup
+        variant={variant}
+        layout={layout}
+        height={heightMap}
+        priority={priority}
+      />
     </div>
   );
 }

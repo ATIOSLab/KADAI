@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Store } from "lucide-react";
-import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 
 export function SiteFooter() {
   return (
@@ -77,11 +77,12 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
-          <div className="flex items-center gap-2.5">
-            <KadaiLogoMark size={24} variant="on-dark" className="shrink-0" />
-            <KadaiWordmark size="text-lg" textColor="text-slate-200" />
-            <span className="text-slate-600">•</span>
-            <span className="tracking-[0.16em] uppercase text-xs font-bold text-slate-400">SISTEM OPERASI BISNIS</span>
+          <div className="flex items-center gap-3">
+            <KadaiLockup variant="on-dark" height={28} className="h-6 sm:h-7 w-auto" />
+            <span className="text-slate-700 hidden sm:inline">•</span>
+            <span className="tracking-[0.16em] uppercase text-[10px] sm:text-xs font-bold text-slate-400 hidden sm:inline">
+              SISTEM OPERASI BISNIS
+            </span>
           </div>
 
           <div className="text-slate-500 text-[11px]">

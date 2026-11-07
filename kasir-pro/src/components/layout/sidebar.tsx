@@ -8,7 +8,7 @@ import { getDefaultPathForRole } from "@/lib/rbac";
 import { useLogout } from "@/hooks/use-logout";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/session";
-import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
+import { KadaiLogoMark, KadaiLockup } from "@/components/shared/kadai-logo";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -56,14 +56,10 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
               collapsed && "justify-center"
             )}
           >
-            <KadaiLogoMark size={28} variant="on-light" className="shrink-0" />
-            {!collapsed && (
-              <span className="min-w-0">
-                <KadaiWordmark size="text-base" />
-                <span className="block truncate text-[8px] font-bold text-muted-foreground uppercase tracking-[0.16em] font-sans">
-                  SISTEM OPERASI BISNIS
-                </span>
-              </span>
+            {collapsed ? (
+              <KadaiLogoMark size={28} variant="on-light" className="shrink-0" />
+            ) : (
+              <KadaiLockup variant="on-light" height={28} className="h-7 w-auto" />
             )}
           </Link>
         </div>

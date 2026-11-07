@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, ArrowUpRight, Monitor, Smartphone, Tablet, Printer, Tv } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { KadaiLogoMark, KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiLogoMark, KadaiWordmark, KadaiPrimaryLogo } from "@/components/shared/kadai-logo";
 
 const PALETTE_TOKENS = [
   {
@@ -77,6 +77,73 @@ export function BrandIdentitySection() {
         <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
           Identitas visual KADAI dirancang dengan disiplin geometris murni: menyatukan ketegasan pembukuan modern, kehangatan dapur kuliner nusantara, dan energi pertumbuhan wirausaha Indonesia.
         </p>
+      </div>
+
+      {/* 1.5. Logo Utama KADAI (Primary Lockup: Simbol K + Wordmark kadaı) */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-900">
+            <span className="size-2 rounded-full bg-primary" />
+            <span>Logo Utama Resmi (Primary Unified Lockup)</span>
+          </div>
+          <span className="text-[11px] text-slate-500 font-medium">
+            Mandat: Simbol K + Wordmark kadaı wajib tampil bersama
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Lockup A: Horizontal (Latar Terang & Gelap) */}
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest block">
+                Format Utama (Horizontal)
+              </span>
+              <h4 className="text-lg font-bold text-slate-950">Lockup Horizontal Resmi</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Digunakan pada header website, faktur kasir, surat jalan, dan kop resmi. Simbol K dan wordmark <span className="font-bold text-slate-900">kadaı</span> sejajar horizontal.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {/* On Light Preview */}
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                <KadaiPrimaryLogo layout="horizontal" showTagline={true} size="md" variant="on-light" />
+                <span className="text-[10px] font-mono text-slate-400">On Light</span>
+              </div>
+              {/* On Dark Preview */}
+              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                <KadaiPrimaryLogo layout="horizontal" showTagline={true} size="md" variant="on-dark" />
+                <span className="text-[10px] font-mono text-slate-400">On Dark</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Lockup B: Stacked (Vertikal / Display) */}
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-[#EA580C] uppercase tracking-widest block">
+                Format Vertikal (Stacked)
+              </span>
+              <h4 className="text-lg font-bold text-slate-950">Lockup Stacked Resmi</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Digunakan pada kartu nama, splash screen aplikasi tablet, backdrop stan pameran, dan merchandise resmi.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* On Light Preview */}
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center space-y-2">
+                <KadaiPrimaryLogo layout="stacked" showTagline={true} size="md" variant="on-light" />
+                <span className="text-[10px] font-mono text-slate-400 pt-1">On Light</span>
+              </div>
+              {/* On Dark Preview */}
+              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center space-y-2">
+                <KadaiPrimaryLogo layout="stacked" showTagline={true} size="md" variant="on-dark" />
+                <span className="text-[10px] font-mono text-slate-400 pt-1">On Dark</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 2. Official 4-Color Palette Swatches with Interactive Copy */}

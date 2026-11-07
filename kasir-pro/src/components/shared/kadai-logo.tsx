@@ -345,3 +345,106 @@ export function KadaiBrandHeader({
     </div>
   );
 }
+
+/**
+ * KADAI PRIMARY LOGO (Logo Utama)
+ * Mandat Brand: Logo utama BUKAN hanya simbol K sendirian,
+ * melainkan kombinasi utuh Simbol Huruf K + Wordmark "kadaı" secara bersamaan.
+ */
+export function KadaiPrimaryLogo({
+  className,
+  size = "md",
+  variant = "on-light",
+  layout = "horizontal",
+  showTagline = false,
+  taglineText = "SISTEM OPERASI BISNIS",
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+  variant?: "on-light" | "on-dark" | "mono-black" | "mono-white";
+  layout?: "horizontal" | "stacked";
+  showTagline?: boolean;
+  taglineText?: string;
+}) {
+  const isDark = variant === "on-dark" || variant === "mono-white";
+  const isMono = variant === "mono-black" || variant === "mono-white";
+
+  const sizeConfig = {
+    sm: { markSize: 24, wordmarkSize: "text-lg", containerSize: "size-7", taglineSize: "text-[7px]" },
+    md: { markSize: 32, wordmarkSize: "text-2xl", containerSize: "size-9", taglineSize: "text-[8.5px]" },
+    lg: { markSize: 42, wordmarkSize: "text-3xl", containerSize: "size-12", taglineSize: "text-[10px]" },
+    xl: { markSize: 56, wordmarkSize: "text-4xl", containerSize: "size-16", taglineSize: "text-[12px]" },
+  }[size];
+
+  const logoMarkVariant =
+    variant === "mono-black"
+      ? "mono-black"
+      : variant === "mono-white"
+        ? "mono-white"
+        : variant === "on-dark"
+          ? "on-dark"
+          : "on-light";
+
+  if (layout === "stacked") {
+    return (
+      <div className={cn("inline-flex flex-col items-center text-center gap-2", className)}>
+        <span
+          className={cn(
+            "flex items-center justify-center rounded-2xl p-2 shrink-0 shadow-xs",
+            isDark ? "bg-slate-900 border border-slate-800" : "bg-slate-950 text-white"
+          )}
+        >
+          <KadaiLogoMark size={sizeConfig.markSize} variant={isDark ? "on-dark" : "brand"} />
+        </span>
+        <div className="flex flex-col items-center">
+          <KadaiWordmark
+            size={sizeConfig.wordmarkSize}
+            textColor={isDark ? "text-white" : "text-slate-950"}
+          />
+          {showTagline && (
+            <span
+              className={cn(
+                "font-bold tracking-[0.2em] uppercase font-sans mt-0.5",
+                sizeConfig.taglineSize,
+                isDark ? "text-slate-400" : "text-slate-500"
+              )}
+            >
+              {taglineText}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("inline-flex items-center gap-3", className)}>
+      <span
+        className={cn(
+          "flex items-center justify-center rounded-xl p-1.5 shrink-0 shadow-xs",
+          sizeConfig.containerSize,
+          isDark ? "bg-slate-900 border border-slate-800" : "bg-slate-950 text-white"
+        )}
+      >
+        <KadaiLogoMark size={sizeConfig.markSize} variant={isDark ? "on-dark" : "brand"} />
+      </span>
+      <div className="flex flex-col justify-center min-w-0 text-left">
+        <KadaiWordmark
+          size={sizeConfig.wordmarkSize}
+          textColor={isDark ? "text-white" : "text-slate-950"}
+        />
+        {showTagline && (
+          <span
+            className={cn(
+              "font-bold tracking-[0.18em] uppercase font-sans truncate",
+              sizeConfig.taglineSize,
+              isDark ? "text-slate-400" : "text-slate-500"
+            )}
+          >
+            {taglineText}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

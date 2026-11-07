@@ -11,6 +11,15 @@
 * **Slogan Inti:** *"Satu sistem untuk gerai, dapur, dan pembukuan."*
 * **Posisi Pasar:** Platform sistem operasi bisnis dan kasir POS modern terintegrasi untuk gerai (*storefront*), dapur (*kitchen display*), dan pembukuan (*accounting & fiscal compliance*) di Indonesia.
 
+### ATURAN MUTLAK LOGO UTAMA (PRIMARY UNIFIED LOCKUP)
+* **Definisi Logo Utama:** Logo utama KADAI **BUKAN hanya simbol huruf K sendirian**, melainkan **kombinasi utuh antara Simbol Huruf K dan Wordmark `kadaı`** (baik format Horizontal Lockup maupun Stacked Lockup).
+* **Peran Simbol K Tunggal:** Simbol huruf K sendirian **hanya** difungsikan sebagai:
+  1. Ikon peluncur aplikasi mobile (*App Launcher Icon*) Android/iOS.
+  2. Tab browser (*Favicon*).
+  3. Indikator ciut (*collapsed icon*) pada sidebar saat ruang layar terbatas.
+  4. Cap/watermark sekunder.
+* Pada seluruh media representasi resmi, header situs, kop surat, faktur, dan materi promosi: **Logo Utama wajib menampilkan Simbol K berdampingan dengan Wordmark `kadaı`**.
+
 ---
 
 ## 2. Palet Warna Resmi (Official Color Tokens)

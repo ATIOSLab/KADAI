@@ -14,6 +14,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { HeroBackgroundSlider } from "./hero-background-slider";
+import { KadaiLogoMark, KadaiWordmark } from "@/components/shared/kadai-logo";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -126,15 +127,15 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
             >
               <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
-              <span className="text-[11px] sm:text-xs text-slate-900 uppercase tracking-wider font-extrabold leading-tight">
-                Sistem Operasi Bisnis Indonesia
+              <span className="text-[11px] sm:text-xs text-slate-900 uppercase tracking-widest font-black leading-tight">
+                SISTEM OPERASI BISNIS
               </span>
             </Badge>
           </div>
 
-          {/* Headline H1 */}
-          <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance px-2 sm:px-0">
-            Satu Aplikasi untuk Kasir, Stok Bahan, dan Pembukuan Anda.
+          {/* Headline H1 (Official Brand Slogan) */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.1] text-balance px-2 sm:px-0">
+            Satu sistem untuk gerai, dapur, dan pembukuan.
           </h1>
 
           {/* Subtitle */}
@@ -280,11 +281,19 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             {/* Right Side: Live Digital Thermal Receipt Card */}
             <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
               <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
-                {/* Receipt Header */}
-                <CardHeader className="p-0 flex flex-row items-center justify-between border-b border-slate-100 pb-3 space-y-0">
-                  <CardTitle className="font-bold text-sm text-slate-950">
-                    {current.receipt.table}
-                  </CardTitle>
+                {/* Official Brand Stamped Receipt Header */}
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="flex size-7 items-center justify-center rounded-lg bg-slate-950 p-1 text-white shadow-2xs">
+                      <KadaiLogoMark size={18} />
+                    </span>
+                    <div className="flex flex-col">
+                      <KadaiWordmark size="text-base" />
+                      <span className="text-[7.5px] font-bold text-slate-500 tracking-[0.16em] uppercase -mt-0.5 font-sans">
+                        SISTEM OPERASI BISNIS
+                      </span>
+                    </div>
+                  </div>
                   <Badge
                     variant="outline"
                     className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"
@@ -292,10 +301,11 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                     <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span>{current.receipt.status}</span>
                   </Badge>
-                </CardHeader>
+                </div>
 
-                <div className="text-[11px] text-slate-500">
-                  {current.receipt.meta}
+                <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium pt-1">
+                  <span className="font-bold text-slate-900">{current.receipt.table}</span>
+                  <span className="text-slate-400 font-mono text-[10px]">{current.receipt.meta}</span>
                 </div>
 
                 {/* Items Table */}

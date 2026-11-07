@@ -104,14 +104,19 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 <circle cx="408" cy="150" r="22" fill="#F59E0B" />
               </svg>
             </span>
-            <div className="flex flex-col">
-              <div className="flex items-baseline leading-none">
-                <span className="text-xl font-extrabold tracking-tight text-slate-950 font-sans">
-                  KADAI
+            <div className="flex flex-col justify-center">
+              <span
+                className="text-2xl font-bold tracking-tight text-slate-950 leading-none inline-flex items-baseline lowercase select-none"
+                style={{ fontFamily: "var(--font-heading)" }}
+                aria-label="kadai"
+              >
+                <span>kada</span>
+                <span className="relative inline-flex items-baseline">
+                  <span>ı</span>
+                  <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
                 </span>
-                <span className="text-[#EA580C] font-black text-2xl leading-none">.</span>
-              </div>
-              <span className="text-[9px] font-bold text-slate-500 tracking-[0.14em] uppercase mt-0.5 font-sans">
+              </span>
+              <span className="text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-1 font-sans">
                 SISTEM OPERASI BISNIS
               </span>
             </div>
@@ -246,6 +251,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             </div>
 
             {/* Direct Links */}
+            <Link
+              href="/#identitas-brand"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Desain Brand
+            </Link>
             <Link
               href="/harga"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"

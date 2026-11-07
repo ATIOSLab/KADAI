@@ -104,6 +104,34 @@ export function KadaiLogoMark({
   );
 }
 
+export function KadaiWordmark({
+  className,
+  textColor = "text-slate-950 dark:text-white",
+  size = "text-2xl",
+}: {
+  className?: string;
+  textColor?: string;
+  size?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "font-bold tracking-tight inline-flex items-baseline lowercase select-none font-heading",
+        size,
+        textColor
+      )}
+      style={{ fontFamily: "var(--font-heading)" }}
+      aria-label="kadai"
+    >
+      <span>kada</span>
+      <span className="relative inline-flex items-baseline">
+        <span>ı</span>
+        <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
+      </span>
+    </span>
+  );
+}
+
 interface KadaiBrandProps {
   className?: string;
   showTagline?: boolean;
@@ -121,26 +149,14 @@ export function KadaiBrandHeader({
 }: KadaiBrandProps) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <KadaiLogoMark size={logoSize} />
-      <div className="flex flex-col">
-        <div className="flex items-baseline leading-none">
-          <span
-            className={cn(
-              "text-xl font-extrabold tracking-tight",
-              textColor ?? "text-slate-950 dark:text-white"
-            )}
-            style={{ fontFamily: "var(--font-sans)" }}
-          >
-            KADAI
-          </span>
-          <span className="text-[#EA580C] font-black text-2xl leading-none">
-            .
-          </span>
-        </div>
+      <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs p-1">
+        <KadaiLogoMark size={logoSize} />
+      </span>
+      <div className="flex flex-col justify-center">
+        <KadaiWordmark textColor={textColor} size="text-2xl" />
         {showTagline && (
           <span
-            className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-[0.16em] uppercase mt-0.5"
-            style={{ fontFamily: "var(--font-sans)" }}
+            className="text-[8.5px] font-bold text-slate-500 dark:text-slate-400 tracking-[0.18em] uppercase mt-0.5 font-sans"
           >
             {taglineText}
           </span>

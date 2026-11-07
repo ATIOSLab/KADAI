@@ -79,10 +79,18 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
             </span>
             {!collapsed && (
               <span className="min-w-0">
-                <span className="block truncate text-sm font-extrabold tracking-tight font-sans">
-                  KADAI<span className="text-[#EA580C]">.</span>
+                <span
+                  className="block truncate text-base font-bold tracking-tight lowercase select-none"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                  aria-label="kadai"
+                >
+                  <span>kada</span>
+                  <span className="relative inline-flex items-baseline">
+                    <span>ı</span>
+                    <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
+                  </span>
                 </span>
-                <span className="block truncate text-[9px] font-bold text-muted-foreground uppercase tracking-wider font-sans">
+                <span className="block truncate text-[8px] font-bold text-muted-foreground uppercase tracking-[0.16em] font-sans">
                   SISTEM OPERASI BISNIS
                 </span>
               </span>

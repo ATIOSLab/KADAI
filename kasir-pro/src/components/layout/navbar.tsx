@@ -229,10 +229,18 @@ export function Navbar({
                   </svg>
                 </span>
                 <div>
-                  <span className="text-sm font-extrabold text-foreground font-sans">
-                    KADAI<span className="text-[#EA580C]">.</span>
+                  <span
+                    className="text-base font-bold text-foreground lowercase inline-flex items-baseline select-none"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                    aria-label="kadai"
+                  >
+                    <span>kada</span>
+                    <span className="relative inline-flex items-baseline">
+                      <span>ı</span>
+                      <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
+                    </span>
                   </span>
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-wider font-sans">
+                  <span className="text-[8px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-[0.16em] font-sans">
                     {roleLabel}
                   </span>
                 </div>

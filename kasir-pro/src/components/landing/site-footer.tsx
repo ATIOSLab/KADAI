@@ -19,6 +19,7 @@ export function SiteFooter() {
               <li><Link href="/fitur#dapur-kds" className="hover:text-white transition-colors">Kitchen Display System</Link></li>
               <li><Link href="/fitur#resep-bom" className="hover:text-white transition-colors">Resep Produksi (BOM)</Link></li>
               <li><Link href="/fitur#pembukuan-pajak" className="hover:text-white transition-colors">Pajak Daerah & SAK EMKM</Link></li>
+              <li><Link href="/#identitas-brand" className="hover:text-white transition-colors text-primary font-semibold">Identitas & Desain Brand</Link></li>
             </ul>
           </div>
 
@@ -98,11 +99,19 @@ export function SiteFooter() {
                 <circle cx="408" cy="150" r="22" fill="#F59E0B" />
               </svg>
             </span>
-            <span className="font-bold text-slate-200">
-              KADAI
+            <span
+              className="font-bold text-slate-200 lowercase inline-flex items-baseline text-lg select-none"
+              style={{ fontFamily: "var(--font-heading)" }}
+              aria-label="kadai"
+            >
+              <span>kada</span>
+              <span className="relative inline-flex items-baseline">
+                <span>ı</span>
+                <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
+              </span>
             </span>
-            <span>•</span>
-            <span className="tracking-wide">SISTEM OPERASI BISNIS</span>
+            <span className="text-slate-600">•</span>
+            <span className="tracking-[0.16em] uppercase text-xs font-bold text-slate-400">SISTEM OPERASI BISNIS</span>
           </div>
 
           <div className="text-slate-500 text-[11px]">

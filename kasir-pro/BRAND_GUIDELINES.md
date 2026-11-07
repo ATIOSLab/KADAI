@@ -55,17 +55,22 @@ Huruf **"K"** kustom dirancang secara geometris dengan 4 komponen bermakna:
 
 ## 4. Standar Tipografi
 
-1. **Font Teks Utama & Heading (Sans-Serif):**
-   * Font: **`Plus Jakarta Sans`** (Google Fonts).
+1. **Font Judul, Headings & Wordmark (Geometric Rounded):**
+   * Font: **`Quicksand`** & **`Poppins`** (Google Fonts).
+   * Variabel CSS: `--font-heading`.
+   * Karakteristik: Geometris bulat (*geometric rounded*), huruf 'a' bertingkat tunggal (*single-story 'a'*), kurva lembut yang selaras 1:1 dengan kapsul silindris dan lengkung wajan logo K.
+   * Diterapkan pada: Semua judul H1, H2, H3, H4, nama modul, judul kartu, dan wordmark `kadai`.
+2. **Font Teks Utama & Antarmuka Aplikasi (Body Sans):**
+   * Font: **`Poppins`** (Google Fonts).
    * Variabel CSS: `--font-sans`.
-   * Karakteristik: Geometris, modern, mudah dibaca pada layar monitor POS kasir, tablet, dan ponsel pintar.
-2. **Font Finansial & Kasir (Monospace / Tabular):**
+   * Karakteristik: Geometris modern, sangat jernih dan nyaman dibaca pada layar kasir POS, tablet, dan smartphone di segala kondisi pencahayaan.
+3. **Font Finansial & Kasir (Monospace / Tabular):**
    * Font: **`Geist Mono`** / Tabular Numbers (`tabular-nums`).
    * Variabel CSS: `--font-mono`.
    * Digunakan pada: Angka rupiah, struk thermal kasir, tabel stok inventori FIFO, barcode, dan laporan laba rugi.
-3. **Wordmark & Lockup:**
-   * Teks `kadai` dengan titik pada huruf `i` menggunakan warna `#F59E0B` (Amber Spark).
-   * Tagline `SISTEM OPERASI BISNIS` menggunakan bobot *Bold*, huruf kapital, dan tracking lebar (`tracking-[0.16em]`).
+4. **Wordmark & Lockup:**
+   * Teks `kadai` dalam huruf kecil (*lowercase*) dengan titik huruf "i" menggunakan warna **Amber `#F59E0B`** (*spark dot*).
+   * Tagline **`SISTEM OPERASI BISNIS`** menggunakan huruf kapital (*all caps*), bobot *Bold*, dan spasi antar-huruf lebar (`tracking-[0.18em]`).
 
 ---
 

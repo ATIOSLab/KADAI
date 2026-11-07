@@ -3,6 +3,7 @@ import { getDefaultPathForRole } from "@/lib/rbac";
 import { SiteHeader } from "@/components/landing/site-header";
 import { HeroSection } from "@/components/landing/hero-section";
 import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid";
+import { BrandIdentitySection } from "@/components/landing/brand-identity-section";
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
@@ -47,6 +48,9 @@ export default async function HomePage() {
 
       {/* 3. Kapabilitas Platform Terpadu (Pilar Inti KADAI: POS, FIFO, BOM, KDS, Transfer) */}
       <CapabilityBentoGrid />
+
+      {/* 3.5. Standar Identitas Brand, Palet Warna & Touchpoint Desain */}
+      <BrandIdentitySection />
 
       {/* 4. Solusi Lintas Industri (3 Kolom Sektor Usaha) */}
       <IndustrySolutions />

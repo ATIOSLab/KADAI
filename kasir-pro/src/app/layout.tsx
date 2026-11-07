@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Quicksand, Poppins, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
@@ -7,11 +7,18 @@ import { PwaRegister } from "@/components/shared/pwa-register";
 import { ReferralTracker } from "@/components/shared/referral-tracker";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const quicksand = Quicksand({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: ["500", "600", "700"],
+});
+
+const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -23,7 +30,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://kadai.asia"),
   title: {
-    default: "KADAI - Sistem Operasi Bisnis Indonesia | Aplikasi Kasir POS, Inventori FIFO, Non-PKP & PKP",
+    default: "KADAI - Satu Sistem untuk Gerai, Dapur, dan Pembukuan | Sistem Operasi Bisnis Indonesia",
     template: "%s | KADAI",
   },
   description:
@@ -206,7 +213,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={cn("font-sans antialiased", plusJakartaSans.variable, geistMono.variable)}>
+    <html
+      lang="id"
+      className={cn(
+        "font-sans antialiased",
+        quicksand.variable,
+        poppins.variable,
+        geistMono.variable
+      )}
+    >
       <head>
         <script
           type="application/ld+json"

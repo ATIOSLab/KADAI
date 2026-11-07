@@ -7,7 +7,8 @@ import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ReferralSection } from "@/components/landing/referral-section";
-import { FAQSection, FAQS } from "@/components/landing/faq-section";
+import { FAQSection } from "@/components/landing/faq-section";
+import { LANDING_FAQS } from "@/lib/landing-faqs";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
@@ -19,7 +20,7 @@ export default async function HomePage() {
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((item) => ({
+    mainEntity: LANDING_FAQS.map((item) => ({
       "@type": "Question",
       name: item.q,
       acceptedAnswer: {

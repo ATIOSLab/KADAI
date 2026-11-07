@@ -80,9 +80,19 @@ export const metadata: Metadata = {
       "Satu Sistem Terpadu untuk Gerai, Dapur, & Pembukuan Anda. Transaksi lancar, stok akurat, pajak tepat.",
     images: ["https://kadai.asia/og-image.png"],
   },
+  alternates: {
+    canonical: "https://kadai.asia",
+  },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   appleWebApp: {
     capable: true,
@@ -95,8 +105,8 @@ export const viewport: Viewport = {
   themeColor: "#0F172A",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
@@ -104,12 +114,31 @@ const schemaGraph = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "WebSite",
+      "@id": "https://kadai.asia/#website",
+      "url": "https://kadai.asia",
+      "name": "KADAI",
+      "description": "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM",
+      "inLanguage": "id-ID",
+      "publisher": {
+        "@id": "https://kadai.asia/#organization",
+      },
+    },
+    {
       "@type": "Organization",
       "@id": "https://kadai.asia/#organization",
       "name": "KADAI",
       "url": "https://kadai.asia",
       "logo": "https://kadai.asia/favicon.svg",
-      "sameAs": ["https://github.com/ATIOSLab/KADAI"],
+      "image": "https://kadai.asia/og-image.png",
+      "sameAs": [
+        "https://github.com/ATIOSLab/KADAI",
+        "https://www.linkedin.com/company/kadai-asia"
+      ],
+      "areaServed": {
+        "@type": "Country",
+        "name": "Indonesia",
+      },
       "founder": {
         "@type": "Organization",
         "name": "ATIOSLab",
@@ -129,6 +158,16 @@ const schemaGraph = {
         "highPrice": "599000",
         "offerCount": "4",
       },
+      "featureList": [
+        "Kasir POS Kilat Latensi Rendah",
+        "Inventori Multi-Batch FIFO (PSAK 14 / IAS 2)",
+        "Kitchen Display System (KDS) Realtime",
+        "Resep Bill of Materials (BOM) Produksi",
+        "Kepatuhan Pajak Restoran PB1 10% (UU HKPD)",
+        "PPh Final UMKM 0.5% (PP 55/2022)",
+        "Laporan Keuangan SAK EMKM Terstandarisasi",
+        "QRIS Dinamis & EDC Multi-Bank"
+      ],
       "description":
         "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM. Transaksi lancar, stok akurat, pajak tepat.",
     },

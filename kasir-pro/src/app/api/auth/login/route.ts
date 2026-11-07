@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
 
     // A07: Rate limiting — prevent brute force attacks
     const clientIp =
+      request.headers.get("cf-connecting-ip")?.trim() ||
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||
       "unknown";

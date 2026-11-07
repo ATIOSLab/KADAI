@@ -65,6 +65,11 @@ export function SiteFooter() {
                   Kebijakan Privasi (UU PDP)
                 </Link>
               </li>
+              <li>
+                <Link href="/syarat-ketentuan" className="hover:text-white transition-colors text-primary font-semibold">
+                  Syarat & Ketentuan Layanan
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

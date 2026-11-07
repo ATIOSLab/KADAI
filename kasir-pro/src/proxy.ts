@@ -19,6 +19,8 @@ const publicPages = [
   "/blog",
   "/pricing",
   "/kebijakan-privasi",
+  "/syarat-ketentuan",
+  "/.well-known",
   "/order",
   "/robots.txt",
   "/sitemap.xml",

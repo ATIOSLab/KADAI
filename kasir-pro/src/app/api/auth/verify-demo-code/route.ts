@@ -12,7 +12,10 @@ const MASTER_CODES = ["KADAI2026", "DEMO-KADAI", "NETKRIDA", "KADAI-DEMO"];
 export async function POST(request: NextRequest) {
   try {
     // Endpoint publik tanpa sesi: batasi percobaan untuk mencegah brute-force kode demo.
-    const clientKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const clientKey =
+      request.headers.get("cf-connecting-ip")?.trim() ||
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "unknown";
     const limit = checkRateLimit(`verify-demo-code:${clientKey}`, 10, 10 * 60 * 1000, 15 * 60 * 1000);
     if (!limit.allowed) {
       return NextResponse.json(

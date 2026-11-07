@@ -1,8 +1,10 @@
 # Kebijakan Privasi & Pelindungan Data Pribadi — KADAI
-# Kontak keamanan & pelaporan kerentanan.
+# Kontak keamanan & pelaporan kerentanan (RFC 9116).
 Contact: https://wa.me/6285159081119
 Contact: https://kadai.asia/demo
 Expires: 2027-11-01T00:00:00.000Z
 Preferred-Languages: id, en
 Canonical: https://kadai.asia/.well-known/security.txt
 Policy: https://kadai.asia/kebijakan-privasi
+Policy: https://kadai.asia/syarat-ketentuan
+Acknowledgments: https://kadai.asia/kebijakan-privasi

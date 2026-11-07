@@ -20,7 +20,7 @@ export interface CostingResult {
 type PrismaExecutor = PrismaClient | Prisma.TransactionClient;
 
 /**
- * Deduct stock and calculate HPP based on configured CostingMethod (FIFO or AVERAGE).
+ * Deduct stock and calculate HPP based on configured CostingMethod (FIFO, FEFO, or AVERAGE).
  * Supports optional outlet-scoping: if outletId is provided, prioritizes batches for that outlet.
  */
 export async function processStockDeduction(
@@ -35,21 +35,38 @@ export async function processStockDeduction(
   const method = options?.method ?? "FIFO";
   const outletId = options?.outletId ?? null;
 
-  // 1. Fetch available batches. If outletId is provided, match that outlet or global (null)
+  // 1. Fetch available batches.
+  const orderByClause: Prisma.ProductBatchOrderByWithRelationInput[] =
+    method === "FEFO"
+      ? [{ expiryDate: "asc" }, { purchaseDate: "asc" }]
+      : [{ purchaseDate: "asc" }];
+
   const batches = await db.productBatch.findMany({
     where: {
       productId,
       remainingQty: { gt: 0 },
       ...(outletId ? { OR: [{ outletId }, { outletId: null }] } : {}),
     },
-    orderBy: { purchaseDate: "asc" },
+    orderBy: orderByClause,
   });
 
   if (batches.length === 0) {
     throw new Error("Stok produk ini tidak tersedia di cabang terpilih.");
   }
 
-  const totalAvailable = batches.reduce((acc, b) => acc + b.remainingQty, 0);
+  let sortedBatches = batches;
+  if (method === "FEFO") {
+    sortedBatches = [...batches].sort((a, b) => {
+      if (a.expiryDate && b.expiryDate) {
+        return a.expiryDate.getTime() - b.expiryDate.getTime();
+      }
+      if (a.expiryDate && !b.expiryDate) return -1;
+      if (!a.expiryDate && b.expiryDate) return 1;
+      return a.purchaseDate.getTime() - b.purchaseDate.getTime();
+    });
+  }
+
+  const totalAvailable = sortedBatches.reduce((acc, b) => acc + b.remainingQty, 0);
   if (totalAvailable < requestedQty) {
     throw new Error(
       `Stok tidak mencukupi. Tersedia ${totalAvailable} unit, diminta ${requestedQty} unit.`
@@ -59,7 +76,7 @@ export async function processStockDeduction(
   // Calculate Weighted Average Cost across available batches if method is AVERAGE
   let weightedAverageCost = new Decimal(0);
   if (method === "AVERAGE" && totalAvailable > 0) {
-    const totalInventoryValue = batches.reduce(
+    const totalInventoryValue = sortedBatches.reduce(
       (acc, b) => acc.add(b.costPrice.mul(b.remainingQty)),
       new Decimal(0)
     );
@@ -71,7 +88,7 @@ export async function processStockDeduction(
   let totalRevenue = new Decimal(0);
   const allocations: CostingAllocation[] = [];
 
-  for (const batch of batches) {
+  for (const batch of sortedBatches) {
     if (remainingQtyToDeduct <= 0) break;
 
     const deductQty = Math.min(remainingQtyToDeduct, batch.remainingQty);

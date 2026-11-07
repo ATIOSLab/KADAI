@@ -11,7 +11,7 @@ export const createOutletSchema = z.object({
   serviceChargeRate: z.coerce.number().min(0, "Service charge minimal 0%").max(50, "Service charge maksimal 50%").default(5),
   outletType: z.enum(["CENTRAL_WAREHOUSE", "CENTRAL_KITCHEN", "RETAIL_BOOTH", "FULL_SERVICE_STORE"]).default("RETAIL_BOOTH"),
   kitchenWorkflow: z.enum(["DIRECT_SERVE", "KITCHEN_DISPATCH", "HYBRID"]).default("DIRECT_SERVE"),
-  costingMethod: z.enum(["FIFO", "AVERAGE"]).default("FIFO"),
+  costingMethod: z.enum(["FIFO", "FEFO", "AVERAGE"]).default("FIFO"),
 });
 
 export const updateOutletSchema = createOutletSchema.partial().extend({

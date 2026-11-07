@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
       }
 
       const store = await tx.store.findFirst();
-      let effectiveCostingMethod: "FIFO" | "AVERAGE" = store?.costingMethod || "FIFO";
+      let effectiveCostingMethod: "FIFO" | "FEFO" | "AVERAGE" = (store?.costingMethod as any) || "FIFO";
       let effectiveKitchenWorkflow: "DIRECT_SERVE" | "KITCHEN_DISPATCH" | "HYBRID" =
         store?.kitchenWorkflow || "KITCHEN_DISPATCH";
 
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
           select: { costingMethod: true, kitchenWorkflow: true },
         });
         if (targetOutlet) {
-          effectiveCostingMethod = targetOutlet.costingMethod;
+          effectiveCostingMethod = targetOutlet.costingMethod as any;
           effectiveKitchenWorkflow = targetOutlet.kitchenWorkflow;
         }
       }

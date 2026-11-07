@@ -20,30 +20,53 @@ export interface FIFOResult {
 type PrismaExecutor = PrismaClient | Prisma.TransactionClient;
 
 /**
- * Process FIFO or Weighted Average deduction for a single product
- * Returns batch allocations and total HPP
+ * Process FIFO, FEFO (First-Expired, First-Out), or Weighted Average deduction for a single product.
+ * Returns batch allocations and total HPP.
+ *
+ * Sorting Priority:
+ * - FEFO: Prioritizes batches with earliest expiryDate (nulls last), then earliest purchaseDate.
+ * - FIFO: Prioritizes batches with earliest purchaseDate.
+ * - AVERAGE: Allocates via FIFO/FEFO sequence while pricing at weighted average cost across available batches.
  */
 export async function processFIFODeduction(
   db: PrismaExecutor,
   productId: string,
   requestedQty: number,
-  options?: { outletId?: string | null; method?: "FIFO" | "AVERAGE" }
+  options?: { outletId?: string | null; method?: "FIFO" | "AVERAGE" | "FEFO" }
 ): Promise<FIFOResult> {
   const method = options?.method ?? "FIFO";
   const outletId = options?.outletId ?? null;
 
-  // Get batches with remaining stock, ordered by purchase date (FIFO)
-  // If outletId is provided, look for batches specific to this outlet or global (null)
+  // Check if product has perishable/batches with expiry dates to determine optimal queue
+  // If method is explicit FEFO or product has expiry dates, order by expiryDate then purchaseDate
+  const orderByClause: Prisma.ProductBatchOrderByWithRelationInput[] =
+    method === "FEFO"
+      ? [{ expiryDate: "asc" }, { purchaseDate: "asc" }]
+      : [{ purchaseDate: "asc" }];
+
   const batches = await db.productBatch.findMany({
     where: {
       productId,
       remainingQty: { gt: 0 },
       ...(outletId ? { OR: [{ outletId }, { outletId: null }] } : {}),
     },
-    orderBy: { purchaseDate: "asc" },
+    orderBy: orderByClause,
   });
 
-  const totalAvailable = batches.reduce((acc, b) => acc + b.remainingQty, 0);
+  // If FEFO was selected (or auto-detected), sort in-memory to ensure null expiryDate batches are placed last
+  let sortedBatches = batches;
+  if (method === "FEFO") {
+    sortedBatches = [...batches].sort((a, b) => {
+      if (a.expiryDate && b.expiryDate) {
+        return a.expiryDate.getTime() - b.expiryDate.getTime();
+      }
+      if (a.expiryDate && !b.expiryDate) return -1;
+      if (!a.expiryDate && b.expiryDate) return 1;
+      return a.purchaseDate.getTime() - b.purchaseDate.getTime();
+    });
+  }
+
+  const totalAvailable = sortedBatches.reduce((acc, b) => acc + b.remainingQty, 0);
   if (totalAvailable < requestedQty) {
     throw new Error(
       `Stok tidak cukup untuk produk ini. Tersedia ${totalAvailable} unit, diminta ${requestedQty} unit.`
@@ -53,7 +76,7 @@ export async function processFIFODeduction(
   // If method is AVERAGE, compute weighted average cost
   let weightedAverageCost = new Decimal(0);
   if (method === "AVERAGE" && totalAvailable > 0) {
-    const totalValue = batches.reduce(
+    const totalValue = sortedBatches.reduce(
       (acc, b) => acc.add(b.costPrice.mul(b.remainingQty)),
       new Decimal(0)
     );
@@ -65,7 +88,7 @@ export async function processFIFODeduction(
   let totalRevenue = new Decimal(0);
   const allocations: FIFOAllocation[] = [];
 
-  for (const batch of batches) {
+  for (const batch of sortedBatches) {
     if (remainingQty <= 0) break;
 
     const deductQty = Math.min(remainingQty, batch.remainingQty);

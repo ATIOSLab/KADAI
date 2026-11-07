@@ -21,6 +21,13 @@ test("Outlet validation: enforces uppercase code and valid schema", () => {
   assert.equal(valid.kitchenWorkflow, "DIRECT_SERVE");
   assert.equal(valid.costingMethod, "FIFO");
 
+  const validFefo = createOutletSchema.parse({
+    name: "Cabang Bakery FEFO",
+    code: "bkr-01",
+    costingMethod: "FEFO",
+  });
+  assert.equal(validFefo.costingMethod, "FEFO");
+
   // Invalid code too short
   assert.throws(() => {
     createOutletSchema.parse({ name: "Cabang", code: "A" });

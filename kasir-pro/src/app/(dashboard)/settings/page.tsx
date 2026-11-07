@@ -44,6 +44,7 @@ interface StoreData {
   taxInclusive: boolean;
   serviceChargeRate: number;
   enableRounding: boolean;
+  costingMethod: "FIFO" | "FEFO" | "AVERAGE";
 }
 
 interface UserData {
@@ -91,6 +92,7 @@ export default function SettingsPage() {
     taxInclusive: false,
     serviceChargeRate: 5,
     enableRounding: true,
+    costingMethod: "FIFO" as "FIFO" | "FEFO" | "AVERAGE",
   });
 
   const [loadingBot, setLoadingBot] = useState(true);
@@ -155,6 +157,7 @@ export default function SettingsPage() {
         taxInclusive: Boolean(res.data.taxInclusive),
         serviceChargeRate: res.data.serviceChargeRate ?? 5,
         enableRounding: Boolean(res.data.enableRounding),
+        costingMethod: (res.data.costingMethod as any) || "FIFO",
       });
     } catch {
       toast.error("Gagal memuat konfigurasi toko");
@@ -237,6 +240,7 @@ export default function SettingsPage() {
           taxInclusive: storeForm.taxInclusive,
           serviceChargeRate: storeForm.serviceChargeRate,
           enableRounding: storeForm.enableRounding,
+          costingMethod: storeForm.costingMethod,
         },
       });
       toast.success("Konfigurasi toko berhasil disimpan!");
@@ -511,6 +515,23 @@ export default function SettingsPage() {
                     <option value="NONE">Tanpa Pajak / Non-PKP (0%)</option>
                   </select>
                 </div>
+                <div className="space-y-2">
+                  <Label>Metode Alokasi Persediaan & Biaya (HPP)</Label>
+                  <select
+                    value={storeForm.costingMethod}
+                    onChange={(e: any) =>
+                      setStoreForm({ ...storeForm, costingMethod: e.target.value })
+                    }
+                    className="w-full h-10 px-3 rounded-lg neo-border bg-card text-xs font-bold"
+                  >
+                    <option value="FIFO">FIFO (First-In First-Out) - Standar Ritel & Akuntansi</option>
+                    <option value="FEFO">FEFO (First-Expired First-Out) - Khusus Makanan/Perishable</option>
+                    <option value="AVERAGE">AVERAGE (Moving Average) - Sembako & Toko Kelontong</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Tarif Pajak Efektif (%)</Label>
                   <Input

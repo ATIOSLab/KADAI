@@ -95,6 +95,7 @@ enum OutletType {
 
 enum CostingMethod {
   FIFO
+  FEFO
   AVERAGE
 }
 

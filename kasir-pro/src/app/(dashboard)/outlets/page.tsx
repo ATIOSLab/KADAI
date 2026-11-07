@@ -365,6 +365,7 @@ export default function OutletsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="FIFO">FIFO (First-In, First-Out)</SelectItem>
+                    <SelectItem value="FEFO">FEFO (First-Expired, First-Out)</SelectItem>
                     <SelectItem value="AVERAGE">Weighted Average (Rata-rata)</SelectItem>
                   </SelectContent>
                 </Select>

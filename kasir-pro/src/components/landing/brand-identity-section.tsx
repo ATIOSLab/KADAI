@@ -279,17 +279,11 @@ export function BrandIdentitySection() {
             {/* Thermal Receipt Paper Card with Perforated Shadow */}
             <div className="relative mx-auto w-full max-w-sm bg-white rounded-2xl p-6 shadow-xl border border-slate-200/80 font-mono text-xs space-y-4">
               {/* Receipt Header with Logo and Brand Lockup */}
-              <div className="text-center space-y-1.5 pb-4 border-b border-dashed border-slate-300">
+              <div className="text-center space-y-2 pb-4 border-b border-dashed border-slate-300">
                 <div className="flex justify-center">
-                  <KadaiLogoMark size={28} variant="mono-black" />
+                  <KadaiLockup variant="on-light" height={32} className="h-8 w-auto mx-auto" />
                 </div>
-                <div className="flex justify-center">
-                  <KadaiWordmark size="text-2xl" textColor="text-slate-950" />
-                </div>
-                <div className="text-[9px] font-bold text-slate-600 tracking-[0.18em] uppercase">
-                  SISTEM OPERASI BISNIS
-                </div>
-                <div className="text-[10px] text-slate-500 pt-1">
+                <div className="text-[10px] text-slate-500">
                   KADAI Resto &amp; Kopi Nusantara
                 </div>
               </div>

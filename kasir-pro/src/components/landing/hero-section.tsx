@@ -14,7 +14,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { HeroBackgroundSlider } from "./hero-background-slider";
-import { KadaiLogoMark, KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -281,19 +281,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             {/* Right Side: Live Digital Thermal Receipt Card */}
             <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
               <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
-                {/* Official Brand Stamped Receipt Header */}
+                {/* Official Brand Stamped Receipt Header (Using /png/lockup/) */}
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="flex size-7 items-center justify-center rounded-lg bg-slate-950 p-1 text-white shadow-2xs">
-                      <KadaiLogoMark size={18} />
-                    </span>
-                    <div className="flex flex-col">
-                      <KadaiWordmark size="text-base" />
-                      <span className="text-[7.5px] font-bold text-slate-500 tracking-[0.16em] uppercase -mt-0.5 font-sans">
-                        SISTEM OPERASI BISNIS
-                      </span>
-                    </div>
-                  </div>
+                  <KadaiLockup variant="on-light" height={26} className="h-6 w-auto" />
                   <Badge
                     variant="outline"
                     className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"

@@ -326,9 +326,7 @@ export function KadaiBrandHeader({
 }: KadaiBrandProps) {
   return (
     <div className={cn("flex items-center gap-2.5 sm:gap-3", className)}>
-      <span className="flex size-8 sm:size-9 lg:size-10 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs p-1 shrink-0">
-        <KadaiLogoMark size={logoSize} />
-      </span>
+      <KadaiLogoMark size={logoSize} variant="on-light" className="shrink-0" />
       <div className="flex flex-col justify-center min-w-0">
         <KadaiWordmark textColor={textColor} size="text-xl sm:text-2xl" />
         {showTagline && (
@@ -350,6 +348,7 @@ export function KadaiBrandHeader({
  * KADAI PRIMARY LOGO (Logo Utama)
  * Mandat Brand: Logo utama BUKAN hanya simbol K sendirian,
  * melainkan kombinasi utuh Simbol Huruf K + Wordmark "kadaı" secara bersamaan.
+ * Bersifat free-standing (berdiri bebas tanpa kotak pembungkus) sesuai master lockup resmi.
  */
 export function KadaiPrimaryLogo({
   className,
@@ -367,13 +366,12 @@ export function KadaiPrimaryLogo({
   taglineText?: string;
 }) {
   const isDark = variant === "on-dark" || variant === "mono-white";
-  const isMono = variant === "mono-black" || variant === "mono-white";
 
   const sizeConfig = {
-    sm: { markSize: 24, wordmarkSize: "text-lg", containerSize: "size-7", taglineSize: "text-[7px]" },
-    md: { markSize: 32, wordmarkSize: "text-2xl", containerSize: "size-9", taglineSize: "text-[8.5px]" },
-    lg: { markSize: 42, wordmarkSize: "text-3xl", containerSize: "size-12", taglineSize: "text-[10px]" },
-    xl: { markSize: 56, wordmarkSize: "text-4xl", containerSize: "size-16", taglineSize: "text-[12px]" },
+    sm: { markSize: 26, wordmarkSize: "text-lg", taglineSize: "text-[7.5px]" },
+    md: { markSize: 34, wordmarkSize: "text-2xl", taglineSize: "text-[8.5px]" },
+    lg: { markSize: 44, wordmarkSize: "text-3xl", taglineSize: "text-[10px]" },
+    xl: { markSize: 58, wordmarkSize: "text-4xl", taglineSize: "text-[12px]" },
   }[size];
 
   const logoMarkVariant =
@@ -388,14 +386,7 @@ export function KadaiPrimaryLogo({
   if (layout === "stacked") {
     return (
       <div className={cn("inline-flex flex-col items-center text-center gap-2", className)}>
-        <span
-          className={cn(
-            "flex items-center justify-center rounded-2xl p-2 shrink-0 shadow-xs",
-            isDark ? "bg-slate-900 border border-slate-800" : "bg-slate-950 text-white"
-          )}
-        >
-          <KadaiLogoMark size={sizeConfig.markSize} variant={isDark ? "on-dark" : "brand"} />
-        </span>
+        <KadaiLogoMark size={sizeConfig.markSize} variant={logoMarkVariant} />
         <div className="flex flex-col items-center">
           <KadaiWordmark
             size={sizeConfig.wordmarkSize}
@@ -418,16 +409,8 @@ export function KadaiPrimaryLogo({
   }
 
   return (
-    <div className={cn("inline-flex items-center gap-3", className)}>
-      <span
-        className={cn(
-          "flex items-center justify-center rounded-xl p-1.5 shrink-0 shadow-xs",
-          sizeConfig.containerSize,
-          isDark ? "bg-slate-900 border border-slate-800" : "bg-slate-950 text-white"
-        )}
-      >
-        <KadaiLogoMark size={sizeConfig.markSize} variant={isDark ? "on-dark" : "brand"} />
-      </span>
+    <div className={cn("inline-flex items-center gap-2.5 sm:gap-3", className)}>
+      <KadaiLogoMark size={sizeConfig.markSize} variant={logoMarkVariant} className="shrink-0" />
       <div className="flex flex-col justify-center min-w-0 text-left">
         <KadaiWordmark
           size={sizeConfig.wordmarkSize}

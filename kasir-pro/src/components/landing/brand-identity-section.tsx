@@ -232,18 +232,8 @@ export function BrandIdentitySection() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#EA580C]/20 via-[#F59E0B]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 space-y-6">
-              {/* Header Lockup */}
-              <div className="flex items-center gap-3">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 p-1 text-white shadow-md">
-                  <KadaiLogoMark size={32} />
-                </span>
-                <div className="flex flex-col justify-center">
-                  <KadaiWordmark textColor="text-white" size="text-2xl sm:text-3xl" />
-                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase mt-0.5 font-sans">
-                    SISTEM OPERASI BISNIS
-                  </span>
-                </div>
-              </div>
+              {/* Header Lockup (Logo Utama: Simbol K + kadaı) */}
+              <KadaiPrimaryLogo layout="horizontal" showTagline={true} size="lg" variant="on-dark" />
 
               {/* Core Slogan Headline */}
               <div className="space-y-3 pt-4">

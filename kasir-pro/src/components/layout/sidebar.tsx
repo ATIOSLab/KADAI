@@ -8,7 +8,7 @@ import { getDefaultPathForRole } from "@/lib/rbac";
 import { useLogout } from "@/hooks/use-logout";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/session";
-import { KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -52,32 +52,11 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
           <Link
             href={homeHref}
             className={cn(
-              "flex min-w-0 flex-1 items-center gap-2",
+              "flex min-w-0 flex-1 items-center gap-2.5",
               collapsed && "justify-center"
             )}
           >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-950 p-1">
-              <svg viewBox="0 0 512 512" fill="none" className="size-full">
-                <defs>
-                  <linearGradient id="sb-ga" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#FB923C" />
-                  </linearGradient>
-                  <linearGradient id="sb-gl" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#F59E0B" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  <linearGradient id="sb-gs" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#E2E8F0" />
-                  </linearGradient>
-                </defs>
-                <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#sb-gs)" />
-                <path d="M212 256L350 114" stroke="url(#sb-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#sb-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <circle cx="408" cy="150" r="22" fill="#F59E0B" />
-              </svg>
-            </span>
+            <KadaiLogoMark size={28} variant="on-light" className="shrink-0" />
             {!collapsed && (
               <span className="min-w-0">
                 <KadaiWordmark size="text-base" />

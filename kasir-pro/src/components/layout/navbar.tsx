@@ -18,7 +18,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { NotificationMenu } from "@/components/layout/notification-menu";
-import { KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -206,29 +206,8 @@ export function Navbar({
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-card shadow-2xl border-r border-border">
             {/* Drawer Header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <div className="flex items-center gap-2">
-                <span className="flex size-8 items-center justify-center rounded-lg bg-slate-950 p-1">
-                  <svg viewBox="0 0 512 512" fill="none" className="size-full">
-                    <defs>
-                      <linearGradient id="nb-ga" x1="0" y1="1" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#EA580C" />
-                        <stop offset="100%" stopColor="#FB923C" />
-                      </linearGradient>
-                      <linearGradient id="nb-gl" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#F59E0B" />
-                        <stop offset="100%" stopColor="#EA580C" />
-                      </linearGradient>
-                      <linearGradient id="nb-gs" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#FFFFFF" />
-                        <stop offset="100%" stopColor="#E2E8F0" />
-                      </linearGradient>
-                    </defs>
-                    <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#nb-gs)" />
-                    <path d="M212 256L350 114" stroke="url(#nb-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                    <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#nb-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                    <circle cx="408" cy="150" r="22" fill="#F59E0B" />
-                  </svg>
-                </span>
+              <div className="flex items-center gap-2.5">
+                <KadaiLogoMark size={28} variant="on-light" className="shrink-0" />
                 <div>
                   <KadaiWordmark size="text-base" />
                   <span className="text-[8px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-[0.16em] font-sans">

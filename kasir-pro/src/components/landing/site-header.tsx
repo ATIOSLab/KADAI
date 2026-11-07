@@ -16,7 +16,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
 
 interface SiteHeaderProps {
   dashboardPath: string | null;
@@ -78,33 +78,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
     <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
       <div className="w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
-          {/* Brand Logo (Clean Human-Grade, No Pill Nesting) */}
+          {/* Brand Logo (Logo Utama: Simbol K + kadaı) */}
           <Link
             href="/"
-            className="flex items-center gap-3 shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+            className="flex items-center gap-2.5 sm:gap-3 shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
           >
-            <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs group-hover:shadow-md transition-all p-1">
-              <svg viewBox="0 0 512 512" fill="none" className="size-full">
-                <defs>
-                  <linearGradient id="hdr-ga" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#FB923C" />
-                  </linearGradient>
-                  <linearGradient id="hdr-gl" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#F59E0B" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  <linearGradient id="hdr-gs" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#E2E8F0" />
-                  </linearGradient>
-                </defs>
-                <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#hdr-gs)" />
-                <path d="M212 256L350 114" stroke="url(#hdr-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#hdr-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <circle cx="408" cy="150" r="22" fill="#F59E0B" />
-              </svg>
-            </span>
+            <KadaiLogoMark size={34} variant="on-light" className="shrink-0 group-hover:scale-105 transition-transform" />
             <div className="flex flex-col justify-center">
               <KadaiWordmark size="text-xl sm:text-2xl" />
               <span className="hidden sm:block text-[8px] sm:text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-0.5 font-sans">

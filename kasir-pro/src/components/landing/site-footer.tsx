@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Store } from "lucide-react";
-import { KadaiWordmark } from "@/components/shared/kadai-logo";
+import { KadaiWordmark, KadaiLogoMark } from "@/components/shared/kadai-logo";
 
 export function SiteFooter() {
   return (
@@ -77,29 +77,8 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
-          <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-lg bg-slate-900 border border-slate-800 p-1">
-              <svg viewBox="0 0 512 512" fill="none" className="size-full">
-                <defs>
-                  <linearGradient id="ftr-ga" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#FB923C" />
-                  </linearGradient>
-                  <linearGradient id="ftr-gl" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#F59E0B" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  <linearGradient id="ftr-gs" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#E2E8F0" />
-                  </linearGradient>
-                </defs>
-                <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#ftr-gs)" />
-                <path d="M212 256L350 114" stroke="url(#ftr-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#ftr-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
-                <circle cx="408" cy="150" r="22" fill="#F59E0B" />
-              </svg>
-            </span>
+          <div className="flex items-center gap-2.5">
+            <KadaiLogoMark size={24} variant="on-dark" className="shrink-0" />
             <KadaiWordmark size="text-lg" textColor="text-slate-200" />
             <span className="text-slate-600">•</span>
             <span className="tracking-[0.16em] uppercase text-xs font-bold text-slate-400">SISTEM OPERASI BISNIS</span>

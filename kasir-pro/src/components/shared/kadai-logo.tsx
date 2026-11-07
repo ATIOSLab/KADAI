@@ -23,17 +23,24 @@ export function KadaiLogoMark({
 }: KadaiLogoProps) {
   const stemFill =
     variant === "white"
-      ? "#FFFFFF"
+      ? "url(#kadai-gs-white)"
       : variant === "monochrome"
         ? "currentColor"
-        : "#020617";
+        : "url(#kadai-gs)";
 
-  const curveStroke =
+  const upperStroke =
     variant === "white"
       ? "#FFFFFF"
       : variant === "monochrome"
         ? "currentColor"
-        : "#EA580C";
+        : "url(#kadai-ga)";
+
+  const lowerStroke =
+    variant === "white"
+      ? "#FFFFFF"
+      : variant === "monochrome"
+        ? "currentColor"
+        : "url(#kadai-gl)";
 
   const sparkFill =
     sparkColor ??
@@ -47,31 +54,52 @@ export function KadaiLogoMark({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 100 100"
+      viewBox="0 0 512 512"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("shrink-0", className)}
       aria-label="Kadai Logo"
     >
-      {/* 1. Batang Tegak (Vertical Stem) */}
-      <rect x="18" y="14" width="16" height="72" rx="8" fill={stemFill} />
+      <defs>
+        <linearGradient id="kadai-ga" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#EA580C" />
+          <stop offset="100%" stopColor="#FB923C" />
+        </linearGradient>
+        <linearGradient id="kadai-gl" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#EA580C" />
+        </linearGradient>
+        <linearGradient id="kadai-gs" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#E2E8F0" />
+        </linearGradient>
+        <linearGradient id="kadai-gs-white" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#F1F5F9" />
+        </linearGradient>
+      </defs>
 
-      {/* 2. Lengkung Wajan (Wok Edge Curve - sweeping arm of K) */}
+      {/* 1. Batang Tegak (Vertical Stem) */}
+      <rect x="120" y="78" width="60" height="356" rx="30" fill={stemFill} />
+
+      {/* 2. Lengkung Wajan & Kaki Diagonal K */}
       <path
-        d="M38 66 C 46 66, 68 62, 78 30"
-        stroke={curveStroke}
-        strokeWidth="14"
+        d="M212 256L350 114"
+        stroke={upperStroke}
+        strokeWidth="60"
         strokeLinecap="round"
+        fill="none"
       />
       <path
-        d="M48 54 L 80 82"
-        stroke={curveStroke}
-        strokeWidth="14"
+        d="M212 256A150 150 0 0 1 362 406"
+        stroke={lowerStroke}
+        strokeWidth="60"
         strokeLinecap="round"
+        fill="none"
       />
 
       {/* 3. Percikan Api (Spark Dot - Amber Accent) */}
-      <circle cx="82" cy="18" r="8" fill={sparkFill} />
+      <circle cx="408" cy="150" r="22" fill={sparkFill} />
     </svg>
   );
 }

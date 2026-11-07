@@ -27,7 +27,17 @@ const publicPages = [
   "/llms.txt",
   "/icon.svg",
   "/favicon.ico",
+  "/favicon.svg",
+  "/favicon-16x16.png",
+  "/favicon-32x32.png",
+  "/favicon-48x48.png",
+  "/apple-touch-icon.png",
+  "/android-chrome-192x192.png",
+  "/android-chrome-512x512.png",
+  "/site.webmanifest",
   "/manifest.json",
+  "/og-image.png",
+  "/brand",
   "/sw.js",
   "/images",
   "/uploads",
@@ -115,6 +125,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.json|window.svg|vercel.svg|next.svg|globe.svg|file.svg|uploads/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|favicon.svg|favicon-.*\\.png|apple-touch-icon.png|android-chrome-.*\\.png|site.webmanifest|manifest.json|og-image.png|brand/|window.svg|vercel.svg|next.svg|globe.svg|file.svg|uploads/).*)"],
 };
 

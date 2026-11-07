@@ -76,12 +76,26 @@ export function SiteFooter() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
           <div className="flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-lg bg-slate-900 p-0.5">
-              <svg viewBox="0 0 100 100" fill="none" className="size-full">
-                <rect x="18" y="14" width="16" height="72" rx="8" fill="#FFFFFF" />
-                <path d="M38 66 C 46 66, 68 62, 78 30" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
-                <path d="M48 52 L 77 78" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
-                <circle cx="82" cy="18" r="8" fill="#F59E0B" />
+            <span className="flex size-7 items-center justify-center rounded-lg bg-slate-900 border border-slate-800 p-1">
+              <svg viewBox="0 0 512 512" fill="none" className="size-full">
+                <defs>
+                  <linearGradient id="ftr-ga" x1="0" y1="1" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#EA580C" />
+                    <stop offset="100%" stopColor="#FB923C" />
+                  </linearGradient>
+                  <linearGradient id="ftr-gl" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#EA580C" />
+                  </linearGradient>
+                  <linearGradient id="ftr-gs" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="100%" stopColor="#E2E8F0" />
+                  </linearGradient>
+                </defs>
+                <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#ftr-gs)" />
+                <path d="M212 256L350 114" stroke="url(#ftr-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
+                <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#ftr-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
+                <circle cx="408" cy="150" r="22" fill="#F59E0B" />
               </svg>
             </span>
             <span className="font-bold text-slate-200">

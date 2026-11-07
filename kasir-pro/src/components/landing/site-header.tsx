@@ -247,34 +247,16 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
             {/* Direct Links */}
             <Link
-              href="/referral"
-              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
-            >
-              Mitra
-            </Link>
-            <Link
-              href="/hardware"
-              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
-            >
-              Hardware
-            </Link>
-            <Link
               href="/harga"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
               Harga
             </Link>
             <Link
-              href="/blog"
+              href="/hardware"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
-              Blog
-            </Link>
-            <Link
-              href="/#pajak-pembukuan"
-              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
-            >
-              Pajak
+              Hardware
             </Link>
             <Link
               href="/#faq"
@@ -284,7 +266,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             </Link>
           </nav>
 
-          {/* Right Action: Clean Moka-style Login + Rounded Solid CTA */}
+          {/* Right Action: Clean Login + Rounded Solid CTA */}
           <div className="hidden xl:flex items-center gap-3 shrink-0">
             {dashboardPath ? (
               <Button
@@ -299,14 +281,8 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             ) : (
               <>
                 <Link
-                  href="/demo"
-                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2.5 py-1"
-                >
-                  Request Demo
-                </Link>
-                <Link
                   href="/login"
-                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-2.5 py-1"
+                  className="text-sm font-semibold text-slate-700 hover:text-primary transition-colors px-3 py-1.5"
                 >
                   Masuk
                 </Link>

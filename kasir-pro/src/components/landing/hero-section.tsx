@@ -22,7 +22,7 @@ interface HeroSectionProps {
 const SEGMENTS = [
   {
     id: "fnb",
-    name: "Kafe & Restoran (F&B)",
+    name: "Kafe & Resto",
     icon: UtensilsCrossed,
     path: "fnb-operational-engine",
     photoUrl: "/images/hero/slide-1.jpg",
@@ -34,8 +34,8 @@ const SEGMENTS = [
       status: "Dapur Aktif",
       meta: "Order ID: 20241105-0041 • Kasir: Budi",
       items: [
-        { name: "2x Nasi Goreng Spesial", bom: "BOM: Beras, Ayam, Telur", price: "Rp 64.000" },
-        { name: "2x Es Kopi Susu Aren", bom: "BOM: Arabica Gayo, Susu, Aren", price: "Rp 36.000" },
+        { name: "2x Nasi Goreng Spesial", bom: "Resep Terpotong Otomatis", price: "Rp 64.000" },
+        { name: "2x Es Kopi Susu Aren", bom: "Resep Terpotong Otomatis", price: "Rp 36.000" },
       ],
       pb1: "Rp 10.000",
       service: "Rp 5.000",
@@ -48,7 +48,7 @@ const SEGMENTS = [
   },
   {
     id: "retail",
-    name: "Ritel & Minimarket",
+    name: "Toko & Ritel",
     icon: Store,
     path: "retail-multi-batch-fifo",
     photoUrl: "/images/hero/slide-3.jpg",
@@ -70,11 +70,11 @@ const SEGMENTS = [
     },
     metric1: { label: "PAJAK PERTAMBAHAN NILAI", val: "PPN 11% Otomatis" },
     metric2: { label: "SCANNER BARCODE", val: "USB & Bluetooth" },
-    metric3: { label: "PENILAIAN STOK", val: "FIFO SAK EMKM" },
+    metric3: { label: "PENILAIAN STOK", val: "FIFO Terverifikasi" },
   },
   {
     id: "central",
-    name: "Dapur Pusat & Gudang",
+    name: "Gudang & Cabang",
     icon: Warehouse,
     path: "central-kitchen-routing",
     photoUrl: "/images/hero/slide-2.jpg",
@@ -125,9 +125,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               variant="outline"
               className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
             >
-              <span className="size-2 rounded-full bg-primary shrink-0" />
-              <span className="text-[10px] sm:text-[11px] text-slate-700 uppercase tracking-wider font-semibold leading-tight">
-                KADAI // TRANSAKSI LANCAR • STOK AKURAT • PAJAK TEPAT
+              <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
+              <span className="text-[10px] sm:text-[11px] text-slate-800 uppercase tracking-wider font-bold leading-tight">
+                Sistem Operasi Bisnis Indonesia • POS, Stok & Pajak
               </span>
             </Badge>
           </div>
@@ -142,7 +142,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
             KADAI membantu pemilik usaha mencatat penjualan kilat, melacak sisa stok bahan otomatis (metode FIFO), membagi pesanan ke layar dapur, hingga menyiapkan rekap pajak restoran PB1 dan PPh final tanpa rumus ribet.
           </p>
 
-          {/* CTA Buttons (Clean Enterprise Action) */}
+          {/* CTA Buttons (Clean Focused Action) */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-xs sm:max-w-none mx-auto w-full px-4 sm:px-0">
             {dashboardPath ? (
               <Button
@@ -173,15 +173,6 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 >
                   <Link href="/demo">Jadwalkan Demo</Link>
                 </Button>
-
-                <Button
-                  asChild
-                  size="lg"
-                  variant="ghost"
-                  className="w-full sm:w-auto font-semibold text-sm h-12 px-6 rounded-full text-slate-700 hover:text-slate-950 hover:bg-white/80"
-                >
-                  <Link href="/login">Masuk ke Toko Anda</Link>
-                </Button>
               </>
             )}
           </div>
@@ -190,9 +181,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
       {/* 2. Interactive Operational Cockpit Section (Unobstructed, Clean Vertical Flow) */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
-        {/* 3 Operational Switcher Tabs (Centered Segmented Control) */}
-        <div className="flex items-center justify-center overflow-x-auto pb-1">
-          <div className="inline-flex p-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md gap-1.5">
+        {/* 3 Operational Switcher Tabs (Centered Segmented Control, Clean Scrollbar) */}
+        <div className="flex items-center justify-start sm:justify-center overflow-x-auto py-1 px-2 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="inline-flex p-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md gap-1.5 shrink-0 mx-auto">
             {SEGMENTS.map((seg, idx) => {
               const Icon = seg.icon;
               const isActive = idx === activeTab;
@@ -217,19 +208,24 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
         {/* Interactive Mockup Container Window Frame */}
         <div className="relative rounded-[28px] bg-white shadow-2xl overflow-hidden border border-slate-200/90">
-          {/* Top Browser Bar */}
+          {/* Top Operational Status Bar */}
           <div className="bg-slate-950 text-slate-300 px-4 sm:px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="size-2.5 rounded-full bg-red-500 inline-block" />
-              <span className="size-2.5 rounded-full bg-amber-500 inline-block" />
-              <span className="size-2.5 rounded-full bg-emerald-500 inline-block" />
-              <span className="font-mono text-slate-300 ml-2 text-[11px] font-semibold">
-                kadai.os // {current.path}
+            <div className="flex items-center gap-2.5">
+              <span className="size-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+              <span className="text-slate-200 text-xs font-bold tracking-tight">
+                KADAI Cloud POS
+              </span>
+              <span className="hidden sm:inline-block text-slate-500 font-medium">|</span>
+              <span className="hidden sm:inline-block text-slate-400 text-[11px]">
+                {current.name} • Gerai Online
               </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-              Realtime Operational Engine
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-400 font-medium bg-slate-900/90 px-2.5 py-0.5 rounded-full border border-slate-800 flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-emerald-400" />
+                <span>Sinkronisasi Otomatis</span>
+              </span>
+            </div>
           </div>
 
           {/* Split Cockpit View */}
@@ -350,23 +346,6 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
                 {current.metric3.val}
               </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating Realtime KPI Badge (Hexus Layered Depth Pattern) */}
-        <div className="hidden sm:flex absolute -bottom-4 right-6 z-20 items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 shadow-xl shadow-slate-900/[0.08]">
-          <div className="size-9 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">
-            <TrendingUp className="size-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Akurasi HPP FIFO & BOM</span>
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-            <div className="text-xs font-bold text-slate-950 tabular-nums flex items-baseline gap-1.5">
-              <span>99.8% Efisiensi Teruji</span>
-              <span className="text-[10px] font-semibold text-emerald-600 font-normal">• Live Multi-Batch</span>
             </div>
           </div>
         </div>

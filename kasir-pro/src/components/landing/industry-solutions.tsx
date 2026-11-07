@@ -56,13 +56,13 @@ export function IndustrySolutions() {
             variant="outline"
             className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
           >
-            Solusi Lintas Industri
+            Solusi Sesuai Karakter Toko
           </Badge>
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
-            Arsitektur Fleksibel untuk Seluruh Sektor Bisnis
+            Dibuat Pas untuk Apapun Usaha Anda
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-            KADAI dirancang secara modular dan agnostik untuk beradaptasi dengan model operasional usaha Anda, mulai dari pencatatan barcode ritel, perakitan resep kuliner, hingga reservasi jasa.
+            KADAI otomatis menyesuaikan cara kerja bisnis Anda — cepat melayani scan barcode di toko ritel, langsung membagi pesanan ke layar dapur restoran, hingga mengatur transaksi jasa.
           </p>
         </div>
 

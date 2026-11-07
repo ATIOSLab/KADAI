@@ -206,12 +206,19 @@ export function Navbar({
             {/* Drawer Header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
               <div className="flex items-center gap-2">
-                <span className="flex size-8 items-center justify-center rounded-lg bg-slate-900 text-white shadow-sm">
-                  <Store className="size-4" />
+                <span className="flex size-8 items-center justify-center rounded-lg bg-slate-950 p-1">
+                  <svg viewBox="0 0 100 100" fill="none" className="size-full">
+                    <rect x="18" y="14" width="16" height="72" rx="8" fill="#FFFFFF" />
+                    <path d="M38 66 C 46 66, 68 62, 78 30" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                    <path d="M48 54 L 80 82" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                    <circle cx="82" cy="18" r="8" fill="#F59E0B" />
+                  </svg>
                 </span>
                 <div>
-                  <span className="text-sm font-bold text-foreground">KADAI</span>
-                  <span className="text-[10px] font-mono text-muted-foreground uppercase block -mt-1">
+                  <span className="text-sm font-extrabold text-foreground font-sans">
+                    KADAI<span className="text-[#EA580C]">.</span>
+                  </span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-wider font-sans">
                     {roleLabel}
                   </span>
                 </div>

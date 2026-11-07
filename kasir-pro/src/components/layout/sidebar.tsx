@@ -55,14 +55,21 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
               collapsed && "justify-center"
             )}
           >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Store className="size-4" />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-950 p-1">
+              <svg viewBox="0 0 100 100" fill="none" className="size-full">
+                <rect x="18" y="14" width="16" height="72" rx="8" fill="#FFFFFF" />
+                <path d="M38 66 C 46 66, 68 62, 78 30" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <path d="M48 54 L 80 82" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <circle cx="82" cy="18" r="8" fill="#F59E0B" />
+              </svg>
             </span>
             {!collapsed && (
               <span className="min-w-0">
-                <span className="block truncate text-sm font-black">KADAI</span>
-                <span className="block truncate text-xs font-medium text-muted-foreground">
-                  Point of Sale
+                <span className="block truncate text-sm font-extrabold tracking-tight font-sans">
+                  KADAI<span className="text-[#EA580C]">.</span>
+                </span>
+                <span className="block truncate text-[9px] font-bold text-muted-foreground uppercase tracking-wider font-sans">
+                  SISTEM OPERASI BISNIS
                 </span>
               </span>
             )}

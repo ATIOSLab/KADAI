@@ -1,7 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="8" fill="#0F172A" />
-  <!-- Store Roof & Counter -->
-  <path d="M7 13V11L8.5 7H23.5L25 11V13C25 14.1 24.1 15 23 15C21.9 15 21 14.1 21 13C21 14.1 20.1 15 19 15C17.9 15 17 14.1 17 13C17 14.1 16.1 15 15 15C13.9 15 13 14.1 13 13C13 14.1 12.1 15 11 15C9.9 15 9 14.1 9 13C9 14.1 8.1 15 7 15C5.9 15 5 14.1 5 13H7Z" fill="#EA580C" />
-  <path d="M8 15V24C8 24.55 8.45 25 9 25H23C23.55 25 24 24.55 24 24V15" stroke="#EA580C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-  <path d="M13 25V19H19V25" stroke="#EA580C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32">
+  <rect width="100" height="100" rx="24" fill="#020617" />
+  <!-- 1. Batang Tegak (Vertical Stem) -->
+  <rect x="22" y="18" width="14" height="64" rx="7" fill="#FFFFFF" />
+  <!-- 2. Lengkung Wajan (Wok Edge Curve) -->
+  <path d="M40 64 C 47 64, 66 60, 75 32" stroke="#EA580C" stroke-width="12" stroke-linecap="round" fill="none" />
+  <path d="M48 52 L 77 78" stroke="#EA580C" stroke-width="12" stroke-linecap="round" fill="none" />
+  <!-- 3. Percikan Api (Spark Dot) -->
+  <circle cx="78" cy="20" r="7.5" fill="#F59E0B" />
 </svg>

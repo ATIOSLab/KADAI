@@ -13,17 +13,24 @@
   --color-bg-main: #F8FAFC;
   --color-bg-card: #FFFFFF;
   --color-bg-sidebar: #FFFFFF;
-  --color-bg-dark: #0F172A;
+  --color-bg-dark: #020617;
+
+  /* Brand Palette from Identity Guide:
+     Slate: #020617 | Ember: #EA580C | Glow: #FB923C | Amber: #F59E0B */
+  --color-kadai-slate: #020617;
+  --color-kadai-ember: #EA580C;
+  --color-kadai-glow: #FB923C;
+  --color-kadai-amber: #F59E0B;
 
   --color-accent-primary: #EA580C;
-  --color-accent-secondary: #0F172A;
+  --color-accent-secondary: #020617;
   --color-accent-success: #10B981;
   --color-accent-warning: #F59E0B;
   --color-accent-danger: #EF4444;
   --color-accent-purple: #8B5CF6;
-  --color-accent-orange: #F97316;
+  --color-accent-orange: #FB923C;
 
-  --color-text-primary: #0F172A;
+  --color-text-primary: #020617;
   --color-text-secondary: #475569;
   --color-text-muted: #64748B;
   --color-text-inverse: #FFFFFF;
@@ -31,7 +38,7 @@
   --color-border-default: #E2E8F0;
   --color-border-light: #E2E8F0;
 
-  --font-sans: var(--font-sans), 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: var(--font-sans), 'Plus Jakarta Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: var(--font-mono), 'Geist Mono', monospace;
 }
 
@@ -455,48 +462,48 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
+  --foreground: #020617;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #020617;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --popover-foreground: #020617;
   --primary: #ea580c;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
+  --secondary-foreground: #020617;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
   --accent: #f8fafc;
-  --accent-foreground: #0f172a;
+  --accent-foreground: #020617;
   --destructive: #ef4444;
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #ea580c;
   --chart-1: #ea580c;
-  --chart-2: #0f172a;
+  --chart-2: #020617;
   --chart-3: #10b981;
   --chart-4: #f59e0b;
-  --chart-5: #8b5cf6;
+  --chart-5: #fb923c;
   --radius: 0.625rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
+  --sidebar-foreground: #020617;
   --sidebar-primary: #ea580c;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f8fafc;
-  --sidebar-accent-foreground: #0f172a;
+  --sidebar-accent-foreground: #020617;
   --sidebar-border: #e2e8f0;
   --sidebar-ring: #ea580c;
 }
 
 .dark {
-  --background: #090d16;
+  --background: #020617;
   --foreground: #f8fafc;
-  --card: #0f172a;
+  --card: #0b1120;
   --card-foreground: #f8fafc;
-  --popover: #0f172a;
+  --popover: #0b1120;
   --popover-foreground: #f8fafc;
-  --primary: #f97316;
-  --primary-foreground: #090d16;
+  --primary: #ea580c;
+  --primary-foreground: #ffffff;
   --secondary: #1e293b;
   --secondary-foreground: #f8fafc;
   --muted: #1e293b;
@@ -506,20 +513,20 @@
   --destructive: #f87171;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: #f97316;
-  --chart-1: #f97316;
-  --chart-2: #38bdf8;
+  --ring: #ea580c;
+  --chart-1: #ea580c;
+  --chart-2: #fb923c;
   --chart-3: #34d399;
-  --chart-4: #fbbf24;
+  --chart-4: #f59e0b;
   --chart-5: #a78bfa;
-  --sidebar: #0b1120;
+  --sidebar: #020617;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #f97316;
+  --sidebar-primary: #ea580c;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1e293b;
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #f97316;
+  --sidebar-ring: #ea580c;
 }
 
 @media print {

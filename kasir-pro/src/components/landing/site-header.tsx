@@ -82,18 +82,23 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             href="/"
             className="flex items-center gap-3 shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
           >
-            <span className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs group-hover:bg-primary transition-colors">
-              <Store className="size-4.5 text-white" />
+            <span className="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs group-hover:bg-[#EA580C] transition-colors p-1">
+              <svg viewBox="0 0 100 100" fill="none" className="size-full">
+                <rect x="18" y="14" width="16" height="72" rx="8" fill="#FFFFFF" />
+                <path d="M38 66 C 46 66, 68 62, 78 30" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <path d="M48 54 L 80 82" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <circle cx="82" cy="18" r="8" fill="#F59E0B" />
+              </svg>
             </span>
             <div className="flex flex-col">
               <div className="flex items-baseline leading-none">
-                <span className="text-xl font-extrabold tracking-tight text-slate-950">
+                <span className="text-xl font-extrabold tracking-tight text-slate-950 font-sans">
                   KADAI
                 </span>
-                <span className="text-primary font-black text-2xl leading-none">.</span>
+                <span className="text-[#EA580C] font-black text-2xl leading-none">.</span>
               </div>
-              <span className="text-[10px] font-medium text-slate-500 tracking-normal mt-0.5">
-                Sistem Operasi Bisnis Indonesia
+              <span className="text-[9px] font-bold text-slate-500 tracking-[0.14em] uppercase mt-0.5 font-sans">
+                SISTEM OPERASI BISNIS
               </span>
             </div>
           </Link>

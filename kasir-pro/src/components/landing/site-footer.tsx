@@ -76,14 +76,19 @@ export function SiteFooter() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
           <div className="flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-lg bg-primary/20 text-primary">
-              <Store className="size-3.5" />
+            <span className="flex size-6 items-center justify-center rounded-lg bg-slate-900 p-0.5">
+              <svg viewBox="0 0 100 100" fill="none" className="size-full">
+                <rect x="18" y="14" width="16" height="72" rx="8" fill="#FFFFFF" />
+                <path d="M38 66 C 46 66, 68 62, 78 30" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <path d="M48 52 L 77 78" stroke="#EA580C" strokeWidth="14" strokeLinecap="round" />
+                <circle cx="82" cy="18" r="8" fill="#F59E0B" />
+              </svg>
             </span>
             <span className="font-bold text-slate-200">
               KADAI
             </span>
             <span>•</span>
-            <span>Sistem Operasi Bisnis Indonesia</span>
+            <span className="tracking-wide">SISTEM OPERASI BISNIS</span>
           </div>
 
           <div className="text-slate-500 text-[11px]">

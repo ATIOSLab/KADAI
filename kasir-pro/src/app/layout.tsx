@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
@@ -7,10 +7,11 @@ import { PwaRegister } from "@/components/shared/pwa-register";
 import { ReferralTracker } from "@/components/shared/referral-tracker";
 import "./globals.css";
 
-const geistSans = Geist({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -121,7 +122,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={cn("font-sans antialiased", geistSans.variable, geistMono.variable)}>
+    <html lang="id" className={cn("font-sans antialiased", plusJakartaSans.variable, geistMono.variable)}>
       <head>
         <script
           type="application/ld+json"

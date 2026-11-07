@@ -1,16 +1,26 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-interface KadaiLogoProps {
+export type KadaiLogoVariant =
+  | "brand"
+  | "on-dark"
+  | "on-light"
+  | "white"
+  | "monochrome"
+  | "mono-black"
+  | "mono-white"
+  | "mono-orange";
+
+export interface KadaiLogoProps {
   className?: string;
   size?: number | string;
-  variant?: "brand" | "monochrome" | "white";
+  variant?: KadaiLogoVariant;
   sparkColor?: string;
 }
 
 /**
  * Kadai Brand Mark (Lettermark K)
- * Precision geometric construction from Brand Identity Guide:
+ * Geometric construction from official KADAI Brand Icon Pack:
  * 1. Batang Tegak (Vertical Stem): Kokoh, stabil, modern
  * 2. Lengkung Wajan (Wok Edge Curve): Dinamis, hangat, F&B DNA
  * 3. Percikan Api (Spark Dot): Energi, pertumbuhan, amber glow
@@ -21,34 +31,80 @@ export function KadaiLogoMark({
   variant = "brand",
   sparkColor,
 }: KadaiLogoProps) {
-  const stemFill =
-    variant === "white"
-      ? "url(#kadai-gs-white)"
-      : variant === "monochrome"
-        ? "currentColor"
-        : "url(#kadai-gs)";
+  // Pure Monochromes (Zero Gradients - Ideal for thermal printers & 1-bit icons)
+  if (variant === "mono-black") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("shrink-0", className)}
+        aria-label="Kadai Logo Mono Black"
+      >
+        <g fill="#000000">
+          <rect x="120" y="78" width="60" height="356" rx="30" />
+          <circle cx="408" cy="150" r="22" />
+        </g>
+        <g stroke="#000000" strokeWidth="60" strokeLinecap="round" fill="none">
+          <path d="M212 256L350 114" />
+          <path d="M212 256A150 150 0 0 1 362 406" />
+        </g>
+      </svg>
+    );
+  }
 
-  const upperStroke =
-    variant === "white"
-      ? "#FFFFFF"
-      : variant === "monochrome"
-        ? "currentColor"
-        : "url(#kadai-ga)";
+  if (variant === "mono-white" || variant === "white") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("shrink-0", className)}
+        aria-label="Kadai Logo Mono White"
+      >
+        <g fill="#FFFFFF">
+          <rect x="120" y="78" width="60" height="356" rx="30" />
+          <circle cx="408" cy="150" r="22" />
+        </g>
+        <g stroke="#FFFFFF" strokeWidth="60" strokeLinecap="round" fill="none">
+          <path d="M212 256L350 114" />
+          <path d="M212 256A150 150 0 0 1 362 406" />
+        </g>
+      </svg>
+    );
+  }
 
-  const lowerStroke =
-    variant === "white"
-      ? "#FFFFFF"
-      : variant === "monochrome"
-        ? "currentColor"
-        : "url(#kadai-gl)";
+  if (variant === "mono-orange") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("shrink-0", className)}
+        aria-label="Kadai Logo Mono Orange"
+      >
+        <g fill="#EA580C">
+          <rect x="120" y="78" width="60" height="356" rx="30" />
+          <circle cx="408" cy="150" r="22" />
+        </g>
+        <g stroke="#EA580C" strokeWidth="60" strokeLinecap="round" fill="none">
+          <path d="M212 256L350 114" />
+          <path d="M212 256A150 150 0 0 1 362 406" />
+        </g>
+      </svg>
+    );
+  }
 
-  const sparkFill =
-    sparkColor ??
-    (variant === "white"
-      ? "#FB923C"
-      : variant === "monochrome"
-        ? "currentColor"
-        : "#F59E0B");
+  // Full color variants (on-light vs on-dark/brand)
+  const isLight = variant === "on-light";
+  const stemFill = isLight ? "#0F172A" : "url(#kadai-gs)";
+  const sparkFill = sparkColor ?? "#F59E0B";
 
   return (
     <svg
@@ -85,14 +141,14 @@ export function KadaiLogoMark({
       {/* 2. Lengkung Wajan & Kaki Diagonal K */}
       <path
         d="M212 256L350 114"
-        stroke={upperStroke}
+        stroke="url(#kadai-ga)"
         strokeWidth="60"
         strokeLinecap="round"
         fill="none"
       />
       <path
         d="M212 256A150 150 0 0 1 362 406"
-        stroke={lowerStroke}
+        stroke="url(#kadai-gl)"
         strokeWidth="60"
         strokeLinecap="round"
         fill="none"
@@ -137,31 +193,150 @@ export function KadaiWordmark({
   );
 }
 
-interface KadaiBrandProps {
+export interface KadaiBrandProps {
   className?: string;
   showTagline?: boolean;
   taglineText?: string;
   logoSize?: number;
   textColor?: string;
+  responsive?: boolean;
 }
 
+/**
+ * App Icon Squircle Master (from svg/kadai-app-icon-*.svg)
+ * Ideal for Tablet POS Home Screen, Mobile Launcher, and High-Impact Badges
+ */
+export function KadaiAppIcon({
+  size = 48,
+  variant = "dark",
+  className,
+}: {
+  size?: number | string;
+  variant?: "dark" | "dark-circle" | "light" | "orange";
+  className?: string;
+}) {
+  if (variant === "orange") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("shrink-0", className)}
+      >
+        <rect width="512" height="512" rx="116" fill="#EA580C" />
+        <g fill="#fff">
+          <rect x="120" y="78" width="60" height="356" rx="30" />
+          <circle cx="408" cy="150" r="22" />
+        </g>
+        <g stroke="#fff" strokeWidth="60" strokeLinecap="round" fill="none">
+          <path d="M212 256L350 114" />
+          <path d="M212 256A150 150 0 0 1 362 406" />
+        </g>
+      </svg>
+    );
+  }
+
+  if (variant === "light") {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={cn("shrink-0", className)}
+      >
+        <defs>
+          <linearGradient id="ai-gt-light" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="100%" stopColor="#F1F5F9" />
+          </linearGradient>
+          <linearGradient id="ai-ga" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stopColor="#EA580C" />
+            <stop offset="100%" stopColor="#FB923C" />
+          </linearGradient>
+          <linearGradient id="ai-gl" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#EA580C" />
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="116" fill="url(#ai-gt-light)" stroke="#E2E8F0" strokeWidth="8" />
+        <rect x="120" y="78" width="60" height="356" rx="30" fill="#0F172A" />
+        <path d="M212 256L350 114" stroke="url(#ai-ga)" strokeWidth="60" strokeLinecap="round" fill="none" />
+        <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#ai-gl)" strokeWidth="60" strokeLinecap="round" fill="none" />
+        <circle cx="408" cy="150" r="22" fill="#F59E0B" />
+      </svg>
+    );
+  }
+
+  const isCircle = variant === "dark-circle";
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 512 512"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("shrink-0", className)}
+    >
+      <defs>
+        <linearGradient id="ai-gt" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1E293B" />
+          <stop offset="100%" stopColor="#020617" />
+        </linearGradient>
+        <linearGradient id="ai-ga-d" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#EA580C" />
+          <stop offset="100%" stopColor="#FB923C" />
+        </linearGradient>
+        <linearGradient id="ai-gl-d" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#EA580C" />
+        </linearGradient>
+        <linearGradient id="ai-gs-d" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#E2E8F0" />
+        </linearGradient>
+      </defs>
+      {isCircle ? (
+        <circle cx="256" cy="256" r="256" fill="url(#ai-gt)" />
+      ) : (
+        <rect width="512" height="512" rx="116" fill="url(#ai-gt)" />
+      )}
+      <rect x="120" y="78" width="60" height="356" rx="30" fill="url(#ai-gs-d)" />
+      <path d="M212 256L350 114" stroke="url(#ai-ga-d)" strokeWidth="60" strokeLinecap="round" fill="none" />
+      <path d="M212 256A150 150 0 0 1 362 406" stroke="url(#ai-gl-d)" strokeWidth="60" strokeLinecap="round" fill="none" />
+      <circle cx="408" cy="150" r="22" fill="#F59E0B" />
+    </svg>
+  );
+}
+
+/**
+ * Kadai Brand Header (Device-Adaptive Lockup)
+ * Automatically adapts between Mobile (compact header) and Desktop (full lockup)
+ */
 export function KadaiBrandHeader({
   className,
   showTagline = true,
   taglineText = "SISTEM OPERASI BISNIS",
   logoSize = 34,
   textColor,
+  responsive = true,
 }: KadaiBrandProps) {
   return (
-    <div className={cn("flex items-center gap-3", className)}>
-      <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs p-1">
+    <div className={cn("flex items-center gap-2.5 sm:gap-3", className)}>
+      <span className="flex size-8 sm:size-9 lg:size-10 items-center justify-center rounded-xl bg-slate-950 text-white shadow-xs p-1 shrink-0">
         <KadaiLogoMark size={logoSize} />
       </span>
-      <div className="flex flex-col justify-center">
-        <KadaiWordmark textColor={textColor} size="text-2xl" />
+      <div className="flex flex-col justify-center min-w-0">
+        <KadaiWordmark textColor={textColor} size="text-xl sm:text-2xl" />
         {showTagline && (
           <span
-            className="text-[8.5px] font-bold text-slate-500 dark:text-slate-400 tracking-[0.18em] uppercase mt-0.5 font-sans"
+            className={cn(
+              "text-[8px] sm:text-[8.5px] font-bold text-slate-500 dark:text-slate-400 tracking-[0.18em] uppercase font-sans truncate",
+              responsive ? "hidden sm:block mt-0.5" : "mt-0.5"
+            )}
           >
             {taglineText}
           </span>

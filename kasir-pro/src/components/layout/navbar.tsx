@@ -18,6 +18,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { NotificationMenu } from "@/components/layout/notification-menu";
+import { KadaiWordmark } from "@/components/shared/kadai-logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -229,17 +230,7 @@ export function Navbar({
                   </svg>
                 </span>
                 <div>
-                  <span
-                    className="text-base font-bold text-foreground lowercase inline-flex items-baseline select-none"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                    aria-label="kadai"
-                  >
-                    <span>kada</span>
-                    <span className="relative inline-flex items-baseline">
-                      <span>ı</span>
-                      <span className="absolute top-[0.12em] left-1/2 -translate-x-1/2 size-[0.24em] rounded-full bg-[#F59E0B]" />
-                    </span>
-                  </span>
+                  <KadaiWordmark size="text-base" />
                   <span className="text-[8px] font-bold text-muted-foreground uppercase block -mt-0.5 tracking-[0.16em] font-sans">
                     {roleLabel}
                   </span>

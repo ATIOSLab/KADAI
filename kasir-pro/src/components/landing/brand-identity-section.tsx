@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, Download, FileArchive, ArrowUpRight } from "lucide-react";
+import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, Download, FileArchive, ArrowUpRight, Monitor, Smartphone, Tablet, Printer, Tv } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { KadaiLogoMark, KadaiWordmark } from "@/components/shared/kadai-logo";
@@ -224,7 +224,7 @@ export function BrandIdentitySection() {
               {/* Receipt Header with Logo and Brand Lockup */}
               <div className="text-center space-y-1.5 pb-4 border-b border-dashed border-slate-300">
                 <div className="flex justify-center">
-                  <KadaiLogoMark size={28} />
+                  <KadaiLogoMark size={28} variant="mono-black" />
                 </div>
                 <div className="flex justify-center">
                   <KadaiWordmark size="text-2xl" textColor="text-slate-950" />
@@ -353,6 +353,118 @@ export function BrandIdentitySection() {
               Presisi monospace tinggi untuk struk thermal kasir, nominal rupiah, kalkulasi FIFO, dan laporan laba rugi.
             </p>
             <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-mono</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4.5. Panduan Penggunaan Logo Adaptif per Perangkat (Device-Specific Guidelines) */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <Layers className="size-4 text-primary" />
+          <span>Matriks Penggunaan Logo Adaptif per Perangkat (Device-Adaptive Guidelines)</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Device 1: Desktop Web */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-800">
+                <Monitor className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-slate-400 uppercase">Desktop / Layar Lebar</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">Horizontal Lockup Lengkap</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">svg/kadai-lockup-horizontal-*.svg</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Digunakan pada bilah navigasi atas (header), footer, dan surat jalan faktur resmi. Menampilkan logo mark K + wordmark kadaı + tagline <span className="font-semibold text-slate-800">SISTEM OPERASI BISNIS</span>.
+            </p>
+          </div>
+
+          {/* Device 2: Mobile Smartphone */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-orange-50 flex items-center justify-center text-primary">
+                <Smartphone className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-primary uppercase">Smartphone (iOS / Android)</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">Compact Adaptive Lockup</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">Mark 32px + Wordmark kadaı</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Tagline disembunyikan secara otomatis pada layar &lt;640px agar header tetap lega dan tombol aksi utama (*CTA*) tidak terdesak. Ikon aplikasi menggunakan <span className="font-semibold text-slate-800">ic_launcher</span> adaptif 432px.
+            </p>
+          </div>
+
+          {/* Device 3: Tablet POS */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+                <Tablet className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-slate-400 uppercase">Tablet Kasir (iPad / Sunmi)</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">App Icon Squircle Dark</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">png/app-icon/kadai-app-icon-dark-512.png</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Digunakan sebagai ikon *Add to Home Screen* (PWA) dan tombol cepat kasir. Di dalam aplikasi, sidebar mengadopsi logo mark 32px saat mode ciut (*collapsed*) untuk memaksimalkan area daftar menu kasir.
+            </p>
+          </div>
+
+          {/* Device 4: Kitchen Display System (KDS) */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-[#EA580C]">
+                <Tv className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-[#EA580C] uppercase">Layar Dapur &amp; Bar (KDS)</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">High-Contrast Glow on Dark</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">svg/kadai-mark-on-dark.svg</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Di lingkungan dapur beruap dan pencahayaan dinamis, logo berlatar gelap Slate `#020617` dengan lengan Glow `#FB923C` memberikan visibilitas kontras tinggi dari jarak pandang 2–4 meter.
+            </p>
+          </div>
+
+          {/* Device 5: Thermal POS Printer */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900">
+                <Printer className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-slate-900 uppercase">Printer Struk 58mm / 80mm</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">Pure Mono-Black 1-Bit</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">svg/kadai-mark-mono-black.svg</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Dilarang keras memakai gradasi warna di atas kertas struk thermal. Gunakan vektor <span className="font-semibold text-slate-900">Mono-Black</span> murni agar cetakan head thermal tajam, tanpa bintik *dithering*, dan hemat kertas.
+            </p>
+          </div>
+
+          {/* Device 6: Favicon & PWA Browser Tab */}
+          <div className="rounded-2xl bg-white border border-slate-200/90 p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="size-8 rounded-lg bg-amber-50 flex items-center justify-center text-[#F59E0B]">
+                <Sparkles className="size-4" />
+              </span>
+              <span className="text-[10px] font-bold font-mono text-[#F59E0B] uppercase">Tab Browser &amp; Bookmark</span>
+            </div>
+            <div>
+              <h5 className="text-sm font-bold text-slate-900">Favicon Multi-Resolusi</h5>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">favicon/favicon.ico &amp; favicon.svg</p>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Browser modern memakai vektor SVG tak terdistorsi, sedangkan browser legacy dan bookmark toolbar memakai format paket multi-ukuran (16px, 32px, 48px) dengan apple-touch-icon 180px.
+            </p>
           </div>
         </div>
       </div>

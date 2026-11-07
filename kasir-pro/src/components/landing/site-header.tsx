@@ -106,8 +106,8 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               </svg>
             </span>
             <div className="flex flex-col justify-center">
-              <KadaiWordmark size="text-2xl" />
-              <span className="text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-0.5 font-sans">
+              <KadaiWordmark size="text-xl sm:text-2xl" />
+              <span className="hidden sm:block text-[8px] sm:text-[8.5px] font-bold text-slate-500 tracking-[0.18em] uppercase mt-0.5 font-sans">
                 SISTEM OPERASI BISNIS
               </span>
             </div>

@@ -38,7 +38,6 @@ const publicPages = [
   "/manifest.json",
   "/og-image.png",
   "/brand",
-  "/downloads",
   "/sw.js",
   "/images",
   "/uploads",

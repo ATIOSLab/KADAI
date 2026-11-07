@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, Download, FileArchive, ArrowUpRight, Monitor, Smartphone, Tablet, Printer, Tv } from "lucide-react";
+import { Sparkles, CheckCircle2, Copy, Check, Palette, Type, Layers, ArrowUpRight, Monitor, Smartphone, Tablet, Printer, Tv } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { KadaiLogoMark, KadaiWordmark } from "@/components/shared/kadai-logo";
@@ -466,33 +466,6 @@ export function BrandIdentitySection() {
               Browser modern memakai vektor SVG tak terdistorsi, sedangkan browser legacy dan bookmark toolbar memakai format paket multi-ukuran (16px, 32px, 48px) dengan apple-touch-icon 180px.
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* 5. Brand Icon Pack Master Download Card */}
-      <div className="rounded-3xl bg-slate-900 text-white p-7 sm:p-10 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-        <div className="space-y-2 max-w-xl text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-[#FB923C] text-[11px] font-bold uppercase tracking-wider">
-            <FileArchive className="size-3.5" />
-            <span>Paket Aset Resmi</span>
-          </div>
-          <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            KADAI Brand Icon Pack (Master Bundle)
-          </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Paket lengkap aset visual resmi: Master Vektor SVG (mark &amp; app icon), PNG App Icon 16–1024px, Logo Mark transparan, Lockup horizontal &amp; stacked, Favicon lengkap, Icon Android &amp; iOS, serta Social Media Kit (OG, LinkedIn, X, Wallpaper, Story).
-          </p>
-        </div>
-
-        <div className="shrink-0 w-full md:w-auto">
-          <a
-            href="/downloads/KADAI-Brand-Icon-Pack.zip"
-            download="KADAI-Brand-Icon-Pack.zip"
-            className="w-full md:w-auto inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#EA580C] to-[#FB923C] text-white hover:brightness-110 transition-all font-bold text-xs sm:text-sm shadow-lg shadow-orange-950/30 group active:scale-95"
-          >
-            <Download className="size-4 group-hover:-translate-y-0.5 transition-transform" />
-            <span>Unduh Icon Pack (.ZIP)</span>
-          </a>
         </div>
       </div>
     </section>

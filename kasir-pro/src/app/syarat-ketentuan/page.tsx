@@ -131,8 +131,8 @@ export default function TermsPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950">
               Syarat & Ketentuan Layanan
             </h1>
-            <p className="mt-2 text-sm text-slate-600 max-w-2xl leading-relaxed">
-              Panduan hukum, lisensi perangkat lunak SaaS, batasan tanggung jawab, serta komitmen kedaulatan data antara pengguna dan KADAI (ATIOSLab).
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
+              Panduan hukum, lisensi perangkat lunak SaaS, batasan tanggung jawab, serta komitmen kedaulatan data antara pengguna dan KADAI di bawah naungan NEW ASIA TECH (newasiatech.co.id).
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500">
               <span>Berlaku efektif sejak: <strong>{EFFECTIVE_DATE}</strong></span>

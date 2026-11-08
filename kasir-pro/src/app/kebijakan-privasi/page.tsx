@@ -160,7 +160,7 @@ export default function PrivacyPolicyPage() {
             Kebijakan Privasi &amp; Pelindungan Data Pribadi
           </h1>
           <p className="text-sm text-slate-500">
-            Berlaku efektif {EFFECTIVE_DATE} · Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)
+            Berlaku efektif {EFFECTIVE_DATE} · Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) &bull; Dikelola oleh NEW ASIA TECH (newasiatech.co.id)
           </p>
         </div>
 

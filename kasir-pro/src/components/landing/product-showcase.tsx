@@ -59,7 +59,7 @@ const TABS: TabItem[] = [
     title: "Inventori Multi-Batch FIFO & Radar Kadaluwarsa",
     subtitle: "Pelacakan alur First-In First-Out per nomor batch, peringatan otomatis bahan mendekati expired date, dan kartu stok mutasi riil.",
     metrics: [
-      { label: "Metode Penilaian", value: "FIFO SAK EMKM" },
+      { label: "Metode Penilaian", value: "FIFO / FEFO / Average" },
       { label: "Radar Expired", value: "Alert < 30 Hari" },
       { label: "Akurasi Opname", value: "100% Tercatat" },
     ],

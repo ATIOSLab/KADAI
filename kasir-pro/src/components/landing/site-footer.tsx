@@ -16,7 +16,7 @@ export function SiteFooter() {
             </span>
             <ul className="space-y-2 text-slate-400">
               <li><Link href="/fitur#kasir-pos" className="hover:text-white transition-colors">Kasir POS Kilat</Link></li>
-              <li><Link href="/fitur#inventori-fifo" className="hover:text-white transition-colors">Inventori FIFO PSAK 14</Link></li>
+              <li><Link href="/fitur#inventori-fifo" className="hover:text-white transition-colors">Inventori Multi-Batch (FIFO/FEFO/Avg)</Link></li>
               <li><Link href="/fitur#dapur-kds" className="hover:text-white transition-colors">Kitchen Display System</Link></li>
               <li><Link href="/fitur#resep-bom" className="hover:text-white transition-colors">Resep Produksi (BOM)</Link></li>
               <li><Link href="/fitur#pembukuan-pajak" className="hover:text-white transition-colors">Pajak Daerah & SAK EMKM</Link></li>

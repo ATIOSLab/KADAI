@@ -29,7 +29,7 @@ export function IndustrySolutions() {
       subtitle: "Minimarket, toko kelontong sembako, apotek, butik fashion, dan grosir.",
       features: [
         "Scan barcode cepat dengan scanner USB, Bluetooth, atau kamera HP.",
-        "Metode FIFO memastikan barang dagangan batch lama terjual lebih dulu.",
+        "Metode fleksibel FIFO, FEFO (First Expired First Out), atau Rata-rata (Average) memastikan barang dagangan batch lama dan tanggal kadaluwarsa terjaga rapi.",
         "Radar peringatan stok menipis dan tanggal kadaluwarsa produk masuk.",
         "Cetak struk kasir thermal 58mm/80mm dan label harga barcode.",
       ],

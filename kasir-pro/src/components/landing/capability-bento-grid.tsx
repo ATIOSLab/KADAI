@@ -88,7 +88,7 @@ export function CapabilityBentoGrid() {
                 <Warehouse className="size-5" />
               </div>
               <Badge variant="outline" className="border-amber-200 bg-amber-50/70 text-amber-800 text-[10px] font-bold">
-                Metode FIFO
+                FIFO • FEFO • Average
               </Badge>
             </div>
             <div>
@@ -100,7 +100,7 @@ export function CapabilityBentoGrid() {
               </h3>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Bahan lama otomatis keluar duluan (FIFO). Sisa stok di gudang berkurang otomatis setiap kasir mencetak struk, lengkap dengan radar peringatan tanggal kadaluwarsa.
+              Dukungan fleksibel metode FIFO, FEFO (First Expired First Out), maupun Average (Rata-rata). Sisa stok di gudang berkurang otomatis setiap kasir mencetak struk, lengkap dengan radar peringatan tanggal kadaluwarsa.
             </p>
           </div>
 
@@ -108,7 +108,7 @@ export function CapabilityBentoGrid() {
             <div className="flex justify-between items-center">
               <span className="font-bold text-slate-800">Batch Susu UHT (Exp: 7 Hari)</span>
               <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[10px]">
-                Habiskan Duluan
+                Habiskan Duluan (FEFO)
               </span>
             </div>
             <div className="flex justify-between items-center text-slate-600">
@@ -117,7 +117,7 @@ export function CapabilityBentoGrid() {
             </div>
             <div className="flex justify-between items-center pt-1 border-t border-slate-100 text-emerald-700 font-semibold text-[11px]">
               <span>Status Stok: Akurat</span>
-              <span>100% FIFO</span>
+              <span>FIFO • FEFO • Average</span>
             </div>
           </div>
         </div>

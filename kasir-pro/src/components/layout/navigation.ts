@@ -91,9 +91,9 @@ export const navigationSections: NavigationSection[] = [
       },
       {
         href: "/inventory",
-        label: "Persediaan & FIFO Batch",
+        label: "Persediaan & Multi-Batch",
         shortLabel: "Stok",
-        description: "Pelacakan stok multi-batch, kartu mutasi, dan restock.",
+        description: "Pelacakan stok multi-batch (FIFO, FEFO, Average), kartu mutasi, dan restock.",
         icon: Warehouse,
         roles: ["ADMIN", "MANAGER", "INVENTORY"],
       },

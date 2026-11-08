@@ -147,26 +147,26 @@ const CLUSTERS = [
     ]
   },
   {
-    vertical: "SERVICE",
-    name: "Klinik Sepatu & Laundry Express KADAI",
-    slug: "laundry",
-    description: "Spesialis Laundry Kiloan, Cuci Sepatu, Tas & Helm dengan Tracking Job Order Realtime",
+    vertical: "RETAIL",
+    name: "Toko Grosir & Distribusi Sembako KADAI",
+    slug: "grosir",
+    description: "Pusat Distribusi Bahan Pokok, Sembako & Ritel Grosir dengan Multi-Satuan (Dus, Bal, Sak, Pcs)",
     outlets: [
-      { name: "KADAI Laundry Express - Tebet Central", code: "LND-01", address: "Jl. Tebet Barat Dalam Raya No. 42, Jaksel", phone: "08127777001", isMain: true },
+      { name: "KADAI Grosir - Gudang Distribusi Kramat Jati", code: "GSR-01", address: "Kawasan Pasar Induk Kramat Jati, Jakarta Timur", phone: "08127777001", isMain: true },
     ],
-    categories: ["Laundry Kiloan Cuci Setrika", "Cuci Sepatu & Sneakers Deep Clean", "Cuci Bedcover & Selimut", "Parfum & Layanan Kilat"],
+    categories: ["Beras & Biji-Bijian Karungan", "Minyak Goreng & Gula Pasir", "Tepung Terigu & Bumbu Masak", "Minuman Kemasan Karton"],
     products: [
-      { name: "Cuci Kering Setrika Reguler (2 Hari)", sku: "LND-KLN-01", barcode: "899700100001", category: "Laundry Kiloan Cuci Setrika", price: 9000, cost: 2500, stock: 999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
-      { name: "Cuci Kering Setrika Express (1 Hari)", sku: "LND-KLN-02", barcode: "899700100002", category: "Laundry Kiloan Cuci Setrika", price: 15000, cost: 3500, stock: 999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
-      { name: "Deep Clean Sneakers Canvas / Suede", sku: "LND-SPT-03", barcode: "899700100003", category: "Cuci Sepatu & Sneakers Deep Clean", price: 45000, cost: 8000, stock: 999, unit: "pasang", type: ProductType.SERVICE, station: StationType.GENERAL },
-      { name: "Cuci Bedcover King Size + Sanitasi", sku: "LND-BDC-04", barcode: "899700100004", category: "Cuci Bedcover & Selimut", price: 35000, cost: 7000, stock: 999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Beras Pandan Wangi Premium 25 kg", sku: "GSR-BRS-01", barcode: "899700100001", category: "Beras & Biji-Bijian Karungan", price: 340000, cost: 305000, stock: 120, unit: "karung", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Minyak Goreng Sawit 2 Liter (Karton 6 Pouch)", sku: "GSR-MYK-02", barcode: "899700100002", category: "Minyak Goreng & Gula Pasir", price: 198000, cost: 182000, stock: 85, unit: "karton", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Gula Pasir Kristal Putih 50 kg (Sak)", sku: "GSR-GLA-03", barcode: "899700100003", category: "Minyak Goreng & Gula Pasir", price: 710000, cost: 660000, stock: 40, unit: "sak", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Tepung Terigu Segitiga Cakra 25 kg", sku: "GSR-TPG-04", barcode: "899700100004", category: "Tepung Terigu & Bumbu Masak", price: 235000, cost: 212000, stock: 65, unit: "karung", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "Rahmat Hidayat (Owner Laundry)", email: "owner.laundry@kadai.com", role: UserRole.ADMIN, pin: "222111" },
-      { name: "Siti Maryam (Manager Laundry)", email: "manager.laundry@kadai.com", role: UserRole.MANAGER, pin: "222222" },
-      { name: "Bella (Kasir Frontdesk Laundry)", email: "kasir.laundry@kadai.com", role: UserRole.CASHIER, pin: null },
-      { name: "Joko (Operator Cuci & Setrika)", email: "operator.laundry@kadai.com", role: UserRole.KITCHEN, pin: null },
-      { name: "Tari (Akuntan Keuangan Laundry)", email: "akuntan.laundry@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
+      { name: "Haji Usman (Owner Grosir)", email: "owner.grosir@kadai.com", role: UserRole.ADMIN, pin: "333111" },
+      { name: "Mulyadi (Kepala Gudang Grosir)", email: "manager.grosir@kadai.com", role: UserRole.MANAGER, pin: "333222" },
+      { name: "Nanda (Kasir Transaksi Grosir)", email: "kasir.grosir@kadai.com", role: UserRole.CASHIER, pin: null },
+      { name: "Bambang (Staf Checker Muat Barang)", email: "gudang.grosir@kadai.com", role: UserRole.INVENTORY, pin: null },
+      { name: "Suryani (Akuntan Piutang Toko)", email: "akuntan.grosir@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
     ]
   }
 ];

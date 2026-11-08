@@ -27,13 +27,13 @@ export function IndustrySolutions() {
       ],
     },
     {
-      title: "Layanan Jasa, Laundry & Multi-Cabang",
+      title: "Grosir & Jaringan Multi-Cabang",
       icon: Building2,
-      subtitle: "Laundry kiloan/satuan, barbershop, salon kecantikan, dan perbaikan service.",
+      subtitle: "Distribusi logistik, transfer antar cabang, booth waralaba, dan multi-outlet.",
       features: [
-        "Work Order & Resi Laundry dengan tracking QR mandiri untuk pelanggan.",
-        "Pencatatan nota DP (uang muka), pelunasan saat ambil, dan lokasi rak barang.",
-        "Pantau status pengerjaan: Cuci, Dryer, Setrika Uap hingga Siap Ambil.",
+        "Transfer persediaan dari gudang/dapur pusat ke seluruh gerai cabang.",
+        "Pantau performa penjualan seluruh gerai secara konsolidasi realtime.",
+        "Pencatatan nota retur, penyesuaian stok opname, dan kartu stok FIFO.",
         "Kontrol hak akses kasir, manajer, dan pembukuan dengan PIN aman.",
       ],
     },

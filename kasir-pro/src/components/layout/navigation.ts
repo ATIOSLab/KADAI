@@ -15,7 +15,6 @@ import {
   Users,
   Building,
   ArrowLeftRight,
-  Shirt,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
@@ -76,14 +75,6 @@ export const navigationSections: NavigationSection[] = [
         description: "Layar monitor antrean tiket dapur dan bar real-time.",
         icon: ChefHat,
         roles: ["ADMIN", "MANAGER", "KITCHEN"],
-      },
-      {
-        href: "/laundry",
-        label: "Laundry & Job Orders",
-        shortLabel: "Laundry",
-        description: "Antrean pengerjaan laundry, tracking resi, dan rak siap ambil.",
-        icon: Shirt,
-        roles: ["ADMIN", "MANAGER", "KITCHEN", "CASHIER"],
       },
     ],
   },
@@ -265,12 +256,6 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Terminal transaksi kasir berkecepatan tinggi dengan kalkulasi pajak otomatis.",
     section: "Operasional & Transaksi",
     eyebrow: "POS Terminal",
-  },
-  "/laundry": {
-    title: "Stasiun Kerja & Antrean Laundry",
-    description: "Pemantauan status cuci, pengeringan, setrika uap, dan rak siap ambil secara real-time.",
-    section: "Operasional & Transaksi",
-    eyebrow: "Service Operations",
   },
   "/products": {
     title: "Katalog Produk & Resep",

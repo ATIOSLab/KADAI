@@ -85,9 +85,9 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           >
             <KadaiLockup
               variant="on-light"
-              height={36}
+              height={48}
               priority
-              className="h-8 sm:h-9 w-auto group-hover:opacity-90 transition-opacity"
+              className="h-10 sm:h-11 md:h-12 w-auto group-hover:opacity-90 transition-opacity"
             />
           </Link>
 

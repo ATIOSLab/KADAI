@@ -202,7 +202,7 @@ export default function ReportsPage() {
                 <SelectValue placeholder="Pilih Cabang" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">🏢 Konsolidasi Semua Cabang</SelectItem>
+                <SelectItem value="ALL">Konsolidasi Semua Cabang</SelectItem>
                 {outlets.map((o) => (
                   <SelectItem key={o.id} value={o.id}>
                     {o.name} {o.isMain ? "(Pusat)" : ""}

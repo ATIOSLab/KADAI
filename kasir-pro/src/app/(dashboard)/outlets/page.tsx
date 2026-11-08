@@ -238,9 +238,9 @@ export default function OutletsPage() {
                   </div>
                   <div className="flex flex-wrap gap-1.5 pt-1.5 border-t border-slate-200/60">
                     <Badge variant="outline" className="text-[10px] font-bold">
-                      {outlet.outletType === "CENTRAL_WAREHOUSE" ? "🏢 Gudang Pusat" :
-                       outlet.outletType === "CENTRAL_KITCHEN" ? "🍳 Dapur Pusat" :
-                       outlet.outletType === "FULL_SERVICE_STORE" ? "🍽️ Full Service" : "🏪 Booth / Kios"}
+                      {outlet.outletType === "CENTRAL_WAREHOUSE" ? "Gudang Pusat" :
+                       outlet.outletType === "CENTRAL_KITCHEN" ? "Dapur Pusat" :
+                       outlet.outletType === "FULL_SERVICE_STORE" ? "Full Service Resto" : "Booth / Kios"}
                     </Badge>
                     <Badge variant="outline" className="text-[10px] font-bold">
                       {outlet.kitchenWorkflow === "DIRECT_SERVE" ? "⚡ Langsung Saji" :

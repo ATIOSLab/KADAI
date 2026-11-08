@@ -381,7 +381,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                   orderType === "DINE_IN" ? "neo-border neo-shadow-sm bg-accent-primary text-white" : "hover:bg-bg-main"
                 )}
               >
-                🍽️ Makan di Tempat (Dine In)
+                Makan di Tempat (Dine In)
               </button>
               <button
                 type="button"

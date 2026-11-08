@@ -241,7 +241,7 @@ function LoginForm() {
                       className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
                     >
                       <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
-                        ☕ Kasir Kafe
+                        Kasir Kafe
                       </div>
                       <div className="text-[9px] text-slate-500">Akses Cepat POS</div>
                     </button>
@@ -267,7 +267,7 @@ function LoginForm() {
                       className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
                     >
                       <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
-                        📦 Gudang FIFO
+                        Gudang FIFO
                       </div>
                       <div className="text-[9px] text-slate-500">Stok & Kadaluwarsa</div>
                     </button>

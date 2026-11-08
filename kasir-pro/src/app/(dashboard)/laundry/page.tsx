@@ -138,8 +138,8 @@ export default function LaundryDashboardPage() {
       </PageHeader>
 
       {/* Filter Stages Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full pb-1 sm:pb-0 scrollbar-none">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap shrink-0">
           {STAGES.map((st) => (
             <button
               key={st.id}
@@ -156,14 +156,14 @@ export default function LaundryDashboardPage() {
         </div>
 
         {/* Search */}
-        <div className="relative w-full sm:w-64 shrink-0">
+        <div className="relative w-full md:w-72 shrink-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && fetchJobs()}
             placeholder="Cari resi / nama / nomor WA..."
-            className="pl-9 h-9 text-xs rounded-xl border-slate-200"
+            className="pl-9 h-9 text-xs rounded-xl border-slate-200 w-full"
           />
         </div>
       </div>

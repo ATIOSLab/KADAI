@@ -555,9 +555,9 @@
     padding: 2mm 1mm;
     background: #ffffff !important;
     color: #000000 !important;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: var(--font-mono), 'Geist Mono', Consolas, 'Courier New', monospace;
     font-size: 11px;
-    line-height: 1.25;
+    line-height: 1.35;
     page-break-after: avoid;
     break-after: avoid;
   }

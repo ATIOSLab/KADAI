@@ -23,7 +23,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { SupervisorPinDialog } from "@/components/shared/supervisor-pin-dialog";
 import { ThermalReceipt } from "@/components/shared/thermal-receipt";
-import { Receipt, ArrowLeft, XCircle, Loader2, Printer } from "lucide-react";
+import { Receipt, ArrowLeft, XCircle, Loader2, Printer, FileText } from "lucide-react";
 import Link from "next/link";
 
 const paymentLabels: Record<string, string> = {
@@ -88,6 +88,7 @@ export default function SaleDetailPage({
   const [supervisorPin, setSupervisorPin] = useState<string | null>(null);
   const [voidReason, setVoidReason] = useState("");
   const [voiding, setVoiding] = useState(false);
+  const [showReceiptPreview, setShowReceiptPreview] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -232,10 +233,14 @@ export default function SaleDetailPage({
     <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
       <PageHeader
         title={sale.invoiceNumber}
+        eyebrow="Operasional & Transaksi"
         description={`Transaksi pada ${new Date(sale.createdAt).toLocaleString("id-ID", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}`}
         icon={Receipt}
       >
-        <Button variant="outline" onClick={() => window.print()}>
+        <Button variant="outline" onClick={() => setShowReceiptPreview(true)}>
+          <FileText className="w-4 h-4 mr-1" /> Pratinjau Struk
+        </Button>
+        <Button onClick={() => window.print()}>
           <Printer className="w-4 h-4 mr-1" /> Cetak Struk
         </Button>
         <Button variant="outline" asChild>
@@ -449,6 +454,52 @@ export default function SaleDetailPage({
           setShowVoid(true);
         }}
       />
+
+      {/* Thermal Receipt Preview Dialog */}
+      <Dialog open={showReceiptPreview} onOpenChange={setShowReceiptPreview}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pratinjau Struk Thermal</DialogTitle>
+            <DialogDescription>
+              Struk format standar printer POS 58mm / 80mm
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 max-h-[65vh] overflow-y-auto neo-scrollbar">
+            <ThermalReceipt
+              invoiceNumber={sale.invoiceNumber}
+              createdAt={sale.createdAt}
+              cashierName={sale.cashier?.name}
+              customerName={sale.customerName}
+              items={sale.items.map((i) => ({
+                name: i.product.name,
+                quantity: i.quantity,
+                unitPrice: Number(i.unitPrice),
+                totalPrice: Number(i.totalPrice),
+                discountAmount: Number(i.discountAmount),
+              }))}
+              subtotal={Number(sale.subtotal)}
+              discountAmount={Number(sale.discountAmount)}
+              totalAmount={Number(sale.totalAmount)}
+              paymentType={sale.paymentType}
+              paymentRef={sale.paymentRef}
+              preview={true}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReceiptPreview(false)}>
+              Tutup
+            </Button>
+            <Button
+              onClick={() => {
+                setShowReceiptPreview(false);
+                setTimeout(() => window.print(), 100);
+              }}
+            >
+              <Printer className="w-4 h-4 mr-1.5" /> Cetak Struk
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Hidden Isolated Thermal Print Engine */}
       <ThermalReceipt

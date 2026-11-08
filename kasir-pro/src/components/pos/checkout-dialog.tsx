@@ -9,6 +9,7 @@ import {
   QrCode,
   Wallet,
   Printer,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch, ApiError } from "@/lib/api";
@@ -76,6 +77,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [success, setSuccess] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [completedSale, setCompletedSale] = useState<any | null>(null);
+  const [showReceiptPreview, setShowReceiptPreview] = useState(false);
 
   useEffect(() => {
     fetch("/api/tables")
@@ -214,18 +216,62 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 <Printer className="size-4 mr-2" /> Cetak Struk Kasir (Thermal)
               </Button>
               <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => setShowReceiptPreview(!showReceiptPreview)}
+              >
+                <FileText className="size-3.5 mr-1.5" />
+                {showReceiptPreview ? "Sembunyikan Pratinjau Struk" : "Lihat Pratinjau Struk Thermal"}
+              </Button>
+              <Button
                 className="w-full font-bold text-xs h-10 shadow-sm"
                 onClick={handleResetForm}
               >
                 Transaksi Baru (Selesai)
               </Button>
             </div>
+
+            {showReceiptPreview && completedSale && (
+              <div className="pt-2 text-left animate-slide-up">
+                <ThermalReceipt
+                  storeName="KADAI"
+                  outletName={completedSale.outlet?.name || "KADAI"}
+                  outletAddress={completedSale.outlet?.address || null}
+                  outletPhone={completedSale.outlet?.phone || null}
+                  invoiceNumber={completedSale.invoiceNumber}
+                  createdAt={completedSale.createdAt}
+                  cashierName={completedSale.cashier?.name || null}
+                  customerName={completedSale.customerName || null}
+                  tableNo={completedSale.table?.tableNo || null}
+                  orderType={completedSale.orderType}
+                  paymentType={completedSale.paymentType}
+                  paymentRef={completedSale.paymentRef || null}
+                  items={(completedSale.items || []).map((i: any) => ({
+                    name: i.product?.name || i.productName || "Item",
+                    quantity: i.quantity,
+                    unitPrice: Number(i.unitPrice),
+                    totalPrice: Number(i.subtotal),
+                    discountAmount: Number(i.discountAmount || 0),
+                  }))}
+                  subtotal={Number(completedSale.subtotal)}
+                  discountAmount={Number(completedSale.discountAmount || 0)}
+                  serviceCharge={Number(completedSale.serviceCharge || 0)}
+                  taxAmount={Number(completedSale.taxAmount || 0)}
+                  roundingAmount={Number(completedSale.roundingAmount || 0)}
+                  totalAmount={Number(completedSale.totalAmount)}
+                  cashReceived={cashAmount ? Number(cashAmount) : null}
+                  changeAmount={changeAmount > 0 ? changeAmount : null}
+                  preview={true}
+                />
+              </div>
+            )}
           </div>
 
-          {completedSale && (
+          {completedSale && !showReceiptPreview && (
             <div className="hidden print:block">
               <ThermalReceipt
-                storeName="KADAI Enterprise"
+                storeName="KADAI"
                 outletName={completedSale.outlet?.name || "KADAI"}
                 outletAddress={completedSale.outlet?.address || null}
                 outletPhone={completedSale.outlet?.phone || null}

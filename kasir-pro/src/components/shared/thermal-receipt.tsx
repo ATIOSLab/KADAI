@@ -102,7 +102,7 @@ export function ThermalReceipt({
         </div>
         <div className="flex justify-between items-center">
           <span className="text-black/80">Kasir</span>
-          <span className="font-semibold">{cashierName || "Kasir"}</span>
+          <span className="font-semibold">{cashierName ? cashierName.split('(')[0].trim() : "Kasir"}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-black/80">Layanan</span>

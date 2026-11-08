@@ -136,7 +136,7 @@ export function PrinterSettingsDialog({
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
+        <div className="p-6 space-y-4">
           {/* Status Box */}
           <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
             isConnected
@@ -260,7 +260,7 @@ export function PrinterSettingsDialog({
           )}
         </div>
 
-        <DialogFooter className="p-4 px-6 border-t border-slate-100 bg-muted/20">
+        <DialogFooter className="p-4 px-6 pb-5 border-t border-slate-100 bg-muted/20">
           <Button
             variant="outline"
             className="w-full sm:w-auto text-xs font-semibold"

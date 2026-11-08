@@ -153,11 +153,12 @@ const schemaGraph = {
       "@type": "Organization",
       "@id": "https://kadai.asia/#organization",
       "name": "KADAI",
-      "legalName": "PT Netkrida Nusantara",
+      "legalName": "NEW ASIA TECH",
       "url": "https://kadai.asia",
       "logo": "https://kadai.asia/favicon.svg",
       "image": "https://kadai.asia/og-image.png",
       "sameAs": [
+        "https://newasiatech.co.id",
         "https://github.com/ATIOSLab/KADAI",
         "https://www.linkedin.com/company/kadai-asia"
       ],
@@ -169,9 +170,15 @@ const schemaGraph = {
         "@type": "PostalAddress",
         "addressCountry": "ID"
       },
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "NEW ASIA TECH",
+        "url": "https://newasiatech.co.id"
+      },
       "founder": {
         "@type": "Organization",
-        "name": "ATIOSLab",
+        "name": "NEW ASIA TECH",
+        "url": "https://newasiatech.co.id"
       },
     },
     {

@@ -20,5 +20,5 @@ KADAI menyatukan Kasir POS Kilat, Fleksibilitas Perpajakan (Non-PKP 0% bebas paj
 - [Enterprise](https://kadai.asia/#harga): Rp 599.000/bulan (Cabang & Gudang Unlimited, Central Kitchen Routing, Transfer Stok, SLA 99.9%).
 
 ## Entitas Pengembang
-- Pengembang: PT Netkrida Nusantara / ATIOSLab (https://github.com/ATIOSLab/KADAI)
+- Pengembang & Pengelola: NEW ASIA TECH (https://newasiatech.co.id) / ATIOSLab (https://github.com/ATIOSLab/KADAI)
 - Lisensi & Wilayah Kedaulatan: Republik Indonesia (Mata Uang IDR / Rupiah, Zona Waktu WIB/WITA/WIT).

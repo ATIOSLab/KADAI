@@ -84,8 +84,21 @@ export function SiteFooter() {
             </span>
           </div>
 
-          <div className="text-slate-500 text-[11px]">
-            Dikembangkan secara berdaulat oleh <strong className="text-slate-400">ATIOSLab</strong> untuk kemajuan ekonomi nasional.
+          <div className="text-slate-500 text-[11px] flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+            <span>
+              KADAI adalah produk teknologi di bawah naungan{" "}
+              <a
+                href="https://newasiatech.co.id"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-300 font-semibold hover:text-primary transition-colors underline decoration-slate-700 underline-offset-2"
+              >
+                NEW ASIA TECH (newasiatech.co.id)
+              </a>
+              .
+            </span>
+            <span className="text-slate-700 hidden sm:inline">•</span>
+            <span>Hak Cipta &copy; 2026. All rights reserved.</span>
           </div>
         </div>
       </div>

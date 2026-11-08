@@ -7,7 +7,7 @@ const verifyCodeSchema = z.object({
   code: z.string().min(3, "Kode demo minimal 3 karakter"),
 });
 
-const MASTER_CODES = ["KADAI2026", "DEMO-KADAI", "NETKRIDA", "KADAI-DEMO"];
+const MASTER_CODES = ["KADAI2026", "DEMO-KADAI", "NEWASIATECH", "KADAI-DEMO"];
 
 export async function POST(request: NextRequest) {
   try {

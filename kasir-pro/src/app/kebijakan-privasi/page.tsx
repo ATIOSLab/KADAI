@@ -49,7 +49,7 @@ const sections: PrivacySection[] = [
     icon: UserCheck,
     title: "2. Pengendali Data Pribadi & Kontak",
     items: [
-      "Pengendali data pribadi pada layanan KADAI adalah tim operasional KADAI yang dikembangkan dan dioperasikan oleh ATIOSLab.",
+      "Pengendali data pribadi pada platform KADAI adalah manajemen KADAI di bawah naungan NEW ASIA TECH (newasiatech.co.id).",
       "Seluruh pertanyaan terkait privasi atau permintaan hak subjek data dapat disampaikan melalui kanal resmi: WhatsApp +62 851-5908-1119 atau formulir pada halaman permintaan demo.",
       "Setiap permintaan hak subjek data direspons paling lambat 30 (tiga puluh) hari kerja sejak permintaan terverifikasi.",
     ],

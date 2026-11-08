@@ -31,7 +31,7 @@ export function bankInstructions(): string[] {
   return [
     `Transfer ke rekening ${process.env.KADAI_BANK_NAME || "Bank (belum dikonfigurasi)"}`,
     `Nomor rekening: ${process.env.KADAI_BANK_ACCOUNT || "—"}`,
-    `Atas nama: ${process.env.KADAI_BANK_HOLDER || "PT Netkrida"}`,
+    `Atas nama: ${process.env.KADAI_BANK_HOLDER || "NEW ASIA TECH"}`,
     "Setelah transfer, kirim bukti transfer ke tim KADAI untuk verifikasi dan aktivasi.",
   ];
 }

@@ -1,5 +1,5 @@
 # KADAI // STANDAR BRAND IDENTITY & DESIGN SYSTEM RESMI
-**Kedaulatan Brand: PT Netkrida Nusantara & ATIOSLab**  
+**Kedaulatan Brand: NEW ASIA TECH (newasiatech.co.id) & ATIOSLab**  
 **Versi:** 1.0 (Produksi / Inviolable Standard)  
 **Dokumen Acuan:** Brand Identity Sheet `kadai - SISTEM OPERASI BISNIS`
 

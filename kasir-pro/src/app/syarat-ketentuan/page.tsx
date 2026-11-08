@@ -41,15 +41,15 @@ const sections: TermSection[] = [
     icon: FileText,
     title: "1. Penerimaan Ketentuan",
     intro:
-      "Dengan mendaftar, mengakses, atau menggunakan layanan KADAI (kadai.asia), Anda menyatakan telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat & Ketentuan ini serta Kebijakan Privasi KADAI. Ketentuan ini merupakan perjanjian yang sah dan mengikat antara Anda (atau badan usaha yang Anda wakili) dan ATIOSLab selaku pengembang dan pengelola platform.",
+      "Dengan mendaftar, mengakses, atau menggunakan layanan KADAI (kadai.asia), Anda menyatakan telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat & Ketentuan ini serta Kebijakan Privasi KADAI. Ketentuan ini merupakan perjanjian yang sah dan mengikat antara Anda (atau badan usaha yang Anda wakili) dan NEW ASIA TECH (newasiatech.co.id) selaku entitas pemilik dan pengelola platform.",
   },
   {
     icon: Server,
     title: "2. Ruang Lingkup Layanan & Lisensi Penggunaan",
     items: [
       "KADAI menyediakan Sistem Operasi Bisnis berbasis komputasi awan (SaaS), mencakup Kasir POS Kilat, Manajemen Inventori Multi-Batch FIFO, Kitchen Display System (KDS), Resep BOM Produksi, Modul Pembukuan Fiskal, dan Kemitraan Referral.",
-      "ATIOSLab memberikan Anda lisensi non-eksklusif, terbatas, tidak dapat dialihkan, dan dapat dibatalkan untuk mengakses dan menggunakan antarmuka sistem sesuai paket langganan aktif Anda.",
-      "Seluruh hak kekayaan intelektual (kode sumber, algoritma, desain grafis, basis data, dan merek dagang) adalah hak milik eksklusif ATIOSLab.",
+      "NEW ASIA TECH memberikan Anda lisensi non-eksklusif, terbatas, tidak dapat dialihkan, dan dapat dibatalkan untuk mengakses dan menggunakan antarmuka sistem sesuai paket langganan aktif Anda.",
+      "Seluruh hak kekayaan intelektual (kode sumber, algoritma, desain grafis, basis data, dan merek dagang) adalah hak milik eksklusif NEW ASIA TECH.",
     ],
   },
   {

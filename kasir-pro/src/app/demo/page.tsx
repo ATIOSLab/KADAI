@@ -123,7 +123,7 @@ function RequestDemoForm() {
             Coba Langsung KADAI untuk Bisnis Anda
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim ahli PT Netkrida.
+            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim spesialis NEW ASIA TECH (newasiatech.co.id).
           </p>
         </div>
 
@@ -172,7 +172,7 @@ function RequestDemoForm() {
                     >
                       <a
                         href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                          `Halo Tim KADAI (PT Netkrida), saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
+                          `Halo Tim KADAI (NEW ASIA TECH - newasiatech.co.id), saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -437,7 +437,7 @@ function RequestDemoForm() {
                   <h3 className="text-base font-bold text-slate-950">
                     Konsultasi Cepat via WhatsApp
                   </h3>
-                  <span className="text-xs text-slate-500">PT Netkrida Solusi Digital</span>
+                  <span className="text-xs text-slate-500">NEW ASIA TECH (newasiatech.co.id)</span>
                 </div>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -449,14 +449,14 @@ function RequestDemoForm() {
               >
                 <a
                   href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                    "Halo Tim KADAI (PT Netkrida), saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
+                    "Halo Tim KADAI (NEW ASIA TECH - newasiatech.co.id), saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="size-4" />
-                  <span>Chat WhatsApp Tim Netkrida</span>
+                  <span>Chat WhatsApp Tim NEW ASIA TECH</span>
                 </a>
               </Button>
             </div>

@@ -121,8 +121,8 @@ export function PrinterSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="shrink-0">
           <div className="flex items-center gap-2">
             <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
               <Printer className="size-5" />
@@ -136,7 +136,7 @@ export function PrinterSettingsDialog({
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Status Box */}
           <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
             isConnected
@@ -260,7 +260,7 @@ export function PrinterSettingsDialog({
           )}
         </div>
 
-        <DialogFooter className="p-4 px-6 pb-5 border-t border-slate-100 bg-muted/20">
+        <DialogFooter className="shrink-0 p-4 px-6 border-t border-slate-100 bg-muted/20">
           <Button
             variant="outline"
             className="w-full sm:w-auto text-xs font-semibold"

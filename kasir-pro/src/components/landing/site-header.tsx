@@ -57,13 +57,13 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
     {
       title: "Kafe & Restoran (F&B)",
       desc: "Manajemen meja, pesanan split-bill, dan pemotongan resep bahan baku (BOM).",
-      href: "/solusi#kuliner-fnb",
+      href: "/solusi/fnb",
       icon: UtensilsCrossed,
     },
     {
       title: "Toko Ritel & Minimarket",
       desc: "Scan barcode produk kilat, kontrol varian SKU, dan batas minimum stok.",
-      href: "/solusi#ritel-minimarket",
+      href: "/solusi/ritel",
       icon: Store,
     },
     {
@@ -231,6 +231,12 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
               Hardware
+            </Link>
+            <Link
+              href="/blog"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
+            >
+              Blog Edukasi
             </Link>
             <Link
               href="/#faq"

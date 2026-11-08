@@ -29,8 +29,8 @@ export function SiteFooter() {
               Solusi Industri
             </span>
             <ul className="space-y-2 text-slate-400">
-              <li><Link href="/solusi#kuliner-fnb" className="hover:text-white transition-colors">Kafe & Restoran (F&B)</Link></li>
-              <li><Link href="/solusi#ritel-minimarket" className="hover:text-white transition-colors">Toko Ritel & Minimarket</Link></li>
+              <li><Link href="/solusi/fnb" className="hover:text-white transition-colors">Kafe & Restoran (F&B)</Link></li>
+              <li><Link href="/solusi/ritel" className="hover:text-white transition-colors">Toko Ritel & Minimarket</Link></li>
               <li><Link href="/solusi#dapur-pusat-gudang" className="hover:text-white transition-colors">Dapur Pusat & Gudang</Link></li>
             </ul>
           </div>

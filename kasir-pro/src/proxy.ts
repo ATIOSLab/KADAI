@@ -16,6 +16,8 @@ const publicPages = [
   "/hardware",
   "/fitur",
   "/solusi",
+  "/solusi/fnb",
+  "/solusi/ritel",
   "/blog",
   "/pricing",
   "/kebijakan-privasi",

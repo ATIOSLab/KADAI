@@ -64,7 +64,7 @@ const TABS: TabItem[] = [
       { label: "Akurasi Opname", value: "100% Tercatat" },
     ],
     content: {
-      meta: { ref: "SKU: BMF-ARABICA-01 • GUDANG PUSAT", status: "FIFO AKTIF", statusClass: "bg-blue-50 text-blue-800 border-blue-300" },
+      meta: { ref: "SKU: BMF-ARABICA-01 • GUDANG PUSAT", status: "FIFO AKTIF", statusClass: "bg-slate-100 text-slate-800 border-slate-300" },
       rows: [
         { label: "Batch #01 (Prioritas Keluar)", sub: "Tgl Beli: 01 Nov 2026 • Sisa 12 kg", val: "HPP Rp 140.000/kg" },
         { label: "Batch #02 (Stok Masuk Baru)", sub: "Tgl Beli: 04 Nov 2026 • Sisa 25 kg", val: "HPP Rp 145.000/kg" },
@@ -133,7 +133,7 @@ const TABS: TabItem[] = [
       { label: "Hak Akses Staf", value: "RBAC 6-Role" },
     ],
     content: {
-      meta: { ref: "TRF-20261105-0014 • GUDANG HQ → BOOTH THAMRIN", status: "IN TRANSIT", statusClass: "bg-purple-50 text-purple-800 border-purple-300" },
+      meta: { ref: "TRF-20261105-0014 • GUDANG HQ → BOOTH THAMRIN", status: "IN TRANSIT", statusClass: "bg-amber-50 text-amber-800 border-amber-300" },
       rows: [
         { label: "Biji Kopi Arabica Gayo (15 kg)", sub: "Batch #01 • Scoped HPP Rp 140.000", val: "Rp 2.100.000" },
         { label: "Susu Pasteurisasi Segar (30 liter)", sub: "Batch #04 • Scoped HPP Rp 20.000", val: "Rp 600.000" },
@@ -248,7 +248,7 @@ export function ProductShowcase() {
                 <span className="font-mono text-xs font-bold text-slate-600">
                   {current.content.meta.ref}
                 </span>
-                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${current.content.meta.statusClass} w-fit`}>
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md border ${current.content.meta.statusClass} w-fit`}>
                   {current.content.meta.status}
                 </span>
               </div>

@@ -5,7 +5,8 @@ import { ProductSearch } from "@/components/pos/product-search";
 import { Cart } from "@/components/pos/cart";
 import { ShiftDialog } from "@/components/pos/shift-dialog";
 import { PrinterSettingsDialog } from "@/components/pos/printer-settings-dialog";
-import { ShoppingCart, ArrowLeft, ShoppingBag, Calculator, Printer } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Calculator, Printer } from "lucide-react";
+import { KadaiLogoMark } from "@/components/shared/kadai-logo";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -49,13 +50,11 @@ export default function PosPage() {
               <ArrowLeft className="size-4" />
             </Link>
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-sm">
-              <ShoppingCart className="size-4" />
-            </div>
+          <div className="flex items-center gap-2.5">
+            <KadaiLogoMark size={30} variant="on-light" className="shrink-0" />
             <div>
-              <h1 className="font-bold text-sm leading-tight text-foreground">KADAI</h1>
-              <p className="text-[10px] font-medium text-muted-foreground">
+              <h1 className="font-bold text-sm leading-tight text-foreground tracking-tight">KADAI</h1>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                 Terminal Kasir POS
               </p>
             </div>
@@ -100,7 +99,7 @@ export default function PosPage() {
           <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block">
             {roleLabel}: {user?.name ?? "Memuat..."}
           </span>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
             <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Online
           </div>

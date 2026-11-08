@@ -10,6 +10,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -85,13 +86,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full max-w-lg my-8">
+    <div className="w-full max-w-lg my-8 animate-slide-up">
       {/* Header */}
       <div className="text-center mb-6">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-primary neo-border neo-shadow flex items-center justify-center mb-3">
-          <Store className="w-8 h-8 text-primary-foreground" />
-        </div>
-        <h1 className="text-2xl font-black tracking-tight">Daftarkan Bisnis Anda di KADAI</h1>
+        <Link href="/" className="inline-flex items-center justify-center mb-3 hover:opacity-90 transition-opacity">
+          <KadaiLockup variant="on-light" height={40} />
+        </Link>
+        <h1 className="text-2xl font-black tracking-tight text-slate-950">Daftarkan Bisnis Anda di KADAI</h1>
         <p className="text-xs text-muted-foreground mt-1 font-medium">
           Mulai operasikan POS cerdas, inventori bahan baku, meja QR, dan pembukuan resmi Indonesia.
         </p>

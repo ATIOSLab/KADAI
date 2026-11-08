@@ -124,7 +124,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           <div className="inline-flex max-w-full justify-center">
             <Badge
               variant="outline"
-              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
+              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-lg luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
             >
               <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
               <span className="text-[11px] sm:text-xs text-slate-900 uppercase tracking-widest font-black leading-tight">
@@ -150,7 +150,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md"
+                  className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-md"
                 >
                   <Link href={dashboardPath} className="flex items-center gap-2">
                     <span>Buka Dashboard Operasional</span>
@@ -162,7 +162,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   <Button
                     asChild
                     size="lg"
-                    className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
+                    className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
                   >
                     <Link href="/register">Coba Gratis 14 Hari</Link>
                   </Button>
@@ -171,7 +171,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-full bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
+                    className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-lg bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
                   >
                     <Link href="/demo">Jadwalkan Demo</Link>
                   </Button>
@@ -205,7 +205,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
         {/* 3 Operational Switcher Tabs (Responsive Grid, Zero Horizontal Overflow) */}
         <div className="flex items-center justify-center w-full px-2">
-          <div className="w-full max-w-lg p-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1">
+          <div className="w-full max-w-lg p-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1">
             {SEGMENTS.map((seg, idx) => {
               const Icon = seg.icon;
               const isActive = idx === activeTab;
@@ -214,7 +214,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   key={seg.id}
                   type="button"
                   onClick={() => setActiveTab(idx)}
-                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-bold transition-all text-center ${
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all text-center ${
                     isActive
                       ? "bg-slate-950 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/70"
@@ -243,9 +243,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 font-medium bg-slate-900/90 px-2.5 py-0.5 rounded-full border border-slate-800 flex items-center gap-1.5">
+              <span className="text-[11px] text-slate-400 font-medium bg-slate-900/90 px-2.5 py-0.5 rounded-md border border-slate-800 flex items-center gap-1.5">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
-                <span>Sinkronisasi Otomatis</span>
+                Realtime Sync
               </span>
             </div>
           </div>
@@ -266,7 +266,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
 
               <div className="relative z-10 space-y-3">
-                <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-full">
+                <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-lg">
                   {current.tag}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
@@ -286,7 +286,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   <KadaiLockup variant="on-light" height={26} className="h-6 w-auto" />
                   <Badge
                     variant="outline"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
                   >
                     <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span>{current.receipt.status}</span>

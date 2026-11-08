@@ -26,24 +26,22 @@ export function FinalCTA() {
 
         <div className="flex flex-col items-center justify-center gap-3.5 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full">
-            {/* Compound Capsule Button (GetLayers + Hexus ArrowUpRight) */}
-            <Link
-              href="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-4 pl-6 pr-2 py-2 rounded-full bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-md group border border-slate-800"
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
             >
-              <span className="font-semibold text-xs sm:text-sm tracking-tight">
-                Mulai Uji Coba Gratis 14 Hari
-              </span>
-              <span className="size-8 rounded-full bg-primary text-white flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+              <Link href="/register" className="flex items-center gap-2">
+                <span>Mulai Uji Coba Gratis 14 Hari</span>
                 <ArrowUpRight className="size-4" />
-              </span>
-            </Link>
+              </Link>
+            </Button>
 
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto font-medium text-xs sm:text-sm h-12 px-6 rounded-full luxury-glass-pill text-slate-800 hover:bg-white border-slate-300"
+              className="w-full sm:w-auto font-semibold text-sm h-12 px-7 rounded-lg bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-xs"
             >
               <a href="#harga">Lihat Paket Langganan</a>
             </Button>

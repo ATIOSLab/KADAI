@@ -116,7 +116,7 @@ function RequestDemoForm() {
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-12 overflow-hidden">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <Badge variant="outline" className="px-3.5 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">
+          <Badge variant="outline" className="px-3.5 py-1 text-xs font-semibold rounded-lg border-primary/30 text-primary bg-primary/5">
             JADWALKAN DEMO EKSKLUSIF & KONSULTASI
           </Badge>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950">

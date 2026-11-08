@@ -53,7 +53,7 @@ export function WorkflowSection() {
     <section className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-12">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
           <span>Alur Terintegrasi</span>
         </div>
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950">

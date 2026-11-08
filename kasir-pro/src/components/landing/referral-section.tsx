@@ -83,7 +83,7 @@ export function ReferralSection() {
           <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
             <Button
               asChild
-              className="rounded-full font-bold h-11 px-7 bg-primary hover:bg-primary/90 text-white shadow-xs"
+              className="rounded-lg font-bold h-11 px-7 bg-primary hover:bg-primary/90 text-white shadow-xs"
             >
               <Link href="/referral" className="flex items-center justify-center gap-2">
                 <span>Daftar Jadi Mitra</span>
@@ -94,7 +94,7 @@ export function ReferralSection() {
             <Button
               asChild
               variant="outline"
-              className="rounded-full font-semibold h-11 px-6 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="rounded-lg font-semibold h-11 px-6 bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
               <Link href="/referral">Lihat Simulasi Komisi</Link>
             </Button>

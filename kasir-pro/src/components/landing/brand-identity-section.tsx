@@ -67,7 +67,7 @@ export function BrandIdentitySection() {
     <section id="identitas-brand" className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full space-y-16">
       {/* 1. Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-50/80 border border-orange-200/90 text-primary text-xs font-semibold shadow-2xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-lg bg-orange-50/80 border border-orange-200/90 text-primary text-xs font-semibold shadow-2xs">
           <Palette className="size-3.5 text-primary" />
           <span className="uppercase tracking-widest text-[11px] font-bold">Identitas & Standar Visual</span>
         </div>

@@ -267,7 +267,7 @@ export default function KDSPage() {
           {ord.status === "QUEUED" && (
             <Button
               onClick={() => updateStatus(ord.id, "COOKING")}
-              className="w-full font-bold text-xs h-10 rounded-xl bg-gradient-to-r from-[#EA580C] to-[#FB923C] text-white hover:brightness-110 shadow-md transition-all active:scale-[0.98]"
+              className="w-full font-bold text-xs h-10 rounded-xl bg-primary text-white hover:bg-primary/90 shadow-sm transition-all active:scale-[0.98]"
             >
               <Flame className="size-3.5 mr-1.5" /> Mulai Masak / Siapkan
             </Button>
@@ -276,7 +276,7 @@ export default function KDSPage() {
           {ord.status === "COOKING" && (
             <Button
               onClick={() => updateStatus(ord.id, "READY")}
-              className="w-full font-bold text-xs h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white hover:brightness-110 shadow-md transition-all active:scale-[0.98]"
+              className="w-full font-bold text-xs h-10 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-all active:scale-[0.98]"
             >
               <CheckCircle2 className="size-3.5 mr-1.5" /> Siap Saji (Ready)
             </Button>

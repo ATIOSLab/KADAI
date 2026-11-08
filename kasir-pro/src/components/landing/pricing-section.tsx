@@ -106,7 +106,7 @@ export function PricingSection() {
               }`}
             >
               {plan.featured && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-xs border-0">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-md shadow-xs border-0">
                   {plan.badge}
                 </Badge>
               )}

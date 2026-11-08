@@ -245,7 +245,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             {dashboardPath ? (
               <Button
                 asChild
-                className="font-bold text-sm h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-white shadow-xs"
+                className="font-bold text-sm h-10 px-5 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-xs"
               >
                 <Link href={dashboardPath} className="flex items-center gap-1.5">
                   <span>Dashboard</span>
@@ -262,7 +262,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 </Link>
                 <Button
                   asChild
-                  className="font-bold text-sm h-10 px-6 rounded-full bg-primary hover:bg-primary/90 text-white shadow-xs transition-transform active:scale-95"
+                  className="font-bold text-sm h-10 px-6 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-xs transition-transform active:scale-95"
                 >
                   <Link href="/register">Coba Gratis</Link>
                 </Button>
@@ -273,11 +273,11 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           {/* Mobile Menu Button */}
           <div className="flex xl:hidden items-center gap-1.5 sm:gap-3 shrink-0">
             {dashboardPath ? (
-              <Button asChild size="sm" className="h-8 sm:h-9 text-xs font-bold px-2.5 sm:px-3 rounded-full bg-primary text-white">
+              <Button asChild size="sm" className="h-8 sm:h-9 text-xs font-bold px-2.5 sm:px-3 rounded-lg bg-primary text-white">
                 <Link href={dashboardPath}>Dashboard</Link>
               </Button>
             ) : (
-              <Button asChild size="sm" className="hidden min-[380px]:inline-flex h-8 sm:h-9 text-xs font-bold px-3 sm:px-4 rounded-full bg-primary text-white">
+              <Button asChild size="sm" className="hidden min-[380px]:inline-flex h-8 sm:h-9 text-xs font-bold px-3 sm:px-4 rounded-lg bg-primary text-white">
                 <Link href="/register">Coba Gratis</Link>
               </Button>
             )}

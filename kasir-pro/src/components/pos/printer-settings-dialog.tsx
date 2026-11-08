@@ -175,54 +175,66 @@ export function PrinterSettingsDialog({
 
           {/* Connection Actions */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold text-slate-700">Hubungkan Printer Baru</Label>
-            <div className="grid grid-cols-2 gap-2.5">
-              <Button
-                variant="outline"
-                className="h-12 flex flex-col items-center justify-center gap-1 text-xs font-bold border-slate-300 hover:border-primary hover:text-primary transition-all"
+            <Label className="text-xs font-bold text-slate-800">Hubungkan Printer Baru</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-1.5 p-2 transition-all cursor-pointer group ${
+                  config.type === "bluetooth" && isConnected
+                    ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20 shadow-xs"
+                    : "border-slate-200 bg-white hover:border-primary/50 hover:bg-slate-50 text-slate-800"
+                }`}
                 onClick={handleConnectBt}
                 disabled={loadingBt}
               >
                 {loadingBt ? (
-                  <Loader2 className="size-4 animate-spin text-primary" />
+                  <Loader2 className="size-5 animate-spin text-primary" />
                 ) : (
-                  <Bluetooth className="size-4 text-blue-600" />
+                  <Bluetooth className={`size-5 transition-transform group-hover:scale-105 ${
+                    config.type === "bluetooth" && isConnected ? "text-primary" : "text-slate-800"
+                  }`} />
                 )}
-                <span>Bluetooth POS</span>
-              </Button>
+                <span className="text-xs font-bold">Bluetooth POS</span>
+              </button>
 
-              <Button
-                variant="outline"
-                className="h-12 flex flex-col items-center justify-center gap-1 text-xs font-bold border-slate-300 hover:border-primary hover:text-primary transition-all"
+              <button
+                type="button"
+                className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-1.5 p-2 transition-all cursor-pointer group ${
+                  config.type === "usb" && isConnected
+                    ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20 shadow-xs"
+                    : "border-slate-200 bg-white hover:border-primary/50 hover:bg-slate-50 text-slate-800"
+                }`}
                 onClick={handleConnectUsb}
                 disabled={loadingUsb}
               >
                 {loadingUsb ? (
-                  <Loader2 className="size-4 animate-spin text-primary" />
+                  <Loader2 className="size-5 animate-spin text-primary" />
                 ) : (
-                  <Usb className="size-4 text-slate-700" />
+                  <Usb className={`size-5 transition-transform group-hover:scale-105 ${
+                    config.type === "usb" && isConnected ? "text-primary" : "text-slate-800"
+                  }`} />
                 )}
-                <span>USB Thermal</span>
-              </Button>
+                <span className="text-xs font-bold">USB Thermal</span>
+              </button>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
               *Didukung di Google Chrome, Microsoft Edge, dan browser berbasis Chromium pada Windows, Mac, dan Android.
             </p>
           </div>
 
           {/* Paper Width Config */}
           <div className="space-y-1.5 pt-2 border-t border-slate-100">
-            <Label className="text-xs font-bold text-slate-700">Lebar Kertas Thermal Roll</Label>
+            <Label className="text-xs font-bold text-slate-800">Lebar Kertas Thermal Roll</Label>
             <Select
               value={String(config.paperWidth)}
               onValueChange={handlePaperWidthChange}
             >
-              <SelectTrigger className="h-9 text-xs">
+              <SelectTrigger className="h-10 text-xs font-medium">
                 <SelectValue placeholder="Pilih lebar kertas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="58">58 mm (Printer Mini / Mobile Bluetooth)</SelectItem>
-                <SelectItem value="80">80 mm (Printer Desktop Kasir Besar / Standar)</SelectItem>
+                <SelectItem value="58">58 mm (Printer Mini / Mobile Bluetooth RPP02 / Panda)</SelectItem>
+                <SelectItem value="80">80 mm (Printer Desktop Kasir Epson / Xprinter / Sunmi)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -233,14 +245,14 @@ export function PrinterSettingsDialog({
               <Button
                 variant="secondary"
                 size="sm"
-                className="w-full text-xs font-bold gap-1.5 h-9"
+                className="w-full text-xs font-bold gap-1.5 h-10 shadow-xs"
                 onClick={handleTestPrint}
                 disabled={testing}
               >
                 {testing ? (
-                  <Loader2 className="size-3.5 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  <Printer className="size-3.5" />
+                  <Printer className="size-4" />
                 )}
                 <span>Cetak Struk Uji Coba (Test Print)</span>
               </Button>
@@ -248,10 +260,10 @@ export function PrinterSettingsDialog({
           )}
         </div>
 
-        <DialogFooter className="border-t border-slate-100 pt-3">
+        <DialogFooter className="border-t border-slate-100 pt-4 pb-2">
           <Button
             variant="outline"
-            className="w-full sm:w-auto text-xs"
+            className="w-full sm:w-auto text-xs font-semibold"
             onClick={() => onOpenChange(false)}
           >
             Tutup

@@ -414,13 +414,13 @@ export function ReferralContent() {
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-slate-900">Butuh Bantuan Pemasaran?</h4>
                 <p className="text-xs text-slate-500">
-                  Konsultasikan program kemitraan dengan koordinator kemitraan NEW ASIA TECH (newasiatech.co.id).
+                  Konsultasikan program kemitraan dengan koordinator kemitraan NEW ASIA TECH.
                 </p>
               </div>
               <Button asChild size="sm" variant="outline" className="rounded-xl border-[#25D366] text-[#25D366] hover:bg-emerald-50 shrink-0">
                 <a
                   href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                    "Halo Tim KADAI (NEW ASIA TECH - newasiatech.co.id), saya ingin bertanya seputar Program Mitra Referral & Afiliasi."
+                    "Halo Tim KADAI (NEW ASIA TECH), saya ingin bertanya seputar Program Mitra Referral & Afiliasi."
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

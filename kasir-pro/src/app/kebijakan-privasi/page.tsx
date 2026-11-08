@@ -49,7 +49,7 @@ const sections: PrivacySection[] = [
     icon: UserCheck,
     title: "2. Pengendali Data Pribadi & Kontak",
     items: [
-      "Pengendali data pribadi pada platform KADAI adalah manajemen KADAI di bawah naungan NEW ASIA TECH (newasiatech.co.id).",
+      "Pengendali data pribadi pada platform KADAI adalah manajemen KADAI di bawah naungan NEW ASIA TECH.",
       "Seluruh pertanyaan terkait privasi atau permintaan hak subjek data dapat disampaikan melalui kanal resmi: WhatsApp +62 851-5908-1119 atau formulir pada halaman permintaan demo.",
       "Setiap permintaan hak subjek data direspons paling lambat 30 (tiga puluh) hari kerja sejak permintaan terverifikasi.",
     ],
@@ -160,7 +160,15 @@ export default function PrivacyPolicyPage() {
             Kebijakan Privasi &amp; Pelindungan Data Pribadi
           </h1>
           <p className="text-sm text-slate-500">
-            Berlaku efektif {EFFECTIVE_DATE} · Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) &bull; Dikelola oleh NEW ASIA TECH (newasiatech.co.id)
+            Berlaku efektif {EFFECTIVE_DATE} · Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) &bull; Dikelola oleh{" "}
+            <a
+              href="https://newasiatech.co.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-700 hover:text-primary transition-colors underline decoration-slate-300 underline-offset-2"
+            >
+              NEW ASIA TECH
+            </a>
           </p>
         </div>
 

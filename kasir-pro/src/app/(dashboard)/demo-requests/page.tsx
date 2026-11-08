@@ -97,7 +97,7 @@ export default function DemoRequestsAdminPage() {
     if (cleanPhone.startsWith("0")) {
       cleanPhone = "62" + cleanPhone.substring(1);
     }
-    const message = `Halo ${item.fullName} (${item.businessName}), terima kasih atas permohonan demo sistem operasi KADAI. Kode Akses Demo Anda: *${item.accessCode}*. Anda dapat login langsung di https://kadai.asia/login?code=${item.accessCode}. Tim NEW ASIA TECH (newasiatech.co.id) siap mendampingi operasional Anda.`;
+    const message = `Halo ${item.fullName} (${item.businessName}), terima kasih atas permohonan demo sistem operasi KADAI. Kode Akses Demo Anda: *${item.accessCode}*. Anda dapat login langsung di https://kadai.asia/login?code=${item.accessCode}. Tim NEW ASIA TECH siap mendampingi operasional Anda.`;
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
   };
 

@@ -41,7 +41,7 @@ const sections: TermSection[] = [
     icon: FileText,
     title: "1. Penerimaan Ketentuan",
     intro:
-      "Dengan mendaftar, mengakses, atau menggunakan layanan KADAI (kadai.asia), Anda menyatakan telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat & Ketentuan ini serta Kebijakan Privasi KADAI. Ketentuan ini merupakan perjanjian yang sah dan mengikat antara Anda (atau badan usaha yang Anda wakili) dan NEW ASIA TECH (newasiatech.co.id) selaku entitas pemilik dan pengelola platform.",
+      "Dengan mendaftar, mengakses, atau menggunakan layanan KADAI (kadai.asia), Anda menyatakan telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat & Ketentuan ini serta Kebijakan Privasi KADAI. Ketentuan ini merupakan perjanjian yang sah dan mengikat antara Anda (atau badan usaha yang Anda wakili) dan NEW ASIA TECH selaku entitas pemilik dan pengelola platform.",
   },
   {
     icon: Server,
@@ -132,7 +132,16 @@ export default function TermsPage() {
               Syarat & Ketentuan Layanan
             </h1>
             <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-              Panduan hukum, lisensi perangkat lunak SaaS, batasan tanggung jawab, serta komitmen kedaulatan data antara pengguna dan KADAI di bawah naungan NEW ASIA TECH (newasiatech.co.id).
+              Panduan hukum, lisensi perangkat lunak SaaS, batasan tanggung jawab, serta komitmen kedaulatan data antara pengguna dan KADAI di bawah naungan{" "}
+              <a
+                href="https://newasiatech.co.id"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-slate-800 hover:text-primary transition-colors underline decoration-slate-300 underline-offset-2"
+              >
+                NEW ASIA TECH
+              </a>
+              .
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500">
               <span>Berlaku efektif sejak: <strong>{EFFECTIVE_DATE}</strong></span>

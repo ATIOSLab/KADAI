@@ -123,7 +123,7 @@ function RequestDemoForm() {
             Coba Langsung KADAI untuk Bisnis Anda
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim spesialis NEW ASIA TECH (newasiatech.co.id).
+            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim spesialis NEW ASIA TECH.
           </p>
         </div>
 
@@ -172,7 +172,7 @@ function RequestDemoForm() {
                     >
                       <a
                         href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                          `Halo Tim KADAI (NEW ASIA TECH - newasiatech.co.id), saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
+                          `Halo Tim KADAI (NEW ASIA TECH), saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -437,7 +437,16 @@ function RequestDemoForm() {
                   <h3 className="text-base font-bold text-slate-950">
                     Konsultasi Cepat via WhatsApp
                   </h3>
-                  <span className="text-xs text-slate-500">NEW ASIA TECH (newasiatech.co.id)</span>
+                  <span className="text-xs text-slate-500">
+                    <a
+                      href="https://newasiatech.co.id"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-primary transition-colors underline decoration-slate-300 underline-offset-2"
+                    >
+                      NEW ASIA TECH
+                    </a>
+                  </span>
                 </div>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -449,7 +458,7 @@ function RequestDemoForm() {
               >
                 <a
                   href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                    "Halo Tim KADAI (NEW ASIA TECH - newasiatech.co.id), saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
+                    "Halo Tim KADAI (NEW ASIA TECH), saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

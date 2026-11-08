@@ -93,7 +93,7 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 className="text-slate-300 font-semibold hover:text-primary transition-colors underline decoration-slate-700 underline-offset-2"
               >
-                NEW ASIA TECH (newasiatech.co.id)
+                NEW ASIA TECH
               </a>
               .
             </span>

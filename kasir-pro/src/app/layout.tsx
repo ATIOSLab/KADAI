@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Quicksand, Poppins, Geist_Mono, Saira } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono, Saira } from "next/font/google";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
@@ -7,14 +7,7 @@ import { PwaRegister } from "@/components/shared/pwa-register";
 import { ReferralTracker } from "@/components/shared/referral-tracker";
 import "./globals.css";
 
-const quicksand = Quicksand({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-  weight: ["500", "600", "700"],
-});
-
-const poppins = Poppins({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -224,8 +217,7 @@ export default function RootLayout({
       lang="id"
       className={cn(
         "font-sans antialiased",
-        quicksand.variable,
-        poppins.variable,
+        plusJakartaSans.variable,
         geistMono.variable,
         saira.variable
       )}

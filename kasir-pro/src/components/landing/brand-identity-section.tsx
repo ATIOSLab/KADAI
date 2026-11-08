@@ -367,13 +367,20 @@ export function BrandIdentitySection() {
           {/* Typo 2: Headings */}
           <div className="space-y-2 sm:px-3 pt-4 sm:pt-0">
             <span className="text-[10px] font-bold text-[#EA580C] uppercase tracking-widest block">
-              2. Judul &amp; Headline
+              2. Judul &amp; Headings (H1–H3)
             </span>
-            <h4 className="text-xl font-black text-slate-950" style={{ fontFamily: "var(--font-heading)" }}>
-              Quicksand
+            <h4
+              className="text-xl font-bold text-slate-950"
+              style={{
+                fontFamily: "'Bahnschrift', var(--font-saira), 'Segoe UI', sans-serif",
+                letterSpacing: "-0.035em",
+                fontWeight: 700,
+              }}
+            >
+              Bahnschrift / Saira
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Geometris bulat (*rounded*), kurva lembut yang selaras dengan kapsul silindris dan lengkung wajan logo K.
+              DIN geometris murni, tegas, berwibawa, dan selaras 1:1 dengan DNA logo <span className="font-bold text-slate-900">kadaı</span>. Diterapkan pada H1–H3, modul, dan metrik.
             </p>
             <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-heading</div>
           </div>
@@ -381,13 +388,13 @@ export function BrandIdentitySection() {
           {/* Typo 3: Body */}
           <div className="space-y-2 sm:px-3 pt-4 sm:pt-0">
             <span className="text-[10px] font-bold text-[#FB923C] uppercase tracking-widest block">
-              3. Antarmuka &amp; Body
+              3. Antarmuka, Tabel &amp; Body
             </span>
             <h4 className="text-xl font-bold text-slate-950 font-sans">
-              Poppins
+              Plus Jakarta Sans
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Jernih, modern, dan ergonomis untuk layar kasir POS, tablet kasir, maupun mobile display di segala kondisi pencahayaan.
+              Modern geometric sans dengan keterbacaan (*legibility*) luar biasa pada teks kecil, ribuan baris pesanan, formulir kasir, dan tombol navigasi.
             </p>
             <div className="pt-2 text-[10px] font-mono text-slate-400">CSS: --font-sans</div>
           </div>

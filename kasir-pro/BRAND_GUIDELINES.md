@@ -62,28 +62,28 @@ Huruf **"K"** kustom dirancang secara geometris dengan 4 komponen bermakna:
 
 ---
 
-## 4. Standar Tipografi
+## 4. Standar Tipografi (Pilihan 1: Pure DIN & Modern Tech)
 
-1. **Font Wordmark Resmi `kadaı` (DIN Geometric):**
+1. **Font Wordmark Resmi `kadaı` & Judul Utama (DIN Geometric):**
    * Font Utama: **`Bahnschrift Bold`** (Font bawaan Windows, gaya DIN geometris modern).
-   * Bobot: **700 (Bold)**, Huruf Kecil (*lowercase*).
+   * Bobot: **700 (Bold)**, Huruf Kecil (*lowercase* untuk wordmark).
    * Spasi (*Tracking*): **−4.5%** (`tracking-[-0.045em]`).
    * Aksen Huruf **ı**: Menggunakan huruf `ı` (dotless i), titik aslinya digantikan lingkaran solid **Amber `#F59E0B`** (*spark dot*).
    * Fallback Web & Multi-Platform:
      * Windows Alternate: **`Segoe UI Bold`**
-     * Web & Non-Windows (macOS, iOS, Android, Linux): **`Saira Bold`** / **`Rajdhani Bold`** (Open-source Google Fonts, DIN geometric style bebas lisensi).
-   * Variabel CSS: `--font-wordmark`.
+     * Web & Non-Windows (macOS, iOS, Android, Linux): **`Saira Bold`** (Google Fonts bersertifikat SIL Open Font License, geometri DIN presisi).
+   * Variabel CSS: `--font-wordmark` & `--font-heading`.
 
-2. **Font Judul & Headings (Geometric Rounded):**
-   * Font: **`Quicksand`** (Google Fonts).
+2. **Font Judul & Headings Aplikasi (H1–H3):**
+   * Font: **`Bahnschrift`** (Windows) / **`Saira`** (macOS, iOS, Android).
    * Variabel CSS: `--font-heading`.
-   * Karakteristik: Geometris bulat (*geometric rounded*), kurva lembut yang selaras dengan kapsul silindris dan lengkung wajan logo K.
-   * Diterapkan pada: Semua judul H1, H2, H3, H4, nama modul, dan judul kartu.
+   * Karakteristik: Geometris DIN murni, tegas, berwibawa, dan selaras 1:1 dengan DNA logo `kadaı`.
+   * Diterapkan pada: Judul H1, H2, H3, nama modul, judul kartu metrik, dan banner kampanye.
 
-3. **Font Teks Utama & Antarmuka Aplikasi (Body Sans):**
-   * Font: **`Poppins`** (Google Fonts).
+3. **Font Teks Utama, Tabel & Antarmuka Aplikasi (Body Sans):**
+   * Font: **`Plus Jakarta Sans`** (Google Fonts).
    * Variabel CSS: `--font-sans`.
-   * Karakteristik: Geometris modern, sangat jernih dan nyaman dibaca pada layar kasir POS, tablet, dan smartphone di segala kondisi pencahayaan.
+   * Karakteristik: Modern geometric sans dengan keterbacaan (*legibility*) luar biasa pada teks kecil (10px–13px), tabel pesanan ribuan baris, formulir kasir, dan navigasi tombol. Ergonomis dan ramah mata kasir.
 
 4. **Font Finansial & Kasir (Monospace / Tabular):**
    * Font: **`Geist Mono`** / Tabular Numbers (`tabular-nums`).

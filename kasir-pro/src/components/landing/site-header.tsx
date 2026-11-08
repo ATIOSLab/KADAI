@@ -221,12 +221,6 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
             {/* Direct Links */}
             <Link
-              href="/#identitas-brand"
-              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
-            >
-              Desain Brand
-            </Link>
-            <Link
               href="/harga"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >

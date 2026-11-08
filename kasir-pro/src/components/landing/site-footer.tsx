@@ -20,7 +20,6 @@ export function SiteFooter() {
               <li><Link href="/fitur#dapur-kds" className="hover:text-white transition-colors">Kitchen Display System</Link></li>
               <li><Link href="/fitur#resep-bom" className="hover:text-white transition-colors">Resep Produksi (BOM)</Link></li>
               <li><Link href="/fitur#pembukuan-pajak" className="hover:text-white transition-colors">Pajak Daerah & SAK EMKM</Link></li>
-              <li><Link href="/#identitas-brand" className="hover:text-white transition-colors text-primary font-semibold">Identitas & Desain Brand</Link></li>
             </ul>
           </div>
 

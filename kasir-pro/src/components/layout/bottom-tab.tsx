@@ -25,8 +25,8 @@ export function BottomTab({ currentUser }: BottomTabProps) {
   }
 
   return (
-    <nav className="fixed inset-x-4 bottom-4 z-50 lg:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="rounded-[28px] border border-border/80 bg-card/95 p-2 shadow-2xl backdrop-blur-xl">
+    <nav className="fixed inset-x-0 bottom-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
+      <div className="px-2 py-1">
         <div
           className="grid items-center gap-1"
           style={{
@@ -42,11 +42,11 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className="flex flex-col items-center gap-1 py-1"
+                  className="flex flex-col items-center gap-0.5 py-0.5"
                 >
                   <div
                     className={cn(
-                      "flex h-11 w-11 items-center justify-center rounded-2xl transition-all",
+                      "flex h-10 w-10 items-center justify-center rounded-xl transition-all",
                       isActive
                         ? "bg-primary text-white shadow-md shadow-primary/25 ring-2 ring-primary/20 scale-105"
                         : "bg-primary/90 text-white shadow-xs hover:bg-primary"
@@ -56,7 +56,7 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                   </div>
                   <span
                     className={cn(
-                      "text-[10px]",
+                      "text-[9px]",
                       isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
                     )}
                   >
@@ -71,14 +71,14 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-2xl px-2 py-2 transition-colors",
+                  "flex flex-col items-center gap-0.5 rounded-xl px-2 py-1 transition-colors",
                   isActive
                     ? "bg-primary/10 text-primary font-bold"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 <Icon className="h-[18px] w-[18px]" />
-                <span className="text-[10px] font-semibold">{tab.shortLabel}</span>
+                <span className="text-[9px] font-semibold">{tab.shortLabel}</span>
               </Link>
             );
           })}

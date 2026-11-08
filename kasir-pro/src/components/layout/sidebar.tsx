@@ -42,7 +42,7 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 border-r border-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 lg:flex",
+        "sticky top-0 hidden h-screen shrink-0 border-r border-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex",
         collapsed ? "w-16" : "w-64"
       )}
       data-collapsed={collapsed}

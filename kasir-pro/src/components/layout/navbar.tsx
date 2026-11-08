@@ -88,10 +88,10 @@ export function Navbar({
   return (
     <>
       <header className="z-40 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur">
-        <div className="flex h-full items-center justify-between gap-3 px-4 lg:px-6">
+        <div className="flex h-full items-center justify-between gap-3 px-4 md:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             {/* Mobile Hamburger Button & Brand Lockup */}
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-2 md:hidden">
               <button
                 type="button"
                 onClick={() => setMobileNavOpen(true)}
@@ -109,7 +109,7 @@ export function Navbar({
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:inline-flex"
+              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
               aria-label={sidebarCollapsed ? "Buka navigasi" : "Ciutkan navigasi"}
             >
               <PanelLeft className="size-4" />
@@ -125,7 +125,7 @@ export function Navbar({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground lg:flex">
+            <div className="hidden items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground md:flex">
               <CalendarDays className="size-3.5 text-primary" />
               <span>{todayLabel}</span>
             </div>

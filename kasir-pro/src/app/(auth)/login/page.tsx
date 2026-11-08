@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Store, Eye, EyeOff, KeyRound, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, KeyRound, CheckCircle2 } from "lucide-react";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -102,12 +103,11 @@ function LoginForm() {
     <div className="w-full max-w-md animate-slide-up">
       {/* Logo */}
       <div className="text-center mb-6">
-        <Link href="/" className="size-14 mx-auto rounded-2xl bg-slate-950 text-white shadow-sm flex items-center justify-center mb-3 group hover:scale-105 transition-transform">
-          <Store className="size-7 text-primary" />
+        <Link href="/" className="inline-flex items-center justify-center mb-2 hover:opacity-90 transition-opacity">
+          <KadaiLockup variant="on-light" height={42} />
         </Link>
-        <h1 className="text-3xl font-black tracking-tight text-slate-950">KADAI</h1>
         <p className="text-slate-600 font-medium text-xs mt-1">
-          Masuk ke akun kasir & dashboard operasional Anda
+          Masuk ke portal kasir &amp; dashboard operasional Anda
         </p>
       </div>
 

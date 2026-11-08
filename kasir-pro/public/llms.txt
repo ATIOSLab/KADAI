@@ -1,14 +1,14 @@
 # KADAI (https://kadai.asia)
-> Sistem Operasi Bisnis Indonesia — Kasir POS Kilat, Inventori FIFO, Fleksibel Non-PKP & PKP, Resep BOM Dapur & Legalitas OSS.
+> Sistem Operasi Bisnis Indonesia — Satu Sistem untuk Gerai, Dapur, dan Pembukuan.
 
-KADAI menyatukan Kasir POS Kilat, Fleksibilitas Perpajakan (Non-PKP 0% bebas pajak & PKP PB1 10%/PPN 11%), Inventori Multi-Batch FIFO (PSAK 14 / SAK EMKM), Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi Kuliner, Multi-Cabang Surat Jalan In-Transit, serta Legalitas Usaha RI (NIB OSS 13 digit, PT Perorangan PP 8/2021, CV, PT, Koperasi, UD).
+KADAI menyatukan Kasir POS Kilat, Fleksibilitas Perpajakan (Non-PKP 0% bebas pajak & PKP PB1 10%/PPN 11%), Inventori Multi-Batch Fleksibel (FIFO, FEFO, Average berstandar PSAK 14 / SAK EMKM), Kitchen Display System (KDS), Resep Bill of Materials (BOM) Produksi, Multi-Cabang Surat Jalan In-Transit, serta Legalitas Usaha RI (NIB OSS 13 digit, PT Perorangan PP 8/2021, CV, PT, Koperasi, UD).
 
 ## Modul & Kapabilitas Utama
 - [POS Kasir Kilat](https://kadai.asia/pos): Transaksi kilat dengan latensi < 0.2 detik, multi-kasir, split-bill, dan cetak struk thermal 58mm/80mm dengan QRIS dinamis & tunai.
 - [Fleksibilitas Fiskal Non-PKP & PKP](https://kadai.asia/#pajak-pembukuan): Bebas pajak untuk toko kelontong/warung Non-PKP (0%), atau hitung otomatis PB1 10% & PPN 11% untuk restoran & badan usaha PKP.
 - [Legalitas Usaha RI](https://kadai.asia/demo): Dukungan format hukum resmi (PT Perorangan UMK PP 8/2021, CV, PT, Koperasi, UD, Usaha Perorangan), NIB OSS-RBA, NIK KTP, dan NPWP.
-- [Inventori Multi-Batch FIFO](https://kadai.asia/inventory): Penilaian persediaan berstandar PSAK 14 / SAK EMKM, pelacakan tanggal kadaluwarsa per-batch stok masuk, serta radar visual peringatan dini.
-- [Dapur Pusat & KDS](https://kadai.asia/kds): Routing pesanan otomatis per-stasiun kerja dapur/bar, notifikasi audio, dan resep produksi bahan baku (Bill of Materials).
+- [Inventori Multi-Batch (FIFO, FEFO, Average)](https://kadai.asia/inventory): Penilaian persediaan berstandar PSAK 14 / SAK EMKM, pelacakan tanggal kadaluwarsa per-batch stok masuk, serta radar visual peringatan dini.
+- [Dapur & Stasiun Produksi (KDS)](https://kadai.asia/kds): Routing pesanan otomatis per-stasiun kerja dapur/bar, pipeline 3-tahap kanban, notifikasi audio, dan resep produksi bahan baku (Bill of Materials).
 - [Multi-Cabang & Transfer Stok](https://kadai.asia/inventory/transfers): Distribusi stok dari gudang pusat ke cabang satelit dengan Surat Jalan Digital status In-Transit.
 - [Kepatuhan Fiskal & SAK EMKM](https://kadai.asia/finance/tax): Rekonsiliasi PPh Final PP 55/2022 tarif 0.5%, monitoring batas omzet Rp 500 Juta, dan laporan laba rugi real-time.
 - [Program Kemitraan & Referral](https://kadai.asia/referral): Komisi mitra 20% berkelanjutan per pembayaran langganan terverifikasi.

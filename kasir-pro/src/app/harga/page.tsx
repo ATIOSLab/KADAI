@@ -16,6 +16,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://kadai.asia/harga",
   },
+  openGraph: {
+    title: "Paket Langganan & Harga Resmi | KADAI",
+    description:
+      "Struktur paket langganan transparan: Starter Rp 0, Professional Rp 99rb, Business Pro Rp 249rb, dan Enterprise Rp 599rb. Tanpa biaya tersembunyi.",
+    url: "https://kadai.asia/harga",
+    images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
+  },
 };
 
 const tiers = [
@@ -60,7 +67,7 @@ const tiers = [
     desc: "Solusi lengkap bisnis berkembang dengan manajemen bahan baku resep dan batch kadaluwarsa.",
     features: [
       "Hingga 3 Gerai (Outlet)",
-      "Inventori Multi-Batch FIFO (PSAK 14)",
+      "Inventori Multi-Batch (FIFO, FEFO, Average)",
       "Radar Tanggal Kadaluwarsa",
       "Resep Produksi / Bill of Materials (BOM)",
       "Transfer Stok Antar Outlet (Surat Jalan)",

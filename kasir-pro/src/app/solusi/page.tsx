@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://kadai.asia/solusi",
   },
+  openGraph: {
+    title: "Solusi Industri: F&B, Ritel, & Dapur Pusat | KADAI",
+    description:
+      "Arsitektur operasional kasir, stok multi-batch, dan alur dapur terpadu untuk kafe, ritel minimarket, hingga multi-cabang distribusi.",
+    url: "https://kadai.asia/solusi",
+    images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
+  },
 };
 
 const solutions = [
@@ -56,7 +63,7 @@ const solutions = [
     ],
     features: [
       "Input kilat barcode scanner fisik & tombol pintas F2/F4",
-      "Inventori batch FIFO (PSAK 14) dengan radar tanggal kedaluwarsa",
+      "Inventori multi-batch fleksibel (FIFO, FEFO, Average) dengan radar tanggal kedaluwarsa",
       "Dukungan varian produk dinamis: ukuran, warna, aroma",
       "Peringatan otomatis saat stok barang mencapai batas minimum",
     ],

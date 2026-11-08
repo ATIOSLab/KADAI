@@ -27,6 +27,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://kadai.asia/hardware",
   },
+  openGraph: {
+    title: "Panduan Hardware & Kompatibilitas Printer | KADAI",
+    description:
+      "Bebas perangkat (hardware-agnostic). Mendukung 99% printer struk thermal ESC/POS 58mm/80mm, barcode scanner, dan tablet Android/iPad tanpa sewa paksa.",
+    url: "https://kadai.asia/hardware",
+    images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
+  },
 };
 
 const hardwareCategories = [

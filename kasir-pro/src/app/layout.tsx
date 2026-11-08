@@ -72,9 +72,9 @@ export const metadata: Metadata = {
     shortcut: ["/favicon.ico"],
   },
   openGraph: {
-    title: "KADAI - Sistem Operasi Bisnis Indonesia (Non-PKP & PKP)",
+    title: "KADAI - Satu Sistem untuk Gerai, Dapur, dan Pembukuan | Sistem Operasi Bisnis Indonesia",
     description:
-      "Satu aplikasi kasir terpadu untuk gerai, dapur, & pembukuan Anda. Cocok untuk usaha Non-PKP (0% pajak) & PKP. Kasir kilat, inventori FIFO, dan kepatuhan fiskal RI.",
+      "Satu sistem operasi bisnis & kasir POS terpadu untuk gerai, dapur/stasiun produksi, dan pembukuan. Mendukung Non-PKP (0%) & PKP (PB1 10%, PPN), inventori multi-batch (FIFO, FEFO, Average), dan rekap laba bersih.",
     url: "https://kadai.asia",
     siteName: "KADAI Operating System",
     locale: "id_ID",
@@ -84,15 +84,15 @@ export const metadata: Metadata = {
         url: "https://kadai.asia/og-image.png",
         width: 1200,
         height: 630,
-        alt: "KADAI - Sistem Operasi Bisnis Indonesia | Aplikasi Kasir POS Non-PKP & PKP",
+        alt: "KADAI - Sistem Operasi Bisnis Indonesia | Satu Sistem untuk Gerai, Dapur, dan Pembukuan",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "KADAI - Sistem Operasi Bisnis Indonesia (Non-PKP & PKP)",
+    title: "KADAI - Satu Sistem untuk Gerai, Dapur, dan Pembukuan | Sistem Operasi Bisnis Indonesia",
     description:
-      "Satu aplikasi kasir terpadu untuk gerai, dapur, & pembukuan Anda. Cocok untuk usaha Non-PKP (0% pajak) & PKP. Kasir kilat, inventori FIFO, dan kepatuhan fiskal RI.",
+      "Satu sistem operasi bisnis & kasir POS terpadu untuk gerai, dapur/stasiun produksi, dan pembukuan. Mendukung Non-PKP (0%) & PKP (PB1 10%, PPN), inventori multi-batch (FIFO, FEFO, Average), dan rekap laba bersih.",
     site: "@kadai_asia",
     creator: "@kadai_asia",
     images: ["https://kadai.asia/og-image.png"],
@@ -135,7 +135,7 @@ const schemaGraph = {
       "@id": "https://kadai.asia/#website",
       "url": "https://kadai.asia",
       "name": "KADAI",
-      "description": "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibilitas Non-PKP & PKP, Inventori Multi-Batch FIFO, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 & SAK EMKM",
+      "description": "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibilitas Non-PKP & PKP, Inventori Multi-Batch (FIFO, FEFO, Average), Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM",
       "inLanguage": "id-ID",
       "publisher": {
         "@id": "https://kadai.asia/#organization",
@@ -198,11 +198,12 @@ const schemaGraph = {
         "Pajak Restoran PB1 10% (UU HKPD) & PPN 11%",
         "Rekap PPh Final UMKM 0.5% (PP 55/2022) Batas Omzet Bebas Pajak",
         "Multi-Cabang & Surat Jalan Transfer Stok Digital In-Transit",
+        "Inventori Multi-Batch Fleksibel (FIFO, FEFO, Average)",
         "Program Kemitraan & Referral Berkelanjutan 20% Komisi",
         "Pembayaran QRIS Dinamis & EDC Multi-Bank"
       ],
       "description":
-        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibel Non-PKP & PKP, Inventori Multi-Batch FIFO, Resep BOM Kuliner, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM.",
+        "Sistem Operasi Bisnis Indonesia: Kasir POS Kilat, Fleksibel Non-PKP & PKP, Inventori Multi-Batch (FIFO, FEFO, Average), Resep BOM Kuliner & Manufaktur, Kitchen Display System (KDS), dan Kepatuhan Pajak PB1 10% & SAK EMKM.",
     },
   ],
 };

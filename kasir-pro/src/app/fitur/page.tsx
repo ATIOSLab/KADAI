@@ -22,9 +22,16 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Fitur & Kapabilitas Sistem Operasi Bisnis",
   description:
-    "Jelajahi kapabilitas terpadu KADAI: kasir POS kilat, inventori multi-batch FIFO (PSAK 14), dapur KDS, resep BOM, kepatuhan pajak daerah PB1 10%, dan integrasi multi-cabang.",
+    "Jelajahi kapabilitas terpadu KADAI: kasir POS kilat, inventori multi-batch fleksibel (FIFO, FEFO, Average), dapur KDS, resep BOM, kepatuhan pajak daerah PB1 10%, dan integrasi multi-cabang.",
   alternates: {
     canonical: "https://kadai.asia/fitur",
+  },
+  openGraph: {
+    title: "Fitur & Kapabilitas Sistem Operasi Bisnis | KADAI",
+    description:
+      "Kasir POS kilat, inventori multi-batch fleksibel (FIFO, FEFO, Average), kitchen display KDS, resep produksi BOM, dan kepatuhan pajak SAK EMKM.",
+    url: "https://kadai.asia/fitur",
+    images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
   },
 };
 
@@ -46,9 +53,9 @@ const featureList = [
   },
   {
     slug: "inventori-fifo",
-    title: "Inventori Multi-Batch FIFO",
-    subtitle: "Penilaian Persediaan Akurat Standar PSAK 14",
-    desc: "Sistem melacak setiap batch stok barang masuk lengkap dengan tanggal kadaluwarsa, vendor asal, dan harga perolehan historis. Mencegah kerugian barang basi secara otomatis.",
+    title: "Inventori Multi-Batch (FIFO / FEFO / Average)",
+    subtitle: "Penilaian Persediaan Fleksibel Berstandar PSAK 14",
+    desc: "Sistem melacak setiap batch stok barang masuk lengkap dengan tanggal kadaluwarsa, vendor asal, dan harga perolehan historis. Mendukung metode First-In First-Out, First-Expired First-Out, maupun Moving Average.",
     icon: Layers,
     badge: "PSAK 14 / IAS 2",
     metrics: "100% Lacak Batch & Kadaluwarsa",

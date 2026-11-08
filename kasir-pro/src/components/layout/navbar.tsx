@@ -90,15 +90,20 @@ export function Navbar({
       <header className="z-40 h-14 shrink-0 border-b border-border bg-background/95 backdrop-blur">
         <div className="flex h-full items-center justify-between gap-3 px-4 lg:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
-            {/* Mobile Hamburger Button */}
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen(true)}
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted lg:hidden"
-              aria-label="Buka menu navigasi"
-            >
-              <Menu className="size-5" />
-            </button>
+            {/* Mobile Hamburger Button & Brand Lockup */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted"
+                aria-label="Buka menu navigasi"
+              >
+                <Menu className="size-5" />
+              </button>
+              <Link href="/dashboard" className="flex items-center shrink-0">
+                <KadaiLockup variant="on-light" height={26} />
+              </Link>
+            </div>
 
             {/* Desktop Collapse Button */}
             <button

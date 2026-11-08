@@ -240,7 +240,7 @@ export function ProductSearch() {
             )}
             style={
               activeCategory === category.id
-                ? { backgroundColor: category.color || "#FF6B35" }
+                ? { backgroundColor: category.color || "#EA580C" }
                 : undefined
             }
           >

@@ -183,28 +183,39 @@ export default function DashboardPage() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ringkasan transaksi, stok, dan performa penjualan hari ini.
+          <div className="flex items-center gap-2">
+            <h1
+              className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Executive Dashboard
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Sistem Aktif
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Ringkasan konsolidasi transaksi, pergerakan persediaan, dan performa omzet real-time.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold">
             <Link href="/products/new">
-              <PackagePlus className="mr-1 size-4" />
-              Produk
+              <PackagePlus className="mr-1 size-3.5 text-slate-600" />
+              Produk Baru
             </Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold">
             <Link href="/inventory/restock">
-              <Warehouse className="mr-1 size-4" />
-              Restock
+              <Warehouse className="mr-1 size-3.5 text-slate-600" />
+              Restock Stok
             </Link>
           </Button>
-          <Button asChild>
+          <Button size="sm" asChild className="h-8 text-xs font-bold bg-accent-primary hover:brightness-110">
             <Link href="/pos">
-              <ScanLine className="mr-1 size-4" />
-              Kasir
+              <ScanLine className="mr-1 size-3.5" />
+              Buka Kasir POS
             </Link>
           </Button>
         </div>

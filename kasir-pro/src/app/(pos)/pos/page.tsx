@@ -72,7 +72,7 @@ export default function PosPage() {
       {/* POS Content: Split view */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left: Product Search */}
-        <div className="flex-1 overflow-y-auto neo-scrollbar p-3 sm:p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4">
+        <div className="flex-1 overflow-y-auto neo-scrollbar p-3 sm:p-4 pb-28 md:pb-6">
           <ProductSearch />
         </div>
 

@@ -19,7 +19,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
           currentUser={user}
         />
-        <main className="neo-scrollbar flex-1 overflow-auto p-4 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:p-6">
+        <main className="neo-scrollbar flex-1 overflow-auto p-4 pb-28 lg:p-6 lg:pb-8">
           {children}
         </main>
       </div>

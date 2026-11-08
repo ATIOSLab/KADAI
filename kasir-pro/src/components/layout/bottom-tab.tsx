@@ -12,6 +12,12 @@ interface BottomTabProps {
 
 export function BottomTab({ currentUser }: BottomTabProps) {
   const pathname = usePathname();
+
+  // Suppress floating bottom tab on dedicated fullscreen workstations (KDS & POS)
+  if (pathname.startsWith("/kds") || pathname.startsWith("/pos")) {
+    return null;
+  }
+
   const visibleTabs = bottomTabs.filter(
     (tab) =>
       !tab.roles || (currentUser ? tab.roles.includes(currentUser.role) : false)

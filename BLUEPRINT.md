@@ -36,5 +36,5 @@ KADAI adalah platform operasi bisnis terintegrasi dan Point of Sale (POS) berbas
 └───────┴───────────────────────────────────────────┴───────────┘
 ```
 
-Untuk detail teknis lengkap, skema database, analisis kompetitor (Moka, Majoo, ESB, Olsera, Pawoon), serta formula akuntansi dan perpajakan, silakan buka:
+Untuk detail teknis lengkap, skema database, perbandingan arsitektur POS konvensional, serta formula akuntansi dan perpajakan, silakan buka:
 👉 **[DOCS/KADAI_ENTERPRISE_BLUEPRINT.md](./DOCS/KADAI_ENTERPRISE_BLUEPRINT.md)**

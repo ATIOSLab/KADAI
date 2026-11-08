@@ -1,7 +1,9 @@
 {
-  "name": "kasir-pro",
-  "version": "0.1.0",
+  "name": "kadai-operating-system",
+  "version": "1.0.0",
+  "description": "KADAI - Sistem Operasi Bisnis Indonesia",
   "private": true,
+  "author": "ATIOSLab",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

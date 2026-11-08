@@ -121,39 +121,39 @@ export function PrinterSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              <Printer className="size-5" />
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl">
+        <DialogHeader className="p-4 px-5 pb-3 border-b border-border shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <Printer className="size-4" />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold">Pengaturan Printer Kasir</DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground">
-                Koneksi langsung Web Bluetooth & WebUSB ESC/POS (Tanpa dialog browser)
+              <DialogTitle className="text-sm font-bold text-foreground">Pengaturan Printer Kasir</DialogTitle>
+              <DialogDescription className="text-[11px] text-muted-foreground">
+                Koneksi langsung Web Bluetooth & WebUSB ESC/POS
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="p-4 px-5 space-y-3 overflow-y-auto">
           {/* Status Box */}
-          <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
+          <div className={`p-2.5 px-3 rounded-xl border flex items-center justify-between text-xs ${
             isConnected
               ? "bg-emerald-50/80 border-emerald-200 text-emerald-900"
               : "bg-slate-50 border-slate-200 text-slate-700"
           }`}>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {isConnected ? (
-                <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
               ) : (
-                <XCircle className="size-4 text-slate-400 shrink-0" />
+                <XCircle className="size-3.5 text-slate-400 shrink-0" />
               )}
               <div>
-                <p className="font-bold">
+                <p className="font-bold text-xs leading-none">
                   {isConnected ? config.deviceName : "Belum Ada Printer Terhubung"}
                 </p>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground mt-0.5">
                   {isConnected
                     ? `Mode: ${config.type.toUpperCase()} • Kertas: ${config.paperWidth}mm`
                     : "Cetak default menggunakan jendela cetak sistem"}
@@ -166,7 +166,7 @@ export function PrinterSettingsDialog({
                 variant="outline"
                 size="xs"
                 onClick={handleDisconnect}
-                className="text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                className="h-7 text-[10px] text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 px-2"
               >
                 Putuskan
               </Button>
@@ -174,24 +174,24 @@ export function PrinterSettingsDialog({
           </div>
 
           {/* Connection Actions */}
-          <div className="space-y-2">
-            <Label className="text-xs font-bold text-slate-800">Hubungkan Printer Baru</Label>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-slate-800">Hubungkan Printer Baru</Label>
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-1.5 p-2 transition-all cursor-pointer group ${
+                className={`h-11 rounded-xl border flex items-center justify-center gap-2 px-2 transition-all cursor-pointer group ${
                   config.type === "bluetooth" && isConnected
-                    ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20 shadow-xs"
+                    ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/30"
                     : "border-slate-200 bg-white hover:border-primary/50 hover:bg-slate-50 text-slate-800"
                 }`}
                 onClick={handleConnectBt}
                 disabled={loadingBt}
               >
                 {loadingBt ? (
-                  <Loader2 className="size-5 animate-spin text-primary" />
+                  <Loader2 className="size-4 animate-spin text-primary" />
                 ) : (
-                  <Bluetooth className={`size-5 transition-transform group-hover:scale-105 ${
-                    config.type === "bluetooth" && isConnected ? "text-primary" : "text-slate-800"
+                  <Bluetooth className={`size-4 transition-transform group-hover:scale-110 ${
+                    config.type === "bluetooth" && isConnected ? "text-primary" : "text-slate-700"
                   }`} />
                 )}
                 <span className="text-xs font-bold">Bluetooth POS</span>
@@ -199,60 +199,60 @@ export function PrinterSettingsDialog({
 
               <button
                 type="button"
-                className={`h-16 rounded-xl border flex flex-col items-center justify-center gap-1.5 p-2 transition-all cursor-pointer group ${
+                className={`h-11 rounded-xl border flex items-center justify-center gap-2 px-2 transition-all cursor-pointer group ${
                   config.type === "usb" && isConnected
-                    ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20 shadow-xs"
+                    ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/30"
                     : "border-slate-200 bg-white hover:border-primary/50 hover:bg-slate-50 text-slate-800"
                 }`}
                 onClick={handleConnectUsb}
                 disabled={loadingUsb}
               >
                 {loadingUsb ? (
-                  <Loader2 className="size-5 animate-spin text-primary" />
+                  <Loader2 className="size-4 animate-spin text-primary" />
                 ) : (
-                  <Usb className={`size-5 transition-transform group-hover:scale-105 ${
-                    config.type === "usb" && isConnected ? "text-primary" : "text-slate-800"
+                  <Usb className={`size-4 transition-transform group-hover:scale-110 ${
+                    config.type === "usb" && isConnected ? "text-primary" : "text-slate-700"
                   }`} />
                 )}
                 <span className="text-xs font-bold">USB Thermal</span>
               </button>
             </div>
-            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
-              *Didukung di Google Chrome, Microsoft Edge, dan browser berbasis Chromium pada Windows, Mac, dan Android.
+            <p className="text-[10px] text-muted-foreground leading-normal">
+              *Didukung di Chrome, Edge, dan Chromium pada Windows, Mac, dan Android.
             </p>
           </div>
 
           {/* Paper Width Config */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-100">
-            <Label className="text-xs font-bold text-slate-800">Lebar Kertas Thermal Roll</Label>
+          <div className="space-y-1 pt-1.5 border-t border-slate-100">
+            <Label className="text-[11px] font-bold text-slate-800">Lebar Kertas Thermal Roll</Label>
             <Select
               value={String(config.paperWidth)}
               onValueChange={handlePaperWidthChange}
             >
-              <SelectTrigger className="h-10 text-xs font-medium">
+              <SelectTrigger className="h-9 text-xs">
                 <SelectValue placeholder="Pilih lebar kertas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="58">58 mm (Printer Mini / Mobile Bluetooth RPP02 / Panda)</SelectItem>
-                <SelectItem value="80">80 mm (Printer Desktop Kasir Epson / Xprinter / Sunmi)</SelectItem>
+                <SelectItem value="58">58 mm (Printer Mini RPP02 / Panda)</SelectItem>
+                <SelectItem value="80">80 mm (Printer Standar Epson / Sunmi)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Test Strip Action */}
           {isConnected && (
-            <div className="pt-2">
+            <div className="pt-1">
               <Button
                 variant="secondary"
                 size="sm"
-                className="w-full text-xs font-bold gap-1.5 h-10 shadow-xs"
+                className="w-full text-xs font-bold gap-1.5 h-8.5"
                 onClick={handleTestPrint}
                 disabled={testing}
               >
                 {testing ? (
-                  <Loader2 className="size-4 animate-spin" />
+                  <Loader2 className="size-3.5 animate-spin" />
                 ) : (
-                  <Printer className="size-4" />
+                  <Printer className="size-3.5" />
                 )}
                 <span>Cetak Struk Uji Coba (Test Print)</span>
               </Button>
@@ -260,10 +260,11 @@ export function PrinterSettingsDialog({
           )}
         </div>
 
-        <DialogFooter className="shrink-0 p-4 px-6 border-t border-slate-100 bg-muted/20">
+        <DialogFooter className="p-3 px-5 border-t border-slate-100 bg-muted/15 shrink-0">
           <Button
             variant="outline"
-            className="w-full sm:w-auto text-xs font-semibold"
+            size="sm"
+            className="w-full sm:w-auto text-xs h-8"
             onClick={() => onOpenChange(false)}
           >
             Tutup

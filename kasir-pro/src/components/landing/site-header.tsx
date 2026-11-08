@@ -91,135 +91,23 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             />
           </Link>
 
-          {/* Center Navigation Links (Clean Flat Typography) */}
+          {/* Center Navigation Links (Clean Flat Typography - Focused & Uncluttered) */}
           <nav
             aria-label="Navigasi Utama"
-            className="hidden xl:flex items-center gap-1 text-sm font-medium text-slate-600 relative h-full"
-            onMouseLeave={() => setActiveDropdown(null)}
-            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null); }}
-            onKeyDown={(event) => { if (event.key === "Escape") { event.currentTarget.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')?.focus(); setActiveDropdown(null); } }}
+            className="hidden lg:flex items-center gap-1.5 text-sm font-semibold text-slate-600 relative h-full"
           >
-            {/* 1. Dropdown Kapabilitas */}
-            <div
-              className="relative h-full flex items-center"
-              onMouseEnter={() => setActiveDropdown("kapabilitas")}
+            <Link
+              href="/fitur"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
-              <button
-                type="button"
-                aria-expanded={activeDropdown === "kapabilitas"}
-                aria-controls="nav-kapabilitas"
-                onClick={() => setActiveDropdown(activeDropdown === "kapabilitas" ? null : "kapabilitas")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-colors cursor-pointer ${
-                  activeDropdown === "kapabilitas"
-                    ? "text-primary font-bold bg-slate-50"
-                    : "text-slate-700 hover:text-primary hover:bg-slate-50"
-                }`}
-              >
-                <span>Layanan & Fitur</span>
-                <ChevronDown
-                  className={`size-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === "kapabilitas" ? "rotate-180 text-primary" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Large Mega Dropdown Card */}
-              {activeDropdown === "kapabilitas" && (
-                <div
-                  id="nav-kapabilitas"
-                  className="absolute top-full left-0 w-88 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
-                >
-                  <div className="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Modul Operasional Utama
-                  </div>
-                  {capabilities.map((item, idx) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={idx}
-                        href={item.href}
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
-                      >
-                        <span className="size-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-primary shrink-0 group-hover:scale-105 transition-transform">
-                          <Icon className="size-4" />
-                        </span>
-                        <div className="space-y-0.5">
-                          <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
-                            {item.title}
-                          </div>
-                          <div className="text-[11px] text-slate-500 leading-tight">
-                            {item.desc}
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* 2. Dropdown Solusi Bisnis */}
-            <div
-              className="relative h-full flex items-center"
-              onMouseEnter={() => setActiveDropdown("solusi")}
+              Fitur
+            </Link>
+            <Link
+              href="/solusi"
+              className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
-              <button
-                type="button"
-                aria-expanded={activeDropdown === "solusi"}
-                aria-controls="nav-solusi"
-                onClick={() => setActiveDropdown(activeDropdown === "solusi" ? null : "solusi")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-colors cursor-pointer ${
-                  activeDropdown === "solusi"
-                    ? "text-primary font-bold bg-slate-50"
-                    : "text-slate-700 hover:text-primary hover:bg-slate-50"
-                }`}
-              >
-                <span>Solusi Industri</span>
-                <ChevronDown
-                  className={`size-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === "solusi" ? "rotate-180 text-primary" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Large Mega Dropdown Card */}
-              {activeDropdown === "solusi" && (
-                <div
-                  id="nav-solusi"
-                  className="absolute top-full left-0 w-88 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
-                >
-                  <div className="px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Sektor Industri
-                  </div>
-                  {solutions.map((item, idx) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={idx}
-                        href={item.href}
-                        onClick={() => setActiveDropdown(null)}
-                        className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
-                      >
-                        <span className="size-8 rounded-lg bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 shrink-0 group-hover:scale-105 transition-transform">
-                          <Icon className="size-4" />
-                        </span>
-                        <div className="space-y-0.5">
-                          <div className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors">
-                            {item.title}
-                          </div>
-                          <div className="text-[11px] text-slate-500 leading-tight">
-                            {item.desc}
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Direct Links */}
+              Solusi
+            </Link>
             <Link
               href="/harga"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
@@ -236,7 +124,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
               href="/blog"
               className="px-3.5 py-2 rounded-lg hover:text-primary hover:bg-slate-50 transition-colors text-slate-700"
             >
-              Blog Edukasi
+              Blog
             </Link>
             <Link
               href="/#faq"
@@ -247,7 +135,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           </nav>
 
           {/* Right Action: Clean Login + Rounded Solid CTA */}
-          <div className="hidden xl:flex items-center gap-3 shrink-0">
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             {dashboardPath ? (
               <Button
                 asChild
@@ -277,7 +165,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex xl:hidden items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex lg:hidden items-center gap-1.5 sm:gap-3 shrink-0">
             {dashboardPath ? (
               <Button asChild size="sm" className="h-8 sm:h-9 text-xs font-bold px-2.5 sm:px-3 rounded-lg bg-primary text-white">
                 <Link href={dashboardPath}>Dashboard</Link>
@@ -302,82 +190,62 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="xl:hidden mt-2 max-w-6xl mx-auto bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xl">
+        <div className="lg:hidden mt-2 max-w-6xl mx-auto bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">
-            <Link
-              href="/demo"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl text-primary bg-orange-50/80 font-bold hover:bg-orange-100 transition-colors"
-            >
-              Request Demo & Konsultasi
-            </Link>
-            <div className="pt-1 pb-0.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Modul & Solusi
-            </div>
             <Link
               href="/fitur"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
             >
-              <span>Fitur & Kapabilitas POS</span>
-              <span className="text-[10px] font-normal text-slate-400">Semua Modul</span>
+              <span>Fitur & Modul POS</span>
+              <span className="text-[10px] font-normal text-slate-400">Kasir, KDS, Stok</span>
             </Link>
             <Link
-              href="/solusi/fnb"
+              href="/solusi"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
             >
-              <span>Restoran & Kafe (F&B)</span>
-              <span className="text-[10px] font-mono text-primary font-bold">KDS & Meja</span>
-            </Link>
-            <Link
-              href="/solusi/ritel"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
-            >
-              <span>Toko Ritel & Grosir</span>
-              <span className="text-[10px] font-mono text-primary font-bold">FIFO & Barcode</span>
-            </Link>
-            <div className="pt-2 pb-0.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Ekosistem Bisnis
-            </div>
-            <Link
-              href="/hardware"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
-            >
-              Panduan Hardware
+              <span>Solusi Bisnis</span>
+              <span className="text-[10px] font-mono text-primary font-bold">F&B & Ritel</span>
             </Link>
             <Link
               href="/harga"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
-              Paket Langganan
+              Paket Harga
+            </Link>
+            <Link
+              href="/hardware"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
+            >
+              Hardware
             </Link>
             <Link
               href="/blog"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
-              Blog Edukasi
-            </Link>
-            <Link
-              href="/referral"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
-            >
-              Program Mitra Referral
+              Blog
             </Link>
             <Link
               href="/#faq"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
               FAQ
             </Link>
           </nav>
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+            <Button asChild className="w-full text-xs font-bold h-10 rounded-xl bg-primary text-white shadow-xs">
+              <Link
+                href={dashboardPath ?? "/register"}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {dashboardPath ? "Buka Dashboard" : "Coba Gratis 14 Hari"}
+              </Link>
+            </Button>
             {!dashboardPath && (
               <Button asChild variant="outline" className="w-full text-xs font-semibold h-10 rounded-xl bg-white border-slate-200">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
@@ -385,14 +253,6 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 </Link>
               </Button>
             )}
-            <Button asChild className="w-full text-xs font-bold h-10 rounded-xl bg-primary text-white shadow-xs">
-              <Link
-                href={dashboardPath ?? "/register"}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {dashboardPath ? "Buka Dashboard" : "Mulai Uji Coba Gratis 14 Hari"}
-              </Link>
-            </Button>
           </div>
         </div>
       )}

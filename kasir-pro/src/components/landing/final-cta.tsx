@@ -12,13 +12,9 @@ export function FinalCTA() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] studio-keylight pointer-events-none -z-10" />
 
       <div className="max-w-4xl mx-auto rounded-[28px] luxury-glass-card p-8 sm:p-14 shadow-2xl text-center space-y-6 relative border border-slate-200/90">
-        <Badge
-          variant="outline"
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50/80 border-orange-200/90 text-primary text-xs font-semibold shadow-2xs"
-        >
-          <ShieldCheck className="size-3.5 shrink-0 text-primary" />
-          <span>Mulai Tanpa Risiko</span>
-        </Badge>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+          Mulai Tanpa Risiko
+        </p>
 
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-950 text-balance leading-tight">
           Saatnya Bisnis Anda Berjalan Lebih Rapi dan Tenang.

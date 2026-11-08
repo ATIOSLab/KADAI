@@ -83,16 +83,13 @@ export function PricingSection() {
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <Badge
-            variant="outline"
-            className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
-          >
-            Harga Transparan
-          </Badge>
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Paket & Biaya Langganan
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 leading-[1.15]">
             Biaya Langganan Jujur Tanpa Biaya Tersembunyi
           </h2>
-          <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-balance">
             Pilih paket yang paling pas untuk skala usaha Anda. Bebas upgrade atau batalkan kapan saja tanpa ikatan kontrak rumit.
           </p>
         </div>

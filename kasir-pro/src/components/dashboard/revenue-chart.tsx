@@ -42,45 +42,46 @@ export function RevenueChart({
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF6B35" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#FF6B35" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#EA580C" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#EA580C" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2D6A4F" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2D6A4F" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#FB923C" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#FB923C" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#E5E5E5"
-                  strokeWidth={1.5}
+                  stroke="#E2E8F0"
+                  strokeWidth={1}
                 />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 12, fontWeight: 700 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fontWeight: 600 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                   tickFormatter={(value) => `${(value / 1000000).toFixed(1)}jt`}
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "2.5px solid #1A1A1A",
+                    border: "1px solid #E2E8F0",
                     borderRadius: "0.75rem",
-                    boxShadow: "4px 4px 0px #1A1A1A",
-                    fontWeight: 700,
+                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                    fontWeight: 600,
+                    backgroundColor: "#FFFFFF",
                   }}
                   formatter={(value) => [formatCurrency(Number(value ?? 0))]}
                 />
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#FF6B35"
-                  strokeWidth={3}
+                  stroke="#EA580C"
+                  strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#colorRevenue)"
                   name="Revenue"
@@ -88,11 +89,11 @@ export function RevenueChart({
                 <Area
                   type="monotone"
                   dataKey="profit"
-                  stroke="#2D6A4F"
-                  strokeWidth={3}
+                  stroke="#FB923C"
+                  strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#colorProfit)"
-                  name="Profit"
+                  name="Gross Profit"
                 />
               </AreaChart>
             </ResponsiveContainer>

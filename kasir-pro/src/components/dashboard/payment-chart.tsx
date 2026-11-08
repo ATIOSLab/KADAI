@@ -45,8 +45,8 @@ export function PaymentChart({
                   cy="50%"
                   outerRadius={90}
                   dataKey="value"
-                  stroke="#1A1A1A"
-                  strokeWidth={2.5}
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
                   label={({ name, percent }) =>
                     `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                   }
@@ -57,10 +57,11 @@ export function PaymentChart({
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    border: "2.5px solid #1A1A1A",
+                    border: "1px solid #E2E8F0",
                     borderRadius: "0.75rem",
-                    boxShadow: "4px 4px 0px #1A1A1A",
-                    fontWeight: 700,
+                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                    fontWeight: 600,
+                    backgroundColor: "#FFFFFF",
                   }}
                   formatter={(value) => [
                     formatCurrency(Number(value ?? 0)),
@@ -68,7 +69,7 @@ export function PaymentChart({
                   ]}
                 />
                 <Legend
-                  wrapperStyle={{ fontSize: 12, fontWeight: 700 }}
+                  wrapperStyle={{ fontSize: 12, fontWeight: 600 }}
                   iconType="circle"
                 />
               </PieChart>

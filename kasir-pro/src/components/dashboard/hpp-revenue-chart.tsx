@@ -43,47 +43,44 @@ export function HppRevenueChart({
               <BarChart data={data}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#E5E5E5"
-                  strokeWidth={1.5}
+                  stroke="#E2E8F0"
+                  strokeWidth={1}
                 />
                 <XAxis
                   dataKey="period"
-                  tick={{ fontSize: 12, fontWeight: 700 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fontWeight: 600 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                   tickFormatter={(value) => `${(value / 1000000).toFixed(1)}jt`}
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "2.5px solid #1A1A1A",
+                    border: "1px solid #E2E8F0",
                     borderRadius: "0.75rem",
-                    boxShadow: "4px 4px 0px #1A1A1A",
-                    fontWeight: 700,
+                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                    fontWeight: 600,
+                    backgroundColor: "#FFFFFF",
                   }}
                   formatter={(value) => [formatCurrency(Number(value ?? 0))]}
                 />
-                <Legend wrapperStyle={{ fontSize: 12, fontWeight: 700 }} />
+                <Legend wrapperStyle={{ fontSize: 12, fontWeight: 600 }} />
                 <Bar
                   dataKey="hpp"
                   name="HPP"
-                  fill="#D62828"
+                  fill="#94A3B8"
                   radius={[4, 4, 0, 0]}
-                  stroke="#1A1A1A"
-                  strokeWidth={1.5}
                   stackId="a"
                 />
                 <Bar
                   dataKey="revenue"
                   name="Revenue"
-                  fill="#2D6A4F"
+                  fill="#EA580C"
                   radius={[4, 4, 0, 0]}
-                  stroke="#1A1A1A"
-                  strokeWidth={1.5}
                 />
               </BarChart>
             </ResponsiveContainer>

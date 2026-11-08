@@ -33,7 +33,10 @@ export function PageHeader({
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-muted">
             Workspace
           </p>
-          <h1 className="text-2xl font-black tracking-tight lg:text-3xl">
+          <h1
+            className="text-2xl font-bold tracking-tight lg:text-3xl text-slate-950 dark:text-white"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
             {title}
           </h1>
           {description && (

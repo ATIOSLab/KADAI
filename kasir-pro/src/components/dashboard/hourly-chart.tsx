@@ -41,27 +41,28 @@ export function HourlyChart({
               <BarChart data={data}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#E5E5E5"
-                  strokeWidth={1.5}
+                  stroke="#E2E8F0"
+                  strokeWidth={1}
                 />
                 <XAxis
                   dataKey="hour"
-                  tick={{ fontSize: 11, fontWeight: 700 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fontWeight: 600 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 10, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                   allowDecimals={false}
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "2.5px solid #1A1A1A",
+                    border: "1px solid #E2E8F0",
                     borderRadius: "0.75rem",
-                    boxShadow: "4px 4px 0px #1A1A1A",
-                    fontWeight: 700,
+                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                    fontWeight: 600,
+                    backgroundColor: "#FFFFFF",
                   }}
                   formatter={(value) => [
                     `${Number(value ?? 0)} transaksi`,
@@ -71,10 +72,8 @@ export function HourlyChart({
                 />
                 <Bar
                   dataKey="transactions"
-                  fill="#004E89"
+                  fill="#020617"
                   radius={[4, 4, 0, 0]}
-                  stroke="#1A1A1A"
-                  strokeWidth={1.5}
                 />
               </BarChart>
             </ResponsiveContainer>

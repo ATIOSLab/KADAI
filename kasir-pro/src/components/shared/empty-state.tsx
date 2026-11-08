@@ -27,10 +27,15 @@ export function EmptyState({
         className
       )}
     >
-      <div className="w-20 h-20 rounded-2xl bg-bg-main neo-border flex items-center justify-center mb-4">
-        <Icon className="w-10 h-10 text-text-muted" />
+      <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center mb-4 text-slate-400 shadow-2xs">
+        <Icon className="w-8 h-8 text-slate-500" />
       </div>
-      <h3 className="text-lg font-extrabold mb-1">{title}</h3>
+      <h3
+        className="text-lg font-bold mb-1 text-slate-900 dark:text-white"
+        style={{ fontFamily: "var(--font-heading)" }}
+      >
+        {title}
+      </h3>
       <p className="text-sm text-text-muted font-medium max-w-sm mb-6">
         {description}
       </p>

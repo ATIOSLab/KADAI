@@ -42,23 +42,23 @@ export function TopProductsChart({
               <BarChart data={data} layout="vertical" margin={{ left: 8, right: 16 }}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#E5E5E5"
-                  strokeWidth={1.5}
+                  stroke="#E2E8F0"
+                  strokeWidth={1}
                   horizontal={false}
                 />
                 <XAxis
                   type="number"
-                  tick={{ fontSize: 11, fontWeight: 600 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                   allowDecimals={false}
                 />
                 <YAxis
                   dataKey="name"
                   type="category"
-                  tick={{ fontSize: 11, fontWeight: 700 }}
-                  stroke="#1A1A1A"
-                  strokeWidth={2}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#334155" }}
+                  stroke="#CBD5E1"
+                  strokeWidth={1}
                   width={170}
                   tickFormatter={(value: string) =>
                     value.length > 26 ? `${value.slice(0, 26)}...` : value
@@ -66,10 +66,11 @@ export function TopProductsChart({
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "2.5px solid #1A1A1A",
+                    border: "1px solid #E2E8F0",
                     borderRadius: "0.75rem",
-                    boxShadow: "4px 4px 0px #1A1A1A",
-                    fontWeight: 700,
+                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                    fontWeight: 600,
+                    backgroundColor: "#FFFFFF",
                   }}
                   formatter={(value, name) => [
                     name === "revenue"
@@ -80,10 +81,8 @@ export function TopProductsChart({
                 />
                 <Bar
                   dataKey="qty"
-                  fill="#FF6B35"
+                  fill="#EA580C"
                   radius={[0, 6, 6, 0]}
-                  stroke="#1A1A1A"
-                  strokeWidth={1.5}
                 />
               </BarChart>
             </ResponsiveContainer>

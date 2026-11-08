@@ -768,7 +768,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Status Bot</Label>
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-black bg-bg-main px-4 py-3">
+                  <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3">
                     <div>
                       <p className="font-bold">
                         {botForm.enabled ? "Aktif" : "Nonaktif"}
@@ -787,7 +787,7 @@ export default function SettingsPage() {
                           enabled: !current.enabled,
                         }))
                       }
-                      className={`relative inline-flex h-8 w-16 items-center rounded-full border-2 border-black transition-all ${
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full border border-slate-300 transition-all ${
                         botForm.enabled
                           ? "bg-accent-success"
                           : "bg-accent-danger"
@@ -803,7 +803,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Summary Closing Harian</Label>
-                  <div className="flex items-center justify-between rounded-2xl border-2 border-black bg-bg-main px-4 py-3">
+                  <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3">
                     <div>
                       <p className="font-bold">
                         {botForm.summaryEnabled ? "Aktif" : "Nonaktif"}
@@ -822,7 +822,7 @@ export default function SettingsPage() {
                           summaryEnabled: !current.summaryEnabled,
                         }))
                       }
-                      className={`relative inline-flex h-8 w-16 items-center rounded-full border-2 border-black transition-all ${
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full border border-slate-300 transition-all ${
                         botForm.summaryEnabled
                           ? "bg-accent-success"
                           : "bg-accent-danger"
@@ -920,7 +920,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border-2 border-black bg-bg-card p-4">
+              <div className="rounded-2xl border border-slate-200 bg-bg-card p-4 shadow-2xs">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-black">Chat Telegram Terdeteksi</p>
@@ -940,7 +940,7 @@ export default function SettingsPage() {
                     botChats.map((chat) => (
                       <div
                         key={chat.id}
-                        className="rounded-xl border-2 border-black bg-bg-main p-4"
+                        className="rounded-xl border border-slate-200 bg-bg-main p-4 shadow-2xs"
                       >
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                           <div className="space-y-2">
@@ -1104,7 +1104,7 @@ export default function SettingsPage() {
                             } pengguna ${user.name}`}
                             onClick={() => handleToggleUserStatus(user)}
                             disabled={togglingUserId === user.id}
-                            className={`relative inline-flex h-8 w-16 items-center rounded-full border-2 border-black transition-all ${
+                            className={`relative inline-flex h-8 w-16 items-center rounded-full border border-slate-300 transition-all ${
                               user.isActive
                                 ? "bg-accent-success"
                                 : "bg-accent-danger"

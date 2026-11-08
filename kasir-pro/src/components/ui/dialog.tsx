@@ -40,7 +40,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 z-10 rounded-md neo-border-thin p-1 opacity-70 hover:opacity-100 hover:bg-bg-main transition-all">
+      <DialogPrimitive.Close className="absolute right-4 top-4 z-10 rounded-lg border border-slate-200 p-1.5 opacity-70 hover:opacity-100 hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-900">
         <X className="h-4 w-4" />
         <span className="sr-only">Tutup</span>
       </DialogPrimitive.Close>

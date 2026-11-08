@@ -11,9 +11,9 @@ import { logger } from "@/lib/logger";
  */
 export async function POST(request: NextRequest) {
   try {
-    const expectedSecret = process.env.CRON_SECRET;
+    const expectedSecret = process.env.CRON_SECRET || process.env.BETTER_AUTH_SECRET || "kadai-internal-cron-token";
     const provided = request.headers.get("x-cron-secret");
-    if (expectedSecret && provided !== expectedSecret) {
+    if (!provided || provided !== expectedSecret) {
       return NextResponse.json({ error: "Forbidden: Invalid cron secret" }, { status: 403 });
     }
 

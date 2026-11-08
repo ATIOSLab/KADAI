@@ -61,7 +61,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left pt-2 pb-16 sm:pb-0">
           <div className="flex items-center gap-3">
             <KadaiLockup variant="on-dark" height={28} className="h-6 sm:h-7 w-auto" />
             <span className="text-slate-700 hidden sm:inline">•</span>

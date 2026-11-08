@@ -159,7 +159,7 @@ export function NotificationMenu({
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 ? (
-            <span className="absolute -right-1 -top-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white shadow-xs">
+            <span className="absolute -right-1 -top-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white shadow-xs">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           ) : null}

@@ -56,7 +56,7 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                   </div>
                   <span
                     className={cn(
-                      "text-[9px]",
+                      "text-[10px]",
                       isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
                     )}
                   >
@@ -78,7 +78,7 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                 )}
               >
                 <Icon className="h-[18px] w-[18px]" />
-                <span className="text-[9px] font-semibold">{tab.shortLabel}</span>
+                <span className="text-[10px] font-semibold">{tab.shortLabel}</span>
               </Link>
             );
           })}

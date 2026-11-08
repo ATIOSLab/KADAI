@@ -94,7 +94,7 @@ export function SummaryCards({ data, loading = false }: SummaryCardsProps) {
               <span className={cn("size-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105", item.color)}>
                 <Icon className="size-4" />
               </span>
-              <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider", item.badgeColor)}>
+              <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider", item.badgeColor)}>
                 {item.badge}
               </span>
             </div>

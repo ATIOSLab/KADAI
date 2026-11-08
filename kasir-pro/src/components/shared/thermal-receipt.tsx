@@ -31,6 +31,8 @@ export interface ThermalReceiptProps {
   cashReceived?: number | null;
   changeAmount?: number | null;
   preview?: boolean;
+  laundryTrackingToken?: string | null;
+  laundryJobCode?: string | null;
 }
 
 export function ThermalReceipt({
@@ -56,6 +58,8 @@ export function ThermalReceipt({
   cashReceived,
   changeAmount,
   preview = false,
+  laundryTrackingToken,
+  laundryJobCode,
 }: ThermalReceiptProps) {
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleString("id-ID", {
@@ -200,6 +204,25 @@ export function ThermalReceipt({
           </>
         )}
       </div>
+
+      {/* Laundry QR Code Tracking Block */}
+      {laundryTrackingToken && (
+        <div className="py-3 border-b border-dashed border-black/60 text-center space-y-1.5">
+          <span className="text-[10px] font-bold tracking-wider uppercase block">
+            LACAK STATUS CUCIAN ANDA
+          </span>
+          <div className="flex justify-center py-1">
+            {/* Real SVG QR code representation or clean link */}
+            <div className="p-2 border border-black/80 rounded bg-white inline-block">
+              <p className="font-mono font-black text-xs">SCAN UNTUK CEK STATUS</p>
+              <p className="font-mono text-[9px] text-black/80">kadai.asia/lacak/{laundryTrackingToken}</p>
+            </div>
+          </div>
+          <p className="text-[9px] text-black/75">
+            Nomor Resi: <strong className="font-bold">{laundryJobCode || invoiceNumber}</strong>
+          </p>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="pt-3 text-center space-y-1">

@@ -27,13 +27,13 @@ export function IndustrySolutions() {
       ],
     },
     {
-      title: "Layanan Jasa & Multi-Cabang",
+      title: "Layanan Jasa, Laundry & Multi-Cabang",
       icon: Building2,
-      subtitle: "Barbershop, salon kecantikan, bengkel otomotif, laundry, dan jaringan franchise.",
+      subtitle: "Laundry kiloan/satuan, barbershop, salon kecantikan, dan perbaikan service.",
       features: [
-        "Pencatatan nota jasa servis dan penjualan produk dalam 1 transaksi.",
-        "Database pelanggan CRM, nomor kontak, dan riwayat kunjungan rutin.",
-        "Pantau seluruh cabang toko secara terpusat dari satu akun pemilik.",
+        "Work Order & Resi Laundry dengan tracking QR mandiri untuk pelanggan.",
+        "Pencatatan nota DP (uang muka), pelunasan saat ambil, dan lokasi rak barang.",
+        "Pantau status pengerjaan: Cuci, Dryer, Setrika Uap hingga Siap Ambil.",
         "Kontrol hak akses kasir, manajer, dan pembukuan dengan PIN aman.",
       ],
     },

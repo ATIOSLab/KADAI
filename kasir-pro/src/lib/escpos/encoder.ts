@@ -31,6 +31,8 @@ export interface ReceiptData {
   paymentRef?: string | null;
   cashReceived?: number | null;
   changeAmount?: number | null;
+  laundryTrackingToken?: string | null;
+  laundryJobCode?: string | null;
 }
 
 export type PaperWidth = 58 | 80;
@@ -254,6 +256,19 @@ export function buildEscPosReceipt(data: ReceiptData, paperWidth: PaperWidth = 5
   if (data.cashReceived && data.cashReceived > 0) {
     enc.twoColumns("Uang Diterima", formatRp(data.cashReceived));
     enc.twoColumns("Kembalian", formatRp(data.changeAmount || 0));
+  }
+
+  // 9.5 Laundry Tracking Link if exists
+  if (data.laundryTrackingToken) {
+    enc.divider("-");
+    enc.alignCenter();
+    enc.bold(true);
+    enc.line("LACAK STATUS CUCIAN");
+    enc.bold(false);
+    enc.line(`kadai.asia/lacak/${data.laundryTrackingToken}`);
+    if (data.laundryJobCode) {
+      enc.line(`No Resi: ${data.laundryJobCode}`);
+    }
   }
 
   // 10. Footer (Centered)

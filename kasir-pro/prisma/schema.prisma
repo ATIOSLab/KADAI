@@ -95,6 +95,27 @@ enum PaymentType {
   E_WALLET
 }
 
+enum LaundryServiceType {
+  KILOAN
+  SATUAN
+}
+
+enum LaundryStatus {
+  RECEIVED
+  WASHING
+  DRYING
+  IRONING
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+}
+
+enum JobPaymentStatus {
+  UNPAID
+  PARTIAL_DP
+  PAID_FULL
+}
+
 enum AdjustmentReason {
   DAMAGED
   LOST
@@ -147,6 +168,10 @@ enum ActionType {
   TABLE_CREATED
   TABLE_UPDATED
   TABLE_DELETED
+  // Laundry & Work Order actions
+  LAUNDRY_JOB_CREATED
+  LAUNDRY_STATUS_CHANGED
+  LAUNDRY_PICKED_UP
   // Recipe & KDS
   RECIPE_UPDATED
   KDS_STATUS_CHANGED
@@ -217,6 +242,7 @@ model User {
   activityLogs     ActivityLog[]
   stockAdjustments StockAdjustment[]
   financeEntries   FinanceEntry[]
+  laundryJobs      LaundryJobOrder[]
 
   @@map("users")
 }
@@ -371,7 +397,8 @@ model Customer {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  sales Sale[]
+  sales       Sale[]
+  laundryJobs LaundryJobOrder[]
 
   @@index([name])
   @@index([phone])
@@ -400,8 +427,9 @@ model Outlet {
   batches           ProductBatch[]
   sales             Sale[]
   tables            RestaurantTable[]
-  transfersSent     StockTransfer[] @relation("SourceOutlet")
-  transfersReceived StockTransfer[] @relation("DestinationOutlet")
+  transfersSent     StockTransfer[]   @relation("SourceOutlet")
+  transfersReceived StockTransfer[]   @relation("DestinationOutlet")
+  laundryJobs       LaundryJobOrder[]
 
   @@map("outlets")
 }
@@ -543,6 +571,7 @@ model Sale {
   items          SaleItem[]
   financeEntries FinanceEntry[]
   kdsOrders      KDSOrder[]
+  laundryJob     LaundryJobOrder?
 
   @@index([cashierId])
   @@index([outletId])
@@ -612,6 +641,68 @@ model KDSOrder {
 
   @@index([station, status])
   @@map("kds_orders")
+}
+
+// ============================================================
+// LAUNDRY & SERVICE JOB ORDERS (ENTERPRISE WORK ORDER ENGINE)
+// ============================================================
+
+model LaundryJobOrder {
+  id              String             @id @default(cuid())
+  jobCode         String             @unique // Nomor Resi Pelacakan (e.g. LND-20261108-0042)
+  trackingToken   String             @unique @default(cuid()) // Token aman untuk scan QR link /lacak/[token]
+  serviceType     LaundryServiceType @default(KILOAN)
+  status          LaundryStatus      @default(RECEIVED)
+  paymentStatus   JobPaymentStatus   @default(UNPAID)
+
+  // Rincian Bobot & Komponen Layanan
+  weightKg        Decimal?           @db.Decimal(6, 2) // Berat timbangan desimal (e.g. 4.85 kg)
+  itemCount       Int?               // Jumlah potong pakaian fisik
+  fragrance       String?            // Pilihan aroma parfum (e.g. Lavender, Sakura, Akasia)
+  rackLocation    String?            // Lokasi rak / keranjang siap ambil (e.g. Rak B-03)
+  specialNotes    String?            // Catatan noda / instruksi khusus pelanggan
+
+  // Estimasi & Log Pengerjaan
+  estimatedDoneAt DateTime           // Target waktu siap ambil
+  receivedAt      DateTime           @default(now())
+  washedAt        DateTime?
+  driedAt         DateTime?
+  ironedAt        DateTime?
+  readyAt         DateTime?
+  pickedUpAt      DateTime?
+
+  // Financial Breakdown (DP & Pelunasan)
+  totalAmount     Decimal            @db.Decimal(15, 2)
+  downPayment     Decimal            @default(0) @db.Decimal(15, 2)
+  remainingAmount Decimal            @default(0) @db.Decimal(15, 2)
+  pickupPaymentMethod PaymentType?   // Metode bayar pelunasan saat ambil barang
+  pickupPaymentRef    String?
+
+  // Notifikasi WhatsApp
+  whatsappNotified Boolean           @default(false)
+  notifiedAt       DateTime?
+
+  // Relations
+  saleId          String             @unique
+  sale            Sale               @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  outletId        String?
+  outlet          Outlet?            @relation(fields: [outletId], references: [id])
+  customerId      String?
+  customer        Customer?          @relation(fields: [customerId], references: [id])
+  customerName    String
+  customerPhone   String?
+  handledById     String
+  handledBy       User               @relation(fields: [handledById], references: [id])
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([customerPhone])
+  @@index([jobCode])
+  @@index([trackingToken])
+  @@map("laundry_job_orders")
 }
 
 // ============================================================

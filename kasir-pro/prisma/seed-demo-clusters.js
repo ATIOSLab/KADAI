@@ -145,6 +145,29 @@ const CLUSTERS = [
       { name: "Dewi (Pastry Chef Dapur)", email: "dapur.cafe@kadai.com", role: UserRole.KITCHEN, pin: null },
       { name: "Anita (Akuntan Kafe & FnB)", email: "akuntan.cafe@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
     ]
+  },
+  {
+    vertical: "SERVICE",
+    name: "Klinik Sepatu & Laundry Express KADAI",
+    slug: "laundry",
+    description: "Spesialis Laundry Kiloan, Cuci Sepatu, Tas & Helm dengan Tracking Job Order Realtime",
+    outlets: [
+      { name: "KADAI Laundry Express - Tebet Central", code: "LND-01", address: "Jl. Tebet Barat Dalam Raya No. 42, Jaksel", phone: "08127777001", isMain: true },
+    ],
+    categories: ["Laundry Kiloan Cuci Setrika", "Cuci Sepatu & Sneakers Deep Clean", "Cuci Bedcover & Selimut", "Parfum & Layanan Kilat"],
+    products: [
+      { name: "Cuci Kering Setrika Reguler (2 Hari)", sku: "LND-KLN-01", barcode: "899700100001", category: "Laundry Kiloan Cuci Setrika", price: 9000, cost: 2500, stock: 999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Kering Setrika Express (1 Hari)", sku: "LND-KLN-02", barcode: "899700100002", category: "Laundry Kiloan Cuci Setrika", price: 15000, cost: 3500, stock: 999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Deep Clean Sneakers Canvas / Suede", sku: "LND-SPT-03", barcode: "899700100003", category: "Cuci Sepatu & Sneakers Deep Clean", price: 45000, cost: 8000, stock: 999, unit: "pasang", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Bedcover King Size + Sanitasi", sku: "LND-BDC-04", barcode: "899700100004", category: "Cuci Bedcover & Selimut", price: 35000, cost: 7000, stock: 999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+    ],
+    users: [
+      { name: "Rahmat Hidayat (Owner Laundry)", email: "owner.laundry@kadai.com", role: UserRole.ADMIN, pin: "222111" },
+      { name: "Siti Maryam (Manager Laundry)", email: "manager.laundry@kadai.com", role: UserRole.MANAGER, pin: "222222" },
+      { name: "Bella (Kasir Frontdesk Laundry)", email: "kasir.laundry@kadai.com", role: UserRole.CASHIER, pin: null },
+      { name: "Joko (Operator Cuci & Setrika)", email: "operator.laundry@kadai.com", role: UserRole.KITCHEN, pin: null },
+      { name: "Tari (Akuntan Keuangan Laundry)", email: "akuntan.laundry@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
+    ]
   }
 ];
 

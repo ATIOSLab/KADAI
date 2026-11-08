@@ -1,14 +1,6 @@
 "use client";
 
 import { ShoppingCart, UtensilsCrossed, Building2, Check } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 export function IndustrySolutions() {
   const industries = [
@@ -48,57 +40,47 @@ export function IndustrySolutions() {
   ];
 
   return (
-    <section id="solusi-industri" className="py-16 sm:py-24 px-4 sm:px-6 bg-slate-50/70 border-y border-slate-200/80 w-full">
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <Badge
-            variant="outline"
-            className="text-xs font-semibold text-primary uppercase tracking-wider px-3.5 py-1 rounded-full border-primary/20 bg-orange-50/60"
-          >
-            Fleksibel Lintas Sektor
-          </Badge>
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-950">
+    <section id="solusi-industri" className="py-20 sm:py-28 px-4 sm:px-6 w-full border-t border-slate-200/80">
+      <div className="max-w-6xl mx-auto space-y-16">
+        {/* Section Header: Pure Typography */}
+        <div className="max-w-3xl space-y-3">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Solusi Lintas Sektor
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-950 leading-[1.15]">
             Dibuat Khusus untuk Karakter Usaha Anda
           </h2>
-          <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed text-balance">
-            Setiap model bisnis punya tantangan berbeda. KADAI menyediakan alur operasional yang langsung pas sejak hari pertama tanpa perlu kustomisasi mahal.
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+            Setiap model bisnis punya tantangan berbeda. KADAI menyediakan alur operasional yang langsung pas sejak hari pertama tanpa perlu kustomisasi rumit.
           </p>
         </div>
 
-        {/* 3-Column Reusable Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* 3-Column Clean Editorial Flow */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12 border-t border-slate-200/80 pt-10 sm:pt-12">
           {industries.map((ind, idx) => {
             const Icon = ind.icon;
             return (
-              <Card
-                key={idx}
-                className="rounded-[24px] luxury-glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border border-slate-200/90"
-              >
-                <CardHeader className="p-0 space-y-4">
-                  <div className="size-11 rounded-xl bg-orange-50 border border-orange-200/80 flex items-center justify-center text-primary">
-                    <Icon className="size-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg font-bold text-slate-950">
-                      {ind.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs text-slate-500 mt-1 italic leading-relaxed">
-                      {ind.subtitle}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <ul className="space-y-2.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
-                    {ind.features.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-start gap-2.5">
-                        <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                        <span className="leading-snug">{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <div key={idx} className="flex flex-col space-y-4">
+                <div className="size-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900">
+                  <Icon className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-950">
+                    {ind.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                    {ind.subtitle}
+                  </p>
+                </div>
+                <ul className="space-y-3 pt-3 border-t border-slate-100 text-xs sm:text-sm text-slate-700">
+                  {ind.features.map((feat, fIdx) => (
+                    <li key={fIdx} className="flex items-start gap-2.5">
+                      <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                      <span className="leading-snug">{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             );
           })}
         </div>

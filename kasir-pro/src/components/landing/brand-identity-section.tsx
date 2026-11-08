@@ -284,7 +284,7 @@ export function BrandIdentitySection() {
                   <KadaiLockup variant="on-light" height={32} className="h-8 w-auto mx-auto" />
                 </div>
                 <div className="text-[10px] text-slate-500">
-                  KADAI Resto &amp; Kopi Nusantara
+                  Gerai &amp; Merchant Resmi KADAI
                 </div>
               </div>
 

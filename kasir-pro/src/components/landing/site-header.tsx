@@ -91,7 +91,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             />
           </Link>
 
-          {/* Center Navigation Links (Clean Flat Typography like Moka) */}
+          {/* Center Navigation Links (Clean Flat Typography) */}
           <nav
             aria-label="Navigasi Utama"
             className="hidden xl:flex items-center gap-1 text-sm font-medium text-slate-600 relative h-full"
@@ -123,7 +123,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 />
               </button>
 
-              {/* Moka-Style Large Mega Dropdown Card */}
+              {/* Large Mega Dropdown Card */}
               {activeDropdown === "kapabilitas" && (
                 <div
                   id="nav-kapabilitas"
@@ -183,7 +183,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 />
               </button>
 
-              {/* Moka-Style Large Mega Dropdown Card */}
+              {/* Large Mega Dropdown Card */}
               {activeDropdown === "solusi" && (
                 <div
                   id="nav-solusi"

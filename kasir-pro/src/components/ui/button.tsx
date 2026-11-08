@@ -9,19 +9,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-accent-primary text-white neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-primary text-white shadow-xs hover:brightness-110 active:scale-[0.98] transition-all",
         secondary:
-          "bg-accent-secondary text-white neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-secondary text-white shadow-xs hover:bg-slate-900 active:scale-[0.98] transition-all",
         success:
-          "bg-accent-success text-white neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-success text-white shadow-xs hover:brightness-110 active:scale-[0.98] transition-all",
         danger:
-          "bg-accent-danger text-white neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-danger text-white shadow-xs hover:brightness-110 active:scale-[0.98] transition-all",
         destructive:
-          "bg-accent-danger text-white neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-danger text-white shadow-xs hover:brightness-110 active:scale-[0.98] transition-all",
         warning:
-          "bg-accent-warning text-text-primary neo-border neo-shadow-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-accent-warning text-slate-950 shadow-xs hover:brightness-105 active:scale-[0.98] transition-all",
         outline:
-          "bg-bg-card text-text-primary neo-border neo-shadow-sm hover:bg-bg-main hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1A1A1A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+          "bg-card text-foreground border border-border hover:bg-muted/60 active:scale-[0.98] transition-all shadow-2xs",
         ghost:
           "border border-transparent bg-transparent text-text-primary shadow-none hover:border-border-default/15 hover:bg-bg-card/80",
         link:

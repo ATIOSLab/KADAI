@@ -84,14 +84,14 @@ export function SiteFooter() {
             </span>
           </div>
 
-          <div className="text-slate-500 text-[11px] flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+          <div className="text-slate-500 text-[11px] flex flex-col sm:flex-row items-center gap-1 sm:gap-2 sm:pr-44">
             <span>
               KADAI adalah produk teknologi di bawah naungan{" "}
               <a
                 href="https://newasiatech.co.id"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-300 font-semibold hover:text-primary transition-colors underline decoration-slate-700 underline-offset-2"
+                className="text-slate-300 font-semibold hover:text-primary transition-colors hover:underline"
               >
                 NEW ASIA TECH
               </a>

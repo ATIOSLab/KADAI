@@ -115,7 +115,7 @@ export default function RegisterPage() {
                   }`}
                 >
                   <UtensilsCrossed className="size-5 text-primary mb-1" />
-                  <p className="font-black text-xs">Kuliner / Kafe / Dimsum</p>
+                  <p className="font-black text-xs">Kuliner, Kafe & Restoran</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">Resep BOM, Meja QR, KDS Dapur</p>
                 </button>
 
@@ -140,7 +140,7 @@ export default function RegisterPage() {
               <div className="space-y-1">
                 <Label className="font-bold text-xs">Nama Usaha / Toko</Label>
                 <Input
-                  placeholder="Contoh: Kopi Kadai / Dimsum 88"
+                  placeholder="Contoh: Kopi Kadai / Resto Nusantara"
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
                   required

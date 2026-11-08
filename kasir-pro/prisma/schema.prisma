@@ -38,7 +38,7 @@ enum SubscriptionTier {
 enum ProductType {
   FINISHED_GOOD // Barang Jadi (Ritel langsung jual)
   RAW_MATERIAL  // Bahan Baku Mentah (Bahan resep F&B)
-  MANUFACTURED  // Produk Jadi Ber-Resep / BOM (Dimsum, Kopi)
+  MANUFACTURED  // Produk Jadi Ber-Resep / BOM (Menu Masakan, Kopi Racik)
   SERVICE       // Jasa / Layanan non-fisik
 }
 

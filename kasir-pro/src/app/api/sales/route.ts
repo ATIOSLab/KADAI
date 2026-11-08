@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         if (!product?.isActive) throw new Error("Produk tidak tersedia");
 
         if (product.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
-          // F&B Manufactured Product with Recipe (e.g. Dimsum, Kopi)
+          // F&B Manufactured Product with Recipe (e.g. Makanan, Kopi)
           // Deduct from raw material ingredients' batches
           let itemCost = new Decimal(0);
           const rawAllocations: any[] = [];

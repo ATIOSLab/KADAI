@@ -248,20 +248,20 @@ function LoginForm() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("dapur.dimsum@kadai.com");
+                        setEmail("dapur.resto@kadai.com");
                         setPassword("password123");
                       }}
                       className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
                     >
                       <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
-                        🍳 Chef Dapur
+                        Chef Dapur KDS
                       </div>
-                      <div className="text-[9px] text-slate-500">Layar Display KDS</div>
+                      <div className="text-[9px] text-slate-500">Layar Display Dapur</div>
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("gudang.sembako@kadai.com");
+                        setEmail("gudang.grosir@kadai.com");
                         setPassword("password123");
                       }}
                       className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
@@ -274,13 +274,13 @@ function LoginForm() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEmail("owner.dimsum@kadai.com");
+                        setEmail("owner.resto@kadai.com");
                         setPassword("password123");
                       }}
                       className="p-2 text-left rounded-xl bg-slate-50 hover:bg-orange-50/80 hover:text-primary border border-slate-200/70 transition-all group cursor-pointer"
                     >
                       <div className="text-[11px] font-bold text-slate-900 group-hover:text-primary">
-                        👑 Owner Bisnis
+                        Owner Bisnis
                       </div>
                       <div className="text-[9px] text-slate-500">Dashboard & Finansial</div>
                     </button>

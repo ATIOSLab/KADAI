@@ -302,7 +302,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="xl:hidden mt-2 max-w-6xl mx-auto luxury-glass-card rounded-2xl p-4 space-y-3 shadow-xl">
+        <div className="xl:hidden mt-2 max-w-6xl mx-auto bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xl">
           <nav className="flex flex-col space-y-1 text-sm font-semibold text-slate-700">
             <Link
               href="/demo"
@@ -311,72 +311,81 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             >
               Request Demo & Konsultasi
             </Link>
+            <div className="pt-1 pb-0.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Modul & Solusi
+            </div>
             <Link
               href="/fitur"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
             >
-              Fitur & Kapabilitas
+              <span>Fitur & Kapabilitas POS</span>
+              <span className="text-[10px] font-normal text-slate-400">Semua Modul</span>
             </Link>
             <Link
-              href="/solusi"
+              href="/solusi/fnb"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
             >
-              Solusi Industri
+              <span>Restoran & Kafe (F&B)</span>
+              <span className="text-[10px] font-mono text-primary font-bold">KDS & Meja</span>
             </Link>
+            <Link
+              href="/solusi/ritel"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors flex items-center justify-between"
+            >
+              <span>Toko Ritel & Grosir</span>
+              <span className="text-[10px] font-mono text-primary font-bold">FIFO & Barcode</span>
+            </Link>
+            <div className="pt-2 pb-0.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Ekosistem Bisnis
+            </div>
             <Link
               href="/hardware"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Panduan Hardware
             </Link>
             <Link
-              href="/referral"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
-            >
-              Program Mitra Referral
-            </Link>
-            <Link
               href="/harga"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
               Paket Langganan
             </Link>
             <Link
               href="/blog"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
-              Blog & Edukasi
+              Blog Edukasi
             </Link>
             <Link
-              href="/#pajak-pembukuan"
+              href="/referral"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
-              Pajak & Pembukuan
+              Program Mitra Referral
             </Link>
             <Link
               href="/#faq"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl hover:bg-slate-50 hover:text-primary transition-colors"
+              className="px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-primary transition-colors"
             >
               FAQ
             </Link>
           </nav>
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             {!dashboardPath && (
-              <Button asChild variant="outline" className="w-full text-xs font-semibold h-10 rounded-xl">
+              <Button asChild variant="outline" className="w-full text-xs font-semibold h-10 rounded-xl bg-white border-slate-200">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                   Masuk ke Akun
                 </Link>
               </Button>
             )}
-            <Button asChild className="w-full text-xs font-bold h-10 rounded-xl bg-primary text-primary-foreground">
+            <Button asChild className="w-full text-xs font-bold h-10 rounded-xl bg-primary text-white shadow-xs">
               <Link
                 href={dashboardPath ?? "/register"}
                 onClick={() => setMobileMenuOpen(false)}

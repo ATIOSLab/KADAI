@@ -11,8 +11,7 @@ import {
   QrCode,
   Zap,
 } from "lucide-react";
-import { SiteHeader } from "@/components/landing/site-header";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { LandingPageShell } from "@/components/landing/landing-page-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,33 +74,21 @@ const coreCapabilities = [
 
 export default function SolutionFnbPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased">
-      <SiteHeader dashboardPath={null} />
+    <LandingPageShell
+      badgeText="SOLUSI KULINER & FOOD SERVICE"
+      title="Satu Sistem Terpadu untuk Kasir Gerai, Dapur, dan Pembukuan Resto"
+      description="Tingkatkan kecepatan rotasi meja (table turnover), hilangkan pesanan salah antar kasir dan dapur, serta kendalikan margin keuntungan kuliner secara presisi."
+    >
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 -mt-8 pb-4">
+        <Button asChild size="lg" className="rounded-xl font-bold text-sm h-11 px-7 bg-primary text-white shadow-xs">
+          <Link href="/register">Coba Gratis 14 Hari</Link>
+        </Button>
+        <Button asChild size="lg" variant="outline" className="rounded-xl font-semibold text-sm h-11 px-6 bg-white border-slate-300">
+          <Link href="/demo">Jadwalkan Demo Resto</Link>
+        </Button>
+      </div>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 space-y-16">
-        {/* Hero Solution */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="px-3.5 py-1 text-xs font-semibold rounded-lg border-primary/30 text-primary bg-primary/5">
-            SOLUSI KULINER & FOOD SERVICE
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950 leading-tight">
-            Satu Sistem Terpadu untuk Kasir Gerai, Dapur, dan Pembukuan Resto
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Tingkatkan kecepatan rotasi meja (*table turnover*), hilangkan pesanan salah antar kasir dan dapur, serta kendalikan margin keuntungan kuliner secara presisi.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Button asChild size="lg" className="rounded-lg font-bold text-sm h-11 px-7 bg-primary text-white shadow-xs">
-              <Link href="/register">Coba Gratis 14 Hari</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-lg font-semibold text-sm h-11 px-6 bg-white border-slate-300">
-              <Link href="/demo">Jadwalkan Demo Resto</Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Problem vs Solution Grid */}
+      {/* Problem vs Solution Grid */}
         <div className="space-y-6">
           <div className="text-center max-w-xl mx-auto space-y-1">
             <h2 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">
@@ -172,9 +159,6 @@ export default function SolutionFnbPage() {
             </Button>
           </div>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </LandingPageShell>
   );
 }

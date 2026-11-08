@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
       <SiteHeader dashboardPath={null} />
       <main className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-14 sm:py-20">
         <div className="space-y-4">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary font-bold text-xs px-3 py-1">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-primary/10 text-primary font-bold text-xs px-3.5 py-1">
             <ShieldCheck className="size-3.5" />
             KEPATUHAN &amp; REGULASI
           </span>

@@ -200,7 +200,7 @@ export default async function BlogDetailPage({
 
         {/* Article Header */}
         <div className="space-y-4">
-          <Badge variant="outline" className="text-xs font-semibold px-3 py-1 rounded-full border-primary/30 text-primary bg-primary/5">
+          <Badge variant="outline" className="text-xs font-semibold px-3.5 py-1 rounded-lg border-primary/30 text-primary bg-primary/5">
             {article.category}
           </Badge>
           <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight">

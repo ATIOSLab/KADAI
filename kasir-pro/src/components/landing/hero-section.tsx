@@ -124,7 +124,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           <div className="inline-flex max-w-full justify-center">
             <Badge
               variant="outline"
-              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-lg luxury-glass-pill text-slate-700 text-xs font-semibold shadow-2xs border-slate-200/80 whitespace-normal text-left sm:text-center"
+              className="inline-flex max-w-full items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-lg bg-white/90 border border-slate-200/90 text-slate-700 text-xs font-semibold shadow-xs whitespace-normal text-left sm:text-center"
             >
               <span className="size-2 rounded-full bg-primary shrink-0 animate-pulse" />
               <span className="text-[11px] sm:text-xs text-slate-900 uppercase tracking-widest font-black leading-tight">

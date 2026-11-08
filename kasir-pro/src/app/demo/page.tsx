@@ -134,7 +134,7 @@ function RequestDemoForm() {
             <Card className="rounded-3xl bg-white/90 backdrop-blur-md border border-slate-200/90 shadow-xs p-6 sm:p-8">
               {successData ? (
                 <div className="space-y-6 text-center py-4">
-                  <div className="size-16 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
+                  <div className="size-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
                     <CheckCircle2 className="size-8" />
                   </div>
                   <div className="space-y-2">

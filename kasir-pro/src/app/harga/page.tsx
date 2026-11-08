@@ -3,8 +3,7 @@ import { Metadata } from "next";
 export const revalidate = 300;
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { SiteHeader } from "@/components/landing/site-header";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { LandingPageShell } from "@/components/landing/landing-page-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,25 +97,13 @@ const tiers = [
 
 export default function HargaPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
-      <SiteHeader dashboardPath={null} />
-
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-16 overflow-hidden">
-        {/* Header Breadcrumb & Title */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">
-            TRANSPARAN TANPA BIAYA TERSEMBUNYI
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950">
-            Investasi Terjangkau untuk Pertumbuhan Bisnis Nyata
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Pilih paket yang sesuai dengan skala usaha Anda. Tanpa kontrak jangka panjang yang mengikat, bebas upgrade atau downgrade kapan saja.
-          </p>
-        </div>
-
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <LandingPageShell
+      badgeText="TRANSPARAN TANPA BIAYA TERSEMBUNYI"
+      title="Investasi Terjangkau untuk Pertumbuhan Bisnis Nyata"
+      description="Pilih paket yang sesuai dengan skala usaha Anda. Tanpa kontrak jangka panjang yang mengikat, bebas upgrade atau downgrade kapan saja."
+    >
+      {/* Pricing Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {tiers.map((tier) => (
             <Card
               key={tier.name}
@@ -128,7 +115,7 @@ export default function HargaPage() {
             >
               {tier.popular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary hover:bg-primary text-white font-bold text-[11px] px-3.5 py-1 rounded-full shadow-md uppercase tracking-wider">
+                  <Badge className="bg-primary hover:bg-primary text-white font-bold text-[11px] px-3 py-0.5 rounded-lg shadow-sm uppercase tracking-wider">
                     {tier.badge}
                   </Badge>
                 </div>
@@ -262,9 +249,6 @@ export default function HargaPage() {
             </table>
           </div>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </LandingPageShell>
   );
 }

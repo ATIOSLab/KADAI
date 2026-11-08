@@ -13,8 +13,7 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import { SiteHeader } from "@/components/landing/site-header";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { LandingPageShell } from "@/components/landing/landing-page-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -130,25 +129,13 @@ const featureList = [
 
 export default function FiturIndexPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
-      <SiteHeader dashboardPath={null} />
-
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-16 overflow-hidden">
-        {/* Header Breadcrumb & Title */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">
-            KAPABILITAS SISTEM KADAI
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950">
-            Satu Ekosistem Lengkap untuk Seluruh Urusan Operasional
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Bukan sekadar aplikasi pencatat pesanan. KADAI menggabungkan terminal kasir, pelacakan inventori berstandar PSAK 14, alur produksi dapur, hingga rekonsiliasi pajak daerah dalam satu platform terpadu.
-          </p>
-        </div>
-
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <LandingPageShell
+      badgeText="KAPABILITAS SISTEM KADAI"
+      title="Satu Ekosistem Lengkap untuk Seluruh Urusan Operasional"
+      description="Bukan sekadar aplikasi pencatat pesanan. KADAI menggabungkan terminal kasir, pelacakan inventori berstandar PSAK 14, alur produksi dapur, hingga rekonsiliasi pajak daerah dalam satu platform terpadu."
+    >
+      {/* Feature Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featureList.map((item) => {
             const Icon = item.icon;
             return (
@@ -229,9 +216,6 @@ export default function FiturIndexPage() {
             </Button>
           </div>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </LandingPageShell>
   );
 }

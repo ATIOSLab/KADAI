@@ -7,8 +7,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
-import { SiteHeader } from "@/components/landing/site-header";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { LandingPageShell } from "@/components/landing/landing-page-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -71,30 +70,18 @@ export const articles = [
 
 export default function BlogIndexPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
-      <SiteHeader dashboardPath={null} />
-
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-16 overflow-hidden">
-        {/* Header Breadcrumb & Title */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">
-            EDUKASI & PRAKTIK TERBAIK
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950">
-            Wawasan Bisnis, Tata Kelola Pajak & Efisiensi Operasional
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Panduan aplikatif berbasis pengalaman nyata untuk membantu pemilik bisnis di Indonesia mengelola rantai pasok, dapur, dan kepatuhan perpajakan.
-          </p>
-        </div>
-
-        {/* Featured Article Card (First) */}
+    <LandingPageShell
+      badgeText="EDUKASI & PRAKTIK TERBAIK"
+      title="Wawasan Bisnis, Tata Kelola Pajak & Efisiensi Operasional"
+      description="Panduan aplikatif berbasis pengalaman nyata untuk membantu pemilik bisnis di Indonesia mengelola rantai pasok, dapur, dan kepatuhan perpajakan."
+    >
+      {/* Featured Article Card (First) */}
         {articles.length > 0 && (
           <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-xs hover:shadow-md transition-all group">
             <div className="flex flex-col lg:flex-row gap-8 items-start justify-between">
               <div className="space-y-4 max-w-3xl">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-primary text-white font-bold text-xs px-3 py-1 rounded-full">
+                  <Badge className="bg-primary text-white font-bold text-xs px-3 py-1 rounded-lg">
                     Artikel Utama
                   </Badge>
                   <span className="text-xs font-semibold text-slate-500">
@@ -181,9 +168,6 @@ export default function BlogIndexPage() {
             </Card>
           ))}
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </LandingPageShell>
   );
 }

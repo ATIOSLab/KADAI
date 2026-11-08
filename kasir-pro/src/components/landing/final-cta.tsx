@@ -11,7 +11,7 @@ export function FinalCTA() {
       {/* Studio Keylight Vignette */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] studio-keylight pointer-events-none -z-10" />
 
-      <div className="max-w-4xl mx-auto rounded-[28px] luxury-glass-card p-8 sm:p-14 shadow-2xl text-center space-y-6 relative border border-slate-200/90">
+      <div className="max-w-4xl mx-auto rounded-[28px] bg-white p-8 sm:p-14 shadow-xl text-center space-y-6 relative border border-slate-200/90">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
           Mulai Tanpa Risiko
         </p>

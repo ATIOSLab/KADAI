@@ -102,7 +102,7 @@ export function PricingSection() {
               className={`rounded-[24px] p-6 sm:p-7 flex flex-col justify-between space-y-6 transition-all duration-300 relative ${
                 plan.featured
                   ? "bg-white border-2 border-primary shadow-2xl ring-2 ring-primary/20 scale-[1.02]"
-                  : "luxury-glass-card border border-slate-200/90 shadow-xs hover:shadow-xl hover:scale-[1.01]"
+                  : "bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:scale-[1.01]"
               }`}
             >
               {plan.featured && (

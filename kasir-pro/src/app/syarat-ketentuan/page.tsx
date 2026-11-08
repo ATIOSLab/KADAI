@@ -124,7 +124,7 @@ export default function TermsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="mb-10 text-center sm:text-left border-b border-slate-200 pb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold mb-4">
               <FileText className="size-3.5" />
               <span>Dokumen Hukum Resmi KADAI</span>
             </div>
@@ -199,7 +199,7 @@ export default function TermsPage() {
           </div>
 
           {/* Help box */}
-          <div className="mt-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mt-10 rounded-2xl bg-slate-950 text-white p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-800">
             <div className="space-y-1 text-center sm:text-left">
               <h3 className="font-bold text-base sm:text-lg">Ada pertanyaan seputar ketentuan layanan?</h3>
               <p className="text-xs text-slate-300">

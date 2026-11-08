@@ -14,8 +14,7 @@ import {
   SlidersHorizontal,
   Wifi,
 } from "lucide-react";
-import { SiteHeader } from "@/components/landing/site-header";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { LandingPageShell } from "@/components/landing/landing-page-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,25 +64,13 @@ const hardwareCategories = [
 
 export default function HardwarePage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col antialiased overflow-x-hidden w-full max-w-full">
-      <SiteHeader dashboardPath={null} />
-
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12 sm:pb-16 space-y-16 overflow-hidden">
-        {/* Header Breadcrumb & Title */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="px-3 py-1 text-xs font-semibold rounded-full border-primary/30 text-primary bg-primary/5">
-            BEBAS PERANGKAT KERAS (HARDWARE-AGNOSTIC)
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-950">
-            Gunakan Perangkat yang Sudah Anda Miliki
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            KADAI tidak mengunci Anda dengan keharusan membeli atau menyewa perangkat keras mahal bermerek. Cukup gunakan printer thermal, scanner, atau tablet yang ada di meja kasir Anda hari ini.
-          </p>
-        </div>
-
-        {/* Hardware Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <LandingPageShell
+      badgeText="BEBAS PERANGKAT KERAS (HARDWARE-AGNOSTIC)"
+      title="Gunakan Perangkat yang Sudah Anda Miliki"
+      description="KADAI tidak mengunci Anda dengan keharusan membeli atau menyewa perangkat keras mahal bermerek. Cukup gunakan printer thermal, scanner, atau tablet yang ada di meja kasir Anda hari ini."
+    >
+      {/* Hardware Category Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {hardwareCategories.map((item, idx) => {
             const Icon = item.icon;
             return (
@@ -147,7 +134,7 @@ export default function HardwarePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
             <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-3">
-              <span className="size-8 rounded-full bg-slate-950 text-white font-bold text-xs flex items-center justify-center">
+              <span className="size-8 rounded-xl bg-slate-950 text-white font-bold text-xs flex items-center justify-center">
                 1
               </span>
               <h3 className="text-base font-bold text-slate-900">Nyalakan Bluetooth / Pasang USB</h3>
@@ -157,7 +144,7 @@ export default function HardwarePage() {
             </div>
 
             <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-3">
-              <span className="size-8 rounded-full bg-slate-950 text-white font-bold text-xs flex items-center justify-center">
+              <span className="size-8 rounded-xl bg-slate-950 text-white font-bold text-xs flex items-center justify-center">
                 2
               </span>
               <h3 className="text-base font-bold text-slate-900">Buka Menu Pengaturan Kasir</h3>
@@ -167,7 +154,7 @@ export default function HardwarePage() {
             </div>
 
             <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-3">
-              <span className="size-8 rounded-full bg-primary text-white font-bold text-xs flex items-center justify-center">
+              <span className="size-8 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center">
                 3
               </span>
               <h3 className="text-base font-bold text-slate-900">Cetak Struk Kilat Otomatis</h3>
@@ -189,17 +176,14 @@ export default function HardwarePage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button asChild size="lg" className="rounded-full font-bold bg-primary hover:bg-primary/90 text-white px-8">
+            <Button asChild size="lg" className="rounded-xl font-bold bg-primary hover:bg-primary/90 text-white px-8">
               <Link href="/register">Coba Gratis 14 Hari</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="rounded-full font-semibold bg-white/10 text-white border-white/20 hover:bg-white/20 px-8">
+            <Button asChild variant="outline" size="lg" className="rounded-xl font-semibold bg-white/10 text-white border-white/20 hover:bg-white/20 px-8">
               <Link href="/harga">Lihat Pilihan Paket</Link>
             </Button>
           </div>
         </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+      </LandingPageShell>
   );
 }

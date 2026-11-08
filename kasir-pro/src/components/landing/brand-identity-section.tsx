@@ -237,7 +237,7 @@ export function BrandIdentitySection() {
 
               {/* Core Slogan Headline */}
               <div className="space-y-3 pt-4">
-                <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-[#FB923C] bg-[#FB923C]/10 border border-[#FB923C]/20 px-3 py-1 rounded-full">
+                <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-[#FB923C] bg-[#FB923C]/10 border border-[#FB923C]/20 px-3 py-1 rounded-lg">
                   Slogan Utama
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">

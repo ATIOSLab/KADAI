@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function FinalCTA() {
   return (
-    <section className="py-20 sm:py-28 px-4 sm:px-6 w-full relative overflow-hidden bg-slate-50/60 border-t border-slate-200/80">
+    <section className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 w-full relative overflow-hidden bg-slate-50/60 border-t border-slate-200/80">
       {/* Studio Keylight Vignette */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] studio-keylight pointer-events-none -z-10" />
 

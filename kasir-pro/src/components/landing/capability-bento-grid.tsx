@@ -57,7 +57,7 @@ export function CapabilityBentoGrid() {
   ];
 
   return (
-    <section id="kapabilitas" className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full">
+    <section id="kapabilitas" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
       {/* Section Header: Pure Editorial Typography, No Pill Badges */}
       <div className="max-w-3xl mb-16 sm:mb-20 space-y-4">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">

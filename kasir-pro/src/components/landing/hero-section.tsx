@@ -203,9 +203,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
       {/* 2. Interactive Operational Cockpit Section (Unobstructed, Clean Vertical Flow) */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
-        {/* 3 Operational Switcher Tabs (Centered Segmented Control, Clean Scrollbar) */}
-        <div className="flex items-center justify-start sm:justify-center overflow-x-auto py-1 px-2 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          <div className="inline-flex p-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md gap-1.5 shrink-0 mx-auto">
+        {/* 3 Operational Switcher Tabs (Responsive Grid, Zero Horizontal Overflow) */}
+        <div className="flex items-center justify-center w-full px-2">
+          <div className="w-full max-w-lg p-1.5 rounded-2xl sm:rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1">
             {SEGMENTS.map((seg, idx) => {
               const Icon = seg.icon;
               const isActive = idx === activeTab;
@@ -214,14 +214,14 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   key={seg.id}
                   type="button"
                   onClick={() => setActiveTab(idx)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-bold transition-all text-center ${
                     isActive
                       ? "bg-slate-950 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/70"
                   }`}
                 >
-                  <Icon className={`size-3.5 ${isActive ? "text-primary" : "text-slate-500"}`} />
-                  <span>{seg.name}</span>
+                  <Icon className={`size-3.5 shrink-0 ${isActive ? "text-primary" : "text-slate-500"}`} />
+                  <span className="truncate">{seg.name}</span>
                 </button>
               );
             })}

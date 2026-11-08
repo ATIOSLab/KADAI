@@ -40,7 +40,7 @@ export function IndustrySolutions() {
   ];
 
   return (
-    <section id="solusi-industri" className="py-20 sm:py-28 px-4 sm:px-6 w-full border-t border-slate-200/80">
+    <section id="solusi-industri" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 w-full border-t border-slate-200/80">
       <div className="max-w-6xl mx-auto space-y-16">
         {/* Section Header: Pure Typography */}
         <div className="max-w-3xl space-y-3">

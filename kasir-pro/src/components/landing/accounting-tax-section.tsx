@@ -22,7 +22,7 @@ export function AccountingTaxSection() {
   ];
 
   return (
-    <section id="pajak-pembukuan" className="py-20 sm:py-28 px-4 sm:px-6 w-full border-t border-slate-200/80">
+    <section id="pajak-pembukuan" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 w-full border-t border-slate-200/80">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         {/* Left Column: Bold Editorial Narrative (Span 5) */}
         <div className="lg:col-span-5 space-y-4">

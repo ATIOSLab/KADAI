@@ -186,7 +186,7 @@ export default function AdjustmentsPage() {
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="neo-table overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-border-default bg-accent-subtle">
                 <tr>

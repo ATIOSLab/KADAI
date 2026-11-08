@@ -14,6 +14,7 @@ import { ChartFrame } from "@/components/dashboard/chart-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import type { RevenueChartData } from "@/types";
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
 
 interface RevenueChartProps {
   data: RevenueChartData[];
@@ -22,19 +23,7 @@ interface RevenueChartProps {
   loading?: boolean;
 }
 
-function formatAxisCurrency(value: number): string {
-  if (value >= 1_000_000_000) {
-    return `${(value / 1_000_000_000).toFixed(1)}M`;
-  }
-  if (value >= 1_000_000) {
-    const val = value / 1_000_000;
-    return `${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}jt`;
-  }
-  if (value >= 1_000) {
-    return `${Math.round(value / 1000)}rb`;
-  }
-  return String(value);
-}
+const formatAxisCurrency = KADAI_CHART_THEME.formatAxisCurrency;
 
 export function RevenueChart({
   data,
@@ -64,31 +53,17 @@ export function RevenueChart({
                     <stop offset="95%" stopColor="#FB923C" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#E2E8F0"
-                  strokeWidth={1}
-                />
+                <CartesianGrid {...KADAI_CHART_THEME.gridProps} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
-                  stroke="#CBD5E1"
-                  strokeWidth={1}
+                  {...KADAI_CHART_THEME.xAxisProps}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
-                  stroke="#CBD5E1"
-                  strokeWidth={1}
+                  {...KADAI_CHART_THEME.yAxisProps}
                   tickFormatter={formatAxisCurrency}
                 />
                 <Tooltip
-                  contentStyle={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "0.75rem",
-                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-                    fontWeight: 600,
-                    backgroundColor: "#FFFFFF",
-                  }}
+                  contentStyle={KADAI_CHART_THEME.tooltipStyle}
                   formatter={(value) => [formatCurrency(Number(value ?? 0))]}
                 />
                 <Area

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
+import { StatCard } from "@/components/shared/stat-card";
 import {
   Select,
   SelectContent,
@@ -126,49 +127,41 @@ export default function TaxSummaryPage() {
       {/* KPI Cards */}
       {data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Total Omzet Bruto ({year})
-            </span>
-            <p className="text-2xl font-black text-foreground tabular-nums">
-              Rp {data.totals.totalGrossRevenue.toLocaleString("id-ID")}
-            </p>
-            <p className="text-[11px] text-muted-foreground">Dasar Perhitungan Pajak (DPP)</p>
-          </Card>
+          <StatCard
+            title={`Total Omzet Bruto (${year})`}
+            value={`Rp ${data.totals.totalGrossRevenue.toLocaleString("id-ID")}`}
+            description="Dasar Perhitungan Pajak (DPP)"
+            badge="DPP"
+            badgeVariant="default"
+          />
 
-          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Pajak Terpungut ({data.store.taxType})
-            </span>
-            <p className="text-2xl font-black text-slate-800 tabular-nums">
-              Rp {data.totals.totalTaxCollected.toLocaleString("id-ID")}
-            </p>
-            <p className="text-[11px] text-muted-foreground">Titipan Pajak Terhitung</p>
-          </Card>
+          <StatCard
+            title={`Pajak Terpungut (${data.store.taxType})`}
+            value={`Rp ${data.totals.totalTaxCollected.toLocaleString("id-ID")}`}
+            description="Titipan Pajak Terhitung"
+            badge="Pajak"
+            badgeVariant="neutral"
+          />
 
-          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Total HPP FIFO Persediaan
-            </span>
-            <p className="text-2xl font-black text-destructive tabular-nums">
-              Rp {data.totals.totalHPP.toLocaleString("id-ID")}
-            </p>
-            <p className="text-[11px] text-muted-foreground">Biaya Pokok Riil Bahan/Barang</p>
-          </Card>
+          <StatCard
+            title="Total HPP FIFO Persediaan"
+            value={`Rp ${data.totals.totalHPP.toLocaleString("id-ID")}`}
+            description="Biaya Pokok Riil Bahan/Barang"
+            badge="HPP"
+            badgeVariant="danger"
+          />
 
-          <Card className="border border-border shadow-sm bg-card p-4 space-y-1">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-              Estimasi PPh Final 0.5%
-            </span>
-            <p className="text-2xl font-black text-primary tabular-nums">
-              Rp {data.totals.totalPphFinal.toLocaleString("id-ID")}
-            </p>
-            <p className="text-[11px] text-emerald-600 font-bold">
-              {data.totals.totalGrossRevenue <= 500_000_000
+          <StatCard
+            title="Estimasi PPh Final 0.5%"
+            value={`Rp ${data.totals.totalPphFinal.toLocaleString("id-ID")}`}
+            description={
+              data.totals.totalGrossRevenue <= 500_000_000
                 ? "Bebas Pajak (PTKP < Rp 500jt)"
-                : "Tarif 0.5% PP 55/2022"}
-            </p>
-          </Card>
+                : "Tarif 0.5% PP 55/2022"
+            }
+            badge="PPh UMKM"
+            badgeVariant="warning"
+          />
         </div>
       )}
 
@@ -182,13 +175,14 @@ export default function TaxSummaryPage() {
             </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
           {loading ? (
             <div className="p-4">
               <TableSkeleton rows={6} cols={7} />
             </div>
           ) : (
-            <table className="w-full text-xs text-left">
+            <div className="neo-table overflow-x-auto">
+              <table className="w-full text-xs text-left">
               <thead className="bg-muted/50 border-b border-border font-black text-muted-foreground uppercase text-[10px]">
                 <tr>
                   <th className="p-3">Bulan</th>
@@ -247,8 +241,9 @@ export default function TaxSummaryPage() {
                 </tr>
               </tfoot>
             </table>
-          )}
-        </CardContent>
+          </div>
+        )}
+      </CardContent>
       </Card>
     </div>
   );

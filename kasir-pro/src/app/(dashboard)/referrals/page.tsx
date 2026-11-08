@@ -17,9 +17,10 @@ import {
   DollarSign,
   TrendingUp,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StatCard } from "@/components/shared/stat-card";
 import { toast } from "sonner";
 
 interface LeadItem {
@@ -188,35 +189,29 @@ export default function ReferralsAdminPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="rounded-2xl p-4 bg-white border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Mitra Terdaftar</span>
-            <span className="size-8 rounded-lg bg-orange-50 flex items-center justify-center text-primary">
-              <Users className="size-4" />
-            </span>
-          </div>
-          <div className="text-2xl font-black text-slate-950 mt-2">{partners.length} Mitra</div>
-        </Card>
+        <StatCard
+          title="Total Mitra Terdaftar"
+          value={`${partners.length} Mitra`}
+          icon={Users}
+          badge="Aktif"
+          badgeVariant="default"
+        />
 
-        <Card className="rounded-2xl p-4 bg-white border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Prospek Klien</span>
-            <span className="size-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <TrendingUp className="size-4" />
-            </span>
-          </div>
-          <div className="text-2xl font-black text-emerald-600 mt-2">{totalLeads} Bisnis</div>
-        </Card>
+        <StatCard
+          title="Total Prospek Klien"
+          value={`${totalLeads} Bisnis`}
+          icon={TrendingUp}
+          badge="Pipeline"
+          badgeVariant="success"
+        />
 
-        <Card className="rounded-2xl p-4 bg-white border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Standar Komisi Berulang</span>
-            <span className="size-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <Wallet className="size-4" />
-            </span>
-          </div>
-          <div className="text-2xl font-black text-blue-600 mt-2">20.0% / Bulan</div>
-        </Card>
+        <StatCard
+          title="Standar Komisi Berulang"
+          value="20.0% / Bulan"
+          icon={Wallet}
+          badge="Mitra Resmi"
+          badgeVariant="neutral"
+        />
       </div>
 
       {/* Table */}
@@ -236,7 +231,7 @@ export default function ReferralsAdminPage() {
               <p className="text-xs text-slate-500 font-medium">Belum ada mitra referral terdaftar.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="neo-table overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
                   <tr>

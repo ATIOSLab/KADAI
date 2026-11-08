@@ -13,6 +13,7 @@ import {
 import { ChartFrame } from "@/components/dashboard/chart-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { HourlySalesData } from "@/types";
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
 
 interface HourlyChartProps {
   data: HourlySalesData[];
@@ -39,31 +40,17 @@ export function HourlyChart({
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#E2E8F0"
-                  strokeWidth={1}
-                />
+                <CartesianGrid {...KADAI_CHART_THEME.gridProps} />
                 <XAxis
                   dataKey="hour"
-                  tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
-                  stroke="#CBD5E1"
-                  strokeWidth={1}
+                  {...KADAI_CHART_THEME.xAxisProps}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fontWeight: 600, fill: "#64748B" }}
-                  stroke="#CBD5E1"
-                  strokeWidth={1}
+                  {...KADAI_CHART_THEME.yAxisProps}
                   allowDecimals={false}
                 />
                 <Tooltip
-                  contentStyle={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "0.75rem",
-                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-                    fontWeight: 600,
-                    backgroundColor: "#FFFFFF",
-                  }}
+                  contentStyle={KADAI_CHART_THEME.tooltipStyle}
                   formatter={(value) => [
                     `${Number(value ?? 0)} transaksi`,
                     "Jumlah",

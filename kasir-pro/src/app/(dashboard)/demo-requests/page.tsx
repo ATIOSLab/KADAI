@@ -192,7 +192,7 @@ export default function DemoRequestsAdminPage() {
               <p className="text-xs text-slate-500 font-medium">Belum ada pengajuan demo baru.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="neo-table overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
                   <tr>

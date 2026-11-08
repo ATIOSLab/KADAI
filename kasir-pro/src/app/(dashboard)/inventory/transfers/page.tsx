@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
+import { StatCard } from "@/components/shared/stat-card";
 
 interface TransferItem {
   id: string;
@@ -298,28 +299,33 @@ export default function StockTransfersPage() {
 
       {/* Telemetry KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="border border-border shadow-xs bg-card p-4">
-          <div className="text-[11px] font-bold text-muted-foreground">Total Transfer</div>
-          <div className="text-2xl font-black text-slate-900 mt-1">{countTotal}</div>
-        </Card>
-        <Card className="border border-border shadow-xs bg-amber-50/50 border-amber-200/60 p-4">
-          <div className="text-[11px] font-bold text-amber-800 flex items-center gap-1.5">
-            <Truck className="size-3.5" /> Dalam Pengiriman
-          </div>
-          <div className="text-2xl font-black text-amber-900 mt-1">{countInTransit}</div>
-        </Card>
-        <Card className="border border-border shadow-xs bg-emerald-50/50 border-emerald-200/60 p-4">
-          <div className="text-[11px] font-bold text-emerald-800 flex items-center gap-1.5">
-            <CheckCircle2 className="size-3.5" /> Selesai Diterima
-          </div>
-          <div className="text-2xl font-black text-emerald-900 mt-1">{countReceived}</div>
-        </Card>
-        <Card className="border border-border shadow-xs bg-slate-50 border-slate-200/60 p-4">
-          <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-            <XCircle className="size-3.5" /> Dibatalkan
-          </div>
-          <div className="text-2xl font-black text-slate-700 mt-1">{countCancelled}</div>
-        </Card>
+        <StatCard
+          title="Total Transfer"
+          value={countTotal}
+          badge="Logistik"
+          badgeVariant="neutral"
+        />
+        <StatCard
+          title="Dalam Pengiriman"
+          value={countInTransit}
+          icon={Truck}
+          badge="In Transit"
+          badgeVariant="warning"
+        />
+        <StatCard
+          title="Selesai Diterima"
+          value={countReceived}
+          icon={CheckCircle2}
+          badge="Received"
+          badgeVariant="success"
+        />
+        <StatCard
+          title="Dibatalkan"
+          value={countCancelled}
+          icon={XCircle}
+          badge="Void"
+          badgeVariant="danger"
+        />
       </div>
 
       {/* Filters */}
@@ -372,7 +378,7 @@ export default function StockTransfersPage() {
         />
       ) : (
         <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
+          <div className="neo-table overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-border text-slate-700 font-bold">
                 <tr>

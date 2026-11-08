@@ -14,6 +14,7 @@ import { ChartFrame } from "@/components/dashboard/chart-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import type { TopProductData } from "@/types";
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
 
 interface TopProductsChartProps {
   data: TopProductData[];
@@ -65,18 +66,12 @@ export function TopProductsChart({
                   }
                 />
                 <Tooltip
-                  contentStyle={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "0.75rem",
-                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-                    fontWeight: 600,
-                    backgroundColor: "#FFFFFF",
-                  }}
-                  formatter={(value, name) => [
-                    name === "revenue"
-                      ? formatCurrency(Number(value ?? 0))
-                      : `${Number(value ?? 0)} unit`,
-                    name === "revenue" ? "Revenue" : "Qty",
+                  contentStyle={KADAI_CHART_THEME.tooltipStyle}
+                  formatter={(value: any, name: any) => [
+                    name === "totalRevenue"
+                      ? formatCurrency(Number(value) || 0)
+                      : `${Number(value) || 0} unit`,
+                    name === "totalRevenue" ? "Pendapatan" : "Terjual",
                   ]}
                 />
                 <Bar

@@ -13,6 +13,7 @@ import { ChartFrame } from "@/components/dashboard/chart-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import type { CategorySalesData } from "@/types";
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
 
 interface CategoryChartProps {
   data: CategorySalesData[];
@@ -55,13 +56,7 @@ export function CategoryChart({
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "0.75rem",
-                    boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-                    fontWeight: 600,
-                    backgroundColor: "#FFFFFF",
-                  }}
+                  contentStyle={KADAI_CHART_THEME.tooltipStyle}
                   formatter={(value) => [
                     formatCurrency(Number(value ?? 0)),
                     "Penjualan",

@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -204,13 +205,7 @@ function BreakdownChartCard({
                       />
                       <Tooltip
                         cursor={{ fill: "rgba(234, 88, 12, 0.04)" }}
-                        contentStyle={{
-                          border: "1px solid #E2E8F0",
-                          borderRadius: "0.75rem",
-                          boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-                          fontWeight: 600,
-                          backgroundColor: "#FFFFFF",
-                        }}
+                        contentStyle={KADAI_CHART_THEME.tooltipStyle}
                         formatter={(value) => [
                           formatCurrency(Number(value ?? 0)),
                           "Nominal",

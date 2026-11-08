@@ -42,13 +42,9 @@ import {
   Legend,
 } from "recharts";
 
-const tooltipStyle = {
-  border: "1px solid #E2E8F0",
-  borderRadius: "0.75rem",
-  boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
-  fontWeight: 600,
-  backgroundColor: "#FFFFFF",
-};
+import { KADAI_CHART_THEME } from "@/lib/chart-theme";
+
+const tooltipStyle = KADAI_CHART_THEME.tooltipStyle;
 
 interface ReportData {
   meta: {

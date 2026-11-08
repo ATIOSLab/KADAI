@@ -205,7 +205,7 @@ export default function CustomersPage() {
 
       {/* Table / List */}
       <Card className="border border-border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="neo-table overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50 border-b border-border text-slate-600 font-bold uppercase tracking-wider">
               <tr>

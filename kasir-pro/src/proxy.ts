@@ -50,6 +50,7 @@ const serverToServerApis = [
   "/api/telegram/webhook",
   "/api/admin/seed-demo",
   "/api/cron/billing-referral",
+  "/api/cron/daily-summary",
   "/api/webhooks/payment/midtrans",
   "/api/webhooks/payment/xendit",
 ];

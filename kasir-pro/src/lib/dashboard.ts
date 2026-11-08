@@ -26,10 +26,10 @@ const PAYMENT_LABELS: Record<PaymentType, string> = {
 };
 
 const PAYMENT_COLORS: Record<PaymentType, string> = {
-  CASH: "#2D6A4F",
-  BANK_TRANSFER: "#004E89",
-  QRIS: "#FF6B35",
-  E_WALLET: "#7209B7",
+  CASH: "#020617",         // Slate
+  QRIS: "#EA580C",         // Ember
+  BANK_TRANSFER: "#F59E0B",// Amber
+  E_WALLET: "#FB923C",     // Glow
 };
 
 function toDayLabel(date: Date) {
@@ -204,7 +204,7 @@ export async function getDashboardOverview(
       const currentCategory = categorySalesMap.get(categoryName) ?? {
         name: categoryName,
         value: 0,
-        color: item.product.category.color ?? "#FFB703",
+        color: item.product.category.color ?? "#EA580C",
       };
       currentCategory.value += Number(item.totalPrice);
       categorySalesMap.set(categoryName, currentCategory);

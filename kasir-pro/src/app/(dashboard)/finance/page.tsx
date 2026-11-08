@@ -84,8 +84,8 @@ const DIRECTION_LABELS: Record<FinanceDirection, string> = {
 };
 
 const BREAKDOWN_COLORS: Record<FinanceDirection, string> = {
-  IN: "#2D6A4F",
-  OUT: "#D62828",
+  IN: "#10B981",
+  OUT: "#EF4444",
 };
 
 function getCurrentMonthRange() {
@@ -181,14 +181,15 @@ function BreakdownChartCard({
                     >
                       <CartesianGrid
                         horizontal={false}
-                        stroke="#E5E5E5"
+                        stroke="#E2E8F0"
                         strokeDasharray="3 3"
+                        strokeWidth={1}
                       />
                       <XAxis
                         type="number"
-                        stroke="#1A1A1A"
-                        strokeWidth={1.5}
-                        tick={{ fontSize: 11, fontWeight: 700 }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
                         tickFormatter={(value) =>
                           formatCompactCurrency(Number(value))
                         }
@@ -197,17 +198,18 @@ function BreakdownChartCard({
                         type="category"
                         dataKey="label"
                         width={170}
-                        stroke="#1A1A1A"
-                        strokeWidth={1.5}
-                        tick={{ fontSize: 11, fontWeight: 700 }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#334155" }}
                       />
                       <Tooltip
-                        cursor={{ fill: "rgba(255, 248, 220, 0.7)" }}
+                        cursor={{ fill: "rgba(234, 88, 12, 0.04)" }}
                         contentStyle={{
-                          border: "2.5px solid #1A1A1A",
+                          border: "1px solid #E2E8F0",
                           borderRadius: "0.75rem",
-                          boxShadow: "4px 4px 0px #1A1A1A",
-                          fontWeight: 700,
+                          boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+                          fontWeight: 600,
+                          backgroundColor: "#FFFFFF",
                         }}
                         formatter={(value) => [
                           formatCurrency(Number(value ?? 0)),
@@ -224,9 +226,7 @@ function BreakdownChartCard({
                       />
                       <Bar
                         dataKey="amount"
-                        radius={[0, 10, 10, 0]}
-                        stroke="#1A1A1A"
-                        strokeWidth={2}
+                        radius={[0, 6, 6, 0]}
                       >
                         {data.map((entry) => (
                           <Cell key={entry.id} fill={entry.fill} />
@@ -636,7 +636,8 @@ export default function FinancePage() {
   return (
     <div className="space-y-6 animate-slide-up">
       <PageHeader
-        title="Laporan Keuangan"
+        title="Buku Kas & Keuangan"
+        eyebrow="Finansial & Akuntansi"
         description="Ledger arus kas bisnis dari modal, penjualan, restock, dan biaya operasional"
         icon={CircleDollarSign}
       >

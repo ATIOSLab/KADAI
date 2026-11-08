@@ -87,10 +87,10 @@ const PAYMENT_LABELS: Record<PaymentType, string> = {
 };
 
 const PAYMENT_COLORS: Record<PaymentType, string> = {
-  CASH: "#2D6A4F",
-  BANK_TRANSFER: "#004E89",
-  QRIS: "#FF6B35",
-  E_WALLET: "#7209B7",
+  CASH: "#020617",         // Slate
+  QRIS: "#EA580C",         // Ember
+  BANK_TRANSFER: "#F59E0B",// Amber
+  E_WALLET: "#FB923C",     // Glow
 };
 
 function formatRangeStart(dateValue: Date, timezone: string) {
@@ -400,7 +400,7 @@ export async function getReportSnapshot(params: {
       const currentCategory = categoryMap.get(category.id) ?? {
         name: category.name,
         value: 0,
-        color: category.color || "#888",
+        color: category.color || "#EA580C",
       };
       currentCategory.value += Number(item.totalPrice);
       categoryMap.set(category.id, currentCategory);

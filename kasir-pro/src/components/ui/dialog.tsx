@@ -34,13 +34,13 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 flex flex-col w-full max-w-lg translate-x-[-50%] translate-y-[-50%] p-0 neo-card animate-scale-in max-h-[90vh] md:max-h-[85vh] overflow-hidden bg-bg-main",
+        "fixed left-[50%] top-[50%] z-50 flex flex-col w-full max-w-lg translate-x-[-50%] translate-y-[-50%] p-0 rounded-2xl border border-border bg-card shadow-2xl animate-scale-in max-h-[90vh] md:max-h-[85vh] overflow-hidden",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 z-10 rounded-lg border border-slate-200 p-1.5 opacity-70 hover:opacity-100 hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-900">
+      <DialogPrimitive.Close className="absolute right-4 top-4 z-10 rounded-lg border border-border p-1.5 opacity-70 hover:opacity-100 hover:bg-muted transition-all text-muted-foreground hover:text-foreground">
         <X className="h-4 w-4" />
         <span className="sr-only">Tutup</span>
       </DialogPrimitive.Close>
@@ -54,7 +54,7 @@ const DialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("flex flex-col space-y-1.5 text-left p-6 pb-4 border-b-2 border-black flex-shrink-0 bg-bg-card", className)}
+    className={cn("flex flex-col space-y-1.5 text-left p-6 pb-4 border-b border-border flex-shrink-0 bg-card", className)}
     {...props}
   />
 );
@@ -66,7 +66,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 p-6 pt-4 border-t-2 border-black flex-shrink-0 bg-bg-card",
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 p-6 pt-4 border-t border-border flex-shrink-0 bg-muted/30",
       className
     )}
     {...props}

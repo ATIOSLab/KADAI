@@ -15,6 +15,13 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { paginateItems } from "@/lib/pagination";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { Warehouse, Search, AlertTriangle, Plus, Package, Clock } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 
 interface InventoryItem {
@@ -43,8 +50,22 @@ export default function InventoryPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showLowOnly, setShowLowOnly] = useState(false);
   const [showExpiringOnly, setShowExpiringOnly] = useState(false);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const res = await apiFetch<{ data: { id: string; name: string }[] }>("/api/categories");
+        setCategories(res.data);
+      } catch {
+        // Fallback silently if categories fail to load
+      }
+    }
+    void loadCategories();
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -66,6 +87,7 @@ export default function InventoryPage() {
       try {
         const params = new URLSearchParams();
         if (debouncedSearch) params.set("search", debouncedSearch);
+        if (categoryFilter !== "ALL") params.set("categoryId", categoryFilter);
         if (showLowOnly) params.set("lowStock", "true");
         if (showExpiringOnly) params.set("expiring", "true");
 
@@ -94,7 +116,7 @@ export default function InventoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearch, showLowOnly, showExpiringOnly]);
+  }, [debouncedSearch, categoryFilter, showLowOnly, showExpiringOnly]);
 
   const paginatedInventory = useMemo(
     () => paginateItems(inventory, page, pageSize),
@@ -121,8 +143,9 @@ export default function InventoryPage() {
   return (
     <div className="space-y-6 animate-slide-up pb-24 lg:pb-8">
       <PageHeader
-        title="Inventori"
-        description="Overview stok & radar kadaluwarsa semua produk"
+        title="Persediaan"
+        eyebrow="Katalog & Rantai Pasok"
+        description="Pelacakan stok multi-batch (FIFO), nilai valuasi persediaan, dan deteksi kadaluwarsa"
         icon={Warehouse}
       >
         {canManageInventory && (
@@ -212,9 +235,9 @@ export default function InventoryPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[180px] sm:min-w-[220px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-muted" />
+      <div className="flex flex-wrap items-center gap-2.5">
+        <div className="relative flex-1 min-w-[180px] sm:min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
           <Input
             placeholder="Cari nama produk, SKU..."
             value={search}
@@ -222,6 +245,29 @@ export default function InventoryPage() {
             className="pl-9 sm:pl-10 text-xs sm:text-sm h-9 sm:h-10"
           />
         </div>
+
+        <div className="w-[160px]">
+          <Select
+            value={categoryFilter}
+            onValueChange={(val) => {
+              setCategoryFilter(val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-9 sm:h-10 text-xs">
+              <SelectValue placeholder="Semua Kategori" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Kategori</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Button
           size="sm"
           variant={showLowOnly ? "danger" : "outline"}
@@ -230,6 +276,7 @@ export default function InventoryPage() {
             setShowExpiringOnly(false);
             setPage(1);
           }}
+          className="h-9 sm:h-10 text-xs"
         >
           <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Low Stock
         </Button>
@@ -241,6 +288,7 @@ export default function InventoryPage() {
             setShowLowOnly(false);
             setPage(1);
           }}
+          className="h-9 sm:h-10 text-xs"
         >
           <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Mendekati Expired
         </Button>

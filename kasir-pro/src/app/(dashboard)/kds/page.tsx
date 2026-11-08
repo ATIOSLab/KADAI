@@ -180,7 +180,7 @@ export default function KDSPage() {
         key={ord.id}
         className={`flex flex-col justify-between overflow-hidden transition-all border rounded-2xl ${
           cockpitMode
-            ? "bg-[#161A18]/90 border-white/10 hover:border-white/20 text-slate-100 shadow-xl"
+            ? "bg-slate-900/90 border-white/10 hover:border-white/20 text-slate-100 shadow-xl"
             : "bg-white border-slate-200 shadow-sm"
         }`}
       >
@@ -303,7 +303,7 @@ export default function KDSPage() {
   return (
     <div
       className={`min-h-[calc(100vh-6rem)] p-4 sm:p-6 rounded-3xl transition-colors space-y-6 ${
-        cockpitMode ? "bg-[#0F1311] text-slate-100" : "bg-slate-50 text-slate-900"
+        cockpitMode ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
       }`}
     >
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-white/5">
@@ -462,7 +462,7 @@ export default function KDSPage() {
         <div
           className={`p-3.5 rounded-2xl border transition-all ${
             cockpitMode
-              ? "bg-[#161A18]/80 border-white/5 text-slate-100 shadow-md"
+              ? "bg-slate-900/80 border-white/5 text-slate-100 shadow-md"
               : "bg-white border-slate-200 text-slate-900 shadow-xs"
           }`}
         >
@@ -480,7 +480,7 @@ export default function KDSPage() {
         <div
           className={`p-3.5 rounded-2xl border transition-all ${
             cockpitMode
-              ? "bg-[#161A18]/80 border-white/5 text-slate-100 shadow-md"
+              ? "bg-slate-900/80 border-white/5 text-slate-100 shadow-md"
               : "bg-white border-slate-200 text-slate-900 shadow-xs"
           }`}
         >
@@ -500,7 +500,7 @@ export default function KDSPage() {
         <div
           className={`p-3.5 rounded-2xl border transition-all ${
             cockpitMode
-              ? "bg-[#161A18]/80 border-white/5 text-slate-100 shadow-md"
+              ? "bg-slate-900/80 border-white/5 text-slate-100 shadow-md"
               : "bg-white border-slate-200 text-slate-900 shadow-xs"
           }`}
         >
@@ -520,7 +520,7 @@ export default function KDSPage() {
         <div
           className={`p-3.5 rounded-2xl border transition-all ${
             cockpitMode
-              ? "bg-[#161A18]/80 border-white/5 text-slate-100 shadow-md"
+              ? "bg-slate-900/80 border-white/5 text-slate-100 shadow-md"
               : "bg-white border-slate-200 text-slate-900 shadow-xs"
           }`}
         >
@@ -563,7 +563,7 @@ export default function KDSPage() {
         <Card
           className={`border p-16 text-center rounded-3xl ${
             cockpitMode
-              ? "bg-[#161A18]/80 border-white/10 text-slate-100 shadow-xl"
+              ? "bg-slate-900/80 border-white/10 text-slate-100 shadow-xl"
               : "bg-white border-slate-200 shadow-xs"
           }`}
         >

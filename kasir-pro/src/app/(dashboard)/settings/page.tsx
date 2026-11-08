@@ -794,7 +794,7 @@ export default function SettingsPage() {
                       }`}
                     >
                       <span
-                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-[2px_2px_0px_#1A1A1A] transition-all ${
+                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-sm transition-all ${
                           botForm.enabled ? "left-9" : "left-1"
                         }`}
                       />
@@ -829,7 +829,7 @@ export default function SettingsPage() {
                       }`}
                     >
                       <span
-                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-[2px_2px_0px_#1A1A1A] transition-all ${
+                        className={`absolute top-1 flex h-5 w-5 rounded-full bg-white shadow-sm transition-all ${
                           botForm.summaryEnabled ? "left-9" : "left-1"
                         }`}
                       />
@@ -1115,7 +1115,7 @@ export default function SettingsPage() {
                             }`}
                           >
                             <span
-                              className={`absolute top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-[2px_2px_0px_#1A1A1A] transition-all ${
+                              className={`absolute top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm transition-all ${
                                 user.isActive ? "left-9" : "left-1"
                               }`}
                             >

@@ -4,6 +4,7 @@ import { LucideIcon } from "lucide-react";
 interface PageHeaderProps {
   title: string;
   description?: string;
+  eyebrow?: string;
   icon?: LucideIcon;
   children?: React.ReactNode;
   className?: string;
@@ -12,6 +13,7 @@ interface PageHeaderProps {
 export function PageHeader({
   title,
   description,
+  eyebrow,
   icon: Icon,
   children,
   className,
@@ -25,14 +27,16 @@ export function PageHeader({
     >
       <div className="flex items-center gap-3">
         {Icon && (
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-black/10 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
-            <Icon className="h-5 w-5 text-accent-primary" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-card shadow-xs">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
         )}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-muted">
-            Workspace
-          </p>
+          {eyebrow && (
+            <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {eyebrow}
+            </p>
+          )}
           <h1
             className="text-2xl font-bold tracking-tight lg:text-3xl text-slate-950 dark:text-white"
             style={{ fontFamily: "var(--font-heading)" }}

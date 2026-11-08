@@ -88,7 +88,7 @@ export function SummaryCards({ data, loading = false }: SummaryCardsProps) {
         return (
           <div
             key={index}
-            className="rounded-2xl p-4 transition-all duration-200 border bg-white dark:bg-[#161A18]/80 border-slate-200/90 dark:border-white/10 shadow-xs hover:shadow-md hover:border-primary/40 group flex flex-col justify-between space-y-3"
+            className="rounded-2xl p-4 transition-all duration-200 border bg-card border-border shadow-xs hover:shadow-md hover:border-primary/40 group flex flex-col justify-between space-y-3"
           >
             <div className="flex items-center justify-between">
               <span className={cn("size-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105", item.color)}>

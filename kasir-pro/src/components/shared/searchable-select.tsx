@@ -107,7 +107,7 @@ export function SearchableSelect({
         <Popover.Content
           align="start"
           sideOffset={6}
-          className="z-50 w-[var(--radix-popover-trigger-width)] rounded-2xl border border-black bg-bg-card p-0 shadow-[4px_4px_0px_#1A1A1A] outline-none animate-scale-in"
+          className="z-50 w-[var(--radix-popover-trigger-width)] rounded-xl border border-border bg-card p-0 shadow-xl outline-none animate-scale-in overflow-hidden"
         >
           <div className="border-b border-border-default p-2">
             <div className="relative">

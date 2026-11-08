@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { bottomTabs, isActivePath } from "@/components/layout/navigation";
+import { getBottomTabsForRole, isActivePath } from "@/components/layout/navigation";
 import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/session";
 
@@ -18,10 +18,7 @@ export function BottomTab({ currentUser }: BottomTabProps) {
     return null;
   }
 
-  const visibleTabs = bottomTabs.filter(
-    (tab) =>
-      !tab.roles || (currentUser ? tab.roles.includes(currentUser.role) : false)
-  );
+  const visibleTabs = getBottomTabsForRole(currentUser?.role);
 
   if (visibleTabs.length === 0) {
     return null;
@@ -29,7 +26,7 @@ export function BottomTab({ currentUser }: BottomTabProps) {
 
   return (
     <nav className="fixed inset-x-4 bottom-4 z-50 lg:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="rounded-[30px] border border-black/10 bg-white/88 p-2 shadow-[0_24px_48px_rgba(15,23,42,0.12)] backdrop-blur-xl">
+      <div className="rounded-[28px] border border-border/80 bg-card/95 p-2 shadow-2xl backdrop-blur-xl">
         <div
           className="grid items-center gap-1"
           style={{
@@ -47,10 +44,22 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                   href={tab.href}
                   className="flex flex-col items-center gap-1 py-1"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-primary to-accent-orange text-white shadow-[0_14px_28px_rgba(251,133,0,0.28)]">
+                  <div
+                    className={cn(
+                      "flex h-11 w-11 items-center justify-center rounded-2xl transition-all",
+                      isActive
+                        ? "bg-primary text-white shadow-md shadow-primary/25 ring-2 ring-primary/20 scale-105"
+                        : "bg-primary/90 text-white shadow-xs hover:bg-primary"
+                    )}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <span className="text-[10px] font-bold text-accent-primary">
+                  <span
+                    className={cn(
+                      "text-[10px]",
+                      isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
+                    )}
+                  >
                     {tab.shortLabel}
                   </span>
                 </Link>
@@ -64,12 +73,12 @@ export function BottomTab({ currentUser }: BottomTabProps) {
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-2xl px-2 py-2 transition-colors",
                   isActive
-                    ? "bg-accent-primary/10 text-accent-primary"
-                    : "text-text-muted"
+                    ? "bg-primary/10 text-primary font-bold"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 <Icon className="h-[18px] w-[18px]" />
-                <span className="text-[10px] font-bold">{tab.shortLabel}</span>
+                <span className="text-[10px] font-semibold">{tab.shortLabel}</span>
               </Link>
             );
           })}

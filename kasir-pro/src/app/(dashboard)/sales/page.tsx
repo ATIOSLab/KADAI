@@ -17,7 +17,17 @@ import {
   Receipt,
   Search,
   Eye,
+  Download,
+  Calendar,
+  Filter,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 
 const paymentLabels: Record<string, string> = {
@@ -50,6 +60,8 @@ export default function SalesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState("ALL");
+  const [dateFilter, setDateFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [pagination, setPagination] = useState({
@@ -78,6 +90,25 @@ export default function SalesPage() {
       try {
         const params = new URLSearchParams();
         if (debouncedSearch) params.set("search", debouncedSearch);
+        if (paymentFilter !== "ALL") params.set("paymentType", paymentFilter);
+
+        if (dateFilter !== "ALL") {
+          const now = new Date();
+          const todayStr = now.toISOString().slice(0, 10);
+          if (dateFilter === "TODAY") {
+            params.set("startDate", todayStr);
+            params.set("endDate", todayStr);
+          } else if (dateFilter === "WEEK") {
+            const past7 = new Date(now.getTime() - 7 * 86400000);
+            params.set("startDate", past7.toISOString().slice(0, 10));
+            params.set("endDate", todayStr);
+          } else if (dateFilter === "MONTH") {
+            const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            params.set("startDate", startMonth.toISOString().slice(0, 10));
+            params.set("endDate", todayStr);
+          }
+        }
+
         params.set("page", String(page));
         params.set("limit", String(pageSize));
 
@@ -107,28 +138,108 @@ export default function SalesPage() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearch, page, pageSize]);
+  }, [debouncedSearch, paymentFilter, dateFilter, page, pageSize]);
+
+  const handleExportCSV = () => {
+    if (sales.length === 0) {
+      toast.error("Tidak ada data transaksi untuk diekspor");
+      return;
+    }
+    const headers = ["Invoice", "Pelanggan", "Kasir", "Total", "Metode", "Status", "Waktu"];
+    const rows = sales.map((s) => [
+      s.invoiceNumber,
+      `"${s.customerName || "-"}"`,
+      `"${s.cashier?.name || "-"}"`,
+      s.totalAmount,
+      paymentLabels[s.paymentType] || s.paymentType,
+      s.isVoided ? "Batal (Void)" : "Berhasil",
+      `"${new Date(s.createdAt).toLocaleString("id-ID")}"`,
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `kadai-sales-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("File CSV transaksi berhasil diunduh");
+  };
 
   return (
     <div className="space-y-6 animate-slide-up">
       <PageHeader
         title="Penjualan"
+        eyebrow="Operasional & Transaksi"
         description={
           user?.role === "CASHIER"
             ? "Riwayat transaksi Anda"
             : "Riwayat semua transaksi"
         }
         icon={Receipt}
-      />
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportCSV}
+          className="gap-1.5 shadow-2xs font-semibold"
+        >
+          <Download className="w-4 h-4 text-muted-foreground" />
+          Ekspor CSV
+        </Button>
+      </PageHeader>
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-        <Input
-          placeholder="Cari invoice atau pelanggan..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10"
-        />
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari invoice atau pelanggan..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-10"
+          />
+        </div>
+
+        <div className="w-[170px]">
+          <Select
+            value={paymentFilter}
+            onValueChange={(val) => {
+              setPaymentFilter(val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-10 text-xs">
+              <SelectValue placeholder="Metode Pembayaran" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Metode</SelectItem>
+              <SelectItem value="CASH">Tunai (Cash)</SelectItem>
+              <SelectItem value="QRIS">QRIS</SelectItem>
+              <SelectItem value="BANK_TRANSFER">Transfer Bank</SelectItem>
+              <SelectItem value="E_WALLET">E-Wallet</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="w-[160px]">
+          <Select
+            value={dateFilter}
+            onValueChange={(val) => {
+              setDateFilter(val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-10 text-xs">
+              <SelectValue placeholder="Rentang Tanggal" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Periode</SelectItem>
+              <SelectItem value="TODAY">Hari Ini</SelectItem>
+              <SelectItem value="WEEK">7 Hari Terakhir</SelectItem>
+              <SelectItem value="MONTH">Bulan Ini</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Card>

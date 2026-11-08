@@ -154,12 +154,12 @@ export function NotificationMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="relative inline-flex size-10 items-center justify-center rounded-2xl border border-transparent bg-transparent text-text-primary transition-colors hover:border-border-default/15 hover:bg-bg-card/80"
+          className="relative inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted"
           aria-label="Buka notifikasi"
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="h-4 w-4" />
           {unreadCount > 0 ? (
-            <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-5 items-center justify-center rounded-full bg-text-primary px-1 text-[10px] font-bold leading-5 text-white">
+            <span className="absolute -right-1 -top-1 inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white shadow-xs">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           ) : null}

@@ -217,8 +217,32 @@ export const bottomTabs = [
   navigationSections[0].items[1], // POS
   navigationSections[1].items[0], // Produk
   navigationSections[3].items[0], // Penjualan
-  navigationSections[4].items[2], // Settings
+  navigationSections[3].items[1], // Laporan
 ];
+
+export function getBottomTabsForRole(role?: AppRole) {
+  switch (role) {
+    case "INVENTORY":
+      return [
+        navigationSections[1].items[0], // Produk
+        navigationSections[1].items[1], // Persediaan
+        navigationSections[1].items[2], // Transfer
+        navigationSections[1].items[3], // Pemasok
+      ];
+    case "ACCOUNTANT":
+      return [
+        navigationSections[3].items[0], // Penjualan
+        navigationSections[3].items[1], // Laporan
+        navigationSections[3].items[2], // Keuangan
+        navigationSections[3].items[3], // Pajak
+      ];
+    case "CASHIER":
+    case "KITCHEN":
+      return [];
+    default:
+      return bottomTabs;
+  }
+}
 
 const pageMetaMap: Record<string, PageMeta> = {
   "/dashboard": {

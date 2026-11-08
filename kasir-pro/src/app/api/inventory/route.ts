@@ -7,12 +7,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
+    const categoryId = searchParams.get("categoryId");
     const lowStockOnly = searchParams.get("lowStock") === "true";
     const expiringOnly = searchParams.get("expiring") === "true";
 
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
+        ...(categoryId && { categoryId }),
         ...(search && {
           OR: [
             { name: { contains: search, mode: "insensitive" } },

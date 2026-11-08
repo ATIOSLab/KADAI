@@ -151,8 +151,9 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6 animate-slide-up">
       <PageHeader
-        title="Produk"
-        description="Kelola semua produk toko Anda"
+        title="Katalog Produk & Resep"
+        eyebrow="Katalog & Rantai Pasok"
+        description="Kelola katalog produk, varian, dan resep Bill of Materials (BOM)"
         icon={Package}
       >
         <Button asChild>

@@ -43,10 +43,11 @@ import {
 } from "recharts";
 
 const tooltipStyle = {
-  border: "2.5px solid #1A1A1A",
+  border: "1px solid #E2E8F0",
   borderRadius: "0.75rem",
-  boxShadow: "4px 4px 0px #1A1A1A",
-  fontWeight: 700,
+  boxShadow: "0 10px 25px -5px rgba(2, 6, 23, 0.08)",
+  fontWeight: 600,
+  backgroundColor: "#FFFFFF",
 };
 
 interface ReportData {
@@ -187,8 +188,9 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 animate-slide-up">
       <PageHeader
-        title="Laporan"
-        description="Analisis penjualan & profitabilitas"
+        title="Laporan Bisnis & Analisis"
+        eyebrow="Finansial & Akuntansi"
+        description="Analisis performa penjualan, margin profitabilitas, dan pola transaksi usaha"
         icon={BarChart3}
       />
 
@@ -330,49 +332,49 @@ export default function ReportsPage() {
                   <AreaChart data={report.revenueTrend}>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="#E5E5E5"
-                      strokeWidth={1.5}
+                      stroke="#E2E8F0"
+                      strokeWidth={1}
                     />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: 12, fontWeight: 700 }}
-                      stroke="#1A1A1A"
-                      strokeWidth={2}
+                      tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                      stroke="#CBD5E1"
+                      strokeWidth={1}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fontWeight: 600 }}
-                      stroke="#1A1A1A"
-                      strokeWidth={2}
+                      tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                      stroke="#CBD5E1"
+                      strokeWidth={1}
                       tickFormatter={(value) => `${(value / 1000000).toFixed(1)}jt`}
                     />
                     <Tooltip
                       contentStyle={tooltipStyle}
                       formatter={(value) => [formatCurrency(Number(value ?? 0))]}
                     />
-                    <Legend wrapperStyle={{ fontSize: 12, fontWeight: 700 }} />
+                    <Legend wrapperStyle={{ fontSize: 12, fontWeight: 600 }} />
                     <Area
                       type="monotone"
                       dataKey="revenue"
                       name="Revenue"
-                      stroke="#FF6B35"
-                      strokeWidth={3}
-                      fill="#FF6B3520"
+                      stroke="#EA580C"
+                      strokeWidth={2.5}
+                      fill="#EA580C20"
                     />
                     <Area
                       type="monotone"
                       dataKey="hpp"
                       name="HPP"
-                      stroke="#D62828"
+                      stroke="#94A3B8"
                       strokeWidth={2}
-                      fill="#D6282810"
+                      fill="#94A3B815"
                     />
                     <Area
                       type="monotone"
                       dataKey="profit"
                       name="Profit"
-                      stroke="#2D6A4F"
+                      stroke="#FB923C"
                       strokeWidth={2}
-                      fill="#2D6A4F10"
+                      fill="#FB923C20"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -440,15 +442,15 @@ export default function ReportsPage() {
                     >
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="#E5E5E5"
-                        strokeWidth={1.5}
+                        stroke="#E2E8F0"
+                        strokeWidth={1}
                         horizontal={false}
                       />
                       <XAxis
                         type="number"
-                        tick={{ fontSize: 11, fontWeight: 600 }}
-                        stroke="#1A1A1A"
-                        strokeWidth={2}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
                         tickFormatter={(value) =>
                           `${(Number(value ?? 0) / 1000000).toFixed(1)}jt`
                         }
@@ -456,9 +458,9 @@ export default function ReportsPage() {
                       <YAxis
                         dataKey="name"
                         type="category"
-                        tick={{ fontSize: 11, fontWeight: 700 }}
-                        stroke="#1A1A1A"
-                        strokeWidth={2}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#334155" }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
                         width={150}
                         tickFormatter={(value: string) =>
                           value.length > 22 ? `${value.slice(0, 22)}...` : value
@@ -470,10 +472,8 @@ export default function ReportsPage() {
                       />
                       <Bar
                         dataKey="revenue"
-                        fill="#004E89"
+                        fill="#EA580C"
                         radius={[0, 6, 6, 0]}
-                        stroke="#1A1A1A"
-                        strokeWidth={1.5}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -503,8 +503,8 @@ export default function ReportsPage() {
                         outerRadius={100}
                         paddingAngle={3}
                         dataKey="value"
-                        stroke="#1A1A1A"
-                        strokeWidth={2.5}
+                        stroke="#FFFFFF"
+                        strokeWidth={2}
                       >
                         {report.paymentDistribution.map((entry, index) => (
                           <Cell key={index} fill={entry.color} />
@@ -515,7 +515,7 @@ export default function ReportsPage() {
                         formatter={(value) => [formatCurrency(Number(value ?? 0))]}
                       />
                       <Legend
-                        wrapperStyle={{ fontSize: 12, fontWeight: 700 }}
+                        wrapperStyle={{ fontSize: 12, fontWeight: 600 }}
                         iconType="circle"
                       />
                     </PieChart>
@@ -538,19 +538,19 @@ export default function ReportsPage() {
                     <BarChart data={report.hourlyDistribution}>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="#E5E5E5"
-                        strokeWidth={1.5}
+                        stroke="#E2E8F0"
+                        strokeWidth={1}
                       />
                       <XAxis
                         dataKey="hour"
-                        tick={{ fontSize: 10, fontWeight: 600 }}
-                        stroke="#1A1A1A"
-                        strokeWidth={2}
+                        tick={{ fontSize: 10, fontWeight: 600, fill: "#64748B" }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fontWeight: 600 }}
-                        stroke="#1A1A1A"
-                        strokeWidth={2}
+                        tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
+                        stroke="#CBD5E1"
+                        strokeWidth={1}
                         allowDecimals={false}
                       />
                       <Tooltip
@@ -559,10 +559,8 @@ export default function ReportsPage() {
                       />
                       <Bar
                         dataKey="transactions"
-                        fill="#FF6B35"
-                        radius={[6, 6, 0, 0]}
-                        stroke="#1A1A1A"
-                        strokeWidth={1.5}
+                        fill="#020617"
+                        radius={[4, 4, 0, 0]}
                       />
                     </BarChart>
                   </ResponsiveContainer>

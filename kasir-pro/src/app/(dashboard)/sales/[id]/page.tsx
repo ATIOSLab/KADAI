@@ -68,6 +68,8 @@ interface SaleDetail {
   voidedAt: string | null;
   createdAt: string;
   cashier: { id: string; name: string; email: string; role: string } | null;
+  outlet?: { id: string; name: string; address?: string | null; phone?: string | null } | null;
+  table?: { tableNo: string } | null;
   items: SaleItemDetail[];
 }
 
@@ -466,6 +468,11 @@ export default function SaleDetailPage({
           </DialogHeader>
           <div className="py-2 max-h-[65vh] overflow-y-auto neo-scrollbar">
             <ThermalReceipt
+              storeName="KADAI"
+              outletName={sale.outlet?.name || "KADAI"}
+              outletAddress={sale.outlet?.address || null}
+              outletPhone={sale.outlet?.phone || null}
+              tableNo={sale.table?.tableNo || null}
               invoiceNumber={sale.invoiceNumber}
               createdAt={sale.createdAt}
               cashierName={sale.cashier?.name}
@@ -503,6 +510,11 @@ export default function SaleDetailPage({
 
       {/* Hidden Isolated Thermal Print Engine */}
       <ThermalReceipt
+        storeName="KADAI"
+        outletName={sale.outlet?.name || "KADAI"}
+        outletAddress={sale.outlet?.address || null}
+        outletPhone={sale.outlet?.phone || null}
+        tableNo={sale.table?.tableNo || null}
         invoiceNumber={sale.invoiceNumber}
         createdAt={sale.createdAt}
         cashierName={sale.cashier?.name}

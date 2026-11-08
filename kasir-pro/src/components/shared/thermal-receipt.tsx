@@ -81,19 +81,24 @@ export function ThermalReceipt({
   };
 
   const renderContent = () => (
-    <div className="w-full text-black font-mono leading-relaxed select-text">
+    <div
+      className="w-full text-black leading-relaxed select-text tracking-tight"
+      style={{
+        fontFamily: "var(--font-mono), 'Geist Mono', Consolas, 'Liberation Mono', Menlo, 'Courier New', monospace",
+      }}
+    >
       {/* Header */}
-      <div className="text-center pb-2.5 border-b border-dashed border-black/50 space-y-1">
-        <h2 className="font-black text-sm sm:text-base tracking-wider uppercase">{storeName}</h2>
-        {outletName && <p className="font-bold text-xs sm:text-[13px] text-black">{outletName}</p>}
+      <div className="text-center pb-2.5 border-b border-dashed border-black/60 space-y-1">
+        <h2 className="font-black text-sm sm:text-base tracking-widest uppercase">{storeName}</h2>
+        {outletName && <p className="font-bold text-xs text-black">{outletName}</p>}
         {outletAddress && <p className="text-[11px] text-black/80 leading-tight max-w-[280px] mx-auto">{outletAddress}</p>}
         {outletPhone && <p className="text-[11px] text-black/80">Telp: {outletPhone}</p>}
       </div>
 
       {/* Meta Info */}
-      <div className="py-2.5 border-b border-dashed border-black/50 text-[11px] space-y-1">
+      <div className="py-2.5 border-b border-dashed border-black/60 text-[11px] space-y-1">
         <div className="flex justify-between items-center">
-          <span className="font-semibold text-black/80">No. Invoice</span>
+          <span className="text-black/80">No. Invoice</span>
           <span className="font-bold">{invoiceNumber}</span>
         </div>
         <div className="flex justify-between items-center">
@@ -117,7 +122,7 @@ export function ThermalReceipt({
       </div>
 
       {/* Item List */}
-      <div className="py-2.5 border-b border-dashed border-black/50 space-y-2">
+      <div className="py-2.5 border-b border-dashed border-black/60 space-y-2">
         {items.map((item, idx) => (
           <div key={idx} className="space-y-0.5 text-xs">
             <div className="font-bold text-black leading-tight">{item.name}</div>
@@ -135,7 +140,7 @@ export function ThermalReceipt({
       </div>
 
       {/* Totals */}
-      <div className="py-2.5 border-b border-dashed border-black/50 space-y-1 text-[11px]">
+      <div className="py-2.5 border-b border-dashed border-black/60 space-y-1 text-[11px]">
         <div className="flex justify-between items-center">
           <span className="text-black/80">Subtotal</span>
           <span className="font-semibold tabular-nums">{formatCurrency(subtotal)}</span>
@@ -171,7 +176,7 @@ export function ThermalReceipt({
       </div>
 
       {/* Payment details */}
-      <div className="py-2.5 border-b border-dashed border-black/50 space-y-1 text-[11px]">
+      <div className="py-2.5 border-b border-dashed border-black/60 space-y-1 text-[11px]">
         <div className="flex justify-between items-center">
           <span className="text-black/80">Metode Bayar</span>
           <span className="font-bold uppercase">{paymentLabels[paymentType] || paymentType}</span>
@@ -179,7 +184,7 @@ export function ThermalReceipt({
         {paymentRef && (
           <div className="flex justify-between items-center text-[10px]">
             <span className="text-black/75">Ref Transaksi</span>
-            <span className="font-mono">{paymentRef}</span>
+            <span>{paymentRef}</span>
           </div>
         )}
         {cashReceived !== undefined && cashReceived !== null && cashReceived > 0 && (

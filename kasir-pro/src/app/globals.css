@@ -39,15 +39,15 @@
   --color-border-light: #E2E8F0;
 
   --font-heading: 'Bahnschrift', var(--font-saira), 'Segoe UI', 'DIN Alternate', -apple-system, sans-serif;
-  --font-sans: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: var(--font-mono), 'Geist Mono', monospace;
+  --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), 'Geist Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   --font-wordmark: 'Bahnschrift', var(--font-saira), 'Segoe UI', 'DIN Alternate', -apple-system, sans-serif;
 }
 
 :root {
   --font-heading: 'Bahnschrift', var(--font-saira), 'Segoe UI', 'DIN Alternate', -apple-system, sans-serif;
-  --font-sans: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: var(--font-mono), 'Geist Mono', monospace;
+  --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), 'Geist Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   --font-wordmark: 'Bahnschrift', var(--font-saira), 'Segoe UI', 'DIN Alternate', -apple-system, sans-serif;
 }
 

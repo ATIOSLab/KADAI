@@ -27,6 +27,8 @@ export async function GET(
       where: { id },
       include: {
         cashier: { select: { id: true, name: true, email: true, role: true } },
+        outlet: { select: { id: true, name: true, address: true, phone: true } },
+        table: { select: { tableNo: true } },
         items: {
           include: {
             product: { select: { id: true, name: true, sku: true, unit: true } },

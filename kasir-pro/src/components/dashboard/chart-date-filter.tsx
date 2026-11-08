@@ -24,25 +24,25 @@ export function ChartDateRangeFilter({
   onEndDateChange,
 }: DateRangeFilterProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <div className="space-y-1">
-        <Label className="text-xs font-bold text-text-muted">Dari</Label>
+    <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5">
+        <span className="text-[11px] font-bold text-muted-foreground">Dari</span>
         <Input
           type="date"
           value={startDate}
           max={endDate}
           onChange={(event) => onStartDateChange(event.target.value)}
-          className="h-9 bg-white"
+          className="h-8 text-xs bg-card w-[135px]"
         />
       </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-bold text-text-muted">Sampai</Label>
+      <div className="flex items-center gap-1.5">
+        <span className="text-[11px] font-bold text-muted-foreground">Sampai</span>
         <Input
           type="date"
           value={endDate}
           min={startDate}
           onChange={(event) => onEndDateChange(event.target.value)}
-          className="h-9 bg-white"
+          className="h-8 text-xs bg-card w-[135px]"
         />
       </div>
     </div>
@@ -56,41 +56,16 @@ export function ChartWeekFilter({
   onAnchorDateChange,
 }: WeekRangeFilterProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <div className="space-y-1 sm:col-span-2">
-        <Label className="text-xs font-bold text-text-muted">
-          Pilih Tanggal Minggu
-        </Label>
-        <Input
-          type="date"
-          value={anchorDate}
-          onChange={(event) => onAnchorDateChange(event.target.value)}
-          className="h-9 bg-white"
-        />
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-bold text-text-muted">Dari</Label>
-        <Input
-          type="date"
-          value={startDate}
-          readOnly
-          disabled
-          className="h-9 bg-bg-main text-text-primary"
-        />
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs font-bold text-text-muted">Sampai</Label>
-        <Input
-          type="date"
-          value={endDate}
-          readOnly
-          disabled
-          className="h-9 bg-bg-main text-text-primary"
-        />
-      </div>
-      <p className="sm:col-span-2 text-xs font-medium text-text-muted">
-        Rentang otomatis mengikuti 1 minggu penuh, dari Senin sampai Minggu.
-      </p>
+    <div className="flex items-center gap-2 flex-wrap">
+      <Input
+        type="date"
+        value={anchorDate}
+        onChange={(event) => onAnchorDateChange(event.target.value)}
+        className="h-8 text-xs bg-card w-[140px]"
+      />
+      <span className="text-[11px] font-semibold text-muted-foreground whitespace-nowrap">
+        {startDate} s/d {endDate}
+      </span>
     </div>
   );
 }

@@ -43,13 +43,12 @@ export function PaymentChart({
                   data={data}
                   cx="50%"
                   cy="50%"
+                  innerRadius={60}
                   outerRadius={90}
+                  paddingAngle={3}
                   dataKey="value"
                   stroke="#FFFFFF"
                   strokeWidth={2}
-                  label={({ name, percent }) =>
-                    `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
-                  }
                 >
                   {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />

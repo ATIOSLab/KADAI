@@ -22,6 +22,20 @@ interface RevenueChartProps {
   loading?: boolean;
 }
 
+function formatAxisCurrency(value: number): string {
+  if (value >= 1_000_000_000) {
+    return `${(value / 1_000_000_000).toFixed(1)}M`;
+  }
+  if (value >= 1_000_000) {
+    const val = value / 1_000_000;
+    return `${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}jt`;
+  }
+  if (value >= 1_000) {
+    return `${Math.round(value / 1000)}rb`;
+  }
+  return String(value);
+}
+
 export function RevenueChart({
   data,
   description,
@@ -65,7 +79,7 @@ export function RevenueChart({
                   tick={{ fontSize: 11, fontWeight: 600, fill: "#64748B" }}
                   stroke="#CBD5E1"
                   strokeWidth={1}
-                  tickFormatter={(value) => `${(value / 1000000).toFixed(1)}jt`}
+                  tickFormatter={formatAxisCurrency}
                 />
                 <Tooltip
                   contentStyle={{

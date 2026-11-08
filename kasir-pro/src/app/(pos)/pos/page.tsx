@@ -1,20 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductSearch } from "@/components/pos/product-search";
 import { Cart } from "@/components/pos/cart";
 import { ShiftDialog } from "@/components/pos/shift-dialog";
-import { ShoppingCart, ArrowLeft, ShoppingBag, Calculator } from "lucide-react";
+import { PrinterSettingsDialog } from "@/components/pos/printer-settings-dialog";
+import { ShoppingCart, ArrowLeft, ShoppingBag, Calculator, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { useCart } from "@/hooks/use-cart";
 import { formatCurrency, cn } from "@/lib/utils";
+import { thermalPrinter, type PrinterConfig } from "@/lib/escpos/driver";
 
 export default function PosPage() {
   const { user } = useSessionUser();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isShiftOpen, setIsShiftOpen] = useState(false);
+  const [isPrinterOpen, setIsPrinterOpen] = useState(false);
+  const [printerConfig, setPrinterConfig] = useState<PrinterConfig>({
+    type: "none",
+    deviceName: null,
+    paperWidth: 58,
+    kickDrawer: false,
+  });
+
+  useEffect(() => {
+    setPrinterConfig(thermalPrinter.loadConfig());
+  }, []);
+
   const itemCount = useCart((state) => state.getItemCount());
   const grandTotal = useCart((state) => state.getGrandTotal());
 
@@ -48,6 +62,30 @@ export default function PosPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsPrinterOpen(true)}
+            className={`text-xs font-bold h-8 px-2.5 flex items-center gap-1.5 transition-all ${
+              printerConfig.type !== "none" && printerConfig.deviceName
+                ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                : "border-slate-300 text-slate-700 hover:bg-slate-50"
+            }`}
+            title="Pengaturan Printer Kasir ESC/POS"
+          >
+            <Printer className={`size-3.5 ${
+              printerConfig.type !== "none" && printerConfig.deviceName ? "text-emerald-600" : "text-slate-500"
+            }`} />
+            <span className="hidden sm:inline">
+              {printerConfig.type !== "none" && printerConfig.deviceName
+                ? `Printer: ${printerConfig.deviceName.slice(0, 12)}`
+                : "Printer"}
+            </span>
+            {printerConfig.type !== "none" && printerConfig.deviceName && (
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            )}
+          </Button>
+
           <Button
             size="sm"
             variant="outline"
@@ -106,6 +144,11 @@ export default function PosPage() {
       </div>
 
       <ShiftDialog open={isShiftOpen} onOpenChange={setIsShiftOpen} />
+      <PrinterSettingsDialog
+        open={isPrinterOpen}
+        onOpenChange={setIsPrinterOpen}
+        onConfigChange={setPrinterConfig}
+      />
     </div>
   );
 }

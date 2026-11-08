@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ThermalReceipt } from "@/components/shared/thermal-receipt";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
+import { thermalPrinter } from "@/lib/escpos/driver";
 
 const paymentMethods = [
   { id: "CASH", label: "Tunai", icon: Banknote, color: "bg-accent-success" },
@@ -175,7 +176,52 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     setCustomerResults([]);
     setCashAmount("");
     setNotes("");
+    setShowReceiptPreview(false);
     onOpenChange(false);
+  };
+
+  const handleDirectPrint = async () => {
+    if (!completedSale) return;
+    if (thermalPrinter.config.type !== "none") {
+      try {
+        toast.loading("Mencetak langsung ke printer ESC/POS...", { id: "print-thermal" });
+        await thermalPrinter.printReceipt({
+          storeName: "KADAI",
+          outletName: completedSale.outlet?.name || "KADAI",
+          outletAddress: completedSale.outlet?.address || null,
+          outletPhone: completedSale.outlet?.phone || null,
+          invoiceNumber: completedSale.invoiceNumber,
+          createdAt: completedSale.createdAt,
+          cashierName: completedSale.cashier?.name || null,
+          customerName: completedSale.customerName || null,
+          tableNo: completedSale.table?.tableNo || null,
+          orderType: completedSale.orderType,
+          paymentType: completedSale.paymentType,
+          paymentRef: completedSale.paymentRef || null,
+          items: (completedSale.items || []).map((i: any) => ({
+            name: i.product?.name || i.productName || "Item",
+            quantity: i.quantity,
+            unitPrice: Number(i.unitPrice),
+            totalPrice: Number(i.subtotal),
+            discountAmount: Number(i.discountAmount || 0),
+          })),
+          subtotal: Number(completedSale.subtotal),
+          discountAmount: Number(completedSale.discountAmount || 0),
+          serviceCharge: Number(completedSale.serviceCharge || 0),
+          taxAmount: Number(completedSale.taxAmount || 0),
+          roundingAmount: Number(completedSale.roundingAmount || 0),
+          totalAmount: Number(completedSale.totalAmount),
+          cashReceived: cashAmount ? Number(cashAmount) : null,
+          changeAmount: changeAmount > 0 ? changeAmount : null,
+        });
+        toast.success(`Struk berhasil dicetak ke ${thermalPrinter.config.deviceName || "Printer"}`, { id: "print-thermal" });
+        return;
+      } catch (err: any) {
+        toast.dismiss("print-thermal");
+        toast.error(`ESC/POS: ${err?.message || "Gagal mencetak"}. Membuka jendela cetak sistem...`);
+      }
+    }
+    window.print();
   };
 
   if (success) {
@@ -209,9 +255,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
             <div className="flex flex-col gap-2 pt-2">
               <Button
-                variant="outline"
-                className="w-full font-bold text-xs h-10"
-                onClick={() => window.print()}
+                className="w-full font-bold text-xs h-10 shadow-sm"
+                onClick={handleDirectPrint}
               >
                 <Printer className="size-4 mr-2" /> Cetak Struk Kasir (Thermal)
               </Button>
@@ -225,7 +270,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 {showReceiptPreview ? "Sembunyikan Pratinjau Struk" : "Lihat Pratinjau Struk Thermal"}
               </Button>
               <Button
-                className="w-full font-bold text-xs h-10 shadow-sm"
+                variant="outline"
+                className="w-full font-bold text-xs h-10 border-slate-300"
                 onClick={handleResetForm}
               >
                 Transaksi Baru (Selesai)

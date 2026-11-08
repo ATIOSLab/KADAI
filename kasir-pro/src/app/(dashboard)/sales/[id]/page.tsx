@@ -25,6 +25,7 @@ import { SupervisorPinDialog } from "@/components/shared/supervisor-pin-dialog";
 import { ThermalReceipt } from "@/components/shared/thermal-receipt";
 import { Receipt, ArrowLeft, XCircle, Loader2, Printer, FileText } from "lucide-react";
 import Link from "next/link";
+import { thermalPrinter } from "@/lib/escpos/driver";
 
 const paymentLabels: Record<string, string> = {
   CASH: "Tunai",
@@ -231,6 +232,43 @@ export default function SaleDetailPage({
     }
   };
 
+  const handlePrint = async () => {
+    if (thermalPrinter.config.type !== "none") {
+      try {
+        toast.loading("Mencetak langsung ke printer ESC/POS...", { id: "print-sale" });
+        await thermalPrinter.printReceipt({
+          storeName: "KADAI",
+          outletName: sale.outlet?.name || "KADAI",
+          outletAddress: sale.outlet?.address || null,
+          outletPhone: sale.outlet?.phone || null,
+          tableNo: sale.table?.tableNo || null,
+          invoiceNumber: sale.invoiceNumber,
+          createdAt: sale.createdAt,
+          cashierName: sale.cashier?.name,
+          customerName: sale.customerName,
+          items: sale.items.map((i) => ({
+            name: i.product.name,
+            quantity: i.quantity,
+            unitPrice: Number(i.unitPrice),
+            totalPrice: Number(i.totalPrice),
+            discountAmount: Number(i.discountAmount),
+          })),
+          subtotal: Number(sale.subtotal),
+          discountAmount: Number(sale.discountAmount),
+          totalAmount: Number(sale.totalAmount),
+          paymentType: sale.paymentType,
+          paymentRef: sale.paymentRef,
+        });
+        toast.success(`Struk berhasil dicetak ke ${thermalPrinter.config.deviceName || "Printer"}`, { id: "print-sale" });
+        return;
+      } catch (err: any) {
+        toast.dismiss("print-sale");
+        toast.error(`ESC/POS: ${err?.message || "Gagal mencetak"}. Membuka jendela cetak sistem...`);
+      }
+    }
+    window.print();
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-slide-up">
       <PageHeader
@@ -242,7 +280,7 @@ export default function SaleDetailPage({
         <Button variant="outline" onClick={() => setShowReceiptPreview(true)}>
           <FileText className="w-4 h-4 mr-1" /> Pratinjau Struk
         </Button>
-        <Button onClick={() => window.print()}>
+        <Button onClick={handlePrint}>
           <Printer className="w-4 h-4 mr-1" /> Cetak Struk
         </Button>
         <Button variant="outline" asChild>

@@ -2,16 +2,14 @@
 
 import { motion } from "motion/react";
 import { 
-  Users, 
-  Activity, 
-  Sparkles, 
   ShieldCheck, 
   Clock, 
   Printer, 
   QrCode, 
   CreditCard,
   Building2,
-  TrendingUp
+  TrendingUp,
+  Cpu
 } from "lucide-react";
 import { FadeIn } from "./fade-in";
 
@@ -26,7 +24,7 @@ const ECOSYSTEM_PARTNERS = [
   { name: "QRIS Nasional", label: "Bank Indonesia" },
   { name: "BCA / Mandiri / BRI", label: "Transfer & VA" },
   { name: "GoPay & OVO", label: "E-Wallet Instan" },
-  { name: "ESC/POS Thermal", label: "Epson, Panda, Kassen" },
+  { name: "ESC/POS Thermal", label: "Standar 58mm & 80mm" },
   { name: "USB & BT Scanner", label: "Plug & Play Barcode" },
   { name: "SAK EMKM Standar", label: "Kepatuhan PP 55/2022" },
 ];
@@ -39,7 +37,7 @@ export function TrustSocialProofBar() {
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-28 bg-amber-500/5 blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        {/* 1. Live Operational Telemetry Ticker (Menghidupkan Suasana Web) */}
+        {/* 1. Live Operational Telemetry Ticker (Alur Nyata Sistem) */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2.5 w-2.5">
@@ -47,10 +45,10 @@ export function TrustSocialProofBar() {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
             </span>
             <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-              Aktivitas Sistem Real-Time
+              Alur Operasional Sistem KADAI
             </span>
             <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
-              • Telemetri Gerai Aktif di Seluruh Indonesia (UTC+7)
+              • Telemetri Engine Kasir, Dapur & Arus Kas Realtime (WIB)
             </span>
           </div>
 
@@ -61,7 +59,7 @@ export function TrustSocialProofBar() {
                 key={idx}
                 className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200/90 text-slate-700 shadow-2xs"
               >
-                <Activity className="size-3 text-primary shrink-0 animate-pulse" />
+                <span className="size-1.5 rounded-full bg-primary shrink-0" />
                 <span className="font-semibold text-[11px]">{event.text}</span>
                 <span className="text-[10px] text-slate-400 font-mono">({event.time})</span>
               </div>
@@ -69,29 +67,27 @@ export function TrustSocialProofBar() {
           </div>
         </div>
 
-        {/* 2. Key Performance Metrics Bar */}
+        {/* 2. Key Performance Metrics Bar (Fakta Teknis Sistem, Tanpa Klaim Angka Palsu) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
           <FadeIn delay={0.05} className="space-y-1">
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight">
-                500+
+                Sub-Detik
               </span>
-              <span className="text-xs font-bold text-primary">Gerai</span>
             </div>
             <p className="text-xs text-slate-600 font-medium">
-              Kedai kopi, restoran, ritel, & minimarket aktif di Indonesia
+              Latensi pencatatan transaksi kasir & cetak struk tanpa jeda loading
             </p>
           </FadeIn>
 
           <FadeIn delay={0.1} className="space-y-1">
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight">
-                &lt; 0.2
+                Dual-Kas
               </span>
-              <span className="text-xs font-bold text-emerald-600">Detik</span>
             </div>
             <p className="text-xs text-slate-600 font-medium">
-              Kecepatan transaksi kasir kilat tanpa hambatan antrean
+              Pemisahan terpadu laci kasir vs kas modal belanja dapur (Petty Cash)
             </p>
           </FadeIn>
 
@@ -103,19 +99,18 @@ export function TrustSocialProofBar() {
               <span className="text-xs font-bold text-amber-600">Gratis</span>
             </div>
             <p className="text-xs text-slate-600 font-medium">
-              Migrasi impor data produk dari Moka/Majoo & paket Starter
+              Migrasi impor data produk dari kasir lama & paket Starter selamanya
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2} className="space-y-1">
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight">
-                99.9%
+                PSAK 14
               </span>
-              <span className="text-xs font-bold text-emerald-600">Uptime</span>
             </div>
             <p className="text-xs text-slate-600 font-medium">
-              Infrastruktur cloud berkecepatan tinggi dengan data real-time
+              Penilaian stok multi-batch FIFO asli & kepatuhan pajak UMKM PP 55/2022
             </p>
           </FadeIn>
         </div>
@@ -123,7 +118,7 @@ export function TrustSocialProofBar() {
         {/* 3. Hardware & Payment Compatibility Strip */}
         <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <span className="font-semibold text-slate-700 shrink-0">
-            Kompatibilitas Penuh Ekosistem Usaha:
+            Kompatibilitas Standar Ekosistem:
           </span>
           <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2 text-[11px] font-medium text-slate-600">
             {ECOSYSTEM_PARTNERS.map((p, idx) => (

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KadaiLockup } from "@/components/shared/kadai-logo";
 import { FadeIn } from "./fade-in";
 
 export function FinalCTA() {
@@ -11,20 +13,52 @@ export function FinalCTA() {
       {/* Studio Keylight Vignette */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] studio-keylight pointer-events-none -z-10" />
 
-      <FadeIn className="max-w-4xl mx-auto rounded-[28px] bg-white p-8 sm:p-14 shadow-xl text-center space-y-6 relative border border-slate-200/90">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-          Mulai Tanpa Risiko
-        </p>
+      <FadeIn className="max-w-4xl mx-auto rounded-[28px] bg-white p-8 sm:p-14 shadow-xl text-center space-y-8 relative border border-slate-200/90 overflow-hidden">
+        {/* Human Representative Card Badge (Sentuhan Tim Konsultan KADAI) */}
+        <div className="inline-flex items-center gap-3 p-1.5 pr-4 rounded-full bg-slate-50 border border-slate-200/90 shadow-2xs mx-auto">
+          <div className="size-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+            KD
+          </div>
+          <div className="text-left">
+            <span className="text-[11px] font-bold text-slate-900 block leading-tight">
+              Tim Konsultan Operasional KADAI
+            </span>
+            <span className="text-[10px] text-slate-500 block leading-tight">
+              Siap mendampingi onboarding & instalasi gerai Anda
+            </span>
+          </div>
+        </div>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-950 text-balance leading-tight">
-          Saatnya Bisnis Anda Berjalan Lebih Rapi dan Tenang.
-        </h2>
+        <div className="space-y-3">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            Mulai Tanpa Risiko
+          </p>
 
-        <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed text-balance">
-          Mulai kelola antrean kasir, pantau sisa stok bahan otomatis, dan nikmati laporan pembukuan yang siap saji setiap malam tanpa lembur hitung nota.
-        </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-950 text-balance leading-tight">
+            Saatnya Bisnis Anda Berjalan Lebih Rapi dan Tenang.
+          </h2>
 
-        <div className="flex flex-col items-center justify-center gap-3.5 pt-2 max-w-sm sm:max-w-none mx-auto w-full">
+          <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed text-balance">
+            Mulai kelola antrean kasir, pantau sisa stok bahan otomatis, dan nikmati laporan pembukuan yang siap saji setiap malam tanpa lembur hitung nota.
+          </p>
+        </div>
+
+        {/* Mockup Preview Tablet Mini POS KADAI */}
+        <div className="max-w-md mx-auto p-3 rounded-2xl bg-slate-900 text-white shadow-2xl border border-slate-800 text-left text-xs space-y-2">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            <KadaiLockup variant="on-dark" height={20} className="h-4 w-auto" />
+            <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Terminal Kasir Siap
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-[11px] text-slate-300">
+            <span>Shift: Kasir Pagi • Gerai Utama</span>
+            <span className="font-bold text-white">Kas Modal: Rp 2.000.000</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center gap-3.5 pt-1 max-w-sm sm:max-w-none mx-auto w-full">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full">
             <Button
               asChild

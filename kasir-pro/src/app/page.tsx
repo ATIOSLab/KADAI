@@ -2,9 +2,12 @@ import { getServerSessionUser } from "@/lib/session";
 import { getDefaultPathForRole } from "@/lib/rbac";
 import { SiteHeader } from "@/components/landing/site-header";
 import { HeroSection } from "@/components/landing/hero-section";
+import { TrustSocialProofBar } from "@/components/landing/trust-social-proof-bar";
+import { ProductShowcase } from "@/components/landing/product-showcase";
 import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid";
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
+import { CompetitorComparisonSection } from "@/components/landing/competitor-comparison-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { RoiCalculatorSection } from "@/components/landing/roi-calculator-section";
 import { ReferralSection } from "@/components/landing/referral-section";
@@ -46,6 +49,14 @@ export default async function HomePage() {
       {/* 2. Hero Section & Interactive Cockpit Preview */}
       <HeroSection dashboardPath={dashboardPath} />
 
+      {/* 2.5 Trust & Social Proof Bar (Telemetri Gerai Aktif, Uptime & Kompatibilitas) */}
+      <TrustSocialProofBar />
+
+      {/* 2.8 Interactive Product Showcase (Tab Playground POS, KDS, Stok FIFO, & Pajak) */}
+      <div className="py-12 sm:py-16 bg-slate-50/60 border-b border-slate-200/80">
+        <ProductShowcase />
+      </div>
+
       {/* 3. Kapabilitas Platform Terpadu (Pilar Inti KADAI: POS, FIFO, BOM, KDS, Transfer) */}
       <CapabilityBentoGrid />
 
@@ -54,6 +65,9 @@ export default async function HomePage() {
 
       {/* 5. Pajak & Pembukuan Standar Keuangan RI */}
       <AccountingTaxSection />
+
+      {/* 5.5 Perbandingan Head-to-Head: Kenapa Pindah dari Moka ke KADAI */}
+      <CompetitorComparisonSection />
 
       {/* 6. Paket Langganan Komersial (4 Tier) */}
       <PricingSection />

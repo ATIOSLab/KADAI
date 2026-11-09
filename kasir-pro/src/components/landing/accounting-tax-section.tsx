@@ -1,6 +1,7 @@
 "use client";
 
 import { Percent, Scale, BarChart3, Check } from "lucide-react";
+import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
 
 export function AccountingTaxSection() {
   const complianceItems = [
@@ -25,7 +26,7 @@ export function AccountingTaxSection() {
     <section id="pajak-pembukuan" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 w-full border-t border-slate-200/80">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         {/* Left Column: Bold Editorial Narrative (Span 5) */}
-        <div className="lg:col-span-5 space-y-4">
+        <FadeIn className="lg:col-span-5 space-y-4">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
             Pajak & Standar Akuntansi
           </p>
@@ -39,16 +40,16 @@ export function AccountingTaxSection() {
             <Check className="size-4 text-emerald-600" />
             <span>Kepatuhan PP 55/2022 & SAK EMKM Indonesia</span>
           </div>
-        </div>
+        </FadeIn>
 
         {/* Right Column: Direct Typographic Rows (Span 7) */}
-        <div className="lg:col-span-7 divide-y divide-slate-200/80">
+        <FadeInStagger className="lg:col-span-7 divide-y divide-slate-200/80">
           {complianceItems.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className={`space-y-2.5 ${idx === 0 ? "pb-8" : "py-8"}`}>
+              <FadeInStaggerItem key={idx} className={`space-y-2.5 group ${idx === 0 ? "pb-8" : "py-8"}`}>
                 <div className="flex items-center gap-3">
-                  <div className="size-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900 shrink-0">
+                  <div className="size-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900 group-hover:bg-primary group-hover:text-white transition-colors duration-300 shrink-0 shadow-2xs">
                     <Icon className="size-4" />
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-slate-950">
@@ -58,10 +59,10 @@ export function AccountingTaxSection() {
                 <p className="text-sm sm:text-base text-slate-600 leading-relaxed pl-12">
                   {item.desc}
                 </p>
-              </div>
+              </FadeInStaggerItem>
             );
           })}
-        </div>
+        </FadeInStagger>
       </div>
     </section>
   );

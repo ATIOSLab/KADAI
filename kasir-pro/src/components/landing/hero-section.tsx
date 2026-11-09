@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, TrendingUp, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { HeroBackgroundSlider } from "./hero-background-slider";
 import { KadaiLockup } from "@/components/shared/kadai-logo";
+import { FadeIn } from "./fade-in";
 
 interface HeroSectionProps {
   dashboardPath: string | null;
@@ -205,7 +207,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
         {/* 3 Operational Switcher Tabs (Responsive Grid, Zero Horizontal Overflow) */}
         <div className="flex items-center justify-center w-full px-2">
-          <div className="w-full max-w-lg p-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1">
+          <div className="w-full max-w-lg p-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1 relative">
             {SEGMENTS.map((seg, idx) => {
               const Icon = seg.icon;
               const isActive = idx === activeTab;
@@ -214,12 +216,19 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   key={seg.id}
                   type="button"
                   onClick={() => setActiveTab(idx)}
-                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all text-center ${
+                  className={`relative z-10 flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-colors text-center ${
                     isActive
-                      ? "bg-slate-950 text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/70"
+                      ? "text-white"
+                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/50"
                   }`}
                 >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeHeroSegmentPill"
+                      className="absolute inset-0 bg-slate-950 rounded-lg shadow-xs -z-10"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                   <Icon className={`size-3.5 shrink-0 ${isActive ? "text-primary" : "text-slate-500"}`} />
                   <span className="truncate">{seg.name}</span>
                 </button>
@@ -251,124 +260,134 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
           </div>
 
           {/* Split Cockpit View */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
-            {/* Left Side: Dark Culinary / Operational Scene with Scrim */}
-            <div className="lg:col-span-6 relative p-6 sm:p-10 flex flex-col justify-end overflow-hidden min-h-[280px] lg:min-h-full">
-              <Image
-                src={current.photoUrl}
-                alt={current.title}
-                fill
-                unoptimized
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              {/* Scrim Gradasi Gelap Sinematik */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[420px]">
+                {/* Left Side: Dark Culinary / Operational Scene with Scrim */}
+                <div className="lg:col-span-6 relative p-6 sm:p-10 flex flex-col justify-end overflow-hidden min-h-[280px] lg:min-h-full">
+                  <Image
+                    src={current.photoUrl}
+                    alt={current.title}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                  {/* Scrim Gradasi Gelap Sinematik */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent -z-0" />
 
-              <div className="relative z-10 space-y-3">
-                <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-lg">
-                  {current.tag}
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-                  {current.title}
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg font-normal">
-                  {current.desc}
-                </p>
-              </div>
-            </div>
-
-            {/* Right Side: Live Digital Thermal Receipt Card */}
-            <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
-              <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
-                {/* Official Brand Stamped Receipt Header (Using /png/lockup/) */}
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <KadaiLockup variant="on-light" height={26} className="h-6 w-auto" />
-                  <Badge
-                    variant="outline"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  >
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>{current.receipt.status}</span>
-                  </Badge>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium pt-1">
-                  <span className="font-bold text-slate-900">{current.receipt.table}</span>
-                  <span className="text-slate-400 font-mono text-[10px]">{current.receipt.meta}</span>
-                </div>
-
-                {/* Items Table */}
-                <CardContent className="p-0 space-y-2.5 text-xs">
-                  {current.receipt.items.map((it, i) => (
-                    <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
-                      <div>
-                        <span className="font-semibold text-slate-900 block">{it.name}</span>
-                        <span className="text-[10px] text-slate-500">{it.bom}</span>
-                      </div>
-                      <span className="font-semibold tabular-nums text-slate-900">{it.price}</span>
-                    </div>
-                  ))}
-
-                  {current.receipt.pb1 !== "Rp 0" && (
-                    <div className="flex justify-between items-center text-slate-600 pt-1">
-                      <span>Pajak Daerah Resto PB1 (10%)</span>
-                      <span className="font-medium tabular-nums">{current.receipt.pb1}</span>
-                    </div>
-                  )}
-
-                  {current.receipt.service !== "Rp 0" && (
-                    <div className="flex justify-between items-center text-slate-600">
-                      <span>Biaya Layanan (5%)</span>
-                      <span className="font-medium tabular-nums">{current.receipt.service}</span>
-                    </div>
-                  )}
-
-                  {/* Total */}
-                  <div className="flex justify-between items-center text-sm font-bold text-slate-950 pt-3 border-t border-slate-200">
-                    <span>TOTAL TAGIHAN</span>
-                    <span className="text-primary font-bold text-base sm:text-lg tabular-nums">
-                      {current.receipt.total}
+                  <div className="relative z-10 space-y-3">
+                    <span className="inline-block text-[10px] font-semibold tracking-widest text-primary uppercase bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-lg">
+                      {current.tag}
                     </span>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                      {current.title}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-lg font-normal">
+                      {current.desc}
+                    </p>
                   </div>
-                </CardContent>
+                </div>
 
-                {/* Receipt Footer */}
-                <CardFooter className="p-0 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
-                  <span>{current.receipt.footer}</span>
-                  <span className="font-semibold text-slate-700">KADAI POS</span>
-                </CardFooter>
-              </Card>
-            </div>
-          </div>
+                {/* Right Side: Live Digital Thermal Receipt Card */}
+                <div className="lg:col-span-6 bg-slate-50/70 p-5 sm:p-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
+                  <Card className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+                    {/* Official Brand Stamped Receipt Header (Using /png/lockup/) */}
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <KadaiLockup variant="on-light" height={26} className="h-6 w-auto" />
+                      <Badge
+                        variant="outline"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      >
+                        <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>{current.receipt.status}</span>
+                      </Badge>
+                    </div>
 
-          {/* Bottom 3 Performance Metrics Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
-            <div className="p-4 text-center">
-              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-                {current.metric1.label}
-              </span>
-              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-                {current.metric1.val}
-              </span>
-            </div>
-            <div className="p-4 text-center">
-              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-                {current.metric2.label}
-              </span>
-              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-                {current.metric2.val}
-              </span>
-            </div>
-            <div className="p-4 text-center">
-              <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
-                {current.metric3.label}
-              </span>
-              <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
-                {current.metric3.val}
-              </span>
-            </div>
-          </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium pt-1">
+                      <span className="font-bold text-slate-900">{current.receipt.table}</span>
+                      <span className="text-slate-400 font-mono text-[10px]">{current.receipt.meta}</span>
+                    </div>
+
+                    {/* Items Table */}
+                    <CardContent className="p-0 space-y-2.5 text-xs">
+                      {current.receipt.items.map((it, i) => (
+                        <div key={i} className="flex justify-between items-start py-1 border-b border-dashed border-slate-100">
+                          <div>
+                            <span className="font-semibold text-slate-900 block">{it.name}</span>
+                            <span className="text-[10px] text-slate-500">{it.bom}</span>
+                          </div>
+                          <span className="font-semibold tabular-nums text-slate-900">{it.price}</span>
+                        </div>
+                      ))}
+
+                      {current.receipt.pb1 !== "Rp 0" && (
+                        <div className="flex justify-between items-center text-slate-600 pt-1">
+                          <span>Pajak Daerah Resto PB1 (10%)</span>
+                          <span className="font-medium tabular-nums">{current.receipt.pb1}</span>
+                        </div>
+                      )}
+
+                      {current.receipt.service !== "Rp 0" && (
+                        <div className="flex justify-between items-center text-slate-600">
+                          <span>Biaya Layanan (5%)</span>
+                          <span className="font-medium tabular-nums">{current.receipt.service}</span>
+                        </div>
+                      )}
+
+                      {/* Total */}
+                      <div className="flex justify-between items-center text-sm font-bold text-slate-950 pt-3 border-t border-slate-200">
+                        <span>TOTAL TAGIHAN</span>
+                        <span className="text-primary font-bold text-base sm:text-lg tabular-nums">
+                          {current.receipt.total}
+                        </span>
+                      </div>
+                    </CardContent>
+
+                    {/* Receipt Footer */}
+                    <CardFooter className="p-0 pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+                      <span>{current.receipt.footer}</span>
+                      <span className="font-semibold text-slate-700">KADAI POS</span>
+                    </CardFooter>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Bottom 3 Performance Metrics Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-slate-200 bg-slate-50 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
+                <div className="p-4 text-center">
+                  <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                    {current.metric1.label}
+                  </span>
+                  <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                    {current.metric1.val}
+                  </span>
+                </div>
+                <div className="p-4 text-center">
+                  <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                    {current.metric2.label}
+                  </span>
+                  <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                    {current.metric2.val}
+                  </span>
+                </div>
+                <div className="p-4 text-center">
+                  <span className="text-[10px] font-medium text-slate-500 block uppercase tracking-wider">
+                    {current.metric3.label}
+                  </span>
+                  <span className="text-xs font-bold text-slate-900 mt-0.5 block tabular-nums">
+                    {current.metric3.val}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

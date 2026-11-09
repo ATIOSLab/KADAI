@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingCart, UtensilsCrossed, Building2, Check } from "lucide-react";
+import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
 
 export function IndustrySolutions() {
   const industries = [
@@ -43,7 +44,7 @@ export function IndustrySolutions() {
     <section id="solusi-industri" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 w-full border-t border-slate-200/80">
       <div className="max-w-6xl mx-auto space-y-16">
         {/* Section Header: Pure Typography */}
-        <div className="max-w-3xl space-y-3">
+        <FadeIn className="max-w-3xl space-y-3">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
             Solusi Lintas Sektor
           </p>
@@ -53,19 +54,19 @@ export function IndustrySolutions() {
           <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
             Setiap model bisnis punya tantangan berbeda. KADAI menyediakan alur operasional yang langsung pas sejak hari pertama tanpa perlu kustomisasi rumit.
           </p>
-        </div>
+        </FadeIn>
 
         {/* 3-Column Clean Editorial Flow */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12 border-t border-slate-200/80 pt-10 sm:pt-12">
+        <FadeInStagger className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12 border-t border-slate-200/80 pt-10 sm:pt-12">
           {industries.map((ind, idx) => {
             const Icon = ind.icon;
             return (
-              <div key={idx} className="flex flex-col space-y-4">
-                <div className="size-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900">
-                  <Icon className="size-5" />
+              <FadeInStaggerItem key={idx} className="flex flex-col space-y-4 group">
+                <div className="size-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900 group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-2xs">
+                  <Icon className="size-5 transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-950">
+                  <h3 className="text-xl font-bold text-slate-950 group-hover:text-primary transition-colors">
                     {ind.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
@@ -80,10 +81,10 @@ export function IndustrySolutions() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </FadeInStaggerItem>
             );
           })}
-        </div>
+        </FadeInStagger>
       </div>
     </section>
   );

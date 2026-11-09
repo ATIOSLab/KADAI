@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { FadeIn } from "./fade-in";
 
 export function FinalCTA() {
   return (
@@ -11,7 +11,7 @@ export function FinalCTA() {
       {/* Studio Keylight Vignette */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] studio-keylight pointer-events-none -z-10" />
 
-      <div className="max-w-4xl mx-auto rounded-[28px] bg-white p-8 sm:p-14 shadow-xl text-center space-y-6 relative border border-slate-200/90">
+      <FadeIn className="max-w-4xl mx-auto rounded-[28px] bg-white p-8 sm:p-14 shadow-xl text-center space-y-6 relative border border-slate-200/90">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
           Mulai Tanpa Risiko
         </p>
@@ -55,7 +55,7 @@ export function FinalCTA() {
             <span>✓ Dukungan teknis Indonesia</span>
           </div>
         </div>
-      </div>
+      </FadeIn>
     </section>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
+import { motion, useScroll, useSpring } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { KadaiLockup } from "@/components/shared/kadai-logo";
 
@@ -12,6 +13,22 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // 4 Primary Navigation Links: Clean, Focused, Enterprise Standards
   const navLinks = [
@@ -23,7 +40,19 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
-      <div className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
+      {/* Top Hairline Scroll Progress Bar (Enterprise Accent) */}
+      <motion.div
+        style={{ scaleX, transformOrigin: "0%" }}
+        className="h-[2px] bg-gradient-to-r from-primary via-orange-500 to-amber-500 w-full fixed top-0 left-0 right-0 z-50 pointer-events-none"
+      />
+
+      <div
+        className={`w-full transition-all duration-200 border-b ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-md border-slate-200/90 shadow-sm"
+            : "bg-white/80 backdrop-blur-sm border-slate-200/60"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-6">
           {/* Brand Logo */}
           <Link
@@ -59,7 +88,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
             {dashboardPath ? (
               <Button
                 asChild
-                className="font-bold text-sm h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-2xs"
+                className="font-bold text-sm h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-2xs transition-all hover:shadow-sm active:scale-98"
               >
                 <Link href={dashboardPath} className="flex items-center gap-1.5">
                   <span>Panel Kontrol</span>
@@ -76,7 +105,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 </Link>
                 <Button
                   asChild
-                  className="font-bold text-sm h-9 px-5 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-2xs transition-transform active:scale-95"
+                  className="font-bold text-sm h-9 px-5 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-2xs transition-all hover:shadow-sm active:scale-95"
                 >
                   <Link href="/register">Coba Gratis</Link>
                 </Button>

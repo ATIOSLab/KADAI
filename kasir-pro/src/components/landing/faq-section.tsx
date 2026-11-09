@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { LANDING_FAQS, FAQItem } from "@/lib/landing-faqs";
+import { motion, AnimatePresence } from "motion/react";
+import { LANDING_FAQS } from "@/lib/landing-faqs";
+import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
 
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -16,7 +17,7 @@ export function FAQSection() {
     <section id="faq" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/70 border-t border-slate-200/80 w-full">
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3">
+        <FadeIn className="text-center max-w-3xl mx-auto space-y-3">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
             Tanya Jawab (FAQ)
           </p>
@@ -26,16 +27,16 @@ export function FAQSection() {
           <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-balance">
             Jawaban lengkap seputar alur operasional, fleksibilitas kasir, hingga kepatuhan standar hukum di Indonesia.
           </p>
-        </div>
+        </FadeIn>
 
-        {/* FAQ Accordion List */}
-        <div className="space-y-4">
+        {/* FAQ Accordion List with Smooth Height Transition */}
+        <FadeInStagger className="space-y-4">
           {LANDING_FAQS.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
-              <div
+              <FadeInStaggerItem
                 key={idx}
-                className="rounded-[20px] bg-white overflow-hidden border border-slate-200/90 shadow-2xs hover:shadow-md transition-all duration-200"
+                className="rounded-[20px] bg-white overflow-hidden border border-slate-200/90 shadow-2xs hover:shadow-md transition-shadow duration-200"
               >
                 <button
                   type="button"
@@ -48,21 +49,31 @@ export function FAQSection() {
                     <span>{faq.q}</span>
                   </span>
                   <ChevronDown
-                    className={`size-4 shrink-0 text-slate-400 transition-transform duration-200 ${
+                    className={`size-4 shrink-0 text-slate-400 transition-transform duration-300 ${
                       isOpen ? "rotate-180 text-primary" : ""
                     }`}
                   />
                 </button>
 
-                {isOpen && (
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in pl-11">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 pl-11">
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </FadeInStaggerItem>
             );
           })}
-        </div>
+        </FadeInStagger>
       </div>
     </section>
   );

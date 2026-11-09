@@ -7,6 +7,7 @@ import {
   Building2,
   Check,
 } from "lucide-react";
+import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
 
 export function CapabilityBentoGrid() {
   const capabilities = [
@@ -58,8 +59,8 @@ export function CapabilityBentoGrid() {
 
   return (
     <section id="kapabilitas" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
-      {/* Section Header: Pure Editorial Typography, No Pill Badges */}
-      <div className="max-w-3xl mb-16 sm:mb-20 space-y-4">
+      {/* Section Header: Pure Editorial Typography */}
+      <FadeIn className="max-w-3xl mb-16 sm:mb-20 space-y-4">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
           Kemampuan Sistem KADAI
         </p>
@@ -69,24 +70,24 @@ export function CapabilityBentoGrid() {
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
           Dirancang untuk menghilangkan pencatatan ganda. Mulai dari kasir di depan, dapur dan persediaan di belakang, hingga laporan keuangan konsolidasi.
         </p>
-      </div>
+      </FadeIn>
 
-      {/* Editorial Grid: Open, Spacious, No Artificial Card Enclosures */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-14 sm:gap-y-16 border-t border-slate-200/80 pt-12 sm:pt-16">
+      {/* Editorial Grid: Open, Spacious with Subtle Stagger Motion */}
+      <FadeInStagger className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-14 sm:gap-y-16 border-t border-slate-200/80 pt-12 sm:pt-16">
         {capabilities.map((item, idx) => {
           const Icon = item.icon;
           return (
-            <div key={idx} className="flex flex-col space-y-4 group">
+            <FadeInStaggerItem key={idx} className="flex flex-col space-y-4 group">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900 group-hover:bg-primary group-hover:text-white transition-colors duration-200">
-                  <Icon className="size-5" />
+                <div className="size-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-900 group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-2xs">
+                  <Icon className="size-5 transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   {item.eyebrow}
                 </span>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-950 leading-snug">
+              <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-950 leading-snug group-hover:text-slate-900 transition-colors">
                 {item.title}
               </h3>
 
@@ -102,10 +103,10 @@ export function CapabilityBentoGrid() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </FadeInStaggerItem>
           );
         })}
-      </div>
+      </FadeInStagger>
     </section>
   );
 }

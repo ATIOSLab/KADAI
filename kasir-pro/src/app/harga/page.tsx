@@ -219,9 +219,23 @@ export default function HargaPage() {
                 <tr>
                   <td className="py-3 px-4 font-medium">Layar Dapur & Bar (KDS)</td>
                   <td className="py-3 px-4 text-center text-slate-300">—</td>
+                  <td className="py-3 px-4 text-center text-slate-400 font-medium">Opsional F&B</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Multi-Stasiun</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Routing CK</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-medium">Manajemen Meja & QR Self-Order</td>
+                  <td className="py-3 px-4 text-center text-slate-300">—</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk (F&B)</td>
                   <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk</td>
                   <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-medium">Barcode Scanner & Radar Expired Date</td>
+                  <td className="py-3 px-4 text-center text-slate-300">—</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk (Ritel)</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Lengkap</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Multi-Gudang</td>
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-medium">Resep Bahan Pokok (BOM)</td>

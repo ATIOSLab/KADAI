@@ -6,6 +6,7 @@ import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid"
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { RoiCalculatorSection } from "@/components/landing/roi-calculator-section";
 import { ReferralSection } from "@/components/landing/referral-section";
 import { FAQSection } from "@/components/landing/faq-section";
 import { LANDING_FAQS } from "@/lib/landing-faqs";
@@ -56,6 +57,9 @@ export default async function HomePage() {
 
       {/* 6. Paket Langganan Komersial (4 Tier) */}
       <PricingSection />
+
+      {/* 6.5 Kalkulator Interaktif Penyelamatan Biaya & Efisiensi (High-Converting Tool) */}
+      <RoiCalculatorSection />
 
       {/* 7. Program Kemitraan & Referral Resmi KADAI */}
       <ReferralSection />

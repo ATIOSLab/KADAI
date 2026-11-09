@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Paket Langganan & Harga Resmi | KADAI",
     description:
-      "Struktur paket langganan transparan: Starter Rp 0, Professional Rp 99rb, Business Pro Rp 249rb, dan Enterprise Rp 599rb. Tanpa biaya tersembunyi.",
+      "Struktur paket langganan transparan: Starter Rp 0, Professional Rp 99rb (QR Meja F&B / Barcode & Alert Expired Ritel), Business Pro Rp 249rb (Resep BOM + KDS Dapur / Multi-Batch FIFO), dan Enterprise Rp 599rb.",
     url: "https://kadai.asia/harga",
     images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
   },

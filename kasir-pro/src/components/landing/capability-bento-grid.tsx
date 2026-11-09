@@ -6,7 +6,7 @@ import {
   ChefHat,
   Building2,
   Wallet,
-  Sparkles,
+  UploadCloud,
   Check,
 } from "lucide-react";
 import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
@@ -59,9 +59,9 @@ export function CapabilityBentoGrid() {
     },
     {
       eyebrow: "Migrasi Kasir Tanpa Ribet",
-      title: "AI Smart Import: Pindah dari Kasir Lain dalam 1 Detik",
+      title: "Smart Batch Import: Pindah Kasir dalam 1 Detik",
       desc: "Sudah pakai sistem kasir sebelumnya? Cukup unggah berkas ekspor Excel/CSV lama Anda. Sistem cerdas KADAI otomatis mengenali kolom nama barang, harga jual, HPP, dan stok awal tanpa biaya tambahan.",
-      icon: Sparkles,
+      icon: UploadCloud,
       highlights: [
         "Deteksi kolom otomatis tanpa format template kaku",
         "Preview tabel dan verifikasi integritas data sebelum impor",

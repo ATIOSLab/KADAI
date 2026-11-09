@@ -3,7 +3,6 @@ import { getDefaultPathForRole } from "@/lib/rbac";
 import { SiteHeader } from "@/components/landing/site-header";
 import { HeroSection } from "@/components/landing/hero-section";
 import { TrustSocialProofBar } from "@/components/landing/trust-social-proof-bar";
-import { ProductShowcase } from "@/components/landing/product-showcase";
 import { CapabilityBentoGrid } from "@/components/landing/capability-bento-grid";
 import { IndustrySolutions } from "@/components/landing/industry-solutions";
 import { AccountingTaxSection } from "@/components/landing/accounting-tax-section";
@@ -52,12 +51,7 @@ export default async function HomePage() {
       {/* 2.5 Trust & Social Proof Bar (Telemetri Gerai Aktif, Uptime & Kompatibilitas) */}
       <TrustSocialProofBar />
 
-      {/* 2.8 Interactive Product Showcase (Tab Playground POS, KDS, Stok FIFO, & Pajak) */}
-      <div className="py-12 sm:py-16 bg-slate-50/60 border-b border-slate-200/80">
-        <ProductShowcase />
-      </div>
-
-      {/* 3. Kapabilitas Platform Terpadu (Pilar Inti KADAI: POS, FIFO, BOM, KDS, Transfer) */}
+      {/* 3. Kapabilitas Platform Terpadu (Pilar Inti KADAI: POS, FIFO, BOM, Kas Modal, Migrasi Data) */}
       <CapabilityBentoGrid />
 
       {/* 4. Solusi Lintas Industri (3 Kolom Sektor Usaha) */}
@@ -66,7 +60,7 @@ export default async function HomePage() {
       {/* 5. Pajak & Pembukuan Standar Keuangan RI */}
       <AccountingTaxSection />
 
-      {/* 5.5 Perbandingan Head-to-Head: Kenapa Pindah dari Moka ke KADAI */}
+      {/* 5.5 Perbandingan Transparan KADAI vs Kasir Konvensional */}
       <CompetitorComparisonSection />
 
       {/* 6. Paket Langganan Komersial (4 Tier) */}

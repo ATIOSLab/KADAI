@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -164,7 +164,6 @@ export function PricingSection() {
                 >
                   {plan.featured && (
                     <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-md shadow-xs border-0 flex items-center gap-1">
-                      <Sparkles className="size-3" />
                       <span>{plan.badge}</span>
                     </Badge>
                   )}

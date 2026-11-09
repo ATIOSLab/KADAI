@@ -226,14 +226,14 @@ export function ProductImportDialog({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-orange-100 text-primary flex items-center justify-center">
-              <Sparkles className="size-4" />
+              <UploadCloud className="size-4" />
             </div>
             <div>
               <DialogTitle className="text-lg font-bold">
-                Migrasi Cepat & Impor Produk (AI Assisted)
+                Migrasi Cepat & Impor Produk
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Pindahkan data produk & stok dari Moka, Majoo, Pawoon, atau Excel lama tanpa ribet.
+                Pindahkan data produk & stok dari aplikasi kasir sebelumnya atau Excel lama tanpa ribet.
               </DialogDescription>
             </div>
           </div>
@@ -259,7 +259,7 @@ export function ProductImportDialog({
                   {file ? file.name : "Klik untuk memilih berkas CSV / Excel Ekspor"}
                 </p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Mendukung ekspor langsung dari Moka POS, Majoo, Pawoon, Olsera, atau spreadsheet CSV.
+                  Mendukung ekspor langsung dari aplikasi kasir sebelumnya atau spreadsheet CSV/Excel.
                 </p>
               </div>
               <Badge variant="outline" className="text-[10px] bg-white border-slate-200">

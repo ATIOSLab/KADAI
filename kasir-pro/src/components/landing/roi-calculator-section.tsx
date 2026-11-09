@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calculator, ArrowRight, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { Calculator, ArrowRight, ShieldCheck, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "./fade-in";
 
@@ -140,7 +140,6 @@ export function RoiCalculatorSection() {
           <div className="lg:col-span-6 bg-slate-950 text-white rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800">
             <div className="space-y-1">
               <span className="text-[10px] font-bold tracking-widest text-primary uppercase flex items-center gap-1">
-                <Sparkles className="size-3" />
                 Potensi Efisiensi Bersih
               </span>
               <div className="text-3xl sm:text-4xl font-black text-white tracking-tight tabular-nums pt-1">

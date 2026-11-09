@@ -76,7 +76,7 @@ export function ReferralSection() {
               Siap Menjadi Mitra Pemasaran Resmi KADAI?
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Daftar sekarang untuk langsung menerima Kode Referral unik, link promosi personal, dan dashboard pencairan komisi Anda.
+              Daftar sekarang untuk langsung menerima Kode Referral unik, link promosi personal, dan panel pencairan komisi Anda.
             </p>
           </div>
 

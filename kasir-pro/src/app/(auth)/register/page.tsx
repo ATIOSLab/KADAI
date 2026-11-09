@@ -280,7 +280,7 @@ export default function RegisterPage() {
             <div className="space-y-2 pt-1">
               <Label className="font-bold text-xs flex items-center justify-between">
                 <span>Pilih Paket Langganan</span>
-                <span className="text-accent-success font-black text-[11px]">Free Trial 14 Hari</span>
+                <span className="text-accent-success font-black text-[11px]">Uji Coba Gratis 14 Hari</span>
               </Label>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <button

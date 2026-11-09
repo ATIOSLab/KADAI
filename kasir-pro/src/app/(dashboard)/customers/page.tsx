@@ -269,7 +269,7 @@ export default function CustomersPage() {
                         className="text-xs h-7"
                         onClick={() => handleOpenEdit(cust)}
                       >
-                        <Edit2 className="size-3.5 mr-1" /> Edit
+                        <Edit2 className="size-3.5 mr-1" /> Ubah
                       </Button>
                     </td>
                   </tr>

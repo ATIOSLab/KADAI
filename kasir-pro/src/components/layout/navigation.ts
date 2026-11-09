@@ -46,7 +46,7 @@ export const navigationSections: NavigationSection[] = [
     items: [
       {
         href: "/dashboard",
-        label: "Executive Dashboard",
+        label: "Dashboard Eksekutif",
         shortLabel: "Dashboard",
         description: "Ringkasan KPI bisnis, omzet harian, dan metrik operasional.",
         icon: LayoutDashboard,
@@ -246,106 +246,106 @@ export function getBottomTabsForRole(role?: AppRole) {
 
 const pageMetaMap: Record<string, PageMeta> = {
   "/dashboard": {
-    title: "Executive Dashboard",
+    title: "Dashboard Eksekutif",
     description: "Ringkasan KPI performa usaha hari ini, omzet, dan indikator penting.",
     section: "Operasional & Transaksi",
-    eyebrow: "Business Overview",
+    eyebrow: "Ringkasan Bisnis",
   },
   "/pos": {
     title: "Point of Sale (POS)",
     description: "Terminal transaksi kasir berkecepatan tinggi dengan kalkulasi pajak otomatis.",
     section: "Operasional & Transaksi",
-    eyebrow: "POS Terminal",
+    eyebrow: "Terminal Kasir",
   },
   "/products": {
     title: "Katalog Produk & Resep",
     description: "Pusat pengelolaan SKU, penetapan harga jual, dan formula Bill of Materials.",
     section: "Katalog & Rantai Pasok",
-    eyebrow: "Catalog & BOM",
+    eyebrow: "Katalog & Resep",
   },
   "/inventory": {
     title: "Manajemen Persediaan",
     description: "Pelacakan persediaan berbasis FIFO batch, kartu stok, dan peringatan restock.",
     section: "Katalog & Rantai Pasok",
-    eyebrow: "Inventory Control",
+    eyebrow: "Kontrol Stok",
   },
   "/inventory/transfers": {
     title: "Transfer Stok Antar Cabang",
     description: "Distribusi stok dari Gudang/Dapur Pusat ke gerai cabang & booth kaki lima.",
     section: "Katalog & Rantai Pasok",
-    eyebrow: "Supply Distribution",
+    eyebrow: "Distribusi Stok",
   },
   "/suppliers": {
     title: "Pemasok & Vendor",
     description: "Direktori vendor, kontak pengadaan, dan histori penerimaan batch barang.",
     section: "Katalog & Rantai Pasok",
-    eyebrow: "Supply Chain",
+    eyebrow: "Rantai Pasok",
   },
   "/customers": {
     title: "Pelanggan & Loyalitas",
     description: "Database pelanggan, akumulasi pembelanjaan, tiering member, dan poin reward.",
     section: "Pelanggan & CRM",
-    eyebrow: "Customer Relations",
+    eyebrow: "Hubungan Pelanggan",
   },
   "/tables": {
     title: "Manajemen Meja & QR Order",
     description: "Tata letak meja operasional dan generator QR code dining pelanggan.",
     section: "Operasional & Transaksi",
-    eyebrow: "Table Management",
+    eyebrow: "Manajemen Meja",
   },
   "/kds": {
     title: "Kitchen Display System (KDS)",
     description: "Antarmuka tiket pesanan real-time untuk stasiun dapur (Kitchen) dan bar.",
     section: "Operasional & Transaksi",
-    eyebrow: "Kitchen Operations",
+    eyebrow: "Operasional Dapur",
   },
   "/sales": {
     title: "Histori Penjualan",
     description: "Audit menyeluruh transaksi penjualan, invoice digital, dan validasi pembatalan (void).",
     section: "Keuangan & Analitik",
-    eyebrow: "Sales Ledger",
+    eyebrow: "Buku Penjualan",
   },
   "/reports": {
     title: "Laporan Performa Bisnis",
     description: "Analisis tren penjualan, estimasi laba kotor, dan komparasi performa kategori.",
     section: "Keuangan & Analitik",
-    eyebrow: "Business Intelligence",
+    eyebrow: "Analitik Bisnis",
   },
   "/finance": {
     title: "Buku Kas & Keuangan",
     description: "Rekapitulasi arus kas masuk dan keluar (cash flow) serta posisi likuiditas.",
     section: "Keuangan & Analitik",
-    eyebrow: "Financial Accounting",
+    eyebrow: "Akuntansi & Kas",
   },
   "/finance/tax": {
     title: "Kepatuhan Pajak & SAK EMKM",
     description: "Rekapitulasi perpajakan PPN 11%, PB1/PBJT 10%, dan PPh Final 0.5% PP 55/2022.",
     section: "Keuangan & Analitik",
-    eyebrow: "Tax Compliance",
+    eyebrow: "Kepatuhan Pajak",
   },
   "/outlets": {
     title: "Multi-Cabang & Outlet",
     description: "Pengelolaan unit usaha multi-cabang, parameter fiskal, dan service charge.",
     section: "Sistem & Multi-Cabang",
-    eyebrow: "Branch Network",
+    eyebrow: "Jaringan Cabang",
   },
   "/activity-log": {
     title: "Audit Trail & Keamanan",
     description: "Rekam jejak aktivitas operasional, verifikasi PIN supervisor, dan audit sistem.",
     section: "Sistem & Multi-Cabang",
-    eyebrow: "Audit Trail",
+    eyebrow: "Audit Keamanan",
   },
   "/settings": {
     title: "Pengaturan Sistem",
     description: "Konfigurasi entitas bisnis, manajemen hak akses staf (RBAC), dan preferensi POS.",
     section: "Sistem & Multi-Cabang",
-    eyebrow: "System Settings",
+    eyebrow: "Pengaturan Sistem",
   },
   "/profile": {
     title: "Profil Pengguna",
     description: "Informasi kredensial pengguna, role wewenang aktif, dan pembaruan keamanan sandi.",
     section: "Akun Pengguna",
-    eyebrow: "My Account",
+    eyebrow: "Akun Saya",
   },
 };
 
@@ -369,8 +369,8 @@ export function getPageMeta(pathname: string): PageMeta {
     : {
         title: "KADAI",
         description: "Workspace operasional untuk toko dan kasir Anda.",
-        section: "Workspace",
-        eyebrow: "Overview",
+        section: "Ruang Kerja",
+        eyebrow: "Ringkasan",
       };
 }
 

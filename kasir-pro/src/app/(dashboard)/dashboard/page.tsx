@@ -188,7 +188,7 @@ export default function DashboardPage() {
               className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              Executive Dashboard
+              Dashboard Eksekutif
             </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />

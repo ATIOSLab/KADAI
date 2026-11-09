@@ -1,14 +1,14 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Request Demo & Jadwal Konsultasi Sistem",
+  title: "Jadwal Demo & Konsultasi Sistem",
   description:
     "Coba demo langsung KADAI: Sistem Operasi Bisnis Indonesia untuk kasir POS kilat, inventori multi-batch fleksibel, alur dapur KDS, dan kepatuhan pajak SAK EMKM.",
   alternates: {
     canonical: "https://kadai.asia/demo",
   },
   openGraph: {
-    title: "Request Demo & Konsultasi Sistem | KADAI",
+    title: "Jadwal Demo & Konsultasi Sistem | KADAI",
     description:
       "Jadwalkan demo langsung sistem operasi bisnis terpadu untuk gerai, dapur, dan pembukuan usaha Anda.",
     url: "https://kadai.asia/demo",

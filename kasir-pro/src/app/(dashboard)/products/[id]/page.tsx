@@ -402,7 +402,7 @@ export default function ProductDetailPage({
           </Link>
         </Button>
         <Button onClick={startEditing}>
-          <Edit className="w-4 h-4 mr-1" /> Edit
+          <Edit className="w-4 h-4 mr-1" /> Ubah
         </Button>
         <Button variant="danger" onClick={() => setShowDelete(true)}>
           <Trash2 className="w-4 h-4 mr-1" /> Hapus

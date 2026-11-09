@@ -153,7 +153,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                   className="w-full sm:w-auto font-bold text-sm h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-md"
                 >
                   <Link href={dashboardPath} className="flex items-center gap-2">
-                    <span>Buka Dashboard Operasional</span>
+                    <span>Buka Panel Kontrol Operasional</span>
                     <ArrowUpRight className="size-4 shrink-0" />
                   </Link>
                 </Button>

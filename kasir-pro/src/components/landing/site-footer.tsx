@@ -42,7 +42,7 @@ export function SiteFooter() {
               <li><Link href="/solusi/fnb" className="hover:text-white transition-colors">Restoran & Kafe (F&B)</Link></li>
               <li><Link href="/solusi/ritel" className="hover:text-white transition-colors">Toko Ritel & Grosir</Link></li>
               <li><Link href="/harga" className="hover:text-white transition-colors">Paket Langganan</Link></li>
-              <li><Link href="/demo" className="hover:text-white transition-colors text-primary font-bold">Request Demo</Link></li>
+              <li><Link href="/demo" className="hover:text-white transition-colors text-primary font-bold">Jadwalkan Demo</Link></li>
             </ul>
           </div>
 

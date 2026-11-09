@@ -14,7 +14,7 @@ export function EnterpriseSection() {
   const capabilities = [
     {
       title: "Visibilitas Multi-Cabang Terpusat",
-      desc: "Pantau performa penjualan, pergerakan stok, dan arus kas seluruh cabang, booth kaki lima, hingga gudang utama dalam satu cockpit pemilik.",
+      desc: "Pantau performa penjualan, pergerakan stok, dan arus kas seluruh cabang, booth kaki lima, hingga gudang utama dalam satu panel kendali pemilik.",
       icon: Building2,
       accent: "text-slate-200 bg-white/5 border-white/10",
     },

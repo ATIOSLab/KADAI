@@ -62,7 +62,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
                 className="font-bold text-sm h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-2xs"
               >
                 <Link href={dashboardPath} className="flex items-center gap-1.5">
-                  <span>Dashboard</span>
+                  <span>Panel Kontrol</span>
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
@@ -88,7 +88,7 @@ export function SiteHeader({ dashboardPath }: SiteHeaderProps) {
           <div className="flex md:hidden items-center gap-2 shrink-0">
             {dashboardPath ? (
               <Button asChild size="sm" className="h-8 text-xs font-bold px-3 rounded-lg bg-primary text-white">
-                <Link href={dashboardPath}>Dashboard</Link>
+                <Link href={dashboardPath}>Panel Kontrol</Link>
               </Button>
             ) : (
               <Button asChild size="sm" className="h-8 text-xs font-bold px-3 rounded-lg bg-primary text-white">

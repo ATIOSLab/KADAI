@@ -259,7 +259,7 @@ export default function ProductsPage() {
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1" asChild>
                     <Link href={`/products/${product.id}`}>
-                      <Edit className="w-4 h-4 mr-1.5" /> Edit
+                      <Edit className="w-4 h-4 mr-1.5" /> Ubah
                     </Link>
                   </Button>
                   {canDeleteProduct && (

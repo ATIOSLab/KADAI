@@ -119,7 +119,7 @@ export function TablePagination({
           onClick={() => onPageChange(page - 1)}
         >
           <ChevronLeft className="h-4 w-4" />
-          Previous
+          Sebelumnya
         </Button>
 
         <div className="flex items-center gap-1">
@@ -155,7 +155,7 @@ export function TablePagination({
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
         >
-          Next
+          Berikutnya
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

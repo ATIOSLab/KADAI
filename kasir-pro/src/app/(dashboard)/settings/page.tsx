@@ -1029,7 +1029,7 @@ export default function SettingsPage() {
                 <tr>
                   <th className="text-left p-3">Nama</th>
                   <th className="text-left p-3">Email</th>
-                  <th className="text-center p-3">Role</th>
+                  <th className="text-center p-3">Peran (Role)</th>
                   <th className="text-center p-3">Status</th>
                   <th className="text-center p-3">Aksi</th>
                 </tr>
@@ -1211,15 +1211,15 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Role</Label>
+                  <Label>Peran Pengguna (Role)</Label>
                   <SearchableSelect
                     value={userForm.role}
                     onValueChange={(val) =>
                       setUserForm({ ...userForm, role: val })
                     }
-                    placeholder="Pilih role"
-                    searchPlaceholder="Cari role..."
-                    emptyMessage="Role tidak ditemukan."
+                    placeholder="Pilih peran pengguna"
+                    searchPlaceholder="Cari peran..."
+                    emptyMessage="Peran tidak ditemukan."
                     options={[
                       { value: "ADMIN", label: "Pemilik Toko (Admin)" },
                       { value: "MANAGER", label: "Manager Cabang" },

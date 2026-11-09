@@ -35,9 +35,11 @@ import {
   Loader2,
   UtensilsCrossed,
   PackageCheck,
+  UploadCloud,
 } from "lucide-react";
 import { RecipeDialog } from "@/components/products/recipe-dialog";
 import { ProductionBatchDialog } from "@/components/products/production-batch-dialog";
+import { ProductImportDialog } from "@/components/pos/product-import-dialog";
 import type { ProductWithStock, PaginatedResponse } from "@/types";
 
 export default function ProductsPage() {
@@ -49,6 +51,7 @@ export default function ProductsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [importOpen, setImportOpen] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: pageSize,
@@ -156,11 +159,20 @@ export default function ProductsPage() {
         description="Kelola katalog produk, varian, dan resep Bill of Materials (BOM)"
         icon={Package}
       >
-        <Button asChild>
-          <Link href="/products/new">
-            <Plus className="w-4 h-4 mr-1" /> Tambah Produk
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setImportOpen(true)}
+            className="border-slate-300 text-slate-700 hover:bg-slate-50"
+          >
+            <UploadCloud className="w-4 h-4 mr-1.5 text-primary" /> Migrasi / Impor Excel
+          </Button>
+          <Button asChild>
+            <Link href="/products/new">
+              <Plus className="w-4 h-4 mr-1" /> Tambah Produk
+            </Link>
+          </Button>
+        </div>
       </PageHeader>
 
       {/* Search */}
@@ -545,6 +557,19 @@ export default function ProductsPage() {
           }}
         />
       )}
+      {/* Product Import Batch Modal */}
+      <ProductImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onSuccess={() => {
+          // reload products list
+          fetch(`/api/products?page=${page}&limit=${pageSize}`)
+            .then((r) => r.json())
+            .then((d) => {
+              if (d.data) setProducts(d.data);
+            });
+        }}
+      />
     </div>
   );
 }

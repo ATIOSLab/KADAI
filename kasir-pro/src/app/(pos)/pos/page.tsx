@@ -5,6 +5,7 @@ import { ProductSearch } from "@/components/pos/product-search";
 import { Cart } from "@/components/pos/cart";
 import { ShiftDialog } from "@/components/pos/shift-dialog";
 import { PrinterSettingsDialog } from "@/components/pos/printer-settings-dialog";
+import { CashMovementDialog } from "@/components/pos/cash-movement-dialog";
 import { ArrowLeft, ShoppingBag, Calculator, Printer } from "lucide-react";
 import { KadaiLogoMark } from "@/components/shared/kadai-logo";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export default function PosPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isShiftOpen, setIsShiftOpen] = useState(false);
   const [isPrinterOpen, setIsPrinterOpen] = useState(false);
+  const [isCashMovementOpen, setIsCashMovementOpen] = useState(false);
   const [printerConfig, setPrinterConfig] = useState<PrinterConfig>({
     type: "none",
     deviceName: null,
@@ -88,12 +90,23 @@ export default function PosPage() {
           <Button
             size="sm"
             variant="outline"
+            onClick={() => setIsCashMovementOpen(true)}
+            className="text-xs font-bold h-8 px-2.5 flex items-center gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-50"
+            title="Catat Modal Kasir & Kas Belanja"
+          >
+            <span className="text-emerald-600 font-black">Rp</span>
+            <span className="hidden sm:inline">Kas & Modal</span>
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
             onClick={() => setIsShiftOpen(true)}
             className="text-xs font-bold h-8 px-2.5 flex items-center gap-1.5 border-slate-300"
             title="Laporan Kas & Tutup Shift"
           >
             <Calculator className="size-3.5 text-primary" />
-            <span className="hidden sm:inline">Kas & Tutup Shift</span>
+            <span className="hidden sm:inline">Tutup Shift</span>
           </Button>
 
           <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block">
@@ -143,6 +156,10 @@ export default function PosPage() {
       </div>
 
       <ShiftDialog open={isShiftOpen} onOpenChange={setIsShiftOpen} />
+      <CashMovementDialog
+        open={isCashMovementOpen}
+        onOpenChange={setIsCashMovementOpen}
+      />
       <PrinterSettingsDialog
         open={isPrinterOpen}
         onOpenChange={setIsPrinterOpen}

@@ -5,6 +5,8 @@ import {
   Warehouse,
   ChefHat,
   Building2,
+  Wallet,
+  Sparkles,
   Check,
 } from "lucide-react";
 import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
@@ -45,6 +47,28 @@ export function CapabilityBentoGrid() {
       ],
     },
     {
+      eyebrow: "Tata Kelola Arus Kas",
+      title: "Kas Modal Kasir & Kas Belanja Operasional Dapur",
+      desc: "Pisahkan uang modal kerja belanja harian (es batu, bumbu, gas) dari uang laci kasir pembeli. Pantau suntikan modal owner dan rekonsiliasi kas harian tanpa campur aduk.",
+      icon: Wallet,
+      highlights: [
+        "Multi-Kantong: Kas Laci Kasir vs Kas Belanja Tim Dapur",
+        "Pencatatan kas masuk & kas keluar instan dari terminal POS",
+        "Rekonsiliasi otomatis saat tutup shift kasir (Z-Report)",
+      ],
+    },
+    {
+      eyebrow: "Migrasi Kasir Tanpa Ribet",
+      title: "AI Smart Import: Pindah dari Kasir Lain dalam 1 Detik",
+      desc: "Sudah pakai kasir lain? Cukup unggah file Excel/CSV dari Moka, Majoo, Pawoon, atau spreadsheet lama. AI kami otomatis mengenali kolom nama, harga, HPP, dan stok awal secara gratis.",
+      icon: Sparkles,
+      highlights: [
+        "Deteksi kolom otomatis tanpa format template kaku",
+        "Preview tabel dan verifikasi integritas data sebelum impor",
+        "100% Gratis di seluruh paket langganan KADAI",
+      ],
+    },
+    {
       eyebrow: "Jaringan Gerai Terpusat",
       title: "Distribusi Antar-Cabang & Surat Jalan Digital",
       desc: "Kelola pasokan dari gudang pusat ke gerai cabang dengan surat jalan digital terenkripsi. Pantau performa omzet seluruh toko secara terpusat dari satu akun pemilik usaha.",
@@ -73,7 +97,7 @@ export function CapabilityBentoGrid() {
       </FadeIn>
 
       {/* Editorial Grid: Open, Spacious with Subtle Stagger Motion */}
-      <FadeInStagger className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-14 sm:gap-y-16 border-t border-slate-200/80 pt-12 sm:pt-16">
+      <FadeInStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12 sm:gap-y-14 border-t border-slate-200/80 pt-12 sm:pt-16">
         {capabilities.map((item, idx) => {
           const Icon = item.icon;
           return (

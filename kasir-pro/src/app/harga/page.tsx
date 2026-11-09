@@ -252,6 +252,20 @@ export default function HargaPage() {
                   <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Termasuk</td>
                 </tr>
                 <tr>
+                  <td className="py-3 px-4 font-medium">Buku Kas & Modal Belanja Operasional</td>
+                  <td className="py-3 px-4 text-center text-slate-300">—</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Kas Kasir</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Multi-Kantong (Kasir & Dapur)</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Terkonsolidasi</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-medium">Migrasi Data Cepat Kasir Lama (Excel/CSV)</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Gratis Selamanya</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Gratis Selamanya</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Gratis Selamanya</td>
+                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ Prioritas Assisted</td>
+                </tr>
+                <tr>
                   <td className="py-3 px-4 font-medium">Pajak PB1 10% & PPh Final PP 55/2022</td>
                   <td className="py-3 px-4 text-center text-slate-300">—</td>
                   <td className="py-3 px-4 text-center text-emerald-600 font-bold">✓ PB1 10%</td>

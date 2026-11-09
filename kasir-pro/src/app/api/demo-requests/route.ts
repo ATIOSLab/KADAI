@@ -81,6 +81,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Kirim notifikasi instan ke admin jika Telegram terhubung
+    try {
+      const recipients = await prisma.telegramChatBinding.findMany({
+        where: { isAuthorized: true },
+        select: { telegramChatId: true },
+      });
+
+      if (recipients.length > 0) {
+        const typeLabelMap: Record<string, string> = {
+          FNB_CAFE: "Kafe & Kedai Minuman",
+          FNB_RESTO: "Restoran / Rumah Makan",
+          FNB_WARUNG: "Warung Makan & Booth",
+          RETAIL_SHOP: "Toko Ritel & Grosir",
+          MINIMARKET: "Minimarket Sembako",
+          SERVICE: "Jasa & Laundry",
+        };
+        const displayType = typeLabelMap[validated.businessType] || validated.businessType;
+        const alertMessage =
+          `🔔 *LEAD PERMOHONAN DEMO KADAI*\n\n` +
+          `👤 *Nama:* ${validated.fullName}\n` +
+          `🏢 *Usaha:* ${validated.businessName} (${displayType})\n` +
+          `📍 *Jumlah Gerai:* ${validated.outletCount} Outlet\n` +
+          `📱 *WhatsApp:* \`${validated.phone}\`\n` +
+          (validated.email ? `✉️ *Email:* ${validated.email}\n` : "") +
+          `🔑 *Kode Akses:* \`${accessCode}\`\n` +
+          (cleanRefCode ? `🤝 *Referral:* \`${cleanRefCode}\`\n` : "") +
+          (validated.notes ? `📝 *Catatan:* ${validated.notes}\n` : "") +
+          `\n_Segera hubungi prospek via WhatsApp untuk jadwal presentasi._`;
+
+        const { sendTelegramMessage } = await import("@/lib/bot/telegram");
+        await Promise.allSettled(
+          recipients.map((r) => sendTelegramMessage(r.telegramChatId, alertMessage))
+        );
+      }
+    } catch (notifErr) {
+      console.error("Gagal mengirim Telegram demo alert:", notifErr);
+    }
+
     return NextResponse.json(
       {
         success: true,

@@ -10,6 +10,9 @@ const sessionUserSchema = z.object({
   email: z.email(),
   role: z.nativeEnum(UserRole),
   version: z.string().min(1),
+  businessType: z.string().optional(),
+  storeTier: z.string().optional(),
+  storeName: z.string().optional(),
 });
 
 export type SessionUser = z.infer<typeof sessionUserSchema>;

@@ -21,11 +21,15 @@ export function Sidebar({ collapsed, currentUser }: SidebarProps) {
   const visibleSections = navigationSections
     .map((section) => ({
       ...section,
-      items: section.items.filter(
-        (item) =>
-          !item.roles ||
-          (currentUser ? item.roles.includes(currentUser.role) : false)
-      ),
+      items: section.items.filter((item) => {
+        const matchesRole =
+          !item.roles || (currentUser ? item.roles.includes(currentUser.role) : false);
+        const matchesBusiness =
+          !item.businessTypes ||
+          !currentUser?.businessType ||
+          item.businessTypes.includes(currentUser.businessType);
+        return matchesRole && matchesBusiness;
+      }),
     }))
     .filter((section) => section.items.length > 0);
   const roleLabelMap: Record<string, string> = {

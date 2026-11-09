@@ -26,6 +26,7 @@ export interface NavigationItem {
   description: string;
   icon: LucideIcon;
   roles?: AppRole[];
+  businessTypes?: string[]; // Filter sesuai vertikal bisnis toko
 }
 
 export interface NavigationSection {
@@ -67,6 +68,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Manajemen tata letak meja dan tautan menu QR mandiri.",
         icon: QrCode,
         roles: ["ADMIN", "MANAGER"],
+        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG"],
       },
       {
         href: "/kds",
@@ -75,6 +77,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Layar monitor antrean tiket dapur dan bar real-time.",
         icon: ChefHat,
         roles: ["ADMIN", "MANAGER", "KITCHEN"],
+        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG"],
       },
     ],
   },

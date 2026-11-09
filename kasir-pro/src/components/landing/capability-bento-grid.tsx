@@ -60,7 +60,7 @@ export function CapabilityBentoGrid() {
     {
       eyebrow: "Migrasi Kasir Tanpa Ribet",
       title: "AI Smart Import: Pindah dari Kasir Lain dalam 1 Detik",
-      desc: "Sudah pakai kasir lain? Cukup unggah file Excel/CSV dari Moka, Majoo, Pawoon, atau spreadsheet lama. AI kami otomatis mengenali kolom nama, harga, HPP, dan stok awal secara gratis.",
+      desc: "Sudah pakai sistem kasir sebelumnya? Cukup unggah berkas ekspor Excel/CSV lama Anda. Sistem cerdas KADAI otomatis mengenali kolom nama barang, harga jual, HPP, dan stok awal tanpa biaya tambahan.",
       icon: Sparkles,
       highlights: [
         "Deteksi kolom otomatis tanpa format template kaku",

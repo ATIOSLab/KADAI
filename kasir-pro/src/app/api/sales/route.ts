@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Pagination tidak valid" }, { status: 400 });
     }
 
-    if ((paymentType && !["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET"].includes(paymentType)) ||
+    if ((paymentType && !["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"].includes(paymentType)) ||
         [startDate, endDate].some((d) => d !== null &&
           (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !Number.isFinite(Date.parse(d))))) {
       return NextResponse.json({ error: "Filter tidak valid" }, { status: 400 });
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
           lte: new Date(endDate + "T23:59:59.999Z"),
         },
       }),
-      ...(paymentType && { paymentType: paymentType as "CASH" | "BANK_TRANSFER" | "QRIS" | "E_WALLET" }),
+      ...(paymentType && { paymentType: paymentType as "CASH" | "BANK_TRANSFER" | "QRIS" | "E_WALLET" | "TEMPO" }),
     };
 
     const [sales, total] = await Promise.all([

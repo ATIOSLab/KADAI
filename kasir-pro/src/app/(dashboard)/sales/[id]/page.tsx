@@ -32,6 +32,7 @@ const paymentLabels: Record<string, string> = {
   QRIS: "QRIS",
   BANK_TRANSFER: "Transfer",
   E_WALLET: "E-Wallet",
+  TEMPO: "Tempo / Bon Mandor",
 };
 
 interface BatchAllocation {

@@ -82,6 +82,7 @@ export function ThermalReceipt({
     BANK_TRANSFER: "TRANSFER BANK",
     QRIS: "QRIS",
     E_WALLET: "E-WALLET",
+    TEMPO: "TEMPO / BON MANDOR",
   };
 
   const renderContent = () => (

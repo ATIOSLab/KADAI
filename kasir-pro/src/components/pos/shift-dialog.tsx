@@ -41,6 +41,7 @@ interface ShiftSummaryData {
     QRIS: { count: number; total: number };
     BANK_TRANSFER: { count: number; total: number };
     E_WALLET: { count: number; total: number };
+    TEMPO?: { count: number; total: number };
   };
 }
 

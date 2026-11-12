@@ -35,6 +35,7 @@ const paymentLabels: Record<string, string> = {
   QRIS: "QRIS",
   BANK_TRANSFER: "Transfer",
   E_WALLET: "E-Wallet",
+  TEMPO: "Tempo / Bon Mandor",
 };
 
 interface SaleItem {
@@ -217,6 +218,7 @@ export default function SalesPage() {
               <SelectItem value="QRIS">QRIS</SelectItem>
               <SelectItem value="BANK_TRANSFER">Transfer Bank</SelectItem>
               <SelectItem value="E_WALLET">E-Wallet</SelectItem>
+              <SelectItem value="TEMPO">Tempo / Bon Mandor</SelectItem>
             </SelectContent>
           </Select>
         </div>

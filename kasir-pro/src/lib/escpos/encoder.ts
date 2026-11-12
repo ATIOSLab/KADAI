@@ -247,6 +247,7 @@ export function buildEscPosReceipt(data: ReceiptData, paperWidth: PaperWidth = 5
     BANK_TRANSFER: "TRANSFER BANK",
     QRIS: "QRIS",
     E_WALLET: "E-WALLET",
+    TEMPO: "TEMPO / BON MANDOR",
   };
   enc.twoColumns("Metode Bayar", paymentLabels[data.paymentType] || data.paymentType);
 

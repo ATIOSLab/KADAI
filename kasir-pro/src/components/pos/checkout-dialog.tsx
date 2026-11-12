@@ -46,6 +46,12 @@ const paymentMethods = [
     icon: Wallet,
     color: "bg-accent-purple",
   },
+  {
+    id: "TEMPO",
+    label: "Tempo / Bon",
+    icon: FileText,
+    color: "bg-slate-700",
+  },
 ];
 
 interface CheckoutDialogProps {

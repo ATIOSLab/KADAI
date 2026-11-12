@@ -268,10 +268,12 @@ function RequestDemoForm() {
                         onChange={(e) => setBusinessType(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       >
+                        <option value="BUILDING_SUPPLY">Toko Bangunan & Alat Teknik</option>
+                        <option value="RETAIL">Toko Ritel & Minimarket Sembako</option>
+                        <option value="PHARMACY">Apotek & Alat Kesehatan</option>
                         <option value="FNB_RESTO">Kafe, Resto & Kuliner (F&B)</option>
-                        <option value="RETAIL">Toko Ritel & Minimarket</option>
                         <option value="CENTRAL_KITCHEN">Dapur Pusat & Multi-Gudang</option>
-                        <option value="SERVICE">Jasa, Salon & Barbershop</option>
+                        <option value="SERVICE">Jasa, Barbershop & Laundry</option>
                         <option value="OTHER">Sektor Lainnya</option>
                       </select>
                     </div>

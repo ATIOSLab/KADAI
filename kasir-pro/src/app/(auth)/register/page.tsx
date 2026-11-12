@@ -7,6 +7,9 @@ import {
   Store,
   UtensilsCrossed,
   ShoppingBag,
+  Hammer,
+  Pill,
+  Scissors,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -104,33 +107,75 @@ export default function RegisterPage() {
             {/* Tipe Usaha Selector */}
             <div className="space-y-2">
               <Label className="font-bold text-xs">Pilih Kategori Usaha Anda</Label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setBusinessType("FNB_CAFE")}
-                  className={`p-3 rounded-xl neo-border text-left transition-all ${
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
                     businessType === "FNB_CAFE"
-                      ? "bg-primary/10 border-primary neo-shadow-sm"
+                      ? "bg-primary/10 border-primary neo-shadow-sm ring-1 ring-primary"
                       : "bg-muted/40 hover:bg-muted"
                   }`}
                 >
-                  <UtensilsCrossed className="size-5 text-primary mb-1" />
-                  <p className="font-black text-xs">Kuliner, Kafe & Restoran</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Resep BOM, Meja QR, KDS Dapur</p>
+                  <UtensilsCrossed className="size-4 text-primary mb-1" />
+                  <p className="font-black text-xs leading-tight">Kafe & Resto</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">BOM & KDS Dapur</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBusinessType("BUILDING_SUPPLY")}
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
+                    businessType === "BUILDING_SUPPLY"
+                      ? "bg-amber-500/10 border-amber-600 neo-shadow-sm ring-1 ring-amber-500"
+                      : "bg-muted/40 hover:bg-muted"
+                  }`}
+                >
+                  <Hammer className="size-4 text-amber-600 mb-1" />
+                  <p className="font-black text-xs leading-tight">Toko Bangunan</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Multi-Gudang & Material</p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setBusinessType("RETAIL")}
-                  className={`p-3 rounded-xl neo-border text-left transition-all ${
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
                     businessType === "RETAIL"
-                      ? "bg-primary/10 border-primary neo-shadow-sm"
+                      ? "bg-primary/10 border-primary neo-shadow-sm ring-1 ring-primary"
                       : "bg-muted/40 hover:bg-muted"
                   }`}
                 >
-                  <ShoppingBag className="size-5 text-accent-secondary mb-1" />
-                  <p className="font-black text-xs">Toko Ritel / Grosir</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Barcode Scan, Batch FIFO, Expired</p>
+                  <ShoppingBag className="size-4 text-accent-secondary mb-1" />
+                  <p className="font-black text-xs leading-tight">Ritel & Sembako</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Barcode Scan & Expired</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBusinessType("PHARMACY")}
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
+                    businessType === "PHARMACY"
+                      ? "bg-emerald-500/10 border-emerald-600 neo-shadow-sm ring-1 ring-emerald-500"
+                      : "bg-muted/40 hover:bg-muted"
+                  }`}
+                >
+                  <Pill className="size-4 text-emerald-600 mb-1" />
+                  <p className="font-black text-xs leading-tight">Apotek & Alkes</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">FEFO Batch & Resep</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBusinessType("SERVICE")}
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
+                    businessType === "SERVICE"
+                      ? "bg-purple-500/10 border-purple-600 neo-shadow-sm ring-1 ring-purple-500"
+                      : "bg-muted/40 hover:bg-muted"
+                  }`}
+                >
+                  <Scissors className="size-4 text-purple-600 mb-1" />
+                  <p className="font-black text-xs leading-tight">Jasa & Salon</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Komisi & Work Order</p>
                 </button>
               </div>
             </div>

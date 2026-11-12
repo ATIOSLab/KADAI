@@ -84,6 +84,7 @@ const PAYMENT_LABELS: Record<PaymentType, string> = {
   BANK_TRANSFER: "Transfer",
   QRIS: "QRIS",
   E_WALLET: "E-Wallet",
+  TEMPO: "Tempo / Bon Mandor",
 };
 
 const PAYMENT_COLORS: Record<PaymentType, string> = {
@@ -91,6 +92,7 @@ const PAYMENT_COLORS: Record<PaymentType, string> = {
   QRIS: "#EA580C",         // Ember
   BANK_TRANSFER: "#F59E0B",// Amber
   E_WALLET: "#FB923C",     // Glow
+  TEMPO: "#64748B",        // Slate-500
 };
 
 function formatRangeStart(dateValue: Date, timezone: string) {

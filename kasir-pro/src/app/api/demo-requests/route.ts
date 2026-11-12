@@ -95,7 +95,9 @@ export async function POST(request: NextRequest) {
           FNB_WARUNG: "Warung Makan & Booth",
           RETAIL_SHOP: "Toko Ritel & Grosir",
           MINIMARKET: "Minimarket Sembako",
-          SERVICE: "Jasa & Laundry",
+          BUILDING_SUPPLY: "Toko Bangunan & Alat Teknik",
+          PHARMACY: "Apotek & Alat Kesehatan",
+          SERVICE: "Jasa, Barbershop & Laundry",
         };
         const displayType = typeLabelMap[validated.businessType] || validated.businessType;
         const alertMessage =

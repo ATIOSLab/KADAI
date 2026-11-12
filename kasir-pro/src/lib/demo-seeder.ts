@@ -3,6 +3,76 @@ import { prisma } from "@/lib/prisma";
 import { ProductType, StationType, UserRole } from "@prisma/client";
 
 export const CLUSTERS = [
+  // 1. TOKO BANGUNAN, MATERIAL & ALAT TEKNIK (HARDWARE & BUILDING SUPPLIES)
+  {
+    vertical: "BUILDING_SUPPLY",
+    name: "TB Surya Abadi Material & Alat Teknik",
+    slug: "bangunan",
+    description: "Toko Bangunan & Supplier Material: Manajemen Multi-Gudang Semen, Besi, Cat, dan Kontrol HPP FIFO",
+    outlets: [
+      { name: "TB Surya Abadi - Toko Depan & Kasir", code: "TKB-01", address: "Jl. Raya Industri No. 88, Bekasi", phone: "08128888001", isMain: true },
+      { name: "TB Surya Abadi - Gudang Induk Semen & Besi", code: "TKB-GDG", address: "Pergudangan Surya Jaya Blok B-12, Bekasi", phone: "08128888002", isMain: false },
+    ],
+    categories: [
+      "Semen & Material Pasir",
+      "Cat Tembok & Pelapis Bocor",
+      "Pipa PVC & Sambungan Fitting",
+      "Besi Beton & Baja Ringan",
+      "Perkakas & Alat Teknik",
+    ],
+    products: [
+      { name: "Semen Tiga Roda 50kg (Sak)", sku: "TKB-SMN-01", barcode: "899800100001", category: "Semen & Material Pasir", price: 72000, cost: 64000, stock: 350, unit: "sak", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Cat Dulux Weathershield 2.5L Brilliant White", sku: "TKB-CAT-02", barcode: "899800100002", category: "Cat Tembok & Pelapis Bocor", price: 245000, cost: 205000, stock: 45, unit: "galon", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Cat Kayu & Besi Avian 1kg Hitam Gloss", sku: "TKB-CAT-03", barcode: "899800100003", category: "Cat Tembok & Pelapis Bocor", price: 68000, cost: 55000, stock: 80, unit: "kaleng", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Pipa PVC Rucika AW 1/2 Inch (4 Meter)", sku: "TKB-PPA-04", barcode: "899800100004", category: "Pipa PVC & Sambungan Fitting", price: 38500, cost: 29000, stock: 160, unit: "batang", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Knee Elbow PVC 1/2 Inch Rucika", sku: "TKB-FTG-05", barcode: "899800100005", category: "Pipa PVC & Sambungan Fitting", price: 5500, cost: 3200, stock: 450, unit: "pcs", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Besi Beton Ulir 10mm SNI (12 Meter)", sku: "TKB-BSI-06", barcode: "899800100006", category: "Besi Beton & Baja Ringan", price: 86000, cost: 74000, stock: 220, unit: "batang", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Baja Ringan Kanal C75 0.75mm SNI (6 Meter)", sku: "TKB-BJR-07", barcode: "899800100007", category: "Besi Beton & Baja Ringan", price: 92000, cost: 78000, stock: 190, unit: "batang", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Mesin Gerinda Tangan Maktec MT90 4 Inch", sku: "TKB-AL-08", barcode: "899800100008", category: "Perkakas & Alat Teknik", price: 385000, cost: 315000, stock: 25, unit: "unit", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Paku Kayu 5cm SNI (Kg)", sku: "TKB-PKU-09", barcode: "899800100009", category: "Perkakas & Alat Teknik", price: 22000, cost: 16500, stock: 140, unit: "kg", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Kran Tembok Onda 1/2 Inch Stainless", sku: "TKB-KRN-10", barcode: "899800100010", category: "Perkakas & Alat Teknik", price: 45000, cost: 32000, stock: 75, unit: "pcs", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+    ],
+    users: [
+      { name: "Hendra Wijaya (Owner TB Surya Abadi)", email: "owner.bangunan@kadai.asia", role: UserRole.ADMIN, pin: "999111" },
+      { name: "Rudi Hartono (Kepala Toko Bangunan)", email: "manager.bangunan@kadai.asia", role: UserRole.MANAGER, pin: "999222" },
+      { name: "Eko Prasetyo (Kasir Kas & Barcode Toko)", email: "kasir.bangunan@kadai.asia", role: UserRole.CASHIER, pin: null },
+      { name: "Surya Kencana (Staf Gudang Material & Semen)", email: "gudang.bangunan@kadai.asia", role: UserRole.INVENTORY, pin: null },
+      { name: "Lestari (Akuntan Piutang Mandor)", email: "akuntan.bangunan@kadai.asia", role: UserRole.ACCOUNTANT, pin: null },
+    ],
+  },
+
+  // 2. APOTEK & ALAT KESEHATAN (PHARMACY RETAIL)
+  {
+    vertical: "PHARMACY",
+    name: "Apotek Sehat Medika & Alkes",
+    slug: "apotek",
+    description: "Apotek & Toko Obat: Pelacakan Kedaluwarsa FEFO, Nomor Batch Presisi, dan Kontrol Stok Obat Keras/Bebas",
+    outlets: [
+      { name: "Apotek Sehat Medika - Pondok Indah", code: "APT-01", address: "Jl. Metro Pondok Indah Blok TC No. 12, Jaksel", phone: "08129999001", isMain: true },
+    ],
+    categories: [
+      "Obat Bebas & Flu Batuk (OTC)",
+      "Vitamin & Imunitas Tubuh",
+      "Antiseptik & P3K",
+      "Alat Kesehatan & Diagnostik",
+    ],
+    products: [
+      { name: "Panadol Extra Merah 10 Kaplet", sku: "APT-OBT-01", barcode: "899900100001", category: "Obat Bebas & Flu Batuk (OTC)", price: 14500, cost: 11200, stock: 260, unit: "strip", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Sanmol Paracetamol 500mg (Strip 4 Tablet)", sku: "APT-OBT-02", barcode: "899900100002", category: "Obat Bebas & Flu Batuk (OTC)", price: 6000, cost: 4200, stock: 320, unit: "strip", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Imboost Force Daya Tahan Tubuh 10 Kaplet", sku: "APT-VIT-03", barcode: "899900100003", category: "Vitamin & Imunitas Tubuh", price: 45000, cost: 36000, stock: 110, unit: "strip", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Tolak Angin Cair Sidomuncul (Box 12 Sachet)", sku: "APT-VIT-04", barcode: "899900100004", category: "Vitamin & Imunitas Tubuh", price: 48000, cost: 39000, stock: 90, unit: "box", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Betadine Antiseptic Solution 60ml", sku: "APT-P3K-05", barcode: "899900100005", category: "Antiseptik & P3K", price: 32000, cost: 24500, stock: 85, unit: "botol", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Tensimeter Digital Otomatis Omron HEM-7120", sku: "APT-ALK-06", barcode: "899900100006", category: "Alat Kesehatan & Diagnostik", price: 480000, cost: 390000, stock: 16, unit: "unit", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+      { name: "Masker Medis 3-Ply Earloop Surgical (Box 50pcs)", sku: "APT-ALK-07", barcode: "899900100007", category: "Alat Kesehatan & Diagnostik", price: 35000, cost: 22000, stock: 140, unit: "box", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
+    ],
+    users: [
+      { name: "apt. Fitri Rahmawati, S.Farm (Owner Apotek)", email: "owner.apotek@kadai.asia", role: UserRole.ADMIN, pin: "222111" },
+      { name: "apt. Bayu Pratama (Apoteker Pengelola Apotek)", email: "manager.apotek@kadai.asia", role: UserRole.MANAGER, pin: "222222" },
+      { name: "Siti Rahayu (Asisten Apoteker / Kasir)", email: "kasir.apotek@kadai.asia", role: UserRole.CASHIER, pin: null },
+      { name: "Indra Gunawan (Gudang Farmasi & FEFO Batch)", email: "gudang.apotek@kadai.asia", role: UserRole.INVENTORY, pin: null },
+      { name: "Citra Melati (Akuntan Pajak & Faktur Farmasi)", email: "akuntan.apotek@kadai.asia", role: UserRole.ACCOUNTANT, pin: null },
+    ],
+  },
   {
     vertical: "FNB_RESTAURANT",
     name: "Resto Rasa Nusantara Multi-Cabang",
@@ -153,12 +223,16 @@ export async function runDemoSeeding() {
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
   for (const cluster of CLUSTERS) {
+    let mainOutletId: string | undefined;
     for (const out of cluster.outlets) {
-      await prisma.outlet.upsert({
+      const o = await prisma.outlet.upsert({
         where: { code: out.code },
         update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain },
         create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain },
       });
+      if (out.isMain || !mainOutletId) {
+        mainOutletId = o.id;
+      }
     }
 
     for (const catName of cluster.categories) {
@@ -217,23 +291,34 @@ export async function runDemoSeeding() {
 
     for (const u of cluster.users) {
       const supervisorPinHash = u.pin ? await bcrypt.hash(u.pin, 12) : null;
-      await prisma.user.upsert({
-        where: { email: u.email },
-        update: {
-          name: u.name,
-          role: u.role,
-          supervisorPin: supervisorPinHash,
-          isActive: true,
-        },
-        create: {
-          name: u.name,
-          email: u.email,
-          passwordHash,
-          role: u.role,
-          supervisorPin: supervisorPinHash,
-          isActive: true,
-        },
-      });
+      const targetEmails = new Set([u.email]);
+      if (u.email.endsWith("@kadai.asia")) {
+        targetEmails.add(u.email.replace("@kadai.asia", "@kadai.com"));
+      } else if (u.email.endsWith("@kadai.com")) {
+        targetEmails.add(u.email.replace("@kadai.com", "@kadai.asia"));
+      }
+
+      for (const email of targetEmails) {
+        await prisma.user.upsert({
+          where: { email },
+          update: {
+            name: u.name,
+            role: u.role,
+            supervisorPin: supervisorPinHash,
+            isActive: true,
+            outletId: mainOutletId,
+          },
+          create: {
+            name: u.name,
+            email,
+            passwordHash,
+            role: u.role,
+            supervisorPin: supervisorPinHash,
+            isActive: true,
+            outletId: mainOutletId,
+          },
+        });
+      }
     }
   }
 

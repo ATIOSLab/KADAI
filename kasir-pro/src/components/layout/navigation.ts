@@ -15,6 +15,7 @@ import {
   Users,
   Building,
   ArrowLeftRight,
+  Shirt,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
@@ -78,6 +79,15 @@ export const navigationSections: NavigationSection[] = [
         icon: ChefHat,
         roles: ["ADMIN", "MANAGER", "KITCHEN"],
         businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG"],
+      },
+      {
+        href: "/laundry",
+        label: "Work Order Laundry",
+        shortLabel: "Laundry",
+        description: "Pelacakan tiket cuci kiloan/satuan, status mesin, dan rak simpan.",
+        icon: Shirt,
+        roles: ["ADMIN", "MANAGER", "CASHIER", "INVENTORY"],
+        businessTypes: ["SERVICE"],
       },
     ],
   },

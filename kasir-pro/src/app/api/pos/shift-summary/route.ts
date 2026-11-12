@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { PaymentType } from "@prisma/client";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
@@ -42,11 +43,12 @@ export async function GET(request: NextRequest) {
     const activeSales = sales.filter((s) => !s.isVoided);
     const voidedSales = sales.filter((s) => s.isVoided);
 
-    const salesByPayment = {
+    const salesByPayment: Record<PaymentType, { count: number; total: number }> = {
       CASH: { count: 0, total: 0 },
       QRIS: { count: 0, total: 0 },
       BANK_TRANSFER: { count: 0, total: 0 },
       E_WALLET: { count: 0, total: 0 },
+      TEMPO: { count: 0, total: 0 },
     };
 
     let totalRevenue = 0;

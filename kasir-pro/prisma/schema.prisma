@@ -26,6 +26,8 @@ enum BusinessType {
   FNB_RESTAURANT
   FNB_WARUNG
   SERVICE
+  BUILDING_SUPPLY
+  PHARMACY
 }
 
 enum SubscriptionTier {
@@ -93,6 +95,7 @@ enum PaymentType {
   BANK_TRANSFER
   QRIS
   E_WALLET
+  TEMPO
 }
 
 enum LaundryServiceType {

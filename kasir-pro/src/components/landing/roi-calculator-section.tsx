@@ -7,15 +7,14 @@ import { Button } from "@/components/ui/button";
 import { FadeIn } from "./fade-in";
 
 export function RoiCalculatorSection() {
-  const [businessType, setBusinessType] = useState<"fnb" | "retail" | "hardware">("fnb");
+  const [businessType, setBusinessType] = useState<"fnb" | "retail">("fnb");
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(35000000); // 35 Juta
   const [outletCount, setOutletCount] = useState<number>(1);
 
   // Estimasi Kebocoran & Efisiensi Berdasarkan Data Nyata Industri
   // F&B: Kebocoran bahan mentah tanpa BOM rata-rata 4-7%, kesalahan nota kasir 1.5%
-  // Hardware/Bangunan: Selisih HPP komoditas & selisih stok gudang 4.8%
   // Ritel: Barang kadaluwarsa tersembunyi & stok mati rata-rata 3-5%
-  const wasteRate = businessType === "fnb" ? 0.055 : businessType === "hardware" ? 0.048 : 0.04;
+  const wasteRate = businessType === "fnb" ? 0.055 : 0.04;
   const estimatedLeakagePerMonth = Math.round(monthlyRevenue * wasteRate * outletCount);
   
   // Waktu rekap nota manual yang dihemat: ~2 jam/hari x 30 hari = 60 jam/outlet
@@ -60,39 +59,28 @@ export function RoiCalculatorSection() {
               <label className="text-xs font-bold text-slate-700 block">
                 Jenis Usaha Anda
               </label>
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-200/70 rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-200/70 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setBusinessType("fnb")}
-                  className={`py-2 px-2 text-[11px] sm:text-xs font-bold rounded-lg transition-all text-center truncate ${
+                  className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${
                     businessType === "fnb"
                       ? "bg-white text-slate-950 shadow-xs"
                       : "text-slate-600 hover:text-slate-950"
                   }`}
                 >
-                  ☕ Kuliner & Kafe
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("hardware")}
-                  className={`py-2 px-2 text-[11px] sm:text-xs font-bold rounded-lg transition-all text-center truncate ${
-                    businessType === "hardware"
-                      ? "bg-white text-slate-950 shadow-xs"
-                      : "text-slate-600 hover:text-slate-950"
-                  }`}
-                >
-                  🏗️ Toko Bangunan
+                  ☕ Kuliner / Kafe / Resto
                 </button>
                 <button
                   type="button"
                   onClick={() => setBusinessType("retail")}
-                  className={`py-2 px-2 text-[11px] sm:text-xs font-bold rounded-lg transition-all text-center truncate ${
+                  className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${
                     businessType === "retail"
                       ? "bg-white text-slate-950 shadow-xs"
                       : "text-slate-600 hover:text-slate-950"
                   }`}
                 >
-                  🛍️ Ritel & Sembako
+                  🛍️ Toko Ritel / Kelontong
                 </button>
               </div>
             </div>

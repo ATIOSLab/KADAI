@@ -39,10 +39,8 @@ export function SiteFooter() {
               Solusi & Paket
             </span>
             <ul className="space-y-2 text-slate-400">
-              <li><Link href="/solusi/bangunan" className="hover:text-white transition-colors">Toko Bangunan & Teknik</Link></li>
               <li><Link href="/solusi/fnb" className="hover:text-white transition-colors">Restoran & Kafe (F&B)</Link></li>
               <li><Link href="/solusi/ritel" className="hover:text-white transition-colors">Toko Ritel & Grosir</Link></li>
-              <li><Link href="/solusi" className="hover:text-white transition-colors">Semua Solusi Sektor</Link></li>
               <li><Link href="/harga" className="hover:text-white transition-colors">Paket Langganan</Link></li>
               <li><Link href="/demo" className="hover:text-white transition-colors text-primary font-bold">Jadwalkan Demo</Link></li>
             </ul>

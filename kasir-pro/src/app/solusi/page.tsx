@@ -6,9 +6,6 @@ import {
   UtensilsCrossed,
   Store,
   Warehouse,
-  Hammer,
-  Pill,
-  Scissors,
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
@@ -18,40 +15,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Solusi Industri: Toko Bangunan, F&B, Ritel, Apotek & Multi-Gudang",
+  title: "Solusi Industri: F&B, Ritel, & Dapur Pusat",
   description:
-    "Solusi sistem operasional kasir, HPP FIFO, dan rantai pasok terarah untuk toko bangunan, kafe, restoran, ritel sembako, apotek, jasa, serta sentra gudang distribusi.",
+    "Solusi sistem operasional kasir dan rantai pasok terarah untuk kafe, restoran, toko ritel, minimarket, serta sentra dapur pusat dan gudang distribusi.",
   alternates: {
     canonical: "https://kadai.asia/solusi",
   },
   openGraph: {
-    title: "Solusi Industri: Toko Bangunan, F&B, Ritel, Apotek & Multi-Gudang | KADAI",
+    title: "Solusi Industri: F&B, Ritel, & Dapur Pusat | KADAI",
     description:
-      "Arsitektur operasional kasir, stok multi-batch, surat jalan transfer cabang, dan alur terpadu untuk berbagai vertikal bisnis Indonesia.",
+      "Arsitektur operasional kasir, stok multi-batch, dan alur dapur terpadu untuk kafe, ritel minimarket, hingga multi-cabang distribusi.",
     url: "https://kadai.asia/solusi",
     images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
   },
 };
 
 const solutions = [
-  {
-    slug: "toko-bangunan",
-    title: "Toko Bangunan & Alat Teknik",
-    category: "Hardware & Building Material",
-    desc: "Dirancang untuk ritme berat toko material. Kelola ribuan SKU fitting pipa & perkakas, pemisahan toko display depan vs gudang semen/besi, dan kontrol HPP modal FIFO.",
-    icon: Hammer,
-    painPoints: [
-      "Harga komoditas besi & semen naik-turun cepat sehingga margin laba kotor meleset",
-      "Stok semen di lahan gudang terpisah tidak sinkron dengan kasir toko depan",
-      "Pencatatan kasbon / bon tempo mandor proyek sering tercecer",
-    ],
-    features: [
-      "Pemisahan Toko Depan vs Gudang Material via transfer stok antar cabang",
-      "Kalkulasi HPP FIFO otomatis mengikuti tanggal dan harga beli tiap batch barang masuk",
-      "Scan barcode kilat ribuan SKU perkakas, kran, saklar, dan fitting PVC",
-      "Mendukung opsi pembayaran Tunai, QRIS, Transfer, hingga Tempo / Bon Mandor",
-    ],
-  },
   {
     slug: "kuliner-fnb",
     title: "Kafe, Restoran & Kuliner (F&B)",
@@ -72,9 +51,9 @@ const solutions = [
   },
   {
     slug: "ritel-minimarket",
-    title: "Toko Ritel, Sembako & Minimarket",
+    title: "Toko Ritel, Minimarket & Fashion",
     category: "Retail & Commerce",
-    desc: "Kecepatan transaksi kasir tinggi untuk gerai dengan ribuan SKU. Scan barcode USB kilat, kontrol varian produk, dan radar deteksi barang kadaluwarsa.",
+    desc: "Kecepatan transaksi kasir tinggi untuk gerai dengan ribuan SKU. Scan barcode USB kilat, kontrol varian warna/ukuran, dan deteksi barang kadaluwarsa.",
     icon: Store,
     painPoints: [
       "Antrean kasir menumpuk karena pencarian nama barang lambat",
@@ -82,51 +61,15 @@ const solutions = [
       "Stok fisik gudang tidak sinkron dengan catatan kasir",
     ],
     features: [
-      "Input kilat barcode scanner fisik & tombol pintas keyboard F2/F4",
+      "Input kilat barcode scanner fisik & tombol pintas F2/F4",
       "Inventori multi-batch fleksibel (FIFO, FEFO, Average) dengan radar tanggal kedaluwarsa",
       "Dukungan varian produk dinamis: ukuran, warna, aroma",
       "Peringatan otomatis saat stok barang mencapai batas minimum",
     ],
   },
   {
-    slug: "apotek-alkes",
-    title: "Apotek & Toko Alat Kesehatan",
-    category: "Pharmacy & Healthcare",
-    desc: "Kepatuhan regulasi farmasi dengan pelacakan nomor batch, tanggal kadaluwarsa FEFO, obat bebas vs resep dokter, dan pencatatan faktur pajak rapi.",
-    icon: Pill,
-    painPoints: [
-      "Obat kadaluwarsa terlewat di rak penyimpanan berisiko sanksi izin",
-      "Sulit melacak riwayat batch obat saat ada retur dari distributor",
-      "Faktur pembelian PPN farmasi berserakan dan sulit direkonsiliasi",
-    ],
-    features: [
-      "Pelacakan nomor batch & expired date dengan pengeluaran First-Expired-First-Out (FEFO)",
-      "Pemisahan kategori obat bebas OTC, obat keras, dan alkes diagnostik",
-      "Cetak nota rincian obat lengkap untuk kwitansi pasien atau asuransi",
-      "Rekapitulasi faktur pajak pembelian & penjualan farmasi terpadu",
-    ],
-  },
-  {
-    slug: "jasa-laundry",
-    title: "Jasa, Barbershop & Laundry Work Order",
-    category: "Service & Lifestyle",
-    desc: "Optimasi bisnis jasa dengan perhitungan komisi otomatis tenaga ahli, manajemen antrean kursi, serta sistem tiket work order cucian kiloan/satuan.",
-    icon: Scissors,
-    painPoints: [
-      "Perhitungan komisi manual kapster/terapis rawan salah hitung",
-      "Baju cucian tertukar atau lupa rak simpan saat pelanggan mengambil",
-      "Sulit menggabungkan biaya jasa dan pembelian produk dalam satu nota",
-    ],
-    features: [
-      "Kalkulasi komisi kapster atau terapis otomatis dari total jasa yang dikerjakan",
-      "Tiket Work Order laundry digital: berat kiloan, parfum, rak simpan & status mesin",
-      "Penjualan produk perawatan (pomade, tonik, parfum) dalam struk yang sama",
-      "Notifikasi status pesanan siap diambil via WhatsApp ke pelanggan",
-    ],
-  },
-  {
     slug: "dapur-pusat-gudang",
-    title: "Dapur Pusat & Multi-Gudang Distribusi",
+    title: "Dapur Pusat & Multi-Gudang",
     category: "Central Kitchen & Logistics",
     desc: "Standarisasi resep porsi massal dan distribusi bahan baku antar cabang. Terbitkan surat jalan digital dan pantau persediaan antar outlet tanpa kebocoran.",
     icon: Warehouse,
@@ -152,7 +95,7 @@ export default function SolusiIndexPage() {
       description="Setiap industri memiliki tantangan operasional unik. KADAI menyediakan alur konfigurasi khusus agar kasir, dapur, dan gudang berjalan selaras tanpa gesekan."
     >
       {/* Solutions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {solutions.map((item) => {
             const Icon = item.icon;
             return (

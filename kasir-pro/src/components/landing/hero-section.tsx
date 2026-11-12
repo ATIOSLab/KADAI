@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, Hammer, TrendingUp, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, UtensilsCrossed, Store, Warehouse, TrendingUp, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,33 +48,6 @@ const SEGMENTS = [
     metric1: { label: "PAJAK RESTORAN", val: "PB1 10% Otomatis" },
     metric2: { label: "KECEPATAN KASIR", val: "< 0.2 Detik" },
     metric3: { label: "FORMAT STRUK", val: "58mm / 80mm" },
-  },
-  {
-    id: "bangunan",
-    name: "Toko Bangunan",
-    icon: Hammer,
-    path: "building-supply-multi-warehouse",
-    photoUrl: "/images/hero/slide-2.jpg",
-    tag: "MATERIAL & GUDANG HEAVY",
-    title: "Multi-Gudang Semen/Besi, HPP FIFO & Barcode Cepat",
-    desc: "Pemisahan toko display depan vs gudang material semen & besi. HPP komoditas fluktuatif terkontrol FIFO dan nota kasir cepat.",
-    receipt: {
-      table: "Faktur TB-20261112-0089",
-      status: "Siap Muat Gudang",
-      meta: "No. Faktur: TB-20261112-0089 • Kasir: Eko",
-      items: [
-        { name: "50x Semen Tiga Roda 50kg (Sak)", bom: "Gudang Induk • FIFO Restock", price: "Rp 3.600.000" },
-        { name: "20x Besi Beton Ulir 10mm SNI", bom: "Gudang Besi • Batch 12m", price: "Rp 1.720.000" },
-        { name: "2x Cat Dulux Weathershield 2.5L", bom: "Display Toko • White Gloss", price: "Rp 490.000" },
-      ],
-      pb1: "Rp 0",
-      service: "Rp 0",
-      total: "Rp 5.810.000",
-      footer: "Faktur Kasir & Surat Jalan Muat Terbit • Tempo / Tunai",
-    },
-    metric1: { label: "MULTI-GUDANG", val: "Toko & Gudang Semen" },
-    metric2: { label: "METODE HPP", val: "FIFO Fluktuasi" },
-    metric3: { label: "PEMBAYARAN", val: "Tunai, QRIS & Tempo" },
   },
   {
     id: "retail",
@@ -169,7 +142,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
           {/* Subtitle */}
           <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance px-3 sm:px-0">
-            KADAI mencatat transaksi kasir dalam hitungan detik, mengontrol persediaan multi-gudang (toko bangunan, sembako, apotek) hingga resep BOM kuliner, dan menyusun laporan pembukuan rapi setiap hari.
+            KADAI mencatat transaksi kasir dalam hitungan detik, memotong stok resep bahan baku otomatis saat pesanan dibuat, dan menyusun laporan pembukuan rapi setiap hari. Spesialis bisnis Kuliner (F&B) dan Ritel Multi-Cabang.
           </p>
 
           {/* CTA Buttons (Clean Focused Action) */}
@@ -232,9 +205,9 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
       {/* 2. Interactive Operational Cockpit Section (Unobstructed, Clean Vertical Flow) */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-16 sm:pb-24 space-y-6">
-        {/* 4 Operational Switcher Tabs (Responsive Grid, Zero Horizontal Overflow) */}
+        {/* 3 Operational Switcher Tabs (Responsive Grid, Zero Horizontal Overflow) */}
         <div className="flex items-center justify-center w-full px-2">
-          <div className="w-full max-w-2xl p-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-2 sm:grid-cols-4 gap-1 relative">
+          <div className="w-full max-w-lg p-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md grid grid-cols-3 gap-1 relative">
             {SEGMENTS.map((seg, idx) => {
               const Icon = seg.icon;
               const isActive = idx === activeTab;

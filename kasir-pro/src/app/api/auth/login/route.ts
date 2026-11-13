@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email },
+      include: { store: { select: { id: true, name: true } } },
     });
 
     // A07: Always return generic error — don't reveal if email exists
@@ -73,6 +74,8 @@ export async function POST(request: NextRequest) {
       email: user.email,
       role: user.role,
       version: authenticatedUser.updatedAt.toISOString(),
+      storeId: user.storeId ?? user.store?.id ?? undefined,
+      storeName: user.store?.name,
     };
 
     // A02: Sign session with HMAC — prevent cookie forgery

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createInvoice } from "@/lib/billing-service";
-import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { SUPER_ADMIN_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError, jsonOk } from "@/lib/api-response";
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
       return NextResponse.json(
         { error: "Hanya Super Admin yang dapat melihat daftar tagihan" },
         { status: 403 }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
       return NextResponse.json(
         { error: "Hanya Super Admin yang dapat menerbitkan tagihan" },
         { status: 403 }

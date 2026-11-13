@@ -66,6 +66,15 @@ function getAdminSeedConfig() {
   };
 }
 
+function getSuperAdminSeedConfig() {
+  return {
+    name: process.env.SUPERADMIN_NAME || "Super Admin Kadai",
+    email: process.env.SUPERADMIN_EMAIL,
+    password: process.env.SUPERADMIN_PASSWORD,
+    role: UserRole.SUPER_ADMIN,
+  };
+}
+
 async function ensureStore() {
   const existingStore = await prisma.store.findFirst({
     select: { id: true },
@@ -173,7 +182,7 @@ async function ensureFinanceCategories() {
   }
 }
 
-async function ensureAdminUser() {
+async function ensureAdminUser(storeId) {
   const admin = getAdminSeedConfig();
   const existingUser = await prisma.user.findUnique({
     where: { email: admin.email },
@@ -190,6 +199,7 @@ async function ensureAdminUser() {
         name: admin.name,
         role: admin.role,
         isActive: true,
+        ...(storeId ? { storeId } : {}),
       },
     });
 
@@ -216,6 +226,7 @@ async function ensureAdminUser() {
       supervisorPin: supervisorPinHash,
       role: admin.role,
       isActive: true,
+      ...(storeId ? { storeId } : {}),
     },
   });
 
@@ -226,14 +237,59 @@ async function ensureAdminUser() {
   };
 }
 
+/**
+ * Bootstrap akun SUPER_ADMIN (operator platform) — hanya bila env diset.
+ * SUPERADMIN_EMAIL wajib; SUPERADMIN_PASSWORD wajib saat akun belum ada.
+ */
+async function ensureSuperAdmin() {
+  const superAdmin = getSuperAdminSeedConfig();
+
+  if (!superAdmin.email) {
+    return { configured: false };
+  }
+
+  const existing = await prisma.user.findUnique({
+    where: { email: superAdmin.email },
+    select: { id: true },
+  });
+
+  if (existing) {
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: { role: UserRole.SUPER_ADMIN, isActive: true, name: superAdmin.name },
+    });
+    return { configured: true, created: false, email: superAdmin.email };
+  }
+
+  if (!superAdmin.password || superAdmin.password.length < 12) {
+    throw new Error(
+      "Set SUPERADMIN_PASSWORD with at least 12 characters before seeding the platform super admin"
+    );
+  }
+
+  const passwordHash = await bcrypt.hash(superAdmin.password, 12);
+  await prisma.user.create({
+    data: {
+      name: superAdmin.name,
+      email: superAdmin.email,
+      passwordHash,
+      role: UserRole.SUPER_ADMIN,
+      isActive: true,
+    },
+  });
+
+  return { configured: true, created: true, email: superAdmin.email };
+}
+
 async function main() {
   console.log("Menjalankan seed minimal untuk deployment...");
 
-  await ensureStore();
+  const storeId = await ensureStore();
   await ensureUnits();
   await ensureFinanceCategories();
   await ensureTables();
-  const admin = await ensureAdminUser();
+  const admin = await ensureAdminUser(storeId);
+  const superAdmin = await ensureSuperAdmin();
 
   console.log("Seed selesai.");
   console.log(`Admin: ${admin.email}`);
@@ -241,6 +297,14 @@ async function main() {
     console.log("Admin dibuat. Gunakan kredensial provisioning yang telah ditetapkan.");
   } else {
     console.log("User admin sudah ada. Password lama dipertahankan.");
+  }
+
+  if (superAdmin.configured) {
+    console.log(
+      `Super Admin platform: ${superAdmin.email} (${superAdmin.created ? "dibuat" : "sudah ada, role dipastikan SUPER_ADMIN"})`
+    );
+  } else {
+    console.log("Super Admin platform: tidak dikonfigurasi (atur SUPERADMIN_EMAIL/SUPERADMIN_PASSWORD untuk bootstrap).");
   }
 
   // Auto seed multi-vertical client demo clusters

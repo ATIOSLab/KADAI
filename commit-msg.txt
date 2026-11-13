@@ -1,0 +1,18 @@
+feat(platform): role SUPER_ADMIN, tenant scoping & manajemen langganan SaaS
+
+Menambahkan operator platform (SUPER_ADMIN) untuk SaaS multi-tenant KADAI:
+
+- schema: enum UserRole + SUPER_ADMIN; ActionType aksi platform; relasi
+  Store->Outlet/User + kolom storeId (tenant scoping) + index
+- migration 2 tahap: enum (terpisah) & tenant scoping (backfill store tunggal)
+- rbac: 7 role; SUPER_ADMIN mewarisi ADMIN; route guard /platform/*
+- api: /api/platform/owners (list/create/update/deactivate + onboarding
+  tenant baru), /api/platform/subscriptions (list + kelola tier/cycle/
+  status/expiry/suspend); billing/referrals/demo gate -> SUPER_ADMIN
+- ui: /platform (KPI & MRR), /platform/owners, /platform/subscriptions
+  (termasuk terbitkan & lunasi invoice via billing-service existing)
+- session: storeId/storeName di payload HMAC + scoping store di /api/auth/session
+- bootstrap: seed env SUPERADMIN_* + scripts/create-superadmin.js
+- guard: anti-eskalasi validator, last-superadmin protection, audit ActivityLog
+- test: tests/platform-rbac.test.ts (8 kasus) — 29/29 test:security hijau
+- docs: RBAC test guide §7 + blueprint v2.2.0

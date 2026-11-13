@@ -203,7 +203,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Demo Leads",
         description: "Kelola & setujui permohonan demo dari calon klien.",
         icon: Users,
-        roles: ["ADMIN"],
+        roles: ["SUPER_ADMIN"],
       },
       {
         href: "/referrals",
@@ -211,7 +211,7 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Mitra Referral",
         description: "Kelola mitra marketing, kode referral, dan komisi.",
         icon: ArrowLeftRight,
-        roles: ["ADMIN"],
+        roles: ["SUPER_ADMIN"],
       },
       {
         href: "/settings",
@@ -219,7 +219,36 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Pengaturan",
         description: "Konfigurasi toko, akun staf, dan hak akses RBAC.",
         icon: Settings,
-        roles: ["ADMIN"],
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      },
+    ],
+  },
+  {
+    label: "Platform KADAI (Super Admin)",
+    items: [
+      {
+        href: "/platform",
+        label: "Platform Dashboard",
+        shortLabel: "Platform",
+        description: "KPI SaaS: tenant aktif, langganan jatuh tempo, invoice pending, dan MRR.",
+        icon: LayoutDashboard,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
+        href: "/platform/owners",
+        label: "Akun Owner (Tenant)",
+        shortLabel: "Owner",
+        description: "Kelola akun pemilik (role ADMIN) lintas tenant: buat, reset, aktif/nonaktif.",
+        icon: Users,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
+        href: "/platform/subscriptions",
+        label: "Langganan & Invoice",
+        shortLabel: "Langganan",
+        description: "Kelola tier, siklus, status, jatuh tempo langganan, dan tagihan seluruh tenant.",
+        icon: Receipt,
+        roles: ["SUPER_ADMIN"],
       },
     ],
   },
@@ -252,6 +281,12 @@ export function getBottomTabsForRole(role?: AppRole) {
     case "CASHIER":
     case "KITCHEN":
       return [];
+    case "SUPER_ADMIN":
+      return [
+        navigationSections[5].items[0], // Platform Dashboard
+        navigationSections[5].items[1], // Akun Owner
+        navigationSections[5].items[2], // Langganan
+      ];
     default:
       return bottomTabs;
   }
@@ -359,6 +394,24 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Informasi kredensial pengguna, role wewenang aktif, dan pembaruan keamanan sandi.",
     section: "Akun Pengguna",
     eyebrow: "Akun Saya",
+  },
+  "/platform": {
+    title: "Platform Dashboard",
+    description: "Ringkasan KPI SaaS KADAI: tenant aktif, langganan jatuh tempo, invoice pending, dan MRR.",
+    section: "Platform KADAI",
+    eyebrow: "Operator Platform",
+  },
+  "/platform/owners": {
+    title: "Akun Owner (Tenant)",
+    description: "Kelola akun pemilik tenant lintas store: buat akun baru, reset kata sandi, dan aktif/nonaktifkan.",
+    section: "Platform KADAI",
+    eyebrow: "Manajemen Tenant",
+  },
+  "/platform/subscriptions": {
+    title: "Langganan & Invoice",
+    description: "Kelola tier langganan, siklus billing, status, dan jatuh tempo seluruh tenant KADAI.",
+    section: "Platform KADAI",
+    eyebrow: "Billing SaaS",
   },
 };
 

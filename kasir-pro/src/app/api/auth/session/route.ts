@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
 
   // Ambil tipe usaha store aktif untuk adaptasi modular dashboard
   const store = await prisma.store.findFirst({
+    where: sessionUser.storeId ? { id: sessionUser.storeId } : undefined,
     select: {
+      id: true,
       businessType: true,
       tier: true,
       name: true,
@@ -43,7 +45,8 @@ export async function GET(request: NextRequest) {
       ...sessionUser,
       businessType: activeBusinessType,
       storeTier: store?.tier ?? "PRO_BUSINESS",
-      storeName: store?.name ?? "KADAI Store",
+      storeName: sessionUser.storeName ?? store?.name ?? "KADAI Store",
+      storeId: sessionUser.storeId ?? store?.id,
     },
   });
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { settleInvoice } from "@/lib/billing-service";
 import { createPaymentIntent } from "@/lib/payment/providers";
-import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { SUPER_ADMIN_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError, jsonOk } from "@/lib/api-response";
 
@@ -27,7 +27,7 @@ async function requireAdmin(request: NextRequest): Promise<
   if (!sessionUser) {
     return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
-  if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+  if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
     return {
       error: NextResponse.json(
         { error: "Hanya Super Admin yang dapat mengelola tagihan" },

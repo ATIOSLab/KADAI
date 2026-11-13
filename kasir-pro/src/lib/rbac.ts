@@ -1,6 +1,7 @@
 
 
 export const APP_ROLES = [
+  "SUPER_ADMIN",
   "ADMIN",
   "MANAGER",
   "CASHIER",
@@ -11,14 +12,20 @@ export const APP_ROLES = [
 
 export type AppRole = (typeof APP_ROLES)[number];
 
-export const ADMIN_ONLY_ROLES = ["ADMIN"] as const;
-export const ADMIN_MANAGER_ROLES = ["ADMIN", "MANAGER"] as const;
-export const ADMIN_CASHIER_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
-export const POS_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
-export const KDS_ROLES = ["ADMIN", "MANAGER", "KITCHEN"] as const;
-export const INVENTORY_ROLES = ["ADMIN", "MANAGER", "INVENTORY"] as const;
-export const FINANCE_ROLES = ["ADMIN", "MANAGER", "ACCOUNTANT"] as const;
+// Operator platform KADAI — satu-satunya role dengan akses /platform/*
+export const SUPER_ADMIN_ROLES = ["SUPER_ADMIN"] as const;
+// ADMIN_ONLY kini = SUPER_ADMIN + ADMIN (owner tenant): superadmin mewarisi
+// seluruh kemampuan admin/owner sehingga dapat menangani dukungan lintas tenant.
+export const ADMIN_ONLY_ROLES = ["SUPER_ADMIN", "ADMIN"] as const;
+export const PLATFORM_OR_OWNER_ROLES = ["SUPER_ADMIN", "ADMIN"] as const;
+export const ADMIN_MANAGER_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER"] as const;
+export const ADMIN_CASHIER_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "CASHIER"] as const;
+export const POS_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "CASHIER"] as const;
+export const KDS_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "KITCHEN"] as const;
+export const INVENTORY_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "INVENTORY"] as const;
+export const FINANCE_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "ACCOUNTANT"] as const;
 export const ALL_AUTHENTICATED_ROLES = [
+  "SUPER_ADMIN",
   "ADMIN",
   "MANAGER",
   "CASHIER",
@@ -35,8 +42,13 @@ type RouteAccessRule = {
 const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/profile", roles: ALL_AUTHENTICATED_ROLES },
   { path: "/settings", roles: ADMIN_ONLY_ROLES },
-  { path: "/demo-requests", roles: ADMIN_ONLY_ROLES },
-  { path: "/referrals", roles: ADMIN_ONLY_ROLES },
+  { path: "/demo-requests", roles: SUPER_ADMIN_ROLES },
+  { path: "/referrals", roles: SUPER_ADMIN_ROLES },
+  // Platform KADAI (khusus SUPER_ADMIN)
+  { path: "/platform", roles: SUPER_ADMIN_ROLES },
+  { path: "/platform/owners", roles: SUPER_ADMIN_ROLES },
+  { path: "/platform/subscriptions", roles: SUPER_ADMIN_ROLES },
+  { path: "/platform/tenants", roles: SUPER_ADMIN_ROLES },
   { path: "/finance/tax", roles: FINANCE_ROLES },
   { path: "/finance", roles: FINANCE_ROLES },
   { path: "/reports", roles: FINANCE_ROLES },
@@ -76,6 +88,8 @@ export function hasRequiredRole(
 
 export function getDefaultPathForRole(role: string | null | undefined) {
   switch (role) {
+    case "SUPER_ADMIN":
+      return "/platform";
     case "CASHIER":
       return "/pos";
     case "KITCHEN":

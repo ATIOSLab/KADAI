@@ -2,8 +2,8 @@
 ## Arsitektur Autentikasi, Otorisasi Hirarkis Multi-Tenant, & Entitlement SaaS Komersial
 
 > **Dokumen Spesifikasi Keamanan & Sistem Akses Produksi**  
-> **Status:** Master Security Specification (Commercial Tier)  
-> **Version:** 2.1.0 (Commercial B2B Ready)  
+> **Status:** Master Security Specification (Commercial Tier) — **SUPER_ADMIN implemented 14 Nov 2026** (lihat DOCS/KADAI_SUPERADMIN_RBAC_IMPLEMENTATION_PLAN.md & KADAI_RBAC_TEST_GUIDE.md §7)  
+> **Version:** 2.2.0 (SUPER_ADMIN Platform Operator — Implemented)  
 > **Author & Architect:** Netkrida (@netkridabot) for Irvan  
 > **Product Target:** KADAI SaaS POS Platform (`https://kadai.asia`)  
 > **Repository:** `ATIOSLab/KADAI` (`main` branch)

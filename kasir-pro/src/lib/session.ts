@@ -13,6 +13,7 @@ const sessionUserSchema = z.object({
   businessType: z.string().optional(),
   storeTier: z.string().optional(),
   storeName: z.string().optional(),
+  storeId: z.string().optional(),
 });
 
 export type SessionUser = z.infer<typeof sessionUserSchema>;

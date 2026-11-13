@@ -97,3 +97,61 @@ Karena endpoint registrasi publik telah ditutup demi keamanan (mencegah pendafta
 2. Sistem otomatis membuka `/finance`.
 3. Akun dapat melihat perhitungan pajak PPN & PBJT/PB1 10%, laporan laba-rugi, dan seluruh riwayat penjualan lengkap beserta rincian modal HPP.
 4. Akun tidak dapat melakukan transaksi penjualan baru di `/pos` maupun mengubah konfigurasi toko di `/settings`.
+
+---
+
+## 7. Role SUPER_ADMIN (Operator Platform) — Implementasi 14 Nov 2026
+
+> **Status:** ✅ Implemented (`feature/platform-superadmin`) — commit rilis setelah verifikasi Dokploy.
+> Komponen: role enum, tenant scoping (`storeId` pada User/Outlet), API `/api/platform/*`, halaman `/platform/*`, reklasifikasi billing/referral/demo ke SUPER_ADMIN.
+
+### 7.1 Bootstrap Akun Super Admin Pertama
+
+**Opsi A — Script CLI di VPS (disarankan):**
+```bash
+node scripts/create-superadmin.js --email superadmin@kadai.com --password '<minimal-12-karakter>' --name 'Super Admin Kadai'
+```
+
+**Opsi B — Seed env (saat deploy/seed berikutnya):**
+```
+SUPERADMIN_EMAIL=superadmin@kadai.com
+SUPERADMIN_PASSWORD=<minimal-12-karakter>
+SUPERADMIN_NAME=Super Admin Kadai
+```
+
+Setelah bootstrap, akun super admin login di `https://kadai.asia/login` → otomatis diarahkan ke `/platform`.
+
+### 7.2 Matriks Akses Role (7 Role)
+
+| Modul / URL | SUPER_ADMIN | ADMIN | MANAGER | CASHIER | KITCHEN | INVENTORY | ACCOUNTANT |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Platform Dashboard** (`/platform`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Akun Owner (Tenant)** (`/platform/owners`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Langganan & Invoice** (`/platform/subscriptions`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Permohonan Demo** (`/demo-requests`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Mitra Referral** (`/referrals`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Billing Invoice** (`/api/billing/invoices`) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Pengaturan Sistem** (`/settings`) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| POS / KDS / Inventori / Finance | ✅* | ✅ | per matriks existing | | | | |
+
+\* SUPER_ADMIN mewarisi kemampuan ADMIN (dukungan lintas tenant), namun navigasi utama difokuskan ke modul platform.
+
+### 7.3 Skenario Uji Platform (Skenario F)
+
+1. Login dengan akun SUPER_ADMIN → sistem membuka `/platform`.
+2. Buka **Akun Owner** → klik **Tambah Owner**:
+   - Pilih **Buat tenant baru** → isi nama tenant, jenis usaha, tier awal (`PRO_BUSINESS`), siklus (`MONTHLY`), data owner → Simpan.
+   - Verifikasi: tenant baru muncul di **Langganan & Invoice** dengan status `ACTIVE` dan jatuh tempo +1 bulan (MONTHLY) / +3 bulan (QUARTERLY) / +12 bulan (ANNUAL).
+3. Pada baris tenant, klik **Kelola** → ubah tier ke `ENTERPRISE` → **Simpan Tier & Siklus** → verifikasi tier tenant berubah di daftar.
+4. Klik **Invoice** → **Terbitkan Tagihan** (tier/siklus dipilih, nominal otomatis dari `src/lib/pricing.ts`) → verifikasi nomor `INV-YYYYMM-####` berstatus `PENDING`.
+5. Pada tagihan `PENDING`, klik **Lunas** → verifikasi status `SETTLED` dan langganan aktif/perpanjang otomatis.
+6. Klik **Kelola** → **Suspend Tenant** (konfirmasi) → verifikasi status `CANCELLED` dan seluruh akun owner tenant dinonaktifkan.
+7. Login dengan akun owner tenant → verifikasi tidak bisa login lagi (akun non-aktif).
+
+### 7.4 Guard Keamanan SUPER_ADMIN
+
+- Admin/owner tenant **tidak dapat** mengakses `/platform/*` dan `/api/platform/*` (403 server-side).
+- `createUserSchema`/`updateUserSchema` (scope tenant) **menolak** nilai role `SUPER_ADMIN` (anti-eskalasi di layer validator).
+- Hanya endpoint platform yang dapat membuat/menonaktifkan SUPER_ADMIN; **last-superadmin protection** mencegah menonaktifkan SUPER_ADMIN aktif terakhir.
+- Seluruh aksi platform tercatat di `ActivityLog` (`OWNER_CREATED`, `OWNER_UPDATED`, `OWNER_DEACTIVATED`, `SUBSCRIPTION_UPDATED`, `TENANT_SUSPENDED`).
+- Session HMAC menyimpan `storeId`/`storeName`; perubahan role otomatis memutus sesi lama (via `version`).

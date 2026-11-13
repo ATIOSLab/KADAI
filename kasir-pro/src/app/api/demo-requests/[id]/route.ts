@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { SUPER_ADMIN_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
@@ -20,7 +20,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+    if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
       return NextResponse.json(
         { error: "Hanya Super Admin yang dapat menyetujui permohonan demo" },
         { status: 403 }

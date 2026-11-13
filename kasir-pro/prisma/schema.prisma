@@ -12,6 +12,7 @@ datasource db {
 // ============================================================
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   MANAGER
   CASHIER
@@ -184,6 +185,14 @@ enum ActionType {
   USER_CREATED
   USER_UPDATED
   USER_DELETED
+  // Platform (Super Admin) actions
+  OWNER_CREATED
+  OWNER_UPDATED
+  OWNER_DEACTIVATED
+  SUBSCRIPTION_UPDATED
+  TENANT_SUSPENDED
+  INVOICE_ISSUED
+  INVOICE_SETTLED
   // Finance actions
   FINANCE_ENTRY_CREATED
   FINANCE_ENTRY_UPDATED
@@ -239,6 +248,8 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
+  storeId          String?
+  store            Store?            @relation(fields: [storeId], references: [id], onDelete: SetNull)
   outletId         String?
   outlet           Outlet?           @relation(fields: [outletId], references: [id])
   sales            Sale[]
@@ -247,6 +258,7 @@ model User {
   financeEntries   FinanceEntry[]
   laundryJobs      LaundryJobOrder[]
 
+  @@index([storeId])
   @@map("users")
 }
 
@@ -283,6 +295,8 @@ model Store {
   // Relations
   subscriptions     StoreSubscription[]
   invoices          PaymentInvoice[]
+  outlets           Outlet[]
+  users             User[]
 
   @@map("stores")
 }
@@ -426,6 +440,8 @@ model Outlet {
   updatedAt         DateTime        @updatedAt
 
   // Relations
+  storeId           String?
+  store             Store?            @relation(fields: [storeId], references: [id], onDelete: SetNull)
   users             User[]
   batches           ProductBatch[]
   sales             Sale[]
@@ -434,6 +450,7 @@ model Outlet {
   transfersReceived StockTransfer[]   @relation("DestinationOutlet")
   laundryJobs       LaundryJobOrder[]
 
+  @@index([storeId])
   @@map("outlets")
 }
 

@@ -9,13 +9,15 @@ import {
   RotateCcw,
   Mail,
   Building2,
+  Store,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatCard } from "@/components/shared/stat-card";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusBadge, ownerStatusTone } from "@/components/shared/status-badge";
 import { SearchableSelect } from "@/components/shared/searchable-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogBody } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,14 +35,8 @@ interface OwnerItem {
   createdAt: string;
   avatar: string | null;
   storeId: string | null;
+  storeCount: number;
   store: { id: string; name: string; tier: string; businessType: string } | null;
-  subscription: {
-    storeId: string;
-    tier: string;
-    cycle: string;
-    status: string;
-    expiresAt: string | null;
-  } | null;
 }
 
 interface StoreOption {
@@ -74,6 +70,11 @@ const emptyForm = {
   cycle: "MONTHLY",
 };
 
+/**
+ * Manajemen Owner (SUPER_ADMIN).
+ * Fokus: akun pemilik tenant — buat, ubah, aktif/nonaktif, reset password.
+ * Info tenant (store) ditampilkan sebagai keterangan, termasuk jumlah tenant.
+ */
 export default function PlatformOwnersPage() {
   const [owners, setOwners] = useState<OwnerItem[]>([]);
   const [stores, setStores] = useState<StoreOption[]>([]);
@@ -88,6 +89,7 @@ export default function PlatformOwnersPage() {
     try {
       const [ownerRes, storeRes] = await Promise.all([
         apiFetch<{ data: OwnerItem[] }>("/api/platform/owners?includeInactive=true"),
+        // daftar tenant untuk menautkan owner ke tenant existing saat onboarding
         apiFetch<{ data: SubscriptionStore[] }>("/api/platform/subscriptions"),
       ]);
       setOwners(ownerRes.data || []);
@@ -120,8 +122,8 @@ export default function PlatformOwnersPage() {
       storeId: owner.storeId ?? "",
       storeName: owner.store?.name ?? "",
       businessType: owner.store?.businessType ?? "FNB_CAFE",
-      tier: owner.subscription?.tier ?? owner.store?.tier ?? "PRO_BUSINESS",
-      cycle: owner.subscription?.cycle ?? "MONTHLY",
+      tier: owner.store?.tier ?? "PRO_BUSINESS",
+      cycle: "MONTHLY",
     });
     setDialogOpen(true);
   };
@@ -195,13 +197,24 @@ export default function PlatformOwnersPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        eyebrow="Operator Platform"
+        title="Akun Owner (Tenant)"
+        description="Kelola akun pemilik tenant KADAI: buat, ubah, reset kata sandi, aktif/nonaktif, dan lihat tenant yang dikelola."
+        icon={UserRound}
+      >
+        <Button onClick={openAdd} className="gap-2">
+          <Plus className="h-4 w-4" /> Tambah Owner
+        </Button>
+      </PageHeader>
+
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           title="Total Akun Owner"
           value={loading ? "—" : owners.length}
           description="Pemilik tenant (role ADMIN)"
           icon={UserRound}
-          badge="Lintas tenant"
+          badge="Platform"
         />
         <StatCard
           title="Owner Aktif"
@@ -247,7 +260,6 @@ export default function PlatformOwnersPage() {
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-text-muted">
                     <th className="py-2 pr-4">Owner</th>
                     <th className="py-2 pr-4">Tenant</th>
-                    <th className="py-2 pr-4">Langganan</th>
                     <th className="py-2 pr-4">Terakhir Login</th>
                     <th className="py-2 pr-4">Status</th>
                     <th className="py-2 text-right">Aksi</th>
@@ -264,41 +276,30 @@ export default function PlatformOwnersPage() {
                       </td>
                       <td className="py-3 pr-4">
                         {owner.store ? (
-                          <>
+                          <div className="space-y-1">
                             <p className="flex items-center gap-1 font-medium">
                               <Building2 className="h-3 w-3 text-text-muted" /> {owner.store.name}
                             </p>
-                            <p className="text-xs text-text-muted">{owner.store.businessType}</p>
-                          </>
+                            <p className="flex items-center gap-1.5 text-xs text-text-muted">
+                              <Store className="h-3 w-3" />
+                              <StatusBadge tone="muted">{owner.storeCount} tenant</StatusBadge>
+                              <span>{owner.store.businessType}</span>
+                            </p>
+                          </div>
                         ) : (
                           <span className="text-xs text-text-muted">Belum ditautkan</span>
                         )}
                       </td>
-                      <td className="py-3 pr-4">
-                        {owner.subscription ? (
-                          <>
-                            <p>{TIER_LABELS[owner.subscription.tier as keyof typeof TIER_LABELS]}</p>
-                            <p className="text-xs text-text-muted">
-                              {owner.subscription.cycle} · s/d {fmtDate(owner.subscription.expiresAt)}
-                            </p>
-                          </>
-                        ) : (
-                          <span className="text-xs text-text-muted">Belum berlangganan</span>
-                        )}
-                      </td>
                       <td className="py-3 pr-4 text-text-muted">{fmtDate(owner.lastLoginAt)}</td>
                       <td className="py-3 pr-4">
-                        <Badge
-                          variant={owner.isActive ? "success" : "muted"}
-                          className={owner.isActive ? "" : "opacity-60"}
-                        >
-                          {owner.isActive ? "AKTIF" : "NON-AKTIF"}
-                        </Badge>
+                        <StatusBadge tone={ownerStatusTone(owner.isActive)}>
+                          {owner.isActive ? "Aktif" : "Nonaktif"}
+                        </StatusBadge>
                       </td>
                       <td className="py-3 text-right">
                         <div className="flex justify-end gap-1">
                           <Button variant="ghost" size="sm" onClick={() => openEdit(owner)}>
-                            Edit
+                            Detail &amp; Edit
                           </Button>
                           <Button
                             variant="ghost"
@@ -320,22 +321,44 @@ export default function PlatformOwnersPage() {
         </CardContent>
       </Card>
 
-      {/* ═══ Dialog Tambah / Edit Owner ═══ */}
+      {/* ═══ Dialog Tambah / Detail & Edit Owner ═══ */}
       <Dialog
         open={dialogOpen}
         onOpenChange={(open) => !open && setDialogOpen(false)}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editTarget ? "Edit Akun Owner" : "Tambah Akun Owner (Onboarding)"}</DialogTitle>
+            <DialogTitle>{editTarget ? "Detail & Edit Akun Owner" : "Tambah Akun Owner (Onboarding)"}</DialogTitle>
             <DialogDescription>
               {editTarget
-                ? "Perbarui data pemilik tenant. Kosongkan password untuk tidak mengubahnya."
+                ? "Data pemilik tenant dan tenant yang dikelolanya. Kosongkan password untuk tidak mengubahnya."
                 : "Buat akun pemilik tenant baru — pilih tenant existing atau buat tenant baru sekaligus."}
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
             <div className="space-y-4">
+              {editTarget && (
+                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                    Tenant Dikelola
+                  </p>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <div>
+                      <p className="flex items-center gap-1.5 font-medium">
+                        <Building2 className="h-3.5 w-3.5 text-text-muted" />
+                        {editTarget.store?.name ?? "Belum ditautkan"}
+                      </p>
+                      <p className="text-xs text-text-muted">
+                        {editTarget.store
+                          ? `${editTarget.store.businessType} · ${TIER_LABELS[editTarget.store.tier as keyof typeof TIER_LABELS] ?? editTarget.store.tier}`
+                          : "Owner ini belum memiliki tenant"}
+                      </p>
+                    </div>
+                    <StatusBadge tone="muted">{editTarget.storeCount} tenant</StatusBadge>
+                  </div>
+                </div>
+              )}
+
               {!editTarget && (
                 <div className="space-y-2">
                   <Label>Mode Tenant</Label>
@@ -462,7 +485,7 @@ export default function PlatformOwnersPage() {
   );
 }
 
-// Untuk tipe response subscriptions (dipakai untuk pilihan tenant)
+// Tipe respons subscriptions — dipakai hanya untuk memilih tenant existing saat onboarding owner
 interface SubscriptionStore {
   storeId: string;
   storeName: string;

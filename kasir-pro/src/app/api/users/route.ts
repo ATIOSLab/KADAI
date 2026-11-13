@@ -5,8 +5,9 @@ import bcrypt from "bcryptjs";
 import { logActivity } from "@/lib/activity-logger";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
-// GET /api/users
+// GET /api/users — daftar staf tenant (terbatas pada store si pemanggil)
 export async function GET(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
@@ -21,7 +22,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const users = await prisma.user.findMany({
+      where: { storeId: scope.storeId },
       select: {
         id: true, name: true, email: true, role: true,
         isActive: true, lastLoginAt: true, createdAt: true, avatar: true,
@@ -50,6 +57,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = createUserSchema.parse(body);
 
@@ -72,6 +84,7 @@ export async function POST(request: NextRequest) {
         supervisorPin: supervisorPinHash,
         role: data.role,
         avatar: data.avatar,
+        storeId: scope.storeId, // staf selalu terikat tenant pembuatnya
       },
       select: { id: true, name: true, email: true, role: true, createdAt: true },
     });

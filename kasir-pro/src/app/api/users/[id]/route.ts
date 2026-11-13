@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { logActivity } from "@/lib/activity-logger";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/users/[id]
 export async function GET(
@@ -24,9 +25,14 @@ export async function GET(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const user = await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findFirst({
+      where: { id, storeId: scope.storeId }, // isolasi tenant: hanya staf store sendiri
       select: {
         id: true,
         name: true,
@@ -74,11 +80,16 @@ export async function PUT(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const data = updateUserSchema.parse(body);
 
-    const existing = await prisma.user.findUnique({ where: { id } });
+    const existing = await prisma.user.findFirst({ where: { id, storeId: scope.storeId } });
     if (!existing) {
       return NextResponse.json(
         { error: "User tidak ditemukan" },
@@ -165,9 +176,14 @@ export async function DELETE(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
 
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findFirst({ where: { id, storeId: scope.storeId } });
     if (!user) {
       return NextResponse.json(
         { error: "User tidak ditemukan" },

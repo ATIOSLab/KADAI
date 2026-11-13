@@ -4,16 +4,26 @@ import { getServerSessionUser } from "@/lib/session";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createOutletSchema, updateOutletSchema } from "@/lib/validators/outlet";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
-// GET /api/outlets
+// GET /api/outlets — daftar cabang milik tenant pemanggil
 export async function GET() {
   try {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return jsonError("Unauthorized", 401);
     }
+    if (!hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+      return jsonError("Forbidden", 403);
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
 
     const outlets = await prisma.outlet.findMany({
+      where: { storeId: scope.storeId },
       orderBy: [{ isMain: "desc" }, { name: "asc" }],
     });
 
@@ -31,12 +41,17 @@ export async function POST(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = createOutletSchema.parse(body);
 
-    // Check duplicate code
-    const existing = await prisma.outlet.findUnique({
-      where: { code: validated.code },
+    // Check duplicate code dalam tenant
+    const existing = await prisma.outlet.findFirst({
+      where: { code: validated.code, storeId: scope.storeId },
     });
     if (existing) {
       return jsonError(`Kode cabang '${validated.code}' sudah digunakan`, 409);
@@ -44,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     if (validated.isMain) {
       await prisma.outlet.updateMany({
-        where: { isMain: true },
+        where: { isMain: true, storeId: scope.storeId },
         data: { isMain: false },
       });
     }
@@ -62,6 +77,7 @@ export async function POST(req: NextRequest) {
         outletType: validated.outletType,
         kitchenWorkflow: validated.kitchenWorkflow,
         costingMethod: validated.costingMethod,
+        storeId: scope.storeId,
       },
     });
 
@@ -79,12 +95,25 @@ export async function PUT(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = updateOutletSchema.parse(body);
 
+    const owned = await prisma.outlet.findFirst({
+      where: { id: validated.id, storeId: scope.storeId },
+      select: { id: true },
+    });
+    if (!owned) {
+      return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
+    }
+
     if (validated.isMain) {
       await prisma.outlet.updateMany({
-        where: { isMain: true, NOT: { id: validated.id } },
+        where: { isMain: true, storeId: scope.storeId, NOT: { id: validated.id } },
         data: { isMain: false },
       });
     }

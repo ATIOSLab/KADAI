@@ -44,14 +44,8 @@ export async function GET(
     const owner = await findOwner(id);
     if (!owner) return jsonError("Akun owner tidak ditemukan", 404);
 
-    const subscription = owner.storeId
-      ? await prisma.storeSubscription.findFirst({
-          where: { storeId: owner.storeId, status: "ACTIVE" },
-          select: { tier: true, cycle: true, status: true, startedAt: true, expiresAt: true },
-        })
-      : null;
-
-    return jsonOk({ ...owner, subscription });
+    // Detail owner: info tenant (store) sebagai keterangan; fokus tetap akun owner.
+    return jsonOk({ ...owner, storeCount: owner.storeId ? 1 : 0 });
   } catch (error) {
     return handleApiError(error, "GET /api/platform/owners/[id]", "Gagal memuat akun owner");
   }

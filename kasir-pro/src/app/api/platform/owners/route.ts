@@ -45,21 +45,11 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    // Lampirkan langganan aktif per tenant (untuk kolom status tenant).
-    const storeIds = Array.from(
-      new Set(owners.map((o) => o.storeId).filter((v): v is string => Boolean(v)))
-    );
-    const subscriptions = storeIds.length
-      ? await prisma.storeSubscription.findMany({
-          where: { storeId: { in: storeIds }, status: "ACTIVE" },
-          select: { storeId: true, tier: true, cycle: true, status: true, expiresAt: true },
-        })
-      : [];
-    const subByStore = new Map(subscriptions.map((s) => [s.storeId, s]));
-
+    // Fokus platform = kelola OWNER; info tenant (store) hanya sebagai keterangan.
+    // storeCount: jumlah tenant yang dikelola owner (skema saat ini 0 atau 1).
     const data = owners.map((owner) => ({
       ...owner,
-      subscription: owner.storeId ? (subByStore.get(owner.storeId) ?? null) : null,
+      storeCount: owner.storeId ? 1 : 0,
     }));
 
     return jsonOk(data);

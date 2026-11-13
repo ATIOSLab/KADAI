@@ -27,35 +27,43 @@ test("APP_ROLES memuat 7 role termasuk SUPER_ADMIN", () => {
   assert.equal(isAppRole("ROOT"), false);
 });
 
-test("SUPER_ADMIN satu-satunya role yang lolos gerbang platform, dan mewarisi kemampuan ADMIN", () => {
+test("SUPER_ADMIN satu-satunya role yang lolos gerbang platform, dan TIDAK mewarisi gerbang tenant", () => {
   assert.equal(hasRequiredRole("SUPER_ADMIN", SUPER_ADMIN_ROLES), true);
   assert.equal(hasRequiredRole("ADMIN", SUPER_ADMIN_ROLES), false);
   assert.equal(hasRequiredRole("MANAGER", SUPER_ADMIN_ROLES), false);
 
-  // SUPER_ADMIN mewarisi seluruh gerbang admin/owner (dukungan lintas tenant)
-  assert.equal(hasRequiredRole("SUPER_ADMIN", ADMIN_ONLY_ROLES), true);
+  // Model peran: SUPER_ADMIN berdiri DI ATAS tenant — fokus kelola owner,
+  // tidak mengoperasikan POS/kasir/stok. Gerbang tenant eksklusif ADMIN ke bawah.
+  assert.equal(hasRequiredRole("SUPER_ADMIN", ADMIN_ONLY_ROLES), false);
   assert.equal(hasRequiredRole("ADMIN", ADMIN_ONLY_ROLES), true);
   assert.equal(hasRequiredRole("CASHIER", ADMIN_ONLY_ROLES), false);
   assert.equal(hasRequiredRole(null, ADMIN_ONLY_ROLES), false);
 });
 
-test("route guard /platform/* hanya untuk SUPER_ADMIN, fitur billing/demo/referral juga SUPER_ADMIN", () => {
+test("route guard /platform/* hanya untuk SUPER_ADMIN, fitur demo/referral juga SUPER_ADMIN, gerbang tenant tertutup untuk SUPER_ADMIN", () => {
   for (const path of ["/platform", "/platform/owners", "/platform/subscriptions"]) {
     assert.equal(canAccessPath(path, "SUPER_ADMIN"), true, `SUPER_ADMIN harus akses ${path}`);
     assert.equal(canAccessPath(path, "ADMIN"), false, `ADMIN tidak boleh akses ${path}`);
     assert.equal(canAccessPath(path, "CASHIER"), false, `CASHIER tidak boleh akses ${path}`);
   }
 
-  // Fitur platform: billing/referral/demo → SUPER_ADMIN (bukan lagi owner)
+  // Fitur platform: referral/demo → SUPER_ADMIN (bukan owner)
   assert.equal(canAccessPath("/demo-requests", "SUPER_ADMIN"), true);
   assert.equal(canAccessPath("/demo-requests", "ADMIN"), false);
   assert.equal(canAccessPath("/referrals", "SUPER_ADMIN"), true);
   assert.equal(canAccessPath("/referrals", "ADMIN"), false);
 
-  // Owner tetap mengelola staf tenant-nya sendiri
+  // Owner tetap mengelola staf tenant-nya sendiri; SUPER_ADMIN TIDAK lagi
+  // mengurusi pengaturan tenant (urusan ADMIN/owner).
   assert.equal(canAccessPath("/settings", "ADMIN"), true);
-  assert.equal(canAccessPath("/settings", "SUPER_ADMIN"), true);
+  assert.equal(canAccessPath("/settings", "SUPER_ADMIN"), false);
   assert.equal(canAccessPath("/settings", "CASHIER"), false);
+
+  // Rute operasional tenant: dashboard/pos/finance tertutup untuk SUPER_ADMIN
+  for (const path of ["/dashboard", "/pos", "/finance", "/inventory", "/products", "/sales", "/activity-log"]) {
+    assert.equal(canAccessPath(path, "SUPER_ADMIN"), false, `SUPER_ADMIN tidak boleh akses ${path}`);
+    assert.equal(canAccessPath(path, "ADMIN"), true, `ADMIN harus akses ${path}`);
+  }
 });
 
 test("default landing page SUPER_ADMIN adalah /platform", () => {

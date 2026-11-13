@@ -13,17 +13,20 @@ export const APP_ROLES = [
 export type AppRole = (typeof APP_ROLES)[number];
 
 // Operator platform KADAI — satu-satunya role dengan akses /platform/*
-export const SUPER_ADMIN_ROLES = ["SUPER_ADMIN"] as const;
-// ADMIN_ONLY kini = SUPER_ADMIN + ADMIN (owner tenant): superadmin mewarisi
-// seluruh kemampuan admin/owner sehingga dapat menangani dukungan lintas tenant.
-export const ADMIN_ONLY_ROLES = ["SUPER_ADMIN", "ADMIN"] as const;
-export const PLATFORM_OR_OWNER_ROLES = ["SUPER_ADMIN", "ADMIN"] as const;
-export const ADMIN_MANAGER_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER"] as const;
-export const ADMIN_CASHIER_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "CASHIER"] as const;
-export const POS_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "CASHIER"] as const;
-export const KDS_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "KITCHEN"] as const;
-export const INVENTORY_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "INVENTORY"] as const;
-export const FINANCE_ROLES = ["SUPER_ADMIN", "ADMIN", "MANAGER", "ACCOUNTANT"] as const;
+// SUPER_ADMIN berdiri DI ATAS tenant: mengelola akun OWNER (role ADMIN),
+// bukan mengoperasikan POS/kasir/stok tenant.
+export const PLATFORM_ROLES = ["SUPER_ADMIN"] as const;
+export const SUPER_ADMIN_ROLES = PLATFORM_ROLES;
+
+// Gerbang TENANT — SUPER_ADMIN SENGAJA TIDAK TERMASUK:
+// superadmin tidak mengurusi operasional tenant; itu tugas ADMIN (owner) ke bawah.
+export const ADMIN_ONLY_ROLES = ["ADMIN"] as const;
+export const ADMIN_MANAGER_ROLES = ["ADMIN", "MANAGER"] as const;
+export const ADMIN_CASHIER_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
+export const POS_ROLES = ["ADMIN", "MANAGER", "CASHIER"] as const;
+export const KDS_ROLES = ["ADMIN", "MANAGER", "KITCHEN"] as const;
+export const INVENTORY_ROLES = ["ADMIN", "MANAGER", "INVENTORY"] as const;
+export const FINANCE_ROLES = ["ADMIN", "MANAGER", "ACCOUNTANT"] as const;
 export const ALL_AUTHENTICATED_ROLES = [
   "SUPER_ADMIN",
   "ADMIN",

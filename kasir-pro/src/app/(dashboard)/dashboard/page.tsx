@@ -25,6 +25,7 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TopProductsChart } from "@/components/dashboard/top-products-chart";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/page-header";
 import { PackagePlus, ScanLine, Warehouse } from "lucide-react";
 import type { DashboardOverview, DashboardSummary } from "@/types";
 
@@ -181,24 +182,15 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1
-              className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Dashboard Eksekutif
-            </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Sistem Aktif
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Ringkasan konsolidasi transaksi, pergerakan persediaan, dan performa omzet real-time.
-          </p>
-        </div>
+      <PageHeader
+        title="Dashboard Eksekutif"
+        description="Ringkasan konsolidasi transaksi, pergerakan persediaan, dan performa omzet real-time."
+        className="mb-0"
+      >
+        <span className="mr-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Sistem Aktif
+        </span>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" asChild className="h-8 text-xs font-semibold">
             <Link href="/products/new">
@@ -219,7 +211,7 @@ export default function DashboardPage() {
             </Link>
           </Button>
         </div>
-      </div>
+      </PageHeader>
 
       <SummaryCards data={summary ?? undefined} loading={summaryLoading} />
 

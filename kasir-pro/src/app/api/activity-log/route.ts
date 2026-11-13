@@ -6,8 +6,9 @@ import {
   hasRequiredRole,
 } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
-// GET /api/activity-log
+// GET /api/activity-log — log dibatasi pada staf tenant yang sama
 export async function GET(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
@@ -22,6 +23,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const canViewAllLogs = hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES);
     const userId = canViewAllLogs
@@ -34,6 +40,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "30");
 
     const where = {
+      ...(canViewAllLogs
+        ? { user: { storeId: scope.storeId } } // isolasi tenant
+        : { userId: sessionUser.id }),
       ...(userId && { userId }),
       ...(action && { action: action as never }),
       ...(startDate && endDate && {

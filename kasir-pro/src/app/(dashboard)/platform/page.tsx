@@ -3,61 +3,53 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Building2,
   Users,
+  UserCheck,
+  UserX,
   Clock,
-  Receipt,
-  TrendingUp,
   AlertTriangle,
   ArrowRight,
+  Store,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/shared/stat-card";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusBadge, ownerStatusTone } from "@/components/shared/status-badge";
 import { apiFetch } from "@/lib/api";
-import { TIER_LABELS, CYCLE_MONTHS, cyclePrice } from "@/lib/pricing";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface SubscriptionSummary {
-  storeId: string;
-  storeName: string;
-  businessType: string;
-  storeTier: string;
+interface PlatformOwner {
+  id: string;
+  name: string;
+  email: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
   createdAt: string;
-  userCount: number;
-  outletCount: number;
-  subscription: {
+  storeCount: number;
+  store: {
     id: string;
+    name: string;
+    businessType: string;
     tier: string;
-    cycle: string;
-    status: string;
-    startedAt: string | null;
-    expiresAt: string | null;
   } | null;
-  daysRemaining: number | null;
-  pendingInvoiceCount: number;
-  pendingInvoiceAmount: number;
 }
 
-const STATUS_STYLE: Record<string, string> = {
-  ACTIVE: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  PAST_DUE: "bg-amber-50 text-amber-700 border-amber-200",
-  EXPIRED: "bg-rose-50 text-rose-700 border-rose-200",
-  CANCELLED: "bg-slate-100 text-slate-700 border-slate-200",
-};
-
+/**
+ * Dashboard Platform (SUPER_ADMIN).
+ * Fokus: mengelola AKUN OWNER (pemilik tenant) — bukan operasional tenant.
+ */
 export default function PlatformDashboardPage() {
-  const [subscriptions, setSubscriptions] = useState<SubscriptionSummary[]>([]);
+  const [owners, setOwners] = useState<PlatformOwner[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await apiFetch<{ data: SubscriptionSummary[] }>(
-          "/api/platform/subscriptions"
+        const res = await apiFetch<{ data: PlatformOwner[] }>(
+          "/api/platform/owners?includeInactive=true"
         );
-        setSubscriptions(res.data || []);
+        setOwners(res.data || []);
       } catch {
         // biarkan kosong — halaman hanya untuk SUPER_ADMIN
       } finally {
@@ -67,75 +59,76 @@ export default function PlatformDashboardPage() {
     load();
   }, []);
 
-  const activeSubs = subscriptions.filter((s) => s.subscription?.status === "ACTIVE");
-  const expiringSoon = subscriptions.filter(
-    (s) => s.daysRemaining !== null && s.daysRemaining <= 30
-  );
-  const expired = subscriptions.filter(
-    (s) => s.subscription?.status === "EXPIRED" || (s.daysRemaining !== null && s.daysRemaining < 0)
-  );
-  const pendingCount = subscriptions.reduce((sum, s) => sum + s.pendingInvoiceCount, 0);
-  const pendingAmount = subscriptions.reduce((sum, s) => sum + s.pendingInvoiceAmount, 0);
-  const totalUsers = subscriptions.reduce((sum, s) => sum + s.userCount, 0);
-  const mrr = activeSubs.reduce((sum, s) => {
-    const sub = s.subscription;
-    if (!sub || sub.tier === "FREE") return sum;
-    return (
-      sum +
-      cyclePrice(sub.tier as keyof typeof TIER_LABELS, sub.cycle as keyof typeof CYCLE_MONTHS) /
-        CYCLE_MONTHS[sub.cycle as keyof typeof CYCLE_MONTHS]
-    );
-  }, 0);
+  const total = owners.length;
+  const active = owners.filter((o) => o.isActive).length;
+  const inactive = total - active;
+  const neverLoggedIn = owners.filter((o) => !o.lastLoginAt).length;
 
-  const fmtIDR = (n: number) =>
-    new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+  const needsAttention = owners.filter((o) => !o.isActive || !o.lastLoginAt);
+
+  const fmtDateTime = (iso: string | null) =>
+    iso
+      ? new Date(iso).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })
+      : "Belum pernah login";
+
+  const recentOwners = [...owners]
+    .sort((a, b) => {
+      const ta = a.lastLoginAt ? new Date(a.lastLoginAt).getTime() : 0;
+      const tb = b.lastLoginAt ? new Date(b.lastLoginAt).getTime() : 0;
+      return tb - ta;
+    })
+    .slice(0, 8);
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        eyebrow="Operator Platform"
+        title="Platform Dashboard"
+        description="Pantau dan kelola akun owner (pemilik tenant) KADAI. Urusan operasional toko tetap di tangan masing-masing owner."
+        icon={Users}
+      >
+        <Button asChild className="gap-2">
+          <Link href="/platform/owners">
+            Kelola Akun Owner <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </PageHeader>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Tenant"
-          value={loading ? "—" : subscriptions.length}
-          description="Store yang terdaftar di platform"
-          icon={Building2}
-          badge="SaaS"
+          title="Total Owner"
+          value={loading ? "—" : total}
+          description="Akun pemilik tenant terdaftar"
+          icon={Users}
+          badge="Platform"
         />
         <StatCard
-          title="Langganan Aktif"
-          value={loading ? "—" : activeSubs.length}
-          description={`${totalUsers} akun pengguna terhubung`}
-          icon={TrendingUp}
+          title="Owner Aktif"
+          value={loading ? "—" : active}
+          description="Akun berstatus aktif"
+          icon={UserCheck}
           badgeVariant="success"
-          badge="MRR aktif"
+          badge="Aktif"
         />
         <StatCard
-          title="Jatuh Tempo ≤ 30 Hari"
-          value={loading ? "—" : expiringSoon.length}
-          description={`${expired.length} sudah lewat jatuh tempo`}
+          title="Owner Nonaktif"
+          value={loading ? "—" : inactive}
+          description="Akun dinonaktifkan sementara"
+          icon={UserX}
+          badgeVariant={inactive > 0 ? "danger" : "success"}
+          badge={inactive > 0 ? "Perlu tindak lanjut" : "Bersih"}
+        />
+        <StatCard
+          title="Belum Pernah Login"
+          value={loading ? "—" : neverLoggedIn}
+          description="Akun dibuat namun belum dipakai"
           icon={Clock}
-          badgeVariant="warning"
-          badge="Perlu perhatian"
-        />
-        <StatCard
-          title="Invoice Pending"
-          value={loading ? "—" : pendingCount}
-          description={fmtIDR(pendingAmount)}
-          icon={Receipt}
-          badgeVariant="danger"
-          badge="Belum dibayar"
+          badgeVariant={neverLoggedIn > 0 ? "warning" : "success"}
+          badge="Onboarding"
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Estimasi MRR</CardTitle>
-            <CardDescription>Pendapatan bulanan berulang dari langganan aktif</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{loading ? "—" : fmtIDR(mrr)}</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">Akses Cepat</CardTitle>
@@ -144,40 +137,39 @@ export default function PlatformDashboardPage() {
           <CardContent className="space-y-2">
             <Button asChild variant="outline" className="w-full justify-between">
               <Link href="/platform/owners">
-                Kelola Akun Owner <ArrowRight className="h-4 w-4" />
+                Daftar &amp; Kelola Owner <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full justify-between">
-              <Link href="/platform/subscriptions">
-                Langganan & Invoice <ArrowRight className="h-4 w-4" />
+              <Link href="/demo-requests">
+                Permohonan Demo <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </CardContent>
         </Card>
-        <Card className="border-amber-200 bg-amber-50/40">
+
+        <Card className="lg:col-span-2 border-amber-200 bg-amber-50/40">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm text-amber-800">
-              <AlertTriangle className="h-4 w-4" /> Perhatian Billing
+              <AlertTriangle className="h-4 w-4" /> Perlu Perhatian
             </CardTitle>
-            <CardDescription>
-              Tenant dengan langganan non-aktif / jatuh tempo
-            </CardDescription>
+            <CardDescription>Owner nonaktif atau belum pernah login</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-8 w-full" />
-            ) : expiringSoon.length === 0 ? (
-              <p className="text-sm text-text-muted">Semua langganan dalam keadaan sehat.</p>
+            ) : needsAttention.length === 0 ? (
+              <p className="text-sm text-text-muted">Semua akun owner sehat.</p>
             ) : (
               <ul className="space-y-1.5 text-sm">
-                {expiringSoon.slice(0, 5).map((s) => (
-                  <li key={s.storeId} className="flex items-center justify-between gap-2">
-                    <span className="truncate">{s.storeName}</span>
-                    <Badge className={STATUS_STYLE[s.subscription?.status ?? ""] ?? ""}>
-                      {s.daysRemaining !== null && s.daysRemaining < 0
-                        ? `Lewat ${Math.abs(s.daysRemaining)} hari`
-                        : `Sisa ${s.daysRemaining} hari`}
-                    </Badge>
+                {needsAttention.slice(0, 5).map((o) => (
+                  <li key={o.id} className="flex items-center justify-between gap-2">
+                    <span className="truncate">
+                      {o.name} <span className="text-text-muted">· {o.email}</span>
+                    </span>
+                    <StatusBadge tone={o.isActive ? "warning" : ownerStatusTone(false)}>
+                      {o.isActive ? "Belum login" : "Nonaktif"}
+                    </StatusBadge>
                   </li>
                 ))}
               </ul>
@@ -188,8 +180,8 @@ export default function PlatformDashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Ringkasan Tenant</CardTitle>
-          <CardDescription>Status langganan seluruh store KADAI</CardDescription>
+          <CardTitle className="text-sm">Ringkasan Akun Owner</CardTitle>
+          <CardDescription>Owner terbaru berdasarkan aktivitas login</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -198,64 +190,49 @@ export default function PlatformDashboardPage() {
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </div>
-          ) : subscriptions.length === 0 ? (
+          ) : recentOwners.length === 0 ? (
             <p className="py-8 text-center text-sm text-text-muted">
-              Belum ada tenant terdaftar.
+              Belum ada akun owner terdaftar.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-text-muted">
+                    <th className="py-2 pr-4">Owner</th>
                     <th className="py-2 pr-4">Tenant</th>
-                    <th className="py-2 pr-4">Tier</th>
                     <th className="py-2 pr-4">Status</th>
-                    <th className="py-2 pr-4">Jatuh Tempo</th>
-                    <th className="py-2 pr-4">Invoice Pending</th>
-                    <th className="py-2" />
+                    <th className="py-2 pr-4">Login Terakhir</th>
+                    <th className="py-2 text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {subscriptions.map((s) => (
-                    <tr key={s.storeId} className="border-b last:border-0">
+                  {recentOwners.map((o) => (
+                    <tr key={o.id} className="border-b last:border-0">
                       <td className="py-3 pr-4">
-                        <p className="font-medium">{s.storeName}</p>
-                        <p className="text-xs text-text-muted">
-                          {s.userCount} user · {s.outletCount} outlet
-                        </p>
+                        <p className="font-medium">{o.name}</p>
+                        <p className="text-xs text-text-muted">{o.email}</p>
                       </td>
                       <td className="py-3 pr-4">
-                        {TIER_LABELS[s.subscription?.tier as keyof typeof TIER_LABELS] ?? s.storeTier}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <Badge className={STATUS_STYLE[s.subscription?.status ?? ""] ?? ""}>
-                          {s.subscription?.status ?? "Belum berlangganan"}
-                        </Badge>
-                      </td>
-                      <td className="py-3 pr-4">
-                        {s.daysRemaining === null
-                          ? "—"
-                          : s.daysRemaining < 0
-                            ? `Lewat ${Math.abs(s.daysRemaining)} hari`
-                            : `${s.daysRemaining} hari`}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {s.pendingInvoiceCount > 0 ? (
-                          <span className="font-semibold text-amber-600">
-                            {s.pendingInvoiceCount} · {fmtIDR(s.pendingInvoiceAmount)}
+                        {o.store ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <Store className="h-3.5 w-3.5 text-text-muted" />
+                            <span>{o.store.name}</span>
+                            <StatusBadge tone="muted">{o.storeCount} tenant</StatusBadge>
                           </span>
                         ) : (
-                          "—"
+                          <span className="text-text-muted">Tanpa tenant</span>
                         )}
                       </td>
+                      <td className="py-3 pr-4">
+                        <StatusBadge tone={ownerStatusTone(o.isActive)}>
+                          {o.isActive ? "Aktif" : "Nonaktif"}
+                        </StatusBadge>
+                      </td>
+                      <td className="py-3 pr-4">{fmtDateTime(o.lastLoginAt)}</td>
                       <td className="py-3 text-right">
-                        <Button
-                          asChild
-                          variant="ghost"
-                          size="sm"
-                          className="gap-1"
-                        >
-                          <Link href="/platform/subscriptions">
+                        <Button asChild variant="ghost" size="sm" className="gap-1">
+                          <Link href="/platform/owners">
                             Kelola <ArrowRight className="h-3 w-3" />
                           </Link>
                         </Button>

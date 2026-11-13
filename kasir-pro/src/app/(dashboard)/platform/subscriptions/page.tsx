@@ -11,11 +11,12 @@ import {
   Building2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatCard } from "@/components/shared/stat-card";
+import { PageHeader } from "@/components/shared/page-header";
+import { StatusBadge, type StatusTone } from "@/components/shared/status-badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogBody } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
@@ -59,18 +60,18 @@ const TIER_OPTIONS = ["FREE", "STARTER", "PRO_BUSINESS", "ENTERPRISE"];
 const CYCLE_OPTIONS = ["MONTHLY", "QUARTERLY", "ANNUAL"];
 const STATUS_OPTIONS = ["ACTIVE", "PAST_DUE", "EXPIRED", "CANCELLED"];
 
-const STATUS_STYLE: Record<string, string> = {
-  ACTIVE: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  PAST_DUE: "bg-amber-50 text-amber-700 border-amber-200",
-  EXPIRED: "bg-rose-50 text-rose-700 border-rose-200",
-  CANCELLED: "bg-slate-100 text-slate-700 border-slate-200",
+const SUB_STATUS_TONE: Record<string, StatusTone> = {
+  ACTIVE: "success",
+  PAST_DUE: "warning",
+  EXPIRED: "danger",
+  CANCELLED: "muted",
 };
 
-const INVOICE_STYLE: Record<string, string> = {
-  PENDING: "bg-amber-50 text-amber-700 border-amber-200",
-  SETTLED: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  FAILED: "bg-rose-50 text-rose-700 border-rose-200",
-  REFUNDED: "bg-slate-100 text-slate-700 border-slate-200",
+const INVOICE_STATUS_TONE: Record<string, StatusTone> = {
+  PENDING: "warning",
+  SETTLED: "success",
+  FAILED: "danger",
+  REFUNDED: "muted",
 };
 
 const fmtIDR = (n: number | string) =>
@@ -190,6 +191,12 @@ export default function PlatformSubscriptionsPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        eyebrow="Billing SaaS"
+        title="Langganan & Invoice"
+        description="Kelola tier langganan, siklus billing, status, dan jatuh tempo tenant KADAI."
+        icon={Receipt}
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard title="Langganan Aktif" value={loading ? "—" : activeCount} description={`dari ${rows.length} tenant`} icon={CheckCircle2} badgeVariant="success" />
         <StatCard title="Jatuh Tempo ≤ 30 Hari" value={loading ? "—" : expiringCount} description="Perlu tindak lanjut billing" icon={CalendarClock} badgeVariant="warning" />
@@ -239,9 +246,9 @@ export default function PlatformSubscriptionsPage() {
                         <p className="text-xs text-text-muted">{row.subscription?.cycle ?? "—"}</p>
                       </td>
                       <td className="py-3 pr-4">
-                        <Badge className={STATUS_STYLE[row.subscription?.status ?? ""] ?? ""}>
+                        <StatusBadge tone={SUB_STATUS_TONE[row.subscription?.status ?? ""] ?? "neutral"}>
                           {row.subscription?.status ?? "BELUM BERLANGGANAN"}
-                        </Badge>
+                        </StatusBadge>
                       </td>
                       <td className="py-3 pr-4">
                         <p>{fmtDate(row.subscription?.expiresAt ?? null)}</p>
@@ -460,7 +467,7 @@ export default function PlatformSubscriptionsPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge className={INVOICE_STYLE[inv.status] ?? ""}>{inv.status}</Badge>
+                          <StatusBadge tone={INVOICE_STATUS_TONE[inv.status] ?? "neutral"}>{inv.status}</StatusBadge>
                           {inv.status === "PENDING" && (
                             <Button
                               size="sm"

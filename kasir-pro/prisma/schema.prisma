@@ -243,6 +243,7 @@ model User {
   role          UserRole  @default(CASHIER)
   avatar        String?
   isActive      Boolean   @default(true)
+  isDemo        Boolean   @default(false) // Ditandai data demonstrasi (demo-seeder); disembunyikan dari modul platform
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -273,6 +274,7 @@ model Store {
   phone             String?
   email             String?
   logo              String?
+  isDemo            Boolean         @default(false) // Penanda tenant demonstrasi (disembunyikan dari modul platform)
   
   // Status Perpajakan & Legalitas Badan Usaha RI
   taxStatus         TaxStatus        @default(NON_PKP)
@@ -360,6 +362,7 @@ model Category {
   color       String?
   icon        String?
   isActive    Boolean   @default(true)
+  isDemo      Boolean   @default(false) // Kategori dari demo-seeder
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -436,6 +439,7 @@ model Outlet {
   taxRate           Decimal         @default(10) @db.Decimal(5, 2)
   serviceChargeRate Decimal         @default(5) @db.Decimal(5, 2)
   isActive          Boolean         @default(true)
+  isDemo            Boolean         @default(false) // Outlet demonstrasi (demo-seeder); tidak dihitung di modul platform
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
@@ -466,6 +470,7 @@ model Product {
   image             String?
   lowStockThreshold Int          @default(10)
   isActive          Boolean      @default(true)
+  isDemo            Boolean      @default(false) // Produk dari demo-seeder
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 

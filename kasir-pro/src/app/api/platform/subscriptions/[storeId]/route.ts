@@ -107,7 +107,7 @@ export async function PUT(
         }
         if (body.suspendOwners) {
           await prisma.user.updateMany({
-            where: { storeId, role: "ADMIN" },
+            where: { storeId, role: "ADMIN", isDemo: false },
             data: { isActive: false },
           });
         }

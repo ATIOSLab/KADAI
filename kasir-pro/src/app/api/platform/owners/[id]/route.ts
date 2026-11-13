@@ -23,7 +23,7 @@ const ownerSelect = {
 
 async function findOwner(id: string) {
   return prisma.user.findFirst({
-    where: { id, role: "ADMIN" }, // endpoint owner: TIDAK bisa menyentuh SUPER_ADMIN
+    where: { id, role: "ADMIN", isDemo: false }, // endpoint owner: TIDAK bisa menyentuh SUPER_ADMIN maupun akun demo
     select: ownerSelect,
   });
 }

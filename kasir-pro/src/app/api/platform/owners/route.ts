@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     const owners = await prisma.user.findMany({
       where: {
         role: "ADMIN",
+        isDemo: false, // akun hasil demo-seeder tidak ditampilkan sebagai owner asli
         ...(storeId ? { storeId } : {}),
         ...(includeInactive ? {} : { isActive: true }),
       },

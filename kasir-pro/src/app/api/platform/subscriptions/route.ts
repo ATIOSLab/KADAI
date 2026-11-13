@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
           },
         },
         invoices: { select: { id: true, status: true, amount: true } },
-        _count: { select: { users: true, outlets: true } },
+        _count: { select: { users: { where: { isDemo: false } }, outlets: { where: { isDemo: false } } } },
       },
       orderBy: { createdAt: "desc" },
     });

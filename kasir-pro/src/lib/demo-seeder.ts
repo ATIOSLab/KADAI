@@ -227,8 +227,8 @@ export async function runDemoSeeding() {
     for (const out of cluster.outlets) {
       const o = await prisma.outlet.upsert({
         where: { code: out.code },
-        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain },
-        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain },
+        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true },
+        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true },
       });
       if (out.isMain || !mainOutletId) {
         mainOutletId = o.id;
@@ -238,8 +238,8 @@ export async function runDemoSeeding() {
     for (const catName of cluster.categories) {
       await prisma.category.upsert({
         where: { name: catName },
-        update: {},
-        create: { name: catName, description: `Kategori ${catName} untuk ${cluster.name}` },
+        update: { isDemo: true },
+        create: { name: catName, description: `Kategori ${catName} untuk ${cluster.name}`, isDemo: true },
       });
     }
 
@@ -255,6 +255,7 @@ export async function runDemoSeeding() {
           productType: prod.type,
           station: prod.station,
           unit: prod.unit,
+          isDemo: true,
         },
         create: {
           name: prod.name,
@@ -265,6 +266,7 @@ export async function runDemoSeeding() {
           station: prod.station,
           unit: prod.unit,
           categoryId: category.id,
+          isDemo: true,
         },
       });
 
@@ -307,6 +309,7 @@ export async function runDemoSeeding() {
             supervisorPin: supervisorPinHash,
             isActive: true,
             outletId: mainOutletId,
+            isDemo: true,
           },
           create: {
             name: u.name,
@@ -316,6 +319,7 @@ export async function runDemoSeeding() {
             supervisorPin: supervisorPinHash,
             isActive: true,
             outletId: mainOutletId,
+            isDemo: true,
           },
         });
       }

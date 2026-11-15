@@ -49,6 +49,7 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/referrals", roles: SUPER_ADMIN_ROLES },
   // Platform KADAI (khusus SUPER_ADMIN)
   { path: "/platform", roles: SUPER_ADMIN_ROLES },
+  { path: "/platform/plans", roles: SUPER_ADMIN_ROLES },
   { path: "/platform/owners", roles: SUPER_ADMIN_ROLES },
   { path: "/platform/subscriptions", roles: SUPER_ADMIN_ROLES },
   { path: "/platform/tenants", roles: SUPER_ADMIN_ROLES },

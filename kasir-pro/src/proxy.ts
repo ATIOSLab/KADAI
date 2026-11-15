@@ -67,6 +67,7 @@ const publicApis = [
   "/api/demo-requests",
   "/api/referrals/register",
   "/api/health",
+  "/api/public/plans",
   ...serverToServerApis,
 ];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);

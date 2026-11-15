@@ -48,6 +48,32 @@ export async function ensureNotLastSuperAdmin(
   return true;
 }
 
+/** Jumlah paket langganan aktif (opsional mengecualikan satu plan). */
+export async function countActivePlans(excludePlanId?: string) {
+  return prisma.subscriptionPlan.count({
+    where: {
+      isActive: true,
+      ...(excludePlanId ? { id: { not: excludePlanId } } : {}),
+    },
+  });
+}
+
+/**
+ * Guard: paket aktif terakhir tidak boleh dinonaktifkan.
+ * Mencegah katalog harga kosong sehingga /harga dan landing kehilangan data.
+ */
+export async function ensureNotLastActivePlan(targetId: string) {
+  const target = await prisma.subscriptionPlan.findUnique({
+    where: { id: targetId },
+    select: { isActive: true },
+  });
+  if (!target) return false;
+  if (!target.isActive) return true; // sudah nonaktif — tidak mengubah katalog
+
+  const remaining = await countActivePlans(targetId);
+  return remaining > 0;
+}
+
 /** Sinkronkan tier Store dengan StoreSubscription (satu sumber kebenaran billing). */
 export async function syncStoreTier(storeId: string, tier: SubscriptionTier) {
   return prisma.store.update({

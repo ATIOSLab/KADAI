@@ -16,6 +16,7 @@ import {
   Building,
   ArrowLeftRight,
   Shirt,
+  Tags,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
@@ -227,6 +228,14 @@ export const navigationSections: NavigationSection[] = [
         roles: ["SUPER_ADMIN"],
       },
       {
+        href: "/platform/plans",
+        label: "Paket Langganan (Plans)",
+        shortLabel: "Paket",
+        description: "Kelola harga, fitur, dan batas pemakaian tiap paket langganan.",
+        icon: Tags,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
         href: "/demo-requests",
         label: "Permohonan Demo (Leads)",
         shortLabel: "Demo Leads",
@@ -397,6 +406,12 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Kelola akun pemilik tenant: buat akun baru, reset kata sandi, aktif/nonaktifkan, dan lihat tenant yang dikelola.",
     section: "Platform KADAI",
     eyebrow: "Manajemen Owner",
+  },
+  "/platform/plans": {
+    title: "Paket Langganan",
+    description: "Atur harga, fitur, dan batas pemakaian tiap paket langganan.",
+    section: "Platform KADAI",
+    eyebrow: "Manajemen Paket",
   },
 };
 

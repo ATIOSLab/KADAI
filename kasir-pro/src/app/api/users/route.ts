@@ -6,6 +6,7 @@ import { logActivity } from "@/lib/activity-logger";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { checkUserLimit } from "@/lib/plan-limits";
 
 // GET /api/users — daftar staf tenant (terbatas pada store si pemanggil)
 export async function GET(request: NextRequest) {
@@ -60,6 +61,11 @@ export async function POST(request: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    const limitCheck = await checkUserLimit(scope.storeId);
+    if (!limitCheck.allowed) {
+      return NextResponse.json({ error: limitCheck.message }, { status: 403 });
     }
 
     const body = await request.json();

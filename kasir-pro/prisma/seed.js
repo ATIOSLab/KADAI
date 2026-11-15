@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { PrismaClient, FinanceDirection, UserRole } = require("@prisma/client");
+const { PrismaClient, FinanceDirection, UserRole, BillingCycle } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
@@ -281,9 +281,153 @@ async function ensureSuperAdmin() {
   return { configured: true, created: true, email: superAdmin.email };
 }
 
+const PLAN_SEEDS = [
+  {
+    code: "FREE",
+    name: "Starter",
+    description: "Untuk warung mikro dan perintis usaha yang baru memulai.",
+    badge: null,
+    sortOrder: 10,
+    features: [
+      "1 Gerai & 1 Akun Kasir",
+      "Maksimal 50 Produk SKU",
+      "Kasir POS Cepat & Cetak Struk",
+      "Laporan Penjualan Harian",
+    ],
+    limits: {
+      maxOutlets: 1,
+      maxUsers: 1,
+      maxProducts: 50,
+      maxSku: 50,
+      kds: false,
+      transferStock: false,
+    },
+    prices: { MONTHLY: 0, QUARTERLY: 0, ANNUAL: 0 },
+  },
+  {
+    code: "STARTER",
+    name: "Professional",
+    description: "Operasional tuntas 1 gerai untuk kedai kafe atau toko ritel aktif.",
+    badge: null,
+    sortOrder: 20,
+    features: [
+      "1 Gerai & Hingga 3 Akun Kasir",
+      "Produk & Transaksi Tanpa Batas",
+      "F&B: QR Meja & Pemesanan Mandiri",
+      "Ritel: Barcode Scanner & Peringatan Kadaluwarsa",
+      "Pembukuan Kas & Pajak SAK EMKM",
+    ],
+    limits: {
+      maxOutlets: 1,
+      maxUsers: 3,
+      maxProducts: null,
+      maxSku: null,
+      kds: false,
+      transferStock: false,
+    },
+    prices: { MONTHLY: 99_000, QUARTERLY: 267_300, ANNUAL: 950_400 },
+  },
+  {
+    code: "PRO_BUSINESS",
+    name: "Business Pro",
+    description: "Kafe, resto & ritel modern dengan manajemen resep, dapur & multi-cabang.",
+    badge: "Paling Banyak Dipilih",
+    sortOrder: 30,
+    features: [
+      "Hingga 3 Gerai / Cabang Usaha",
+      "F&B: Resep BOM Bahan Baku & Layar Dapur KDS",
+      "Ritel: Inventori Multi-Batch (FIFO & FEFO Asli)",
+      "Transfer Stok Antar-Cabang (Surat Jalan)",
+      "Rekap PB1/PPN & PPh Final 0.5% PP 55/2022",
+      "Dukungan WhatsApp Prioritas",
+    ],
+    limits: {
+      maxOutlets: 3,
+      maxUsers: null,
+      maxProducts: null,
+      maxSku: null,
+      kds: true,
+      transferStock: true,
+    },
+    prices: { MONTHLY: 249_000, QUARTERLY: 672_300, ANNUAL: 2_390_400 },
+  },
+  {
+    code: "ENTERPRISE",
+    name: "Enterprise",
+    description: "Waralaba berjejaring, sentra dapur pusat, dan multi-gudang.",
+    badge: null,
+    sortOrder: 40,
+    features: [
+      "Gerai & Gudang Tak Terbatas",
+      "Sentra Dapur Pusat (Central Kitchen)",
+      "Routing Pesanan Antar-Sentra Produksi",
+      "Laporan Konsolidasi Multi-Entitas",
+      "Dedicated Account Manager & SLA 99.9%",
+    ],
+    limits: {
+      maxOutlets: null,
+      maxUsers: null,
+      maxProducts: null,
+      maxSku: null,
+      kds: true,
+      transferStock: true,
+      centralKitchen: true,
+    },
+    prices: { MONTHLY: 599_000, QUARTERLY: 1_617_300, ANNUAL: 5_750_400 },
+  },
+];
+
+/**
+ * Seed idempotent katalog paket langganan (SubscriptionPlan + PlanPrice).
+ * Sumber nilai mengikuti TIER_PRICES (engine billing). FREE selalu Rp 0.
+ */
+async function ensurePlans() {
+  let created = 0;
+  let skipped = 0;
+
+  for (const seed of PLAN_SEEDS) {
+    const existing = await prisma.subscriptionPlan.findUnique({
+      where: { code: seed.code },
+      select: { id: true },
+    });
+
+    // PENTING: seed berjalan SETIAP boot container (docker/start.sh).
+    // Jadi paket yang SUDAH ADA tidak boleh diperbarui/ditimpa — kalau ditimpa,
+    // semua perubahan harga/fitur dari /platform/plans akan hilang tiap deploy.
+    if (existing) {
+      skipped += 1;
+      continue;
+    }
+
+    await prisma.subscriptionPlan.create({
+      data: {
+        code: seed.code,
+        name: seed.name,
+        description: seed.description,
+        badge: seed.badge,
+        features: seed.features,
+        limits: seed.limits,
+        sortOrder: seed.sortOrder,
+        isActive: true,
+        prices: {
+          create: Object.entries(seed.prices).map(([cycle, amount]) => ({
+            cycle,
+            amount,
+          })),
+        },
+      },
+    });
+    created += 1;
+  }
+
+  console.log(`Katalog plan: ${created} dibuat, ${skipped} dipertahankan (edit superadmin tidak ditimpa).`);
+  return { created, skipped };
+}
+
 async function main() {
   console.log("Menjalankan seed minimal untuk deployment...");
 
+  await ensurePlans();
   const storeId = await ensureStore();
   await ensureUnits();
   await ensureFinanceCategories();

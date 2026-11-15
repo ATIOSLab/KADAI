@@ -5,6 +5,7 @@ import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createOutletSchema, updateOutletSchema } from "@/lib/validators/outlet";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { checkOutletLimit } from "@/lib/plan-limits";
 
 // GET /api/outlets — daftar cabang milik tenant pemanggil
 export async function GET() {
@@ -44,6 +45,11 @@ export async function POST(req: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return jsonError(scope.message, scope.status);
+    }
+
+    const limitCheck = await checkOutletLimit(scope.storeId);
+    if (!limitCheck.allowed) {
+      return jsonError(limitCheck.message, 403);
     }
 
     const body = await req.json();

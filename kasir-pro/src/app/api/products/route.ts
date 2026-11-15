@@ -6,6 +6,7 @@ import { createProductSchema } from "@/lib/validators/product";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { checkProductLimit } from "@/lib/plan-limits";
 import { ZodError } from "zod";
 
 function normalizeUnitName(name: string) {
@@ -116,6 +117,12 @@ export async function POST(request: NextRequest) {
         { error: "Role Anda tidak dapat menambah produk" },
         { status: 403 }
       );
+    }
+
+    // Kuota paket langganan: batas jumlah produk per tenant (dikelola superadmin)
+    const limitCheck = await checkProductLimit(sessionUser.storeId);
+    if (!limitCheck.allowed) {
+      return NextResponse.json({ error: limitCheck.message }, { status: 403 });
     }
 
     const body = await request.json();

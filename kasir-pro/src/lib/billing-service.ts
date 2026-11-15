@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { CYCLE_MONTHS, TIER_LABELS, cyclePrice } from "@/lib/pricing";
+import { CYCLE_MONTHS, TIER_LABELS } from "@/lib/pricing";
+import { cyclePrice } from "@/lib/plan-catalog";
 import { attributeInvoiceToReferral } from "@/lib/referral-engine";
 import type { BillingCycle, PaymentProvider, SubscriptionTier } from "@prisma/client";
 
@@ -31,7 +32,7 @@ export async function createInvoice(opts: {
   });
   if (!store) throw new Error("Toko tidak ditemukan");
 
-  const amount = opts.amount ?? cyclePrice(opts.tier, opts.cycle);
+  const amount = opts.amount ?? (await cyclePrice(opts.tier, opts.cycle));
 
   const now = new Date();
   const stamp = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}`;

@@ -95,6 +95,86 @@ export const subscriptionUpdateSchema = z
     }
   });
 
+const PLAN_CYCLES = ["MONTHLY", "QUARTERLY", "ANNUAL"] as const;
+
+const planPriceAmount = z.number().int().min(0, "Harga tidak boleh negatif");
+
+export const planLimitsSchema = z
+  .object({
+    maxOutlets: z.number().int().min(0).nullable().optional(),
+    maxUsers: z.number().int().min(0).nullable().optional(),
+    maxProducts: z.number().int().min(0).nullable().optional(),
+    maxSku: z.number().int().min(0).nullable().optional(),
+    kds: z.boolean().optional(),
+    transferStock: z.boolean().optional(),
+    centralKitchen: z.boolean().optional(),
+  })
+  .passthrough();
+
+const planPricesSchema = z.object({
+  MONTHLY: planPriceAmount,
+  QUARTERLY: planPriceAmount,
+  ANNUAL: planPriceAmount,
+});
+
+const planPricesUpdateSchema = z.object({
+  MONTHLY: planPriceAmount.optional(),
+  QUARTERLY: planPriceAmount.optional(),
+  ANNUAL: planPriceAmount.optional(),
+});
+
+/**
+ * Paket langganan platform. `code` immutable setelah dibuat (dipakai sebagai
+ * pemetaan tier Store) dan hanya huruf besar/angka/garis bawah.
+ * FREE wajib Rp 0 di semua siklus.
+ */
+export const planCreateSchema = z
+  .object({
+    code: z
+      .string()
+      .min(2, "Kode paket minimal 2 karakter")
+      .max(40, "Kode paket maksimal 40 karakter")
+      .regex(/^[A-Z0-9_]+$/, "Kode paket hanya boleh huruf besar, angka, dan garis bawah"),
+    name: z.string().min(1, "Nama paket wajib diisi").max(100),
+    description: z.string().max(500).optional().nullable(),
+    badge: z.string().max(40).optional().nullable(),
+    features: z.array(z.string().max(200)).default([]),
+    limits: planLimitsSchema.default({}),
+    prices: planPricesSchema,
+    sortOrder: z.number().int().min(0).default(0),
+    isActive: z.boolean().default(true),
+  })
+  .superRefine((data, ctx) => {
+    if (data.code === "FREE") {
+      for (const cycle of PLAN_CYCLES) {
+        if (data.prices[cycle] !== 0) {
+          ctx.addIssue({
+            code: "custom",
+            message: "Paket FREE harus Rp 0 pada semua siklus",
+            path: ["prices", cycle],
+          });
+        }
+      }
+    }
+  });
+
+export const planUpdateSchema = z
+  .object({
+    name: z.string().min(1).max(100).optional(),
+    description: z.string().max(500).optional().nullable(),
+    badge: z.string().max(40).optional().nullable(),
+    features: z.array(z.string().max(200)).optional(),
+    limits: planLimitsSchema.optional(),
+    prices: planPricesUpdateSchema.optional(),
+    sortOrder: z.number().int().min(0).optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine((d) => Object.keys(d).length > 0, {
+    message: "Tidak ada field yang dikirim untuk diperbarui",
+  });
+
 export type OwnerCreateInput = z.infer<typeof ownerCreateSchema>;
 export type OwnerUpdateInput = z.infer<typeof ownerUpdateSchema>;
 export type SubscriptionUpdateInput = z.infer<typeof subscriptionUpdateSchema>;
+export type PlanCreateInput = z.infer<typeof planCreateSchema>;
+export type PlanUpdateInput = z.infer<typeof planUpdateSchema>;

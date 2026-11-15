@@ -14,14 +14,38 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
 import { FadeIn, FadeInStagger, FadeInStaggerItem } from "./fade-in";
 
-const PLANS = [
+export type LandingPlan = {
+  code: string;
+  name: string;
+  description: string | null;
+  badge: string | null;
+  features: string[];
+  sortOrder: number;
+  prices: { MONTHLY: number; QUARTERLY: number; ANNUAL: number };
+};
+
+type CardPlan = {
+  name: string;
+  subtitle: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  yearlyBilled: string;
+  period: string;
+  features: string[];
+  cta: string;
+  featured: boolean;
+  badge?: string;
+};
+
+const STATIC_PLANS: CardPlan[] = [
   {
     name: "Starter",
     subtitle: "Untuk warung mikro dan perintis usaha yang baru memulai.",
-    monthlyPrice: "Rp 0",
-    yearlyPrice: "Rp 0",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
     yearlyBilled: "Gratis Selamanya",
     period: "/ bln",
     features: [
@@ -36,9 +60,9 @@ const PLANS = [
   {
     name: "Professional",
     subtitle: "Operasional tuntas 1 gerai untuk kedai kafe atau toko ritel aktif.",
-    monthlyPrice: "Rp 99.000",
-    yearlyPrice: "Rp 79.000",
-    yearlyBilled: "Ditagih Rp 948rb/thn (Hemat 20%)",
+    monthlyPrice: 99000,
+    yearlyPrice: 79200,
+    yearlyBilled: `Ditagih ${formatCurrency(950400)}/thn (Hemat 20%)`,
     period: "/ bln",
     features: [
       "1 Gerai & Hingga 3 Akun Kasir",
@@ -54,9 +78,9 @@ const PLANS = [
     name: "Business Pro",
     badge: "Paling Banyak Dipilih",
     subtitle: "Kafe, resto & ritel modern dengan manajemen resep, dapur & multi-cabang.",
-    monthlyPrice: "Rp 249.000",
-    yearlyPrice: "Rp 199.000",
-    yearlyBilled: "Ditagih Rp 2.38jt/thn (Hemat 20%)",
+    monthlyPrice: 249000,
+    yearlyPrice: 199200,
+    yearlyBilled: `Ditagih ${formatCurrency(2390400)}/thn (Hemat 20%)`,
     period: "/ bln",
     features: [
       "Hingga 3 Gerai / Cabang Usaha",
@@ -72,9 +96,9 @@ const PLANS = [
   {
     name: "Enterprise",
     subtitle: "Waralaba berjejaring, sentra dapur pusat, dan multi-gudang.",
-    monthlyPrice: "Rp 599.000",
-    yearlyPrice: "Rp 499.000",
-    yearlyBilled: "Ditagih tahunan dengan Dedicated SLA",
+    monthlyPrice: 599000,
+    yearlyPrice: 479200,
+    yearlyBilled: `Ditagih ${formatCurrency(5750400)}/thn (Hemat 20%)`,
     period: "/ bln",
     features: [
       "Gerai & Gudang Tak Terbatas",
@@ -88,8 +112,40 @@ const PLANS = [
   },
 ];
 
-export function PricingSection() {
+function toCardPlan(plan: LandingPlan): CardPlan {
+  const monthly = plan.prices.MONTHLY ?? 0;
+  const annual = plan.prices.ANNUAL ?? 0;
+  const yearlyPrice = annual > 0 ? Math.round(annual / 12) : 0;
+  const savings = monthly > 0 && annual > 0 ? Math.round((1 - annual / (monthly * 12)) * 100) : 0;
+  const featured = plan.code === "PRO_BUSINESS";
+  const yearlyBilled =
+    annual > 0
+      ? `Ditagih ${formatCurrency(annual)}/thn${savings > 0 ? ` (Hemat ${savings}%)` : ""}`
+      : "Gratis Selamanya";
+  const cta =
+    plan.code === "FREE"
+      ? "Mulai Gratis"
+      : plan.code === "ENTERPRISE"
+        ? "Hubungi Tim Kami"
+        : `Pilih ${plan.name}`;
+
+  return {
+    name: plan.name,
+    subtitle: plan.description ?? "",
+    monthlyPrice: monthly,
+    yearlyPrice,
+    yearlyBilled,
+    period: "/ bln",
+    features: plan.features,
+    cta,
+    featured,
+    badge: plan.badge ?? (featured ? "Paling Banyak Dipilih" : undefined),
+  };
+}
+
+export function PricingSection({ plans = [] }: { plans?: LandingPlan[] }) {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const cards = plans.length > 0 ? plans.map(toCardPlan) : STATIC_PLANS;
 
   return (
     <section id="harga" className="py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-slate-50/70 border-t border-slate-200/80 w-full">
@@ -151,7 +207,7 @@ export function PricingSection() {
 
         {/* 4-Tier Reusable Pricing Grid */}
         <FadeInStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {PLANS.map((plan) => {
+          {cards.map((plan) => {
             const price = billingCycle === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
             return (
               <FadeInStaggerItem key={plan.name} className="flex">
@@ -180,14 +236,14 @@ export function PricingSection() {
                       <div className="flex items-baseline gap-1">
                         <AnimatePresence mode="wait">
                           <motion.span
-                            key={price}
+                            key={`${billingCycle}-${price}`}
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 4 }}
                             transition={{ duration: 0.15 }}
                             className={`text-3xl font-bold tabular-nums tracking-tight ${plan.featured ? "text-primary" : "text-slate-950"}`}
                           >
-                            {price}
+                            {formatCurrency(price)}
                           </motion.span>
                         </AnimatePresence>
                         <span className="text-xs font-medium text-slate-500">

@@ -87,7 +87,14 @@ export async function POST(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     if (sale.isVoided) {
-      return NextResponse.json({ error: "Transaksi sudah di-void" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Transaksi sudah di-void",
+          code: "SALE_ALREADY_VOIDED",
+        },
+        { status: 409 }
+      );
     }
 
     // Restore stock in transaction

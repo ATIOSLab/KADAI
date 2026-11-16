@@ -468,3 +468,16 @@ test("pendaftaran mitra referral tidak membocorkan data mitra lain", () => {
     "jangan langsung membalas data lengkap saat duplikat"
   );
 });
+
+test("stok kurang dan void ganda menjawab 409 beserta kodenya", () => {
+  const sales = route("sales");
+  const voidRoute = route("sales/[id]/void");
+
+  // Handler kasir tidak boleh meratakan ApiBusinessError jadi 400 tanpa kode
+  assert.match(sales, /if \(error instanceof ApiBusinessError\)/);
+  assert.match(sales, /code: error\.code/);
+  assert.doesNotMatch(sales, /const status = isStockError\s*\?\s*400/);
+
+  assert.match(voidRoute, /SALE_ALREADY_VOIDED/);
+  assert.match(voidRoute, /"Transaksi sudah di-void"[\s\S]{0,120}?\{ status: 409 \}/);
+});

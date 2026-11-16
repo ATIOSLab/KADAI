@@ -662,6 +662,16 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    // ApiBusinessError sudah membawa status + kode (409 INSUFFICIENT_STOCK,
+    // 404 PRODUCT_NOT_FOUND, ...) beserta pesan yang menyebut sisa stok. Jangan
+    // diratakan menjadi 400 tanpa kode: kasir kehilangan info jumlah tersedia.
+    if (error instanceof ApiBusinessError) {
+      return NextResponse.json(
+        { success: false, error: error.message, code: error.code },
+        { status: error.status }
+      );
+    }
+
     const message = error instanceof Error ? error.message : "Gagal membuat transaksi";
     const isStockError =
       message.includes("Stok tidak cukup") || message.includes("Kurang");
@@ -670,7 +680,7 @@ export async function POST(request: NextRequest) {
     const isConflict =
       error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
     const status = isStockError
-      ? 400
+      ? 409
       : isNotFound
         ? 404
         : isUnavailable || isConflict

@@ -384,3 +384,42 @@ test("pelanggaran aturan bisnis dijawab 4xx, bukan 500", () => {
     "handler wajib memakai status dari error bisnis"
   );
 });
+
+test("penjualan tanpa cabang tetap terlihat oleh tenantnya, tanpa membuka tenant lain", () => {
+  const list = route("sales");
+  const detail = route("sales/[id]");
+
+  for (const [name, src] of [
+    ["daftar", list],
+    ["detail", detail],
+  ] as const) {
+    assert.match(
+      src,
+      /\{ storeId: scope\.storeId \}/,
+      `${name}: cakupan lewat storeId langsung`
+    );
+    assert.match(
+      src,
+      /\{ storeId: null, outlet: \{ storeId: scope\.storeId \} \}/,
+      `${name}: baris lama dikenali lewat outlet`
+    );
+  }
+
+  // Filter tanggal daftar penjualan = tanggal kalender zona bisnis, bukan UTC
+  assert.match(list, /fromZonedTime\(`\$\{startDate\}T00:00:00\.000`, timezone\)/);
+  assert.match(list, /fromZonedTime\(`\$\{endDate\}T23:59:59\.999`, timezone\)/);
+  assert.doesNotMatch(list, /new Date\(endDate \+ "T23:59:59\.999Z"\)/);
+});
+
+test("produksi batch mewarisi harga jual nyata & menolak bahan kurang sebagai 409", () => {
+  const produce = route("products/[id]/produce");
+
+  assert.match(
+    produce,
+    /where: \{ productId: product\.id, sellingPrice: \{ gt: 0 \} \}/,
+    "harga jual hasil produksi tidak boleh 0 hanya karena batch terakhir 0"
+  );
+  assert.match(produce, /INSUFFICIENT_STOCK/, "bahan baku kurang harus 409");
+  assert.match(produce, /formatInTimeZone\(new Date\(\), timezone, "yyyyMMdd"\)/);
+  assert.doesNotMatch(produce, /new Date\(\)\.toISOString\(\)\.slice\(0, 10\)/);
+});

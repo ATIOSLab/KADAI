@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApiBusinessError } from "@/lib/api-response";
+import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { prisma } from "@/lib/prisma";
 import { voidSaleSchema } from "@/lib/validators/sale";
 import { restoreFIFODeductions } from "@/lib/fifo";
@@ -65,7 +65,13 @@ export async function POST(
     }
 
     const sale = await prisma.sale.findFirst({
-      where: { id, outlet: { storeId: scope.storeId } },
+      where: {
+        id,
+        OR: [
+          { storeId: scope.storeId },
+          { storeId: null, outlet: { storeId: scope.storeId } },
+        ],
+      },
       include: {
         items: {
           include: { batchAllocations: true },
@@ -88,7 +94,14 @@ export async function POST(
     await prisma.$transaction(async (tx) => {
       // Atomic claim prevents concurrent requests from restoring stock twice.
       const claim = await tx.sale.updateMany({
-        where: { id, isVoided: false, outlet: { storeId: scope.storeId } },
+        where: {
+          id,
+          isVoided: false,
+          OR: [
+            { storeId: scope.storeId },
+            { storeId: null, outlet: { storeId: scope.storeId } },
+          ],
+        },
         data: { isVoided: true },
       });
       if (claim.count !== 1) {
@@ -153,7 +166,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("POST /api/sales/[id]/void error:", error);
-    return NextResponse.json({ error: "Gagal void transaksi" }, { status: 500 });
+    // Void ganda / transaksi bukan milik tenant = aturan bisnis (4xx), bukan 500
+    return handleApiError(error, "POST /api/sales/[id]/void", "Gagal void transaksi");
   }
 }

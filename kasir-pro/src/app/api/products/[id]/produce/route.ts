@@ -3,7 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { hasRequiredRole, INVENTORY_ROLES } from "@/lib/rbac";
 import { produceBatchSchema } from "@/lib/validators/produce";
-import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import {
+  ApiBusinessError,
+  jsonOk,
+  jsonError,
+  handleApiError,
+} from "@/lib/api-response";
+import { formatInTimeZone } from "date-fns-tz";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { Decimal } from "@prisma/client/runtime/library";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 
@@ -70,7 +77,16 @@ export async function POST(
       );
     }
 
-    const fallbackSellingPrice = product.batches[0]?.sellingPrice || new Decimal(0);
+    // Harga jual hasil produksi: ikuti batch terakhir yang PUNYA harga jual. Batch
+    // terakhir bisa bernilai 0 (mis. barang masuk lewat jalur lama), dan menyalin 0
+    // membuat hasil produksi tidak bisa dijual.
+    const priceReference = await prisma.productBatch.findFirst({
+      where: { productId: product.id, sellingPrice: { gt: 0 } },
+      orderBy: { createdAt: "desc" },
+      select: { sellingPrice: true },
+    });
+    const fallbackSellingPrice =
+      priceReference?.sellingPrice ?? product.batches[0]?.sellingPrice ?? new Decimal(0);
 
     // 2. Resolve target outlet (wajib milik tenant pemanggil)
     let effectiveOutletId = validated.outletId || null;
@@ -89,7 +105,9 @@ export async function POST(
       effectiveOutletId = defaultOutlet?.id || null;
     }
 
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    // Segmen tanggal nomor batch mengikuti zona bisnis toko, bukan jam server (UTC)
+    const timezone = await resolveBusinessTimezone();
+    const dateStr = formatInTimeZone(new Date(), timezone, "yyyyMMdd");
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const finalBatchNumber =
       validated.batchNumber?.trim() || `PROD-${product.sku}-${dateStr}-${randomSuffix}`;
@@ -120,8 +138,11 @@ export async function POST(
         );
 
         if (totalAvailable < totalNeeded) {
-          throw new Error(
-            `Stok bahan baku "${recipe.ingredient.name}" tidak mencukupi. Dibutuhkan ${totalNeeded} ${recipe.ingredient.unit || "unit"}, tersedia hanya ${totalAvailable}`
+          // Bahan baku kurang = aturan bisnis (409), bukan kegagalan server
+          throw new ApiBusinessError(
+            `Stok bahan baku "${recipe.ingredient.name}" tidak mencukupi. Dibutuhkan ${totalNeeded} ${recipe.ingredient.unit || "unit"}, tersedia hanya ${totalAvailable}`,
+            409,
+            "INSUFFICIENT_STOCK"
           );
         }
 

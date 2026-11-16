@@ -21,6 +21,7 @@ import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getBusinessDayStart } from "@/lib/business-day";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
+import { fromZonedTime } from "date-fns-tz";
 import { ZodError } from "zod";
 
 // GET /api/sales — List sales
@@ -61,23 +62,41 @@ export async function GET(request: NextRequest) {
           (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !Number.isFinite(Date.parse(d))))) {
       return NextResponse.json({ error: "Filter tidak valid" }, { status: 400 });
     }
+    const timezone = await resolveBusinessTimezone();
+
     const where = {
-      // Isolasi tenant: hanya penjualan dari outlet milik tenant pemanggil
-      outlet: { storeId: scope.storeId },
-      ...(search && {
-        OR: [
-          { invoiceNumber: { contains: search, mode: "insensitive" as const } },
-          { customerName: { contains: search, mode: "insensitive" as const } },
-        ],
-      }),
+      AND: [
+        {
+          // Isolasi tenant: penjualan milik tenant pemanggil.
+          // kolom storeId ada) dikenali lewat outlet, sedangkan penjualan tanpa
+          // outlet (tenant tanpa cabang) tetap terlihat lewat storeId.
+          OR: [
+            { storeId: scope.storeId },
+            { storeId: null, outlet: { storeId: scope.storeId } },
+          ],
+        },
+        ...(search
+          ? [
+              {
+                OR: [
+                  { invoiceNumber: { contains: search, mode: "insensitive" as const } },
+                  { customerName: { contains: search, mode: "insensitive" as const } },
+                ],
+              },
+            ]
+          : []),
+      ],
       ...(sessionUser.role === "CASHIER" && { cashierId: sessionUser.id }),
       ...(outletId && { outletId }),
-      ...(startDate && endDate && {
-        createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate + "T23:59:59.999Z"),
-        },
-      }),
+      ...(startDate &&
+        endDate && {
+          // Tanggal filter adalah tanggal KALENDER zona bisnis: 00:00 hari pertama
+          // sampai 23:59:59.999 hari terakhir waktu toko, bukan UTC.
+          createdAt: {
+            gte: fromZonedTime(`${startDate}T00:00:00.000`, timezone),
+            lte: fromZonedTime(`${endDate}T23:59:59.999`, timezone),
+          },
+        }),
       ...(paymentType && { paymentType: paymentType as "CASH" | "BANK_TRANSFER" | "QRIS" | "E_WALLET" | "TEMPO" }),
     };
 
@@ -377,8 +396,12 @@ export async function POST(request: NextRequest) {
       // bertanggal hari setempat.
       const todaySalesCount = await tx.sale.count({
         where: {
-          // Isolasi tenant: nomor invoice dihitung per tenant
-          outlet: { storeId: scope.storeId },
+          // Isolasi tenant: nomor invoice dihitung per tenant (termasuk penjualan
+          // tanpa cabang dan baris lama yang hanya punya relasi outlet)
+          OR: [
+            { storeId: scope.storeId },
+            { storeId: null, outlet: { storeId: scope.storeId } },
+          ],
           createdAt: { gte: getBusinessDayStart(new Date(), timezone) },
         },
       });

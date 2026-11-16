@@ -30,7 +30,15 @@ export async function GET(
 
     const { id } = await params;
     const sale = await prisma.sale.findFirst({
-      where: { id, outlet: { storeId: scope.storeId } },
+      // Cakupan tenant: storeId langsung (mencakup penjualan tanpa cabang), dengan
+      // cadangan relasi outlet untuk baris lama yang belum punya storeId.
+      where: {
+        id,
+        OR: [
+          { storeId: scope.storeId },
+          { storeId: null, outlet: { storeId: scope.storeId } },
+        ],
+      },
       include: {
         cashier: { select: { id: true, name: true, email: true, role: true } },
         outlet: { select: { id: true, name: true, address: true, phone: true } },

@@ -6,6 +6,8 @@ import { generateBatchNumber } from "@/lib/utils";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { getBusinessDayStart } from "@/lib/business-day";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
   getSystemFinanceCategoryId,
@@ -33,6 +35,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
+    // Zona bisnis: dasar penomoran batch & jendela harian (bukan jam server UTC)
+    const timezone = await resolveBusinessTimezone();
+
     const body = await request.json();
     const data = createBatchSchema.parse(body);
 
@@ -52,12 +57,15 @@ export async function POST(request: NextRequest) {
       // dua tenant dengan SKU sama tidak lagi saling menabrak (P2002).
       const todayBatchCount = await tx.productBatch.count({
         where: {
-          createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          },
+          createdAt: { gte: getBusinessDayStart(new Date(), timezone) },
         },
       });
-      const batchNumber = generateBatchNumber(product.sku, todayBatchCount + 1);
+      const batchNumber = generateBatchNumber(
+        product.sku,
+        todayBatchCount + 1,
+        new Date(),
+        timezone
+      );
       const purchaseDate = data.purchaseDate ? new Date(data.purchaseDate) : new Date();
 
       const createdBatch = await tx.productBatch.create({

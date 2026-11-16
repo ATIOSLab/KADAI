@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { formatInTimeZone } from "date-fns-tz";
+import { DEFAULT_BUSINESS_TIMEZONE } from "./business-day";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,12 +20,10 @@ function padSequence(value: number, length: number) {
   return String(value).padStart(length, "0");
 }
 
-function formatDateSegment(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}${month}${day}`;
+function formatDateSegment(date: Date, timezone = DEFAULT_BUSINESS_TIMEZONE) {
+  // Nomor dokumen memakai TANGGAL BISNIS (zona toko), bukan tanggal server (UTC):
+  // struk pukul 01:00 WIB harus bertanggal hari itu, bukan hari UTC sebelumnya.
+  return formatInTimeZone(date, timezone, "yyyyMMdd");
 }
 
 export function formatCurrency(value: number | string | null | undefined) {
@@ -36,17 +36,22 @@ export function formatNumber(value: number | string | null | undefined) {
   return numberFormatter.format(Number.isFinite(amount) ? amount : 0);
 }
 
-export function generateInvoiceNumber(sequence: number, date = new Date()) {
-  return `INV-${formatDateSegment(date)}-${padSequence(sequence, 4)}`;
+export function generateInvoiceNumber(
+  sequence: number,
+  date = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+) {
+  return `INV-${formatDateSegment(date, timezone)}-${padSequence(sequence, 4)}`;
 }
 
 export function generateBatchNumber(
   sku: string,
   sequence: number,
-  date = new Date()
+  date = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
 ) {
   const normalizedSku = sku.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-  return `BATCH-${normalizedSku}-${formatDateSegment(date)}-${padSequence(
+  return `BATCH-${normalizedSku}-${formatDateSegment(date, timezone)}-${padSequence(
     sequence,
     3
   )}`;

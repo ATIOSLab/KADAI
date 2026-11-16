@@ -76,6 +76,26 @@ export function toLocalDateTime(dateValue: Date, timezone: string) {
   return formatInTimeZone(dateValue, timezone, "dd MMM yyyy HH:mm");
 }
 
+/**
+ * Awal hari operasional pada zona bisnis. Server produksi berjalan di UTC,
+ * sehingga `setHours(0,0,0,0)` memotong hari pada 07:00 WIB.
+ */
+export function getBusinessDayStart(
+  now = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+) {
+  return fromZonedTime(`${toLocalDate(now, timezone)}T00:00:00.000`, timezone);
+}
+
+/** Awal bulan berjalan pada zona bisnis (untuk rentang default buku kas). */
+export function getBusinessMonthStart(
+  now = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+) {
+  const [year, month] = toLocalDate(now, timezone).split("-");
+  return fromZonedTime(`${year}-${month}-01T00:00:00.000`, timezone);
+}
+
 export function getBusinessDayContext(
   now = new Date(),
   settings?: Partial<BusinessDaySettings> | null

@@ -5,6 +5,13 @@ import {
 } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { fromZonedTime } from "date-fns-tz";
+import {
+  getBusinessMonthStart,
+  shiftIsoDate,
+  toLocalDate,
+} from "@/lib/business-day";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { logActivity } from "@/lib/activity-logger";
 import {
   assertFinanceAccess,
@@ -46,24 +53,39 @@ const financeEntryInclude = {
   },
 } satisfies Prisma.FinanceEntryInclude;
 
-function getDefaultDateRange() {
+function getDefaultDateRange(timezone: string) {
+  // Awal bulan & akhir hari pada ZONA BISNIS toko: server berjalan di UTC,
+  // sehingga versi sebelumnya memotong 7 jam pertama bulan/hari untuk toko WIB.
   const now = new Date();
   return {
-    startDate: new Date(now.getFullYear(), now.getMonth(), 1),
-    endDate: new Date(now.setHours(23, 59, 59, 999)),
+    startDate: getBusinessMonthStart(now, timezone),
+    endDate: new Date(
+      fromZonedTime(
+        `${shiftIsoDate(toLocalDate(now, timezone), 1)}T00:00:00.000`,
+        timezone
+      ).getTime() - 1
+    ),
   };
 }
 
-function parseDateRange(request: NextRequest) {
+async function parseDateRange(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const defaults = getDefaultDateRange();
+  // Zona bisnis untuk rentang default dan tanggal kiriman klien (tanggal
+  // kalender toko, bukan instant UTC — "2026-11-16T23:59:59.999Z" akhirnya
+  // menyapu transaksi sampai 07:00 WIB keesokan hari).
+  const timezone = await resolveBusinessTimezone();
+  const defaults = getDefaultDateRange(timezone);
+  const startParam = searchParams.get("startDate");
+  const endParam = searchParams.get("endDate");
 
   return {
-    startDate: searchParams.get("startDate")
-      ? new Date(searchParams.get("startDate")!)
+    startDate: startParam
+      ? fromZonedTime(`${startParam}T00:00:00.000`, timezone)
       : defaults.startDate,
-    endDate: searchParams.get("endDate")
-      ? new Date(`${searchParams.get("endDate")}T23:59:59.999Z`)
+    endDate: endParam
+      ? new Date(
+          fromZonedTime(`${shiftIsoDate(endParam, 1)}T00:00:00.000`, timezone).getTime() - 1
+        )
       : defaults.endDate,
   };
 }
@@ -151,7 +173,7 @@ export async function GET(request: NextRequest) {
     await ensureFinanceCategories();
 
     const { searchParams } = new URL(request.url);
-    const { startDate, endDate } = parseDateRange(request);
+    const { startDate, endDate } = await parseDateRange(request);
     const direction = getEnumParam(
       searchParams,
       "direction",

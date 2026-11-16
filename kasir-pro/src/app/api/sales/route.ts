@@ -18,6 +18,8 @@ import { Decimal } from "@prisma/client/runtime/library";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { getBusinessDayStart } from "@/lib/business-day";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { ZodError } from "zod";
 
 // GET /api/sales — List sales
@@ -165,6 +167,9 @@ export async function POST(request: NextRequest) {
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
+
+    // Zona bisnis: dasar penomoran invoice & jendela harian (bukan jam server UTC)
+    const timezone = await resolveBusinessTimezone();
 
     const body = await request.json();
     const data = checkoutSchema.parse(body);
@@ -349,16 +354,21 @@ export async function POST(request: NextRequest) {
       }
 
       // 2. Generate invoice number
+      // Jendela harian & tanggal pada nomor memakai zona bisnis, bukan jam server
+      // (UTC): urutan reset pada tengah malam WIB dan struk dini hari tetap
+      // bertanggal hari setempat.
       const todaySalesCount = await tx.sale.count({
         where: {
           // Isolasi tenant: nomor invoice dihitung per tenant
           outlet: { storeId: scope.storeId },
-          createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          },
+          createdAt: { gte: getBusinessDayStart(new Date(), timezone) },
         },
       });
-      const invoiceNumber = generateInvoiceNumber(todaySalesCount + 1);
+      const invoiceNumber = generateInvoiceNumber(
+        todaySalesCount + 1,
+        new Date(),
+        timezone
+      );
 
       // 3. Store tax & service charge settings
       const serviceRate = Number(store?.serviceChargeRate || 0);

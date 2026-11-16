@@ -5,6 +5,8 @@ import { getSessionUserFromRequest } from "@/lib/session";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { getBusinessDayStart } from "@/lib/business-day";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 
 const CASHIER_SELECT = { id: true, name: true, role: true, outletId: true };
 
@@ -28,9 +30,9 @@ export async function GET(request: NextRequest) {
         ? searchParams.get("cashierId") || sessionUser.id
         : sessionUser.id;
 
-    // Shift window: default to start of today in local time
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    // Shift window: awal hari pada zona bisnis toko (bukan jam server UTC)
+    const timezone = await resolveBusinessTimezone();
+    const todayStart = getBusinessDayStart(new Date(), timezone);
 
     const [sales, scopedCashier, store] = await Promise.all([
       // Semua agregasi shift dibatasi ke tenant pemanggil (sale.outlet.storeId)
@@ -139,8 +141,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Query active sales for today — dibatasi ke tenant pemanggil
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    const timezone = await resolveBusinessTimezone();
+    const todayStart = getBusinessDayStart(new Date(), timezone);
 
     const sales = await prisma.sale.findMany({
       where: {

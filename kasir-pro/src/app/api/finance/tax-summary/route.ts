@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fromZonedTime, formatInTimeZone } from "date-fns-tz";
 import { prisma } from "@/lib/prisma";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { getServerSessionUser } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { FINANCE_ROLES, hasRequiredRole } from "@/lib/rbac";
@@ -17,11 +19,18 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const year = Number(searchParams.get("year")) || new Date().getFullYear();
+    // Zona waktu toko: tahun buku & bulan penjualan tidak boleh mengikuti jam
+    // server (UTC) - penjualan 01:00 WIB tanggal 1 akan jatuh ke bulan sebelumnya.
+    const timezone = await resolveBusinessTimezone();
+    const year =
+      Number(searchParams.get("year")) ||
+      Number(formatInTimeZone(new Date(), timezone, "yyyy"));
     const outletId = searchParams.get("outletId");
 
-    const startOfYear = new Date(year, 0, 1);
-    const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+    const startOfYear = fromZonedTime(`${year}-01-01T00:00:00.000`, timezone);
+    const endOfYear = new Date(
+      fromZonedTime(`${year + 1}-01-01T00:00:00.000`, timezone).getTime() - 1
+    );
 
     // Fetch all sales for this year
     const sales = await prisma.sale.findMany({
@@ -73,7 +82,7 @@ export async function GET(req: NextRequest) {
     const PTKP_THRESHOLD = 500_000_000; // Rp 500 Juta batas bebas pajak WP OP
 
     for (const sale of sales) {
-      const monthIdx = new Date(sale.createdAt).getMonth();
+      const monthIdx = Number(formatInTimeZone(sale.createdAt, timezone, "M")) - 1;
       const gross = Number(sale.subtotal);
       const srv = Number(sale.serviceCharge);
       const tax = Number(sale.taxAmount);

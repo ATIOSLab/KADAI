@@ -300,3 +300,38 @@ test("zona waktu bisnis dibaca dari pengaturan platform", () => {
   assert.match(helper, /botSettings\.findFirst/);
   assert.match(helper, /DEFAULT_BUSINESS_TIMEZONE/);
 });
+
+test("nomor dokumen (invoice/batch) memakai tanggal zona bisnis", () => {
+  const utils = read("src/lib/utils.ts");
+  assert.match(
+    utils,
+    /return formatInTimeZone\(date, timezone, "yyyyMMdd"\)/,
+    "segmen tanggal nomor dokumen tidak boleh memakai jam server (UTC)"
+  );
+  assert.match(utils, /timezone = DEFAULT_BUSINESS_TIMEZONE/);
+
+  const sales = route("sales");
+  assert.match(sales, /gte: getBusinessDayStart\(new Date\(\), timezone\)/);
+  assert.match(sales, /generateInvoiceNumber\(\s*todaySalesCount \+ 1,\s*new Date\(\),\s*timezone\s*\)/);
+
+  const batches = route("batches");
+  assert.match(batches, /gte: getBusinessDayStart\(new Date\(\), timezone\)/);
+});
+
+test("jendela harian modul kas, shift, dan buku kas memakai zona bisnis", () => {
+  const shift = route("pos/shift-summary");
+  assert.doesNotMatch(
+    shift,
+    /setHours\(0, 0, 0, 0\)/,
+    "awal hari tidak boleh memakai jam server (UTC)"
+  );
+  assert.match(shift, /getBusinessDayStart\(new Date\(\), timezone\)/);
+
+  const finance = route("finance");
+  assert.match(finance, /getBusinessMonthStart\(now, timezone\)/);
+  assert.match(finance, /await parseDateRange\(request\)/);
+
+  const tax = route("finance/tax-summary");
+  assert.match(tax, /formatInTimeZone\(sale\.createdAt, timezone, "M"\)/);
+  assert.match(tax, /fromZonedTime\(`\$\{year\}-01-01T00:00:00\.000`, timezone\)/);
+});

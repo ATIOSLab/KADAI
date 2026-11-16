@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -113,162 +114,177 @@ export function CashMovementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className={`size-8 rounded-lg flex items-center justify-center ${
-              direction === "IN" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
-            }`}>
-              {direction === "IN" ? <ArrowDownCircle className="size-4" /> : <ArrowUpCircle className="size-4" />}
+      <DialogContent className="max-w-lg">
+        <DialogHeader className="pr-14">
+          <div className="flex items-start gap-3">
+            <div
+              className={`size-9 rounded-xl flex items-center justify-center shrink-0 ${
+                direction === "IN"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {direction === "IN" ? (
+                <ArrowDownCircle className="size-4.5" />
+              ) : (
+                <ArrowUpCircle className="size-4.5" />
+              )}
             </div>
-            <div>
-              <DialogTitle className="text-base font-bold">
-                Pencatatan Kas Modal & Belanja
+            <div className="min-w-0 space-y-1">
+              <DialogTitle className="text-base font-bold leading-snug">
+                Pencatatan Kas Modal &amp; Belanja
               </DialogTitle>
-              <DialogDescription className="text-xs">
+              <DialogDescription className="text-xs leading-relaxed">
                 Kelola setoran modal kasir dan pengeluaran belanja operasional gerai.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-1">
-          {/* Arah Kas Toggle */}
-          <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
-            <button
-              type="button"
-              onClick={() => {
-                setDirection("IN");
-                if (!title) setTitle("Setoran Modal Kasir / Belanja");
-              }}
-              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <DialogBody className="space-y-5">
+            {/* Arah Kas Toggle */}
+            <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-xl">
+              <button
+                type="button"
+                onClick={() => {
+                  setDirection("IN");
+                  if (!title) setTitle("Setoran Modal Kasir / Belanja");
+                }}
+                className={`py-2.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
                 direction === "IN"
-                  ? "bg-white text-emerald-700 shadow-xs"
-                  : "text-slate-600 hover:text-slate-950"
-              }`}
-            >
-              <ArrowDownCircle className="size-3.5" />
-              <span>Kas Masuk (Modal)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setDirection("OUT");
-                if (title.includes("Modal")) setTitle("");
-              }}
-              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                direction === "OUT"
-                  ? "bg-white text-red-700 shadow-xs"
-                  : "text-slate-600 hover:text-slate-950"
-              }`}
-            >
-              <ArrowUpCircle className="size-3.5" />
-              <span>Kas Keluar (Belanja)</span>
-            </button>
-          </div>
-
-          {/* Pemegang / Kantong Kas Selector */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-bold text-slate-700">
-              Kantong / Alokasi Dana
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setWalletType("CASHIER")}
-                className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
-                  walletType === "CASHIER"
-                    ? "border-primary bg-primary/5 text-slate-950 font-bold shadow-2xs"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  ? "bg-card text-emerald-700 shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
                 }`}
-              >
-                <div className="font-bold flex items-center justify-between">
-                  <span>💵 Kas Laci Kasir</span>
-                  {walletType === "CASHIER" && <CheckCircle2 className="size-3.5 text-primary" />}
-                </div>
-                <p className="text-[10px] text-slate-500 font-normal mt-0.5">
-                  Uang kembalian shift & transaksi depan
-                </p>
+                >
+                <ArrowDownCircle className="size-3.5 shrink-0" />
+                <span className="truncate">Kas Masuk (Modal)</span>
               </button>
-
               <button
                 type="button"
-                onClick={() => setWalletType("PURCHASING")}
-                className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
-                  walletType === "PURCHASING"
-                    ? "border-primary bg-primary/5 text-slate-950 font-bold shadow-2xs"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                onClick={() => {
+                  setDirection("OUT");
+                  if (title.includes("Modal")) setTitle("");
+                }}
+                className={`py-2.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                direction === "OUT"
+                  ? "bg-card text-red-700 shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
                 }`}
-              >
-                <div className="font-bold flex items-center justify-between">
-                  <span>🛒 Kas Dapur / Belanja</span>
-                  {walletType === "PURCHASING" && <CheckCircle2 className="size-3.5 text-primary" />}
-                </div>
-                <p className="text-[10px] text-slate-500 font-normal mt-0.5">
-                  Uang modal pasar, es batu & bumbu
-                </p>
+                >
+                <ArrowUpCircle className="size-3.5 shrink-0" />
+                <span className="truncate">Kas Keluar (Belanja)</span>
               </button>
             </div>
-          </div>
 
-          {/* Nominal Input */}
-          <div className="space-y-1.5">
-            <Label htmlFor="cashAmount" className="text-xs font-bold text-slate-700">
-              Nominal Uang (Rp)
-            </Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                Rp
-              </span>
+            {/* Pemegang / Kantong Kas Selector */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold">
+                Kantong / Alokasi Dana
+              </Label>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setWalletType("CASHIER")}
+                  className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                    walletType === "CASHIER"
+                      ? "border-primary bg-primary/5 text-foreground font-bold shadow-2xs"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="font-bold flex items-center justify-between gap-2">
+                    <span className="truncate">💵 Kas Laci Kasir</span>
+                    {walletType === "CASHIER" && (
+                      <CheckCircle2 className="size-3.5 text-primary shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-[10px] leading-snug text-muted-foreground font-normal mt-1">
+                    Uang kembalian shift & transaksi depan
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setWalletType("PURCHASING")}
+                  className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                    walletType === "PURCHASING"
+                      ? "border-primary bg-primary/5 text-foreground font-bold shadow-2xs"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="font-bold flex items-center justify-between gap-2">
+                    <span className="truncate">🛒 Kas Dapur / Belanja</span>
+                    {walletType === "PURCHASING" && (
+                      <CheckCircle2 className="size-3.5 text-primary shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-[10px] leading-snug text-muted-foreground font-normal mt-1">
+                    Uang modal pasar, es batu & bumbu
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Nominal Input */}
+            <div className="space-y-2">
+              <Label htmlFor="cashAmount" className="text-xs font-bold">
+                Nominal Uang (Rp)
+              </Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground pointer-events-none">
+                  Rp
+                </span>
+                <Input
+                  id="cashAmount"
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Contoh: 2000000"
+                  className="pl-10 font-mono text-sm font-bold"
+                  required
+                  min={1000}
+                />
+              </div>
+            </div>
+
+            {/* Keterangan */}
+            <div className="space-y-2">
+              <Label htmlFor="cashTitle" className="text-xs font-bold">
+                Keterangan Transaksi
+              </Label>
               <Input
-                id="cashAmount"
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Contoh: 2000000"
-                className="pl-9 font-mono text-sm font-bold text-slate-900"
+                id="cashTitle"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={
+                  direction === "IN"
+                    ? "Contoh: Setoran modal operasional hari ini dari Owner"
+                    : "Contoh: Belanja es batu kristal 2 bal & isi ulang galon"
+                }
+                className="text-xs"
                 required
-                min={1000}
               />
             </div>
-          </div>
 
-          {/* Keterangan */}
-          <div className="space-y-1.5">
-            <Label htmlFor="cashTitle" className="text-xs font-bold text-slate-700">
-              Keterangan Transaksi
-            </Label>
-            <Input
-              id="cashTitle"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={
-                direction === "IN"
-                  ? "Contoh: Setoran modal operasional hari ini dari Owner"
-                  : "Contoh: Belanja es batu kristal 2 bal & isi ulang galon"
-              }
-              className="text-xs"
-              required
-            />
-          </div>
+            {/* Catatan / Penerima */}
+            <div className="space-y-2">
+              <Label htmlFor="cashNotes" className="text-xs font-bold">
+                Catatan / Nama Staf Pelaksana (Opsional)
+              </Label>
+              <Textarea
+                id="cashNotes"
+                rows={2}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Contoh: Diserahkan ke Koki Dapur / Kasir Shift Pagi"
+                className="text-xs"
+              />
+            </div>
 
-          {/* Catatan / Penerima */}
-          <div className="space-y-1.5">
-            <Label htmlFor="cashNotes" className="text-xs font-bold text-slate-700">
-              Catatan / Nama Staf Pelaksana (Opsional)
-            </Label>
-            <Textarea
-              id="cashNotes"
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Contoh: Diserahkan ke Koki Dapur / Kasir Shift Pagi"
-              className="text-xs"
-            />
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="pt-2 gap-2">
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"

@@ -193,7 +193,13 @@ test("penomoran dokumen yang indeksnya unik global memakai hitungan global", () 
   assert.match(modelBlock(schema, "StockTransfer"), /transferNumber\s+String\s+@unique/);
   assert.match(modelBlock(schema, "ProductBatch"), /batchNumber\s+String\s+@unique/);
 
-  assert.match(route("inventory/transfers"), /prisma\.stockTransfer\.count\(\)/);
+  // Nomor transfer unik GLOBAL, tetapi urutannya per-hari (startsWith TRF-<tanggal>)
+  // dan tahan balapan lewat createTransferWithRetry - bukan count() global tanpa filter.
+  assert.match(
+    route("inventory/transfers"),
+    /transferNumber: \{ startsWith: `TRF-\$\{dateStr\}` \}/
+  );
+  assert.doesNotMatch(route("inventory/transfers"), /prisma\.stockTransfer\.count\(\)/);
   assert.doesNotMatch(
     route("batches"),
     /todayBatchCount = await tx\.productBatch\.count\(\{\s*where: \{\s*productId/,
@@ -334,4 +340,42 @@ test("jendela harian modul kas, shift, dan buku kas memakai zona bisnis", () => 
   const tax = route("finance/tax-summary");
   assert.match(tax, /formatInTimeZone\(sale\.createdAt, timezone, "M"\)/);
   assert.match(tax, /fromZonedTime\(`\$\{year\}-01-01T00:00:00\.000`, timezone\)/);
+});
+
+test("transfer stok tidak boleh menciptakan stok atau harga nol di cabang tujuan", () => {
+  const transfers = route("inventory/transfers");
+
+  assert.match(
+    transfers,
+    /INSUFFICIENT_STOCK/,
+    "stok sumber kurang harus menggagalkan transaksi, bukan menciptakan stok"
+  );
+  assert.match(transfers, /if \(remainingToDeduct > 0\) \{/, "wajib ada gerbang stok kurang");
+  assert.doesNotMatch(
+    transfers,
+    /sellingPrice: new Decimal\(0\)/,
+    "barang hasil transfer tidak boleh berharga jual 0"
+  );
+  assert.match(
+    transfers,
+    /sellingPrice: averagePrice/,
+    "harga jual tujuan = rata-rata tertimbang batch sumber"
+  );
+  assert.match(transfers, /costPrice: averageCost/, "HPP tujuan = rata-rata tertimbang");
+  assert.match(transfers, /createTransferWithRetry/, "nomor transfer harus tahan balapan");
+  assert.match(
+    transfers,
+    /formatInTimeZone\(new Date\(\), timezone, "yyyyMMdd"\)/,
+    "tanggal nomor transfer = tanggal bisnis"
+  );
+});
+
+test("pelanggaran aturan bisnis dijawab 4xx, bukan 500", () => {
+  const apiResponse = read("src/lib/api-response.ts");
+  assert.match(apiResponse, /export class ApiBusinessError extends Error/);
+  assert.match(
+    apiResponse,
+    /if \(error instanceof ApiBusinessError\) \{[\s\S]{0,220}?jsonError\(error\.message, error\.status/,
+    "handler wajib memakai status dari error bisnis"
+  );
 });

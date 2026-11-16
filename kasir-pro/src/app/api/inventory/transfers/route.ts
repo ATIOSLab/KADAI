@@ -3,10 +3,17 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { hasRequiredRole, INVENTORY_ROLES } from "@/lib/rbac";
 import { createTransferSchema, updateTransferStatusSchema } from "@/lib/validators/transfer";
-import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import {
+  ApiBusinessError,
+  jsonOk,
+  jsonError,
+  handleApiError,
+} from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "@prisma/client";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { formatInTimeZone } from "date-fns-tz";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 
 // GET /api/inventory/transfers
 export async function GET(request: NextRequest) {
@@ -67,6 +74,27 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * `transferNumber` unik GLOBAL tetapi dihitung per-hari. Dua transfer bersamaan
+ * bisa menghitung nomor yang sama dan menabrak constraint (P2002) - ulangi dengan
+ * nomor segar; hitungan ulang otomatis memakai nomor berikutnya.
+ */
+async function createTransferWithRetry<T>(run: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      return await run();
+    } catch (error) {
+      const isNumberCollision =
+        error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+      if (!isNumberCollision || attempt === 4) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("Gagal membuat nomor transfer unik");
+}
+
 // POST /api/inventory/transfers
 export async function POST(request: NextRequest) {
   try {
@@ -107,58 +135,69 @@ export async function POST(request: NextRequest) {
       return jsonError("Ada produk yang bukan milik tenant Anda", 403);
     }
 
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    // Nomor transfer unik global (definisi schema) → penomoran tetap memakai hitungan global
-    const count = await prisma.stockTransfer.count();
-    const transferNumber = `TRF-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+    // Tanggal & urutan nomor transfer mengikuti zona bisnis toko, bukan jam server
+    // (UTC), dan urutannya per-hari agar awal hari kembali ke 0001.
+    const timezone = await resolveBusinessTimezone();
+    const dateStr = formatInTimeZone(new Date(), timezone, "yyyyMMdd");
 
-    const newTransfer = await prisma.$transaction(async (tx) => {
-      const transfer = await tx.stockTransfer.create({
-        data: {
-          transferNumber,
-          sourceOutletId: validated.sourceOutletId,
-          destinationOutletId: validated.destinationOutletId,
-          status: "IN_TRANSIT",
-          notes: validated.notes || null,
-          createdById: sessionUser.id,
-          shippedAt: new Date(),
-          items: {
-            create: validated.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              costPrice: new Decimal(item.costPrice || 0),
-              notes: item.notes || null,
-            })),
-          },
-        },
-        include: {
-          sourceOutlet: true,
-          destinationOutlet: true,
-          items: {
-            include: { product: true },
-          },
-        },
+    const newTransfer = await createTransferWithRetry(async () => {
+      const count = await prisma.stockTransfer.count({
+        where: { transferNumber: { startsWith: `TRF-${dateStr}` } },
       });
+      const transferNumber = `TRF-${dateStr}-${String(count + 1).padStart(4, "0")}`;
 
-      await tx.activityLog.create({
-        data: {
-          action: "STOCK_TRANSFERRED",
-          entity: "StockTransfer",
-          entityId: transfer.id,
-          userId: sessionUser.id,
-          details: {
+      return prisma.$transaction(async (tx) => {
+        const transfer = await tx.stockTransfer.create({
+          data: {
             transferNumber,
-            from: transfer.sourceOutlet.name,
-            to: transfer.destinationOutlet.name,
-            itemCount: validated.items.length,
+            sourceOutletId: validated.sourceOutletId,
+            destinationOutletId: validated.destinationOutletId,
+            status: "IN_TRANSIT",
+            notes: validated.notes || null,
+            createdById: sessionUser.id,
+            shippedAt: new Date(),
+            items: {
+              create: validated.items.map((item) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                costPrice: new Decimal(item.costPrice || 0),
+                notes: item.notes || null,
+              })),
+            },
           },
-        },
-      });
+          include: {
+            sourceOutlet: true,
+            destinationOutlet: true,
+            items: {
+              include: { product: true },
+            },
+          },
+        });
 
-      return transfer;
+        await tx.activityLog.create({
+          data: {
+            action: "STOCK_TRANSFERRED",
+            entity: "StockTransfer",
+            entityId: transfer.id,
+            userId: sessionUser.id,
+            details: {
+              transferNumber,
+              from: transfer.sourceOutlet.name,
+              to: transfer.destinationOutlet.name,
+              itemCount: validated.items.length,
+            },
+          },
+        });
+
+        return transfer;
+      });
     });
 
-    return jsonOk(newTransfer, `Transfer ${transferNumber} berhasil dibuat`, 201);
+    return jsonOk(
+      newTransfer,
+      `Transfer ${newTransfer.transferNumber} berhasil dibuat`,
+      201
+    );
   } catch (error) {
     return handleApiError(error, "POST /api/inventory/transfers", "Gagal membuat transfer stok");
   }
@@ -220,7 +259,11 @@ export async function PUT(request: NextRequest) {
           });
 
           let remainingToDeduct = item.quantity;
-          let calculatedCostPrice = new Decimal(item.costPrice || 0);
+          // Harga pokok & harga jual tujuan = rata-rata TERTIMBANG batch sumber yang
+          // benar-benar dipakai. Sebelumnya: cost diambil dari batch terakhir yang
+          // dibaca, dan harga jual tujuan ditulis 0 (barang tak bisa dijual lagi).
+          let costValue = new Decimal(0);
+          let priceValue = new Decimal(0);
 
           for (const batch of sourceBatches) {
             if (remainingToDeduct <= 0) break;
@@ -229,8 +272,37 @@ export async function PUT(request: NextRequest) {
               where: { id: batch.id },
               data: { remainingQty: { decrement: takeQty } },
             });
-            calculatedCostPrice = batch.costPrice;
+            costValue = costValue.add(new Decimal(batch.costPrice).mul(takeQty));
+            priceValue = priceValue.add(new Decimal(batch.sellingPrice).mul(takeQty));
             remainingToDeduct -= takeQty;
+          }
+
+          // Stok sumber kurang: gagalkan SELURUH transaksi. Tanpa ini cabang tujuan
+          // menerima barang yang tidak pernah keluar dari gudang sumber - stok
+          // tercipta dari ketiadaan dan jejak audit tidak seimbang.
+          if (remainingToDeduct > 0) {
+            throw new ApiBusinessError(
+              `Stok ${item.product.name} di cabang asal tidak mencukupi: dibutuhkan ${item.quantity}, tersedia ${item.quantity - remainingToDeduct}. Perbarui transfer sebelum menerima barang.`,
+              409,
+              "INSUFFICIENT_STOCK"
+            );
+          }
+
+          const receivedQty = new Decimal(Math.max(1, item.quantity));
+          const averageCost = costValue.div(receivedQty);
+          let averagePrice = priceValue.div(receivedQty);
+
+          if (averagePrice.lte(0)) {
+            // Batch sumber tanpa harga jual (mis. hasil transfer lama): pakai harga
+            // jual terakhir produk ini supaya barang tetap bisa dijual di tujuan.
+            const reference = await tx.productBatch.findFirst({
+              where: { productId: item.productId, sellingPrice: { gt: 0 } },
+              orderBy: { createdAt: "desc" },
+              select: { sellingPrice: true },
+            });
+            averagePrice = reference
+              ? new Decimal(reference.sellingPrice)
+              : new Decimal(0);
           }
 
           const destBatchNumber = `TRF-${transfer.transferNumber}-${item.product.sku}`;
@@ -240,8 +312,8 @@ export async function PUT(request: NextRequest) {
               productId: item.productId,
               quantity: item.quantity,
               remainingQty: item.quantity,
-              costPrice: calculatedCostPrice,
-              sellingPrice: new Decimal(0),
+              costPrice: averageCost,
+              sellingPrice: averagePrice,
               outletId: transfer.destinationOutletId,
               notes: `Diterima dari mutasi transfer ${transfer.transferNumber} (${transfer.sourceOutlet.name})`,
               purchaseDate: new Date(),

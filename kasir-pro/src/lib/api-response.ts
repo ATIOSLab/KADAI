@@ -46,6 +46,23 @@ export function jsonError(
   );
 }
 
+/**
+ * Kesalahan ATURAN BISNIS (bukan bug): pelanggaran aturan yang bisa dipahami
+ * pengguna harus menjawab 4xx, bukan 500. Sebelum ini setiap business error
+ * jatuh ke cabang `Error` dan dijawab 500.
+ */
+export class ApiBusinessError extends Error {
+  status: number;
+  code: string;
+
+  constructor(message: string, status = 400, code = "BUSINESS_RULE") {
+    super(message);
+    this.name = "ApiBusinessError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export function handleApiError(
   error: unknown,
   context: string,
@@ -97,7 +114,13 @@ export function handleApiError(
     return jsonError(fallbackMessage, 500, undefined, "DATABASE_ERROR");
   }
 
-  // 3. Known Business Logic Error
+  // 3. Pelanggaran aturan bisnis dengan status eksplisit (4xx)
+  if (error instanceof ApiBusinessError) {
+    logger.warn(`Business rule at ${context}: ${error.message}`, context);
+    return jsonError(error.message, error.status, undefined, error.code);
+  }
+
+  // 4. Known Business Logic Error
   if (error instanceof Error) {
     logger.error(`Error at ${context}: ${error.message}`, error, context);
 

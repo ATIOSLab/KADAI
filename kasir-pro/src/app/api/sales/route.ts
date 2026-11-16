@@ -236,7 +236,9 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (!product?.isActive) throw new Error("Produk tidak tersedia");
+        // Isolasi tenant: produk tenant lain tidak boleh bisa dijual (404, bukan 500)
+        if (!product) throw new Error("Produk tidak ditemukan pada tenant Anda");
+        if (!product.isActive) throw new Error("Produk tidak tersedia");
 
         if (product.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
           // F&B Manufactured Product with Recipe (e.g. Makanan, Kopi)
@@ -579,10 +581,16 @@ export async function POST(request: NextRequest) {
       );
     }
     const message = error instanceof Error ? error.message : "Gagal membuat transaksi";
-    const status =
-      message.includes("Stok tidak cukup") || message.includes("Kurang")
-        ? 400
-        : 500;
-    return NextResponse.json({ error: status === 400 ? "Stok tidak mencukupi" : "Gagal membuat transaksi" }, { status });
+    const isStockError =
+      message.includes("Stok tidak cukup") || message.includes("Kurang");
+    const isNotFound = message.includes("tidak ditemukan");
+    const isUnavailable = message === "Produk tidak tersedia";
+    const status = isStockError ? 400 : isNotFound ? 404 : isUnavailable ? 400 : 500;
+    const clientMessage = isStockError
+      ? "Stok tidak mencukupi"
+      : status === 500
+        ? "Gagal membuat transaksi"
+        : message;
+    return NextResponse.json({ error: clientMessage }, { status });
   }
 }

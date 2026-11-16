@@ -148,6 +148,18 @@ test("migrasi scoping + backfill tersedia dan backfill tidak menebak", () => {
   assert.match(barcode, /products_storeId_barcode_key/);
 });
 
+test("penjualan lintas tenant ditolak dengan 404, bukan 500", () => {
+  const sales = route("sales");
+  assert.match(sales, /if \(!product\) throw new Error\("Produk tidak ditemukan pada tenant Anda"\)/);
+  assert.match(sales, /const isNotFound = message\.includes\("tidak ditemukan"\)/);
+  assert.match(sales, /storeId: scope\.storeId/);
+  assert.match(
+    sales,
+    /where: \{ id: data\.outletId, storeId: scope\.storeId \}/,
+    "outlet yang dipilih klien wajib divalidasi kepemilikannya"
+  );
+});
+
 test("endpoint publik QR tetap tanpa sesi dan memvalidasi meja", () => {
   const order = route("order");
   assert.doesNotMatch(order, /resolveTenantScope/);

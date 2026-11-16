@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDashboardOverview } from "@/lib/dashboard";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 function parseDateParam(value: string | null, endOfDay = false) {
   if (!value) {
@@ -24,6 +25,11 @@ export async function GET(request: NextRequest) {
         { error: "Role Anda tidak dapat mengakses dashboard" },
         { status: 403 }
       );
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
     const { searchParams } = new URL(request.url);
@@ -49,6 +55,7 @@ export async function GET(request: NextRequest) {
     const overview = await getDashboardOverview({
       startDate: startDate,
       endDate: endDate,
+      storeId: scope.storeId,
     });
     return NextResponse.json({ data: overview });
   } catch (error) {

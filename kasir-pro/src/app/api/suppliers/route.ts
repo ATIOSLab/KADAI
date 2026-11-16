@@ -4,6 +4,7 @@ import { getServerSessionUser } from "@/lib/session";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createSupplierSchema, updateSupplierSchema } from "@/lib/validators/supplier";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/suppliers
 export async function GET(req: NextRequest) {
@@ -13,11 +14,17 @@ export async function GET(req: NextRequest) {
       return jsonError("Unauthorized", 401);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search")?.trim() || "";
 
     const suppliers = await prisma.supplier.findMany({
       where: {
+        storeId: scope.storeId,
         ...(search && {
           OR: [
             { name: { contains: search, mode: "insensitive" } },
@@ -48,6 +55,11 @@ export async function POST(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = createSupplierSchema.parse(body);
 
@@ -57,6 +69,7 @@ export async function POST(req: NextRequest) {
         phone: validated.phone || null,
         email: validated.email || null,
         address: validated.address || null,
+        storeId: scope.storeId,
       },
     });
 
@@ -74,8 +87,21 @@ export async function PUT(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = updateSupplierSchema.parse(body);
+
+    const owned = await prisma.supplier.findFirst({
+      where: { id: validated.id, storeId: scope.storeId },
+      select: { id: true },
+    });
+    if (!owned) {
+      return jsonError("Data tidak ditemukan pada tenant Anda", 404);
+    }
 
     const supplier = await prisma.supplier.update({
       where: { id: validated.id },

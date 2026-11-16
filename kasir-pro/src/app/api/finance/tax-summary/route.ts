@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { FINANCE_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {
@@ -8,6 +9,11 @@ export async function GET(req: NextRequest) {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser || !hasRequiredRole(sessionUser.role, FINANCE_ROLES)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
     const { searchParams } = new URL(req.url);
@@ -21,6 +27,7 @@ export async function GET(req: NextRequest) {
     const sales = await prisma.sale.findMany({
       where: {
         isVoided: false,
+        outlet: { storeId: scope.storeId },
         ...(outletId && outletId !== "ALL" ? { outletId } : {}),
         createdAt: { gte: startOfYear, lte: endOfYear },
       },
@@ -37,8 +44,10 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     });
 
-    // Fetch store tax profile
-    const store = await prisma.store.findFirst();
+    // Fetch store tax profile (tenant pemanggil)
+    const store = await prisma.store.findUnique({
+      where: { id: scope.storeId },
+    });
 
     // Group by month (0-11)
     const monthlySummary = Array.from({ length: 12 }, (_, i) => {

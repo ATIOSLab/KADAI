@@ -5,6 +5,7 @@ import { logActivity } from "@/lib/activity-logger";
 import { assertFinanceAccess } from "@/lib/finance";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { updateFinanceEntryPayloadSchema } from "@/lib/validators/finance";
 
 const financeEntryInclude = {
@@ -41,9 +42,9 @@ function getFinanceForbiddenResponse(message = "Anda tidak memiliki akses ke lap
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
-async function getEditableEntry(id: string) {
-  const entry = await prisma.financeEntry.findUnique({
-    where: { id },
+async function getEditableEntry(id: string, storeId: string) {
+  const entry = await prisma.financeEntry.findFirst({
+    where: { id, storeId },
     include: {
       category: true,
     },
@@ -87,8 +88,13 @@ export async function PATCH(
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const editable = await getEditableEntry(id);
+    const editable = await getEditableEntry(id, scope.storeId);
     if ("error" in editable) {
       return NextResponse.json(
         { error: editable.error },
@@ -99,8 +105,12 @@ export async function PATCH(
     const body = await request.json();
     const data = updateFinanceEntryPayloadSchema.parse(body);
 
-    const category = await prisma.financeCategory.findUnique({
-      where: { id: data.categoryId },
+    const category = await prisma.financeCategory.findFirst({
+      where: {
+        id: data.categoryId,
+        // Kategori sistem/default (storeId NULL) tetap dipakai bersama semua tenant
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
+      },
       select: {
         id: true,
         name: true,
@@ -189,8 +199,13 @@ export async function DELETE(
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const editable = await getEditableEntry(id);
+    const editable = await getEditableEntry(id, scope.storeId);
     if ("error" in editable) {
       return NextResponse.json(
         { error: editable.error },

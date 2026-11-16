@@ -125,10 +125,21 @@ async function ensureTables() {
 }
 
 async function ensureUnits() {
-  await prisma.unit.createMany({
-    data: DEFAULT_UNITS,
-    skipDuplicates: true,
-  });
+  // Idempoten manual: unique index (storeId, normalizedName) memperlakukan NULL sebagai
+  // nilai berbeda, jadi createMany+skipDuplicates bisa menduplikasi satuan bawaan tiap boot.
+  for (const unit of DEFAULT_UNITS) {
+    const existing = await prisma.unit.findFirst({
+      where: { normalizedName: unit.normalizedName, storeId: null },
+      select: { id: true, isActive: true },
+    });
+    if (existing) {
+      if (existing.isActive === false) {
+        await prisma.unit.update({ where: { id: existing.id }, data: { isActive: true } });
+      }
+      continue;
+    }
+    await prisma.unit.create({ data: unit });
+  }
 }
 
 async function ensureFinanceCategories() {

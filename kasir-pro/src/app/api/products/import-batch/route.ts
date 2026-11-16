@@ -4,6 +4,7 @@ import { getSessionUserFromRequest } from "@/lib/session";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { z } from "zod";
 
 // Schema item batch import
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
       return jsonError("Wewenang tidak cukup untuk impor produk", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await request.json();
     const validated = batchImportPayloadSchema.parse(body);
 
@@ -45,8 +51,10 @@ export async function POST(request: NextRequest) {
       errors: [] as string[],
     };
 
-    // Cache kategori yang ada
-    const existingCategories = await prisma.category.findMany();
+    // Cache kategori tenant pemanggil
+    const existingCategories = await prisma.category.findMany({
+      where: { storeId: scope.storeId },
+    });
     const categoryMap = new Map<string, string>();
     for (const cat of existingCategories) {
       categoryMap.set(cat.name.toLowerCase().trim(), cat.id);
@@ -56,14 +64,16 @@ export async function POST(request: NextRequest) {
     let defaultCatId = categoryMap.get("umum");
     if (!defaultCatId) {
       const defCat = await prisma.category.create({
-        data: { name: "Umum", color: "#64748B" },
+        data: { name: "Umum", color: "#64748B", storeId: scope.storeId },
       });
       defaultCatId = defCat.id;
       categoryMap.set("umum", defaultCatId);
     }
 
-    // Default unit
-    const fallbackUnit = await prisma.unit.findFirst();
+    // Default unit (satuan bawaan platform atau milik tenant)
+    const fallbackUnit = await prisma.unit.findFirst({
+      where: { OR: [{ storeId: scope.storeId }, { storeId: null }] },
+    });
     const defaultUnitName = fallbackUnit?.name || "pcs";
 
     for (let i = 0; i < validated.products.length; i++) {
@@ -81,6 +91,7 @@ export async function POST(request: NextRequest) {
               data: {
                 name: cleanCatName,
                 color: "#F97316", // default KADAI Ember
+                storeId: scope.storeId,
               },
             });
             categoryMap.set(lowerCat, newCat.id);
@@ -93,9 +104,9 @@ export async function POST(request: NextRequest) {
           item.sku?.trim() ||
           `KDI-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
 
-        // Cek apakah SKU sudah ada
-        const existingProduct = await prisma.product.findUnique({
-          where: { sku: finalSku },
+        // Cek SKU dalam tenant pemanggil (SKU unik per tenant)
+        const existingProduct = await prisma.product.findFirst({
+          where: { sku: finalSku, storeId: scope.storeId },
         });
 
         if (existingProduct) {
@@ -119,6 +130,7 @@ export async function POST(request: NextRequest) {
               categoryId,
               lowStockThreshold: 10,
               productType: "FINISHED_GOOD",
+              storeId: scope.storeId,
             },
           });
 

@@ -10,22 +10,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Token meja diperlukan" }, { status: 400 });
     }
 
-    // Find table by QR token
+    // Find table by QR token (sertakan store pemilik outlet meja untuk isolasi tenant)
     const table = await prisma.restaurantTable.findUnique({
       where: { qrToken: token },
+      include: { outlet: { select: { storeId: true } } },
     });
 
     if (!table) {
       return NextResponse.json({ error: "Meja tidak ditemukan atau kode QR tidak valid" }, { status: 404 });
     }
 
-    // Get store settings
-    const store = await prisma.store.findFirst();
+    // Get store settings milik tenant pemilik meja
+    const storeId = table.outlet?.storeId ?? null;
+    const store = storeId
+      ? await prisma.store.findUnique({ where: { id: storeId } })
+      : null;
 
     // Get available products (only finished goods & manufactured items with remaining batch stock or recipe)
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
+        storeId,
         productType: { in: ["FINISHED_GOOD", "MANUFACTURED"] },
       },
       include: {

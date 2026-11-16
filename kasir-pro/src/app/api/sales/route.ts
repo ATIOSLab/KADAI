@@ -16,6 +16,7 @@ import {
 } from "@/lib/finance";
 import { Decimal } from "@prisma/client/runtime/library";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ZodError } from "zod";
 
@@ -32,6 +33,11 @@ export async function GET(request: NextRequest) {
         { error: "Role Anda tidak dapat melihat transaksi" },
         { status: 403 }
       );
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
     const { searchParams } = new URL(request.url);
@@ -53,6 +59,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Filter tidak valid" }, { status: 400 });
     }
     const where = {
+      // Isolasi tenant: hanya penjualan dari outlet milik tenant pemanggil
+      outlet: { storeId: scope.storeId },
       ...(search && {
         OR: [
           { invoiceNumber: { contains: search, mode: "insensitive" as const } },
@@ -131,8 +139,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = checkoutSchema.parse(body);
+
+    // Isolasi tenant: cabang (outlet) yang dipilih klien wajib milik tenant pemanggil
+    if (data.outletId) {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: data.outletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return NextResponse.json(
+          { error: "Cabang tidak ditemukan pada tenant Anda" },
+          { status: 404 }
+        );
+      }
+    }
 
     const idempotencyKey =
       request.headers.get("x-idempotency-key")?.trim() ||
@@ -168,14 +195,16 @@ export async function POST(request: NextRequest) {
           effectiveOutletId = userRec.outletId;
         } else {
           const mainOutlet = await tx.outlet.findFirst({
-            where: { isMain: true, isActive: true },
+            where: { isMain: true, isActive: true, storeId: scope.storeId },
             select: { id: true },
           });
           effectiveOutletId = mainOutlet?.id || null;
         }
       }
 
-      const store = await tx.store.findFirst();
+      const store = await tx.store.findUnique({
+        where: { id: scope.storeId },
+      });
       let effectiveCostingMethod: "FIFO" | "FEFO" | "AVERAGE" = (store?.costingMethod as any) || "FIFO";
       let effectiveKitchenWorkflow: "DIRECT_SERVE" | "KITCHEN_DISPATCH" | "HYBRID" =
         store?.kitchenWorkflow || "KITCHEN_DISPATCH";
@@ -198,8 +227,8 @@ export async function POST(request: NextRequest) {
       let itemDiscountTotal = new Decimal(0);
 
       for (const item of data.items) {
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
+        const product = await tx.product.findFirst({
+          where: { id: item.productId, storeId: scope.storeId },
           include: {
             recipesAsParent: {
               include: { ingredient: true },
@@ -295,6 +324,8 @@ export async function POST(request: NextRequest) {
       // 2. Generate invoice number
       const todaySalesCount = await tx.sale.count({
         where: {
+          // Isolasi tenant: nomor invoice dihitung per tenant
+          outlet: { storeId: scope.storeId },
           createdAt: {
             gte: new Date(new Date().setHours(0, 0, 0, 0)),
           },
@@ -402,10 +433,20 @@ export async function POST(request: NextRequest) {
 
       // 6. Update table occupancy if dine-in
       if (data.tableId) {
-        await tx.restaurantTable.update({
-          where: { id: data.tableId },
-          data: { isOccupied: true },
+        // Isolasi tenant: meja wajib milik outlet tenant pemanggil
+        const ownedTable = await tx.restaurantTable.findFirst({
+          where: {
+            id: data.tableId,
+            OR: [{ outlet: { storeId: scope.storeId } }, { outletId: null }],
+          },
+          select: { id: true },
         });
+        if (ownedTable) {
+          await tx.restaurantTable.update({
+            where: { id: data.tableId },
+            data: { isOccupied: true },
+          });
+        }
       }
 
       // 7. Route to Kitchen Display System (KDS) according to KitchenWorkflow
@@ -478,21 +519,29 @@ export async function POST(request: NextRequest) {
           categoryId: saleCategoryId,
           createdByUserId: sessionUser.id,
           saleId: sale.id,
+          storeId: scope.storeId,
         },
       });
 
       // 8. Update customer CRM stats
       if (data.customerId) {
-        const loyaltyEarned = Math.floor(Number(totalAmount) / 10000);
-        await tx.customer.update({
-          where: { id: data.customerId },
-          data: {
-            totalSpent: { increment: totalAmount },
-            visitCount: { increment: 1 },
-            loyaltyPoints: { increment: loyaltyEarned },
-            lastVisitAt: new Date(),
-          },
+        // Isolasi tenant: pelanggan (CRM) wajib milik tenant pemanggil
+        const ownedCustomer = await tx.customer.findFirst({
+          where: { id: data.customerId, storeId: scope.storeId },
+          select: { id: true },
         });
+        if (ownedCustomer) {
+          const loyaltyEarned = Math.floor(Number(totalAmount) / 10000);
+          await tx.customer.update({
+            where: { id: data.customerId },
+            data: {
+              totalSpent: { increment: totalAmount },
+              visitCount: { increment: 1 },
+              loyaltyPoints: { increment: loyaltyEarned },
+              lastVisitAt: new Date(),
+            },
+          });
+        }
       }
 
       return sale;

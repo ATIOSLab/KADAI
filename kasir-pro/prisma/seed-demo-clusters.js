@@ -249,12 +249,30 @@ async function seedDemoClusters() {
   // 1. Seed Outlets
   for (const cluster of CLUSTERS) {
     console.log(`\nProcessing Klaster: ${cluster.name} (${cluster.vertical})`);
+
+    // 0. Tenant demo per klaster — data demo tidak lagi global, tiap klaster punya store sendiri
+    let demoTenant = await prisma.store.findFirst({
+      where: { name: cluster.name, isDemo: true },
+    });
+    if (!demoTenant) {
+      demoTenant = await prisma.store.create({
+        data: {
+          name: cluster.name,
+          businessType: cluster.vertical || "RETAIL",
+          isDemo: true,
+          taxType: TaxType.NONE,
+        },
+      });
+    }
+    const tenantId = demoTenant.id;
+    console.log(`  [Tenant Demo] ${cluster.name} -> ${tenantId}`);
+
     let mainOutlet = null;
     for (const out of cluster.outlets) {
       const o = await prisma.outlet.upsert({
         where: { code: out.code },
-        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain },
-        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain },
+        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain, storeId: tenantId },
+        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain, storeId: tenantId },
       });
       if (out.isMain || !mainOutlet) {
         mainOutlet = o;
@@ -263,38 +281,56 @@ async function seedDemoClusters() {
     }
 
     // 2. Seed Categories & Products
+    // Kategori demo milik tenant klaster ini. Baris lama hasil seed sebelumnya
+    // masih storeId NULL (global) → diklaim ke tenant klaster ini agar tidak bocor.
+    const categoryMap = new Map();
     for (const catName of cluster.categories) {
-      await prisma.category.upsert({
-        where: { name: catName },
-        update: {},
-        create: { name: catName, description: `Kategori ${catName} untuk ${cluster.name}` },
+      let category = await prisma.category.findFirst({
+        where: { name: catName, storeId: tenantId },
       });
+      if (!category) {
+        const legacy = await prisma.category.findFirst({ where: { name: catName, storeId: null } });
+        category = legacy
+          ? await prisma.category.update({
+              where: { id: legacy.id },
+              data: { storeId: tenantId, isDemo: true },
+            })
+          : await prisma.category.create({
+              data: {
+                name: catName,
+                description: `Kategori ${catName} untuk ${cluster.name}`,
+                isDemo: true,
+                storeId: tenantId,
+              },
+            });
+      }
+      categoryMap.set(catName.trim().toLowerCase(), category);
     }
 
     for (const prod of cluster.products) {
-      const category = await prisma.category.findUnique({ where: { name: prod.category } });
+      const category = categoryMap.get((prod.category || "").trim().toLowerCase());
       if (!category) continue;
 
-      const p = await prisma.product.upsert({
-        where: { sku: prod.sku },
-        update: {
-          name: prod.name,
-          barcode: prod.barcode,
-          productType: prod.type,
-          station: prod.station,
-          unit: prod.unit,
-        },
-        create: {
-          name: prod.name,
-          sku: prod.sku,
-          barcode: prod.barcode,
-          description: `Katalog demo untuk ${cluster.name}`,
-          productType: prod.type,
-          station: prod.station,
-          unit: prod.unit,
-          categoryId: category.id,
-        },
-      });
+      const productData = {
+        name: prod.name,
+        barcode: prod.barcode,
+        productType: prod.type,
+        station: prod.station,
+        unit: prod.unit,
+        categoryId: category.id,
+        isDemo: true,
+        storeId: tenantId,
+      };
+      const legacyProduct = await prisma.product.findFirst({ where: { sku: prod.sku } });
+      const p = legacyProduct
+        ? await prisma.product.update({ where: { id: legacyProduct.id }, data: productData })
+        : await prisma.product.create({
+            data: {
+              ...productData,
+              sku: prod.sku,
+              description: `Katalog demo untuk ${cluster.name}`,
+            },
+          });
 
       // Seed Product Batch (FIFO tracking)
       const batchNo = `BATCH-${prod.sku}-202611`;
@@ -338,6 +374,7 @@ async function seedDemoClusters() {
             supervisorPin: supervisorPinHash,
             isActive: true,
             outletId: mainOutlet ? mainOutlet.id : undefined,
+            storeId: tenantId,
           },
           create: {
             name: u.name,
@@ -347,6 +384,7 @@ async function seedDemoClusters() {
             supervisorPin: supervisorPinHash,
             isActive: true,
             outletId: mainOutlet ? mainOutlet.id : undefined,
+            storeId: tenantId,
           },
         });
         console.log(`  [User ${u.role}] ${email} (PIN: ${u.pin || "-"})`);

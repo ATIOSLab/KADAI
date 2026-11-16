@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { Decimal } from "@prisma/client/runtime/library";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/products/[id]/recipe
 export async function GET(
@@ -22,9 +23,14 @@ export async function GET(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const product = await prisma.product.findFirst({
+      where: { id, storeId: scope.storeId },
       include: {
         recipesAsParent: {
           include: {
@@ -110,13 +116,34 @@ export async function PUT(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
     const body = await req.json();
     const { items = [] } = body; // Array<{ ingredientId, quantityNeeded, unit?, wastagePercent? }>
 
-    const product = await prisma.product.findUnique({ where: { id } });
+    const product = await prisma.product.findFirst({
+      where: { id, storeId: scope.storeId },
+    });
     if (!product) {
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
+    }
+
+    // Semua bahan baku wajib milik tenant pemanggil (cegah resep lintas tenant)
+    if (items.length > 0) {
+      const ingredientIds: string[] = items.map((i: any) => i.ingredientId);
+      const ownedIngredients = await prisma.product.count({
+        where: { id: { in: ingredientIds }, storeId: scope.storeId },
+      });
+      if (ownedIngredients !== new Set(ingredientIds).size) {
+        return NextResponse.json(
+          { error: "Ada bahan baku yang bukan milik tenant Anda" },
+          { status: 400 }
+        );
+      }
     }
 
     // Update recipe in transaction

@@ -1,10 +1,22 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { jsonOk, handleApiError } from "@/lib/api-response";
+import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import { getServerSessionUser } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/inventory — Stock overview
 export async function GET(request: NextRequest) {
   try {
+    const sessionUser = await getServerSessionUser();
+    if (!sessionUser) {
+      return jsonError("Unauthorized", 401);
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const categoryId = searchParams.get("categoryId");
@@ -14,6 +26,7 @@ export async function GET(request: NextRequest) {
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
+        storeId: scope.storeId,
         ...(categoryId && { categoryId }),
         ...(search && {
           OR: [

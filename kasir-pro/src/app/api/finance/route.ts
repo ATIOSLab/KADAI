@@ -13,6 +13,7 @@ import {
 } from "@/lib/finance";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { financeEntryPayloadSchema } from "@/lib/validators/finance";
 
 const financeEntryInclude = {
@@ -91,9 +92,17 @@ function getFinanceForbiddenResponse() {
   );
 }
 
-async function getActiveCategoryOrThrow(categoryId: string, direction: FinanceDirection) {
-  const category = await prisma.financeCategory.findUnique({
-    where: { id: categoryId },
+async function getActiveCategoryOrThrow(
+  categoryId: string,
+  direction: FinanceDirection,
+  storeId: string
+) {
+  const category = await prisma.financeCategory.findFirst({
+    where: {
+      id: categoryId,
+      // Kategori sistem/default bawaan (storeId NULL) tetap dipakai bersama semua tenant
+      OR: [{ storeId }, { storeId: null }],
+    },
     select: {
       id: true,
       name: true,
@@ -134,6 +143,11 @@ export async function GET(request: NextRequest) {
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     await ensureFinanceCategories();
 
     const { searchParams } = new URL(request.url);
@@ -155,6 +169,7 @@ export async function GET(request: NextRequest) {
 
     const rangeWhere: Prisma.FinanceEntryWhereInput = {
       isArchived: false,
+      storeId: scope.storeId,
       entryDate: {
         gte: startDate,
         lte: endDate,
@@ -189,6 +204,7 @@ export async function GET(request: NextRequest) {
 
     const balanceWhere: Prisma.FinanceEntryWhereInput = {
       isArchived: false,
+      storeId: scope.storeId,
       entryDate: {
         lte: endDate,
       },
@@ -246,6 +262,10 @@ export async function GET(request: NextRequest) {
         },
       }),
       prisma.financeCategory.findMany({
+        where: {
+          // Kategori sistem/default (storeId NULL) terlihat semua tenant
+          OR: [{ storeId: scope.storeId }, { storeId: null }],
+        },
         select: {
           id: true,
           name: true,
@@ -330,13 +350,19 @@ export async function POST(request: NextRequest) {
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     await ensureFinanceCategories();
 
     const body = await request.json();
     const data = financeEntryPayloadSchema.parse(body);
     const categoryResult = await getActiveCategoryOrThrow(
       data.categoryId,
-      data.direction
+      data.direction,
+      scope.storeId
     );
 
     if ("error" in categoryResult) {
@@ -356,6 +382,7 @@ export async function POST(request: NextRequest) {
         entryDate: new Date(data.entryDate),
         categoryId: categoryResult.category.id,
         createdByUserId: sessionUser.id,
+        storeId: scope.storeId,
       },
       include: financeEntryInclude,
     });

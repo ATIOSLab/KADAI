@@ -124,9 +124,14 @@ function formatDayLabel(dateValue: Date, timezone: string) {
   });
 }
 
-function getSaleWhereInput(range: { start: Date; endExclusive: Date }) {
+function getSaleWhereInput(
+  range: { start: Date; endExclusive: Date },
+  storeId?: string | null
+) {
   return {
     isVoided: false,
+    // Isolasi tenant: hanya penjualan dari outlet milik store pemanggil
+    ...(storeId ? { outlet: { storeId } } : {}),
     createdAt: {
       gte: range.start,
       lt: range.endExclusive,
@@ -134,16 +139,20 @@ function getSaleWhereInput(range: { start: Date; endExclusive: Date }) {
   } satisfies Prisma.SaleWhereInput;
 }
 
-export async function getSalesSummary(range: BusinessRange, timezone: string) {
+export async function getSalesSummary(
+  range: BusinessRange,
+  timezone: string,
+  storeId?: string | null
+) {
   const [aggregate, transactions] = await Promise.all([
     prisma.sale.aggregate({
-      where: getSaleWhereInput(range),
+      where: getSaleWhereInput(range, storeId),
       _sum: {
         totalAmount: true,
       },
     }),
     prisma.sale.count({
-      where: getSaleWhereInput(range),
+      where: getSaleWhereInput(range, storeId),
     }),
   ]);
 
@@ -160,9 +169,13 @@ export async function getSalesSummary(range: BusinessRange, timezone: string) {
   } satisfies SalesSummaryResult;
 }
 
-export async function getProfitSummary(range: BusinessRange, timezone: string) {
+export async function getProfitSummary(
+  range: BusinessRange,
+  timezone: string,
+  storeId?: string | null
+) {
   const aggregate = await prisma.sale.aggregate({
-    where: getSaleWhereInput(range),
+    where: getSaleWhereInput(range, storeId),
     _sum: {
       totalAmount: true,
       totalCost: true,
@@ -190,9 +203,13 @@ export async function getProfitSummary(range: BusinessRange, timezone: string) {
   } satisfies ProfitSummaryResult;
 }
 
-export async function getTopProducts(range: BusinessRange, limit = 5) {
+export async function getTopProducts(
+  range: BusinessRange,
+  limit = 5,
+  storeId?: string | null
+) {
   const sales = await prisma.sale.findMany({
-    where: getSaleWhereInput(range),
+    where: getSaleWhereInput(range, storeId),
     include: {
       items: {
         include: {
@@ -227,10 +244,10 @@ export async function getTopProducts(range: BusinessRange, limit = 5) {
     .slice(0, Math.max(1, limit));
 }
 
-export async function getPaymentMix(range: BusinessRange) {
+export async function getPaymentMix(range: BusinessRange, storeId?: string | null) {
   const grouped = await prisma.sale.groupBy({
     by: ["paymentType"],
-    where: getSaleWhereInput(range),
+    where: getSaleWhereInput(range, storeId),
     _sum: {
       totalAmount: true,
     },
@@ -269,10 +286,11 @@ export async function getHourlySales(range: BusinessRange, timezone: string) {
     );
 }
 
-export async function getLowStockHighlights(limit = 5) {
+export async function getLowStockHighlights(limit = 5, storeId?: string | null) {
   const products = await prisma.product.findMany({
     where: {
       isActive: true,
+      ...(storeId ? { storeId } : {}),
     },
     include: {
       batches: {
@@ -307,6 +325,7 @@ export async function getReportSnapshot(params: {
   weekDate: string;
   timezone?: string;
   outletId?: string | null;
+  storeId?: string | null;
 }) {
   const timezone = params.timezone || DEFAULT_BUSINESS_TIMEZONE;
   const startDate = parseCalendarDate(params.startDate, timezone);
@@ -348,11 +367,15 @@ export async function getReportSnapshot(params: {
       ? { outletId: params.outletId }
       : {};
 
+  // Isolasi tenant: laporan hanya mencakup outlet milik store pemanggil
+  const storeFilter = params.storeId ? { outlet: { storeId: params.storeId } } : {};
+
   const [rangeSales, weekSales] = await Promise.all([
     prisma.sale.findMany({
       where: {
         isVoided: false,
         ...outletFilter,
+        ...storeFilter,
         createdAt: { gte: startDate, lte: endDate },
       },
       include: saleInclude,
@@ -362,6 +385,7 @@ export async function getReportSnapshot(params: {
       where: {
         isVoided: false,
         ...outletFilter,
+        ...storeFilter,
         createdAt: { gte: weekStartDate, lte: weekEndDate },
       },
       include: saleInclude,

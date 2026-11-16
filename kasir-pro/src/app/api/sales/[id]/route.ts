@@ -3,6 +3,7 @@ import { redactCosts, SALES_READ_ROLES } from "@/app/api/_lib/access";
 import { prisma } from "@/lib/prisma";
 import { hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/sales/[id] — Sale detail with batch allocations
 export async function GET(
@@ -22,9 +23,14 @@ export async function GET(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const sale = await prisma.sale.findUnique({
-      where: { id },
+    const sale = await prisma.sale.findFirst({
+      where: { id, outlet: { storeId: scope.storeId } },
       include: {
         cashier: { select: { id: true, name: true, email: true, role: true } },
         outlet: { select: { id: true, name: true, address: true, phone: true } },

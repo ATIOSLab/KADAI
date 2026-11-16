@@ -6,6 +6,7 @@ import { createTransferSchema, updateTransferStatusSchema } from "@/lib/validato
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "@prisma/client";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/inventory/transfers
 export async function GET(request: NextRequest) {
@@ -19,12 +20,23 @@ export async function GET(request: NextRequest) {
       return jsonError("Akses ditolak", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const sourceOutletId = searchParams.get("sourceOutletId");
     const destinationOutletId = searchParams.get("destinationOutletId");
 
-    const where: Prisma.StockTransferWhereInput = {};
+    // Isolasi tenant: hanya transfer yang melibatkan cabang tenant pemanggil
+    const where: Prisma.StockTransferWhereInput = {
+      AND: [
+        { sourceOutlet: { storeId: scope.storeId } },
+        { destinationOutlet: { storeId: scope.storeId } },
+      ],
+    };
     if (status && status !== "ALL") where.status = status as any;
     if (sourceOutletId && sourceOutletId !== "ALL") where.sourceOutletId = sourceOutletId;
     if (destinationOutletId && destinationOutletId !== "ALL") where.destinationOutletId = destinationOutletId;
@@ -67,10 +79,36 @@ export async function POST(request: NextRequest) {
       return jsonError("Hanya Admin, Manager, atau Staf Gudang yang dapat membuat transfer stok", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await request.json();
     const validated = createTransferSchema.parse(body);
 
+    // Kedua cabang wajib milik tenant pemanggil
+    const ownedOutlets = await prisma.outlet.count({
+      where: {
+        storeId: scope.storeId,
+        id: { in: [validated.sourceOutletId, validated.destinationOutletId] },
+      },
+    });
+    if (ownedOutlets !== 2) {
+      return jsonError("Cabang asal/tujuan bukan milik tenant Anda", 403);
+    }
+
+    // Produk yang dimutasi wajib milik tenant pemanggil
+    const productIds = validated.items.map((item) => item.productId);
+    const ownedProducts = await prisma.product.count({
+      where: { id: { in: productIds }, storeId: scope.storeId },
+    });
+    if (ownedProducts !== new Set(productIds).size) {
+      return jsonError("Ada produk yang bukan milik tenant Anda", 403);
+    }
+
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    // Nomor transfer unik global (definisi schema) → penomoran tetap memakai hitungan global
     const count = await prisma.stockTransfer.count();
     const transferNumber = `TRF-${dateStr}-${String(count + 1).padStart(4, "0")}`;
 
@@ -138,11 +176,22 @@ export async function PUT(request: NextRequest) {
       return jsonError("Akses ditolak", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await request.json();
     const validated = updateTransferStatusSchema.parse(body);
 
-    const transfer = await prisma.stockTransfer.findUnique({
-      where: { id: validated.id },
+    const transfer = await prisma.stockTransfer.findFirst({
+      where: {
+        id: validated.id,
+        OR: [
+          { sourceOutlet: { storeId: scope.storeId } },
+          { destinationOutlet: { storeId: scope.storeId } },
+        ],
+      },
       include: {
         items: { include: { product: true } },
         sourceOutlet: true,
@@ -151,7 +200,7 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!transfer) {
-      return jsonError("Transfer tidak ditemukan", 404);
+      return jsonError("Transfer tidak ditemukan pada tenant Anda", 404);
     }
 
     if (transfer.status !== "IN_TRANSIT" && transfer.status !== "DRAFT") {
@@ -206,6 +255,7 @@ export async function PUT(request: NextRequest) {
               reason: "OTHER",
               notes: `Mutasi transfer keluar ke ${transfer.destinationOutlet.name} (${transfer.transferNumber})`,
               userId: sessionUser.id,
+              storeId: scope.storeId,
             },
           });
 
@@ -216,6 +266,7 @@ export async function PUT(request: NextRequest) {
               reason: "OTHER",
               notes: `Penerimaan transfer stok dari ${transfer.sourceOutlet.name} (${transfer.transferNumber})`,
               userId: sessionUser.id,
+              storeId: scope.storeId,
             },
           });
         }

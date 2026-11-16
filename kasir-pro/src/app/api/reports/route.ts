@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FINANCE_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { getDefaultDashboardRange, getCurrentWeekRange, getWeekRangeFromDate } from "@/lib/dashboard-periods";
 import { getReportSnapshot } from "@/lib/reporting";
 
@@ -19,6 +20,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const defaultRange = getDefaultDashboardRange();
     const defaultWeek = getCurrentWeekRange();
@@ -35,11 +41,16 @@ export async function GET(request: NextRequest) {
       );
     }
     const normalizedWeek = getWeekRangeFromDate(weekDateParam);
+    // Isolasi tenant: angka agregat laporan dihitung oleh getReportSnapshot
+    // (src/lib/reporting.ts). Lib itu WAJIB menerima filter storeId tenant agar
+    // snapshot tidak mencampur data lintas tenant — di luar 8 file izin edit.
     const report = await getReportSnapshot({
       startDate: startDateParam,
       endDate: endDateParam,
       weekDate: normalizedWeek.startDate,
       outletId: outletIdParam,
+      // Isolasi tenant: lib reporting.ts memfilter penjualan lewat outlet.storeId
+      storeId: scope.storeId,
     });
 
     return NextResponse.json({

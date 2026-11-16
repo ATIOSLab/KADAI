@@ -5,6 +5,7 @@ import { updateProductSchema } from "@/lib/validators/product";
 import { logActivity } from "@/lib/activity-logger";
 import { deleteProductImageByUrl } from "@/lib/product-image";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import {
   ADMIN_ONLY_ROLES,
   INVENTORY_ROLES,
@@ -34,9 +35,14 @@ export async function GET(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const product = await prisma.product.findFirst({
+      where: { id, storeId: scope.storeId },
       include: {
         category: true,
         batches: {
@@ -89,11 +95,16 @@ export async function PUT(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = updateProductSchema.parse(body);
 
-    const existingProduct = await prisma.product.findUnique({
-      where: { id },
+    const existingProduct = await prisma.product.findFirst({
+      where: { id, storeId: scope.storeId },
     });
 
     if (!existingProduct) {
@@ -104,11 +115,12 @@ export async function PUT(
     }
 
     if (data.sku || data.barcode) {
+      // SKU dicek per tenant; barcode tetap global
       const conflictingProduct = await prisma.product.findFirst({
         where: {
           id: { not: id },
           OR: [
-            ...(data.sku ? [{ sku: data.sku }] : []),
+            ...(data.sku ? [{ sku: data.sku, storeId: scope.storeId }] : []),
             ...(data.barcode ? [{ barcode: data.barcode }] : []),
           ],
         },
@@ -122,19 +134,43 @@ export async function PUT(
       }
     }
 
+    if (data.categoryId) {
+      const ownedCategory = await prisma.category.findFirst({
+        where: { id: data.categoryId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedCategory) {
+        return NextResponse.json(
+          { error: "Kategori tidak ditemukan pada tenant Anda" },
+          { status: 400 }
+        );
+      }
+    }
+
     if (data.unit) {
       const unitName = data.unit.trim();
-      await prisma.unit.upsert({
-        where: { normalizedName: normalizeUnitName(unitName) },
-        update: {
-          name: unitName,
-          isActive: true,
+      const normalizedUnit = normalizeUnitName(unitName);
+      const existingUnit = await prisma.unit.findFirst({
+        where: {
+          normalizedName: normalizedUnit,
+          OR: [{ storeId: scope.storeId }, { storeId: null }],
         },
-        create: {
-          name: unitName,
-          normalizedName: normalizeUnitName(unitName),
-        },
+        select: { id: true },
       });
+      if (existingUnit) {
+        await prisma.unit.update({
+          where: { id: existingUnit.id },
+          data: { isActive: true },
+        });
+      } else {
+        await prisma.unit.create({
+          data: {
+            name: unitName,
+            normalizedName: normalizedUnit,
+            storeId: scope.storeId,
+          },
+        });
+      }
       data.unit = unitName;
     }
 
@@ -201,8 +237,13 @@ export async function DELETE(
       );
     }
 
-    const existingProduct = await prisma.product.findUnique({
-      where: { id },
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    const existingProduct = await prisma.product.findFirst({
+      where: { id, storeId: scope.storeId },
     });
 
     if (!existingProduct) {

@@ -8,6 +8,7 @@ import {
   getSystemFinanceCategoryId,
 } from "@/lib/finance";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { verifySupervisorPin } from "@/lib/rbac/pin";
 
@@ -25,6 +26,12 @@ export async function POST(
     if (!hasRequiredRole(sessionUser.role, ["ADMIN", "MANAGER", "CASHIER"])) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { reason } = voidSaleSchema.parse(body);
@@ -56,8 +63,8 @@ export async function POST(
       approvedSupervisorName = `${pinCheck.supervisor?.name} (${pinCheck.supervisor?.role})`;
     }
 
-    const sale = await prisma.sale.findUnique({
-      where: { id },
+    const sale = await prisma.sale.findFirst({
+      where: { id, outlet: { storeId: scope.storeId } },
       include: {
         items: {
           include: { batchAllocations: true },
@@ -80,7 +87,7 @@ export async function POST(
     await prisma.$transaction(async (tx) => {
       // Atomic claim prevents concurrent requests from restoring stock twice.
       const claim = await tx.sale.updateMany({
-        where: { id, isVoided: false },
+        where: { id, isVoided: false, outlet: { storeId: scope.storeId } },
         data: { isVoided: true },
       });
       if (claim.count !== 1) throw new Error("SALE_ALREADY_VOIDED");
@@ -110,6 +117,7 @@ export async function POST(
           categoryId: saleVoidCategoryId,
           createdByUserId: sessionUser.id,
           saleId: id,
+          storeId: scope.storeId,
         },
       });
 

@@ -45,6 +45,8 @@ function toHourLabel(hour: number) {
 interface DashboardOverviewOptions {
   startDate?: Date;
   endDate?: Date;
+  // Isolasi tenant: bila diisi, seluruh agregasi dibatasi ke store ini
+  storeId?: string | null;
 }
 
 export async function getDashboardOverview(
@@ -62,6 +64,7 @@ export async function getDashboardOverview(
     prisma.sale.findMany({
       where: {
         isVoided: false,
+        ...(options.storeId ? { outlet: { storeId: options.storeId } } : {}),
         createdAt: {
           gte: startDate,
           lte: endDate,
@@ -98,6 +101,7 @@ export async function getDashboardOverview(
     prisma.product.findMany({
       where: {
         isActive: true,
+        ...(options.storeId ? { storeId: options.storeId } : {}),
       },
       include: {
         batches: {
@@ -112,6 +116,7 @@ export async function getDashboardOverview(
     prisma.product.count({
       where: {
         isActive: true,
+        ...(options.storeId ? { storeId: options.storeId } : {}),
       },
     }),
   ]);

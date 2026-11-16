@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createProductSchema } from "@/lib/validators/product";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { checkProductLimit } from "@/lib/plan-limits";
 import { ZodError } from "zod";
@@ -27,8 +28,19 @@ export async function GET(request: NextRequest) {
     }
     const skip = (page - 1) * limit;
 
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Isolasi tenant: hanya produk milik tenant pemanggil
+    // (storeId NULL = data demo/shared lama, sengaja tidak diikutkan)
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const where = {
       isActive: true,
+      storeId: scope.storeId,
       ...(search && {
         OR: [
           { name: { contains: search, mode: "insensitive" as const } },
@@ -38,9 +50,6 @@ export async function GET(request: NextRequest) {
       }),
       ...(categoryId && { categoryId }),
     };
-
-    const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -119,8 +128,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     // Kuota paket langganan: batas jumlah produk per tenant (dikelola superadmin)
-    const limitCheck = await checkProductLimit(sessionUser.storeId);
+    const limitCheck = await checkProductLimit(scope.storeId);
     if (!limitCheck.allowed) {
       return NextResponse.json({ error: limitCheck.message }, { status: 403 });
     }
@@ -128,11 +142,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createProductSchema.parse(body);
 
-    // Check if SKU already exists
+    // SKU unik per tenant; barcode tetap unik global (identitas fisik barang)
     const existingProduct = await prisma.product.findFirst({
       where: {
         OR: [
-          { sku: data.sku },
+          { sku: data.sku, storeId: scope.storeId },
           ...(data.barcode ? [{ barcode: data.barcode }] : []),
         ],
       },
@@ -145,18 +159,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const unitName = data.unit.trim();
-    await prisma.unit.upsert({
-      where: { normalizedName: normalizeUnitName(unitName) },
-      update: {
-        name: unitName,
-        isActive: true,
-      },
-      create: {
-        name: unitName,
-        normalizedName: normalizeUnitName(unitName),
-      },
+    // Kategori wajib milik tenant pemanggil (cegah IDOR lintas tenant)
+    const ownedCategory = await prisma.category.findFirst({
+      where: { id: data.categoryId, storeId: scope.storeId },
+      select: { id: true },
     });
+    if (!ownedCategory) {
+      return NextResponse.json(
+        { error: "Kategori tidak ditemukan pada tenant Anda" },
+        { status: 400 }
+      );
+    }
+
+    const unitName = data.unit.trim();
+    const normalizedUnit = normalizeUnitName(unitName);
+    const existingUnit = await prisma.unit.findFirst({
+      where: {
+        normalizedName: normalizedUnit,
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
+      },
+      select: { id: true },
+    });
+    if (existingUnit) {
+      await prisma.unit.update({
+        where: { id: existingUnit.id },
+        data: { isActive: true },
+      });
+    } else {
+      await prisma.unit.create({
+        data: {
+          name: unitName,
+          normalizedName: normalizedUnit,
+          storeId: scope.storeId,
+        },
+      });
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -170,6 +207,7 @@ export async function POST(request: NextRequest) {
         categoryId: data.categoryId,
         lowStockThreshold: data.lowStockThreshold,
         image: data.image,
+        storeId: scope.storeId,
       },
       include: { category: true },
     });

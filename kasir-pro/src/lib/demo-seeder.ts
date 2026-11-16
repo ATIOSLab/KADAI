@@ -223,52 +223,96 @@ export async function runDemoSeeding() {
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
   for (const cluster of CLUSTERS) {
+    // Tenant demo per klaster: data demo tidak lagi global (isolasi tenant)
+    let demoTenant = await prisma.store.findFirst({
+      where: { name: cluster.name, isDemo: true },
+      select: { id: true },
+    });
+    if (!demoTenant) {
+      demoTenant = await prisma.store.create({
+        data: {
+          name: cluster.name,
+          businessType: cluster.vertical as any,
+          isDemo: true,
+        },
+        select: { id: true },
+      });
+    }
+    const tenantId = demoTenant.id;
+
     let mainOutletId: string | undefined;
     for (const out of cluster.outlets) {
       const o = await prisma.outlet.upsert({
         where: { code: out.code },
-        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true },
-        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true },
+        update: { name: out.name, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true, storeId: tenantId },
+        create: { name: out.name, code: out.code, address: out.address, phone: out.phone, isMain: out.isMain, isDemo: true, storeId: tenantId },
       });
       if (out.isMain || !mainOutletId) {
         mainOutletId = o.id;
       }
     }
 
+    // Kategori demo milik tenant klaster ini (klaim baris lama yang masih global)
+    const categoryMap = new Map<string, { id: string }>();
     for (const catName of cluster.categories) {
-      await prisma.category.upsert({
-        where: { name: catName },
-        update: { isDemo: true },
-        create: { name: catName, description: `Kategori ${catName} untuk ${cluster.name}`, isDemo: true },
+      let category = await prisma.category.findFirst({
+        where: { name: catName, storeId: tenantId },
+        select: { id: true },
       });
+      if (!category) {
+        const legacy = await prisma.category.findFirst({
+          where: { name: catName, storeId: null },
+          select: { id: true },
+        });
+        category = legacy
+          ? await prisma.category.update({
+              where: { id: legacy.id },
+              data: { storeId: tenantId, isDemo: true },
+              select: { id: true },
+            })
+          : await prisma.category.create({
+              data: {
+                name: catName,
+                description: `Kategori ${catName} untuk ${cluster.name}`,
+                isDemo: true,
+                storeId: tenantId,
+              },
+              select: { id: true },
+            });
+      }
+      categoryMap.set(catName.trim().toLowerCase(), category);
     }
 
     for (const prod of cluster.products) {
-      const category = await prisma.category.findUnique({ where: { name: prod.category } });
+      const category = categoryMap.get((prod.category || "").trim().toLowerCase());
       if (!category) continue;
 
-      const p = await prisma.product.upsert({
+      const productData = {
+        name: prod.name,
+        barcode: prod.barcode,
+        productType: prod.type,
+        station: prod.station,
+        unit: prod.unit,
+        categoryId: category.id,
+        isDemo: true,
+        storeId: tenantId,
+      };
+      const legacyProduct = await prisma.product.findFirst({
         where: { sku: prod.sku },
-        update: {
-          name: prod.name,
-          barcode: prod.barcode,
-          productType: prod.type,
-          station: prod.station,
-          unit: prod.unit,
-          isDemo: true,
-        },
-        create: {
-          name: prod.name,
-          sku: prod.sku,
-          barcode: prod.barcode,
-          description: `Katalog demo untuk ${cluster.name}`,
-          productType: prod.type,
-          station: prod.station,
-          unit: prod.unit,
-          categoryId: category.id,
-          isDemo: true,
-        },
+        select: { id: true },
       });
+      const p = legacyProduct
+        ? await prisma.product.update({
+            where: { id: legacyProduct.id },
+            data: productData,
+          })
+        : await prisma.product.create({
+            data: {
+              ...productData,
+              sku: prod.sku,
+              description: `Katalog demo untuk ${cluster.name}`,
+            },
+          });
 
       const batchNo = `BATCH-${prod.sku}-202611`;
       await prisma.productBatch.upsert({
@@ -310,6 +354,7 @@ export async function runDemoSeeding() {
             isActive: true,
             outletId: mainOutletId,
             isDemo: true,
+            storeId: tenantId,
           },
           create: {
             name: u.name,
@@ -320,6 +365,7 @@ export async function runDemoSeeding() {
             isActive: true,
             outletId: mainOutletId,
             isDemo: true,
+            storeId: tenantId,
           },
         });
       }

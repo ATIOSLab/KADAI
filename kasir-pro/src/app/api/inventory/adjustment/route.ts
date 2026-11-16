@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/activity-logger";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { z } from "zod";
 
 const adjustmentSchema = z.object({
@@ -27,8 +28,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = adjustmentSchema.parse(body);
+
+    // Pastikan produk milik tenant pemanggil
+    const product = await prisma.product.findFirst({
+      where: { id: data.productId, storeId: scope.storeId },
+      select: { id: true },
+    });
+    if (!product) {
+      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
+    }
 
     // Create adjustment record
     const adjustment = await prisma.stockAdjustment.create({
@@ -38,6 +53,7 @@ export async function POST(request: NextRequest) {
         reason: data.reason,
         notes: data.notes,
         userId: sessionUser.id,
+        storeId: scope.storeId,
       },
       include: { product: true, user: true },
     });
@@ -95,12 +111,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
+    const where = { storeId: scope.storeId };
+
     const [adjustments, total] = await Promise.all([
       prisma.stockAdjustment.findMany({
+        where,
         include: {
           product: { select: { id: true, name: true, sku: true } },
           user: { select: { id: true, name: true } },
@@ -109,7 +133,7 @@ export async function GET(request: NextRequest) {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.stockAdjustment.count(),
+      prisma.stockAdjustment.count({ where }),
     ]);
 
     return NextResponse.json({

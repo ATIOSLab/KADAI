@@ -3,12 +3,18 @@ import { prisma } from "@/lib/prisma";
 import { buildSkuPrefix, formatSku } from "@/lib/utils";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 export async function GET(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
     if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
     const { searchParams } = new URL(request.url);
@@ -19,16 +25,18 @@ export async function GET(request: NextRequest) {
     let resolvedCategoryName = categoryName?.trim() || "";
 
     if (!resolvedCategoryName && categoryId) {
-      const category = await prisma.category.findUnique({
-        where: { id: categoryId },
+      const category = await prisma.category.findFirst({
+        where: { id: categoryId, storeId: scope.storeId },
         select: { name: true },
       });
       resolvedCategoryName = category?.name ?? "";
     }
 
     const prefix = buildSkuPrefix(resolvedCategoryName, productName);
+    // Nomor urut SKU dihitung per tenant (SKU kini unik per tenant)
     const existingSkus = await prisma.product.findMany({
       where: {
+        storeId: scope.storeId,
         sku: {
           startsWith: `${prefix}-`,
           mode: "insensitive",

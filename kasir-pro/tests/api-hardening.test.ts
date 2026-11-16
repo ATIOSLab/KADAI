@@ -44,6 +44,10 @@ test("webhook authenticates before payload and void claims atomically", () => {
   assert.ok(webhook.indexOf("timingSafeEqual(Buffer") < webhook.indexOf("request.json()"));
   assert.match(webhook, /!expectedSecret/);
   const voidRoute = route("sales/[id]/void");
-  assert.match(voidRoute, /where: \{ id, isVoided: false \}/);
+  // Guard atomik: claim wajib memakai isVoided: false DAN dibatasi tenant (isolasi tenant)
+  assert.match(
+    voidRoute,
+    /where: \{ id, isVoided: false, outlet: \{ storeId: scope\.storeId \} \}/
+  );
   assert.match(voidRoute, /claim.count !== 1/);
 });

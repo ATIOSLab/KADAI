@@ -302,6 +302,14 @@ model Store {
   invoices          PaymentInvoice[]
   outlets           Outlet[]
   users             User[]
+  categories        Category[]
+  products          Product[]
+  units             Unit[]
+  suppliers         Supplier[]
+  customers         Customer[]
+  financeCategories FinanceCategory[]
+  financeEntries    FinanceEntry[]
+  stockAdjustments  StockAdjustment[]
 
   @@map("stores")
 }
@@ -360,7 +368,7 @@ model BotJob {
 
 model Category {
   id          String    @id @default(cuid())
-  name        String    @unique
+  name        String
   description String?
   color       String?
   icon        String?
@@ -369,21 +377,32 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  // Tenant
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   // Relations
   products Product[]
 
+  @@unique([storeId, name])
+  @@index([storeId])
   @@map("categories")
 }
 
 model Unit {
   id             String   @id @default(cuid())
   name           String
-  normalizedName String   @unique
+  normalizedName String
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  @@unique([name])
+  // Tenant (NULL = satuan bawaan platform, dipakai bersama semua tenant)
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  @@unique([storeId, normalizedName])
+  @@index([storeId])
   @@index([isActive])
   @@map("units")
 }
@@ -398,16 +417,21 @@ model Supplier {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  // Tenant
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   // Relations
   batches ProductBatch[]
 
+  @@index([storeId])
   @@map("suppliers")
 }
 
 model Customer {
   id            String    @id @default(cuid())
   name          String
-  phone         String?   @unique
+  phone         String?
   email         String?
   address       String?
   memberTier    String    @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM
@@ -420,9 +444,15 @@ model Customer {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Tenant
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   sales       Sale[]
   laundryJobs LaundryJobOrder[]
 
+  @@unique([storeId, phone])
+  @@index([storeId])
   @@index([name])
   @@index([phone])
   @@map("customers")
@@ -464,7 +494,7 @@ model Outlet {
 model Product {
   id                String       @id @default(cuid())
   name              String
-  sku               String       @unique
+  sku               String
   barcode           String?      @unique
   description       String?
   productType       ProductType  @default(FINISHED_GOOD)
@@ -477,6 +507,10 @@ model Product {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
+  // Tenant
+  storeId             String?
+  store               Store?              @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   // Relations
   categoryId          String
   category            Category            @relation(fields: [categoryId], references: [id])
@@ -487,6 +521,8 @@ model Product {
   recipesAsIngredient RecipeItem[]        @relation("IngredientRecipe")
   stockTransferItems  StockTransferItem[]
 
+  @@unique([storeId, sku])
+  @@index([storeId])
   @@index([categoryId])
   @@index([name])
   @@map("products")
@@ -744,12 +780,17 @@ model StockAdjustment {
   notes          String?
   createdAt      DateTime         @default(now())
 
+  // Tenant
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   // Relations
   productId String
   product   Product @relation(fields: [productId], references: [id])
   userId    String
   user      User    @relation(fields: [userId], references: [id])
 
+  @@index([storeId])
   @@index([productId])
   @@index([userId])
   @@map("stock_adjustments")
@@ -785,14 +826,19 @@ model FinanceCategory {
   name       String
   direction  FinanceDirection
   isSystem   Boolean          @default(false)
-  systemKey  String?          @unique
+  systemKey  String?          @unique // kategori sistem platform (SALE_INCOME dll) — unik global, dipakai semua tenant
   isActive   Boolean          @default(true)
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
 
+  // Tenant (NULL = kategori sistem bawaan platform, dipakai bersama)
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   entries FinanceEntry[]
 
-  @@unique([name, direction])
+  @@unique([storeId, name, direction])
+  @@index([storeId])
   @@index([direction, isActive])
   @@map("finance_categories")
 }
@@ -808,6 +854,10 @@ model FinanceEntry {
   isArchived      Boolean          @default(false)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  // Tenant
+  storeId         String?
+  store           Store?           @relation(fields: [storeId], references: [id], onDelete: SetNull)
 
   categoryId      String
   category        FinanceCategory  @relation(fields: [categoryId], references: [id])
@@ -826,6 +876,7 @@ model FinanceEntry {
   @@index([saleId])
   @@index([productBatchId])
   @@index([isArchived, entryDate])
+  @@index([storeId, entryDate])
   @@map("finance_entries")
 }
 

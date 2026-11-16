@@ -5,6 +5,7 @@ import { logActivity } from "@/lib/activity-logger";
 import { assertFinanceAccess, ensureFinanceCategories } from "@/lib/finance";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { financeCategoryPayloadSchema } from "@/lib/validators/finance";
 
 function getFinanceForbiddenResponse() {
@@ -28,12 +29,19 @@ export async function GET(request: NextRequest) {
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     await ensureFinanceCategories();
 
     const { searchParams } = new URL(request.url);
     const direction = searchParams.get("direction");
     const includeInactive = searchParams.get("includeInactive") === "true";
     const where = {
+      // Kategori sistem/default (storeId NULL) tetap terlihat semua tenant
+      OR: [{ storeId: scope.storeId }, { storeId: null }],
       ...(direction && Object.values(FinanceDirection).includes(direction as FinanceDirection)
         ? { direction: direction as FinanceDirection }
         : {}),
@@ -69,15 +77,22 @@ export async function POST(request: NextRequest) {
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     await ensureFinanceCategories();
 
     const body = await request.json();
     const data = financeCategoryPayloadSchema.parse(body);
 
+    // Cek duplikat hanya pada kategori milik tenant ini atau kategori bersama (storeId NULL)
     const existing = await prisma.financeCategory.findFirst({
       where: {
         name: data.name,
         direction: data.direction,
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
       },
     });
 
@@ -91,11 +106,15 @@ export async function POST(request: NextRequest) {
     let category;
     let action: "FINANCE_CATEGORY_CREATED" | "FINANCE_CATEGORY_UPDATED";
 
-    if (existing) {
+    if (existing && existing.storeId === scope.storeId) {
       category = await prisma.financeCategory.update({
         where: { id: existing.id },
         data: { isActive: true, name: data.name, direction: data.direction },
       });
+      action = "FINANCE_CATEGORY_UPDATED";
+    } else if (existing) {
+      // Kategori default bersama (storeId NULL) tidak boleh diubah tenant → pakai apa adanya
+      category = existing;
       action = "FINANCE_CATEGORY_UPDATED";
     } else {
       category = await prisma.financeCategory.create({
@@ -104,6 +123,7 @@ export async function POST(request: NextRequest) {
           direction: data.direction,
           isSystem: false,
           isActive: true,
+          storeId: scope.storeId,
         },
       });
       action = "FINANCE_CATEGORY_CREATED";

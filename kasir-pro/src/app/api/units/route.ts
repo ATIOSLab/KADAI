@@ -4,7 +4,8 @@ import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createUnitSchema } from "@/lib/validators/unit";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
-import { getSessionUserFromRequest } from "@/lib/session";
+import { getSessionUserFromRequest, getServerSessionUser } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 function normalizeUnitName(name: string) {
   return name.trim().toLowerCase();
@@ -12,8 +13,21 @@ function normalizeUnitName(name: string) {
 
 export async function GET() {
   try {
+    const sessionUser = await getServerSessionUser();
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const units = await prisma.unit.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
+      },
       orderBy: { name: "asc" },
       select: {
         id: true,
@@ -39,12 +53,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = createUnitSchema.parse(body);
     const normalizedName = normalizeUnitName(data.name);
 
-    const existingUnit = await prisma.unit.findUnique({
-      where: { normalizedName },
+    // Satuan dilihat per-tenant: baris milik tenant + baris bawaan platform (storeId NULL).
+    const existingUnit = await prisma.unit.findFirst({
+      where: {
+        normalizedName,
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
+      },
       select: {
         id: true,
         name: true,
@@ -60,6 +83,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: data.name.trim(),
         normalizedName,
+        storeId: scope.storeId,
       },
       select: {
         id: true,

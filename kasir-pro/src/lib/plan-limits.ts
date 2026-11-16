@@ -113,8 +113,9 @@ export async function checkProductLimit(
     return { allowed: true };
   }
 
+  // Kuota dihitung per tenant (produk milik store ini saja); row demo/global tidak dihitung
   const count = await prisma.product.count({
-    where: { isDemo: false }, // row demo tidak dihitung — kuota untuk produk asli
+    where: { isDemo: false, ...(storeId ? { storeId } : {}) },
   });
   if (count + additional > limits.maxProducts) {
     return {

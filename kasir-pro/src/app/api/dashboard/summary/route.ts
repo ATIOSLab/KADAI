@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDashboardOverview } from "@/lib/dashboard";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // GET /api/dashboard/summary
 export async function GET(request: NextRequest) {
@@ -18,7 +19,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const overview = await getDashboardOverview();
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    const overview = await getDashboardOverview({ storeId: scope.storeId });
     return NextResponse.json({
       data: overview.summary,
     });

@@ -4,22 +4,28 @@ import { logActivity } from "@/lib/activity-logger";
 import { assertFinanceAccess } from "@/lib/finance";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import { financeCategoryPayloadSchema } from "@/lib/validators/finance";
 
 function getFinanceForbiddenResponse(message = "Anda tidak memiliki akses ke laporan keuangan") {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
-async function getEditableCategory(id: string) {
-  const category = await prisma.financeCategory.findUnique({
-    where: { id },
+async function getEditableCategory(id: string, storeId: string) {
+  const category = await prisma.financeCategory.findFirst({
+    where: {
+      id,
+      // Hanya kategori milik tenant ini atau kategori bersama (storeId NULL) yang bisa dilihat
+      OR: [{ storeId }, { storeId: null }],
+    },
   });
 
   if (!category) {
     return { error: "Kategori keuangan tidak ditemukan", status: 404 as const };
   }
 
-  if (category.isSystem) {
+  // Kategori sistem/default bersama (storeId NULL) tidak boleh diubah tenant
+  if (category.isSystem || category.storeId === null) {
     return {
       error: "Kategori sistem tidak dapat diubah",
       status: 403 as const,
@@ -46,8 +52,13 @@ export async function PATCH(
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const editable = await getEditableCategory(id);
+    const editable = await getEditableCategory(id, scope.storeId);
     if ("error" in editable) {
       return NextResponse.json(
         { error: editable.error },
@@ -63,6 +74,7 @@ export async function PATCH(
         id: { not: id },
         name: data.name,
         direction: data.direction,
+        OR: [{ storeId: scope.storeId }, { storeId: null }],
       },
     });
 
@@ -125,8 +137,13 @@ export async function DELETE(
       return getFinanceForbiddenResponse();
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { id } = await params;
-    const editable = await getEditableCategory(id);
+    const editable = await getEditableCategory(id, scope.storeId);
     if ("error" in editable) {
       return NextResponse.json(
         { error: editable.error },

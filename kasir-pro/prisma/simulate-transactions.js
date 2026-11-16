@@ -5,19 +5,30 @@ const prisma = new PrismaClient();
 async function simulateTransactions() {
   console.log("=== Mensimulasikan Transaksi Penjualan Riil untuk Klaster Demo ===");
 
-  const outlet = await prisma.outlet.findFirst({ where: { isMain: true } });
+  // Simulasi HARUS berada dalam satu tenant demo agar tidak mencampur katalog lintas tenant
+  const tenant = await prisma.store.findFirst({ where: { isDemo: true } });
+  if (!tenant) {
+    console.error("Tenant demo tidak ditemukan. Jalankan seed-demo-clusters.js terlebih dahulu.");
+    return;
+  }
+
+  const outlet = await prisma.outlet.findFirst({
+    where: { isMain: true, storeId: tenant.id },
+  });
   if (!outlet) {
-    console.error("Outlet utama tidak ditemukan.");
+    console.error("Outlet utama tenant demo tidak ditemukan.");
     return;
   }
 
-  const cashier = await prisma.user.findFirst({ where: { role: "ADMIN" } });
+  const cashier = await prisma.user.findFirst({
+    where: { role: "ADMIN", storeId: tenant.id },
+  });
   if (!cashier) {
-    console.error("User admin/kasir tidak ditemukan.");
+    console.error("User admin/kasir tenant demo tidak ditemukan.");
     return;
   }
 
-  const products = await prisma.product.findMany({ take: 6 });
+  const products = await prisma.product.findMany({ where: { storeId: tenant.id }, take: 6 });
   if (products.length === 0) {
     console.error("Produk belum terisi di database.");
     return;

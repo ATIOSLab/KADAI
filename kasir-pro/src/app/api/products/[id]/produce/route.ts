@@ -5,6 +5,7 @@ import { hasRequiredRole, INVENTORY_ROLES } from "@/lib/rbac";
 import { produceBatchSchema } from "@/lib/validators/produce";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 // POST /api/products/[id]/produce
 export async function POST(
@@ -24,6 +25,11 @@ export async function POST(
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { id: productId } = await params;
     const body = await req.json();
     const validated = produceBatchSchema.parse(body);
@@ -31,8 +37,8 @@ export async function POST(
     const qty = validated.quantityToProduce;
 
     // 1. Fetch product, recipes, and existing batches to inherit selling price
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
+    const product = await prisma.product.findFirst({
+      where: { id: productId, storeId: scope.storeId },
       include: {
         batches: {
           orderBy: { createdAt: "desc" },
@@ -66,11 +72,19 @@ export async function POST(
 
     const fallbackSellingPrice = product.batches[0]?.sellingPrice || new Decimal(0);
 
-    // 2. Resolve target outlet
+    // 2. Resolve target outlet (wajib milik tenant pemanggil)
     let effectiveOutletId = validated.outletId || null;
-    if (!effectiveOutletId) {
+    if (effectiveOutletId) {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: effectiveOutletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return jsonError("Cabang bukan milik tenant Anda", 403);
+      }
+    } else {
       const defaultOutlet = await prisma.outlet.findFirst({
-        where: { isMain: true },
+        where: { isMain: true, storeId: scope.storeId },
       });
       effectiveOutletId = defaultOutlet?.id || null;
     }
@@ -131,6 +145,7 @@ export async function POST(
               reason: "OTHER",
               notes: `Konsumsi bahan baku untuk produksi ${qty} unit ${product.name} (Batch: ${finalBatchNumber})`,
               userId: sessionUser.id,
+              storeId: scope.storeId,
             },
           });
 
@@ -162,6 +177,7 @@ export async function POST(
           reason: "OTHER",
           notes: `Hasil produksi batch ${finalBatchNumber} (${qty} unit)`,
           userId: sessionUser.id,
+          storeId: scope.storeId,
         },
       });
 

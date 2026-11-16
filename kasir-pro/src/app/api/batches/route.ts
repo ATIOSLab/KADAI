@@ -5,6 +5,7 @@ import { createBatchSchema } from "@/lib/validators/batch";
 import { generateBatchNumber } from "@/lib/utils";
 import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
   getSystemFinanceCategoryId,
@@ -27,12 +28,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = createBatchSchema.parse(body);
 
-    // Check product exists
-    const product = await prisma.product.findUnique({
-      where: { id: data.productId },
+    // Check product exists dan milik tenant pemanggil
+    const product = await prisma.product.findFirst({
+      where: { id: data.productId, storeId: scope.storeId },
       select: { id: true, sku: true, name: true },
     });
 
@@ -84,6 +90,7 @@ export async function POST(request: NextRequest) {
           categoryId: restockCategoryId,
           createdByUserId: sessionUser.id,
           productBatchId: createdBatch.id,
+          storeId: scope.storeId,
         },
       });
 
@@ -120,6 +127,16 @@ export async function POST(request: NextRequest) {
 // GET /api/batches — List batches
 export async function GET(request: NextRequest) {
   try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("productId") || undefined;
     const hasRemaining = searchParams.get("hasRemaining");
@@ -127,6 +144,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     const where = {
+      product: { storeId: scope.storeId },
       ...(productId && { productId }),
       ...(hasRemaining === "true" && { remainingQty: { gt: 0 } }),
     };

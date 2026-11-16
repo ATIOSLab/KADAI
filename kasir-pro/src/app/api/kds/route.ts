@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { KDS_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { Prisma } from "@prisma/client";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,12 +19,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(req.url);
     const station = searchParams.get("station"); // KITCHEN, BAR, or null for ALL
     const outletId = searchParams.get("outletId");
 
     const whereClause: Prisma.KDSOrderWhereInput = {
       status: { in: ["QUEUED", "COOKING", "READY"] },
+      // Isolasi tenant: hanya tiket dari outlet milik tenant pemanggil
+      sale: { outlet: { storeId: scope.storeId } },
     };
 
     if (station && station !== "ALL") {
@@ -31,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (outletId && outletId !== "ALL") {
-      whereClause.sale = { outletId };
+      whereClause.sale = { outletId, outlet: { storeId: scope.storeId } };
     }
 
     const orders = await prisma.kDSOrder.findMany({
@@ -83,6 +91,11 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await req.json();
     const { id, status } = body;
 
@@ -102,6 +115,17 @@ export async function PUT(req: NextRequest) {
       updateData.readyAt = now;
     } else if (status === "SERVED") {
       updateData.servedAt = now;
+    }
+
+    const owned = await prisma.kDSOrder.findFirst({
+      where: { id, sale: { outlet: { storeId: scope.storeId } } },
+      select: { id: true },
+    });
+    if (!owned) {
+      return NextResponse.json(
+        { error: "Tiket dapur tidak ditemukan" },
+        { status: 404 }
+      );
     }
 
     const updated = await prisma.kDSOrder.update({

@@ -5,12 +5,23 @@ import { prisma } from "@/lib/prisma";
 import { createCategorySchema } from "@/lib/validators/category";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
-// GET /api/categories
-export async function GET() {
+// GET /api/categories — hanya kategori milik tenant pemanggil
+export async function GET(request: NextRequest) {
   try {
+    const sessionUser = getSessionUserFromRequest(request);
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const categories = await prisma.category.findMany({
-      where: { isActive: true },
+      where: { isActive: true, storeId: scope.storeId },
       include: { _count: { select: { products: true } } },
       orderBy: { name: "asc" },
     });
@@ -36,12 +47,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await request.json();
     const data = createCategorySchema.parse(body);
 
     const trimmedName = data.name.trim();
     const existingCategory = await prisma.category.findFirst({
       where: {
+        storeId: scope.storeId,
         name: {
           equals: trimmedName,
           mode: "insensitive",
@@ -65,6 +82,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...data,
         name: trimmedName,
+        storeId: scope.storeId,
       },
     });
 

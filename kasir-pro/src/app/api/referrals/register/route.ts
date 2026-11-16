@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/api-response";
+import { checkRateLimit } from "@/lib/security";
+import { Prisma } from "@prisma/client";
 
 const registerPartnerSchema = z.object({
   fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
@@ -15,6 +17,27 @@ const registerPartnerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Endpoint publik: batasi pendaftaran per IP agar tidak bisa dibanjiri
+    const clientKey =
+      request.headers.get("cf-connecting-ip")?.trim() ||
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "unknown";
+    const limit = checkRateLimit(
+      `referral-register:${clientKey}`,
+      5,
+      10 * 60 * 1000,
+      30 * 60 * 1000
+    );
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Terlalu banyak pendaftaran dari jaringan ini. Coba lagi dalam ${limit.retryAfterSeconds} detik.`,
+        },
+        { status: 429 }
+      );
+    }
+
     const rawBody = await request.json();
     const validated = registerPartnerSchema.parse(rawBody);
 
@@ -26,6 +49,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
+      // Nomor/email yang cocok sebagian TIDAK boleh membocorkan kode & komisi
+      // mitra lain (oracle enumerasi). Detail hanya untuk pemilik data.
+      const isSamePerson =
+        existing.phone === validated.phone &&
+        existing.email.toLowerCase() === validated.email.toLowerCase();
+
+      if (!isSamePerson) {
+        return NextResponse.json({
+          success: true,
+          isExisting: true,
+          message:
+            "Nomor atau email tersebut sudah terdaftar. Hubungi admin KADAI bila Anda mitra yang sah.",
+        });
+      }
+
       return NextResponse.json({
         success: true,
         isExisting: true,
@@ -40,24 +78,45 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate kode unik referral (REF-5 karakter alfanumerik)
-    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const referralCode = `REF-${randomSuffix}`;
+    // Kode referral 5 karakter acak berpeluang tabrakan; ulangi dengan kode baru
+    // bila constraint unik menolak (P2002 pada referralCode) alih-alih
+    // menggagalkan pendaftaran mitra.
+    const createPartner = async () => {
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const referralCode = `REF-${randomSuffix}`;
 
-    const newPartner = await prisma.referralPartner.create({
-      data: {
-        fullName: validated.fullName,
-        phone: validated.phone,
-        email: validated.email,
-        bankName: validated.bankName,
-        bankAccountNumber: validated.bankAccountNumber,
-        bankAccountName: validated.bankAccountName,
-        notes: validated.notes || null,
-        referralCode,
-        commissionRate: 20.0, // Standar komisi 20%
-        status: "ACTIVE",
-      },
-    });
+        try {
+          return await prisma.referralPartner.create({
+            data: {
+              fullName: validated.fullName,
+              phone: validated.phone,
+              email: validated.email,
+              bankName: validated.bankName,
+              bankAccountNumber: validated.bankAccountNumber,
+              bankAccountName: validated.bankAccountName,
+              notes: validated.notes || null,
+              referralCode,
+              commissionRate: 20.0, // Standar komisi 20%
+              status: "ACTIVE",
+            },
+          });
+        } catch (error) {
+          const isCodeCollision =
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            error.code === "P2002" &&
+            JSON.stringify(error.meta?.target ?? "").includes("referralCode");
+
+          if (!isCodeCollision || attempt === 4) {
+            throw error;
+          }
+        }
+      }
+
+      throw new Error("Gagal membuat kode referral unik");
+    };
+
+    const newPartner = await createPartner();
 
     return NextResponse.json(
       {

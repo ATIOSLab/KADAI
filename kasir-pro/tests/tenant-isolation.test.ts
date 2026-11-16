@@ -451,3 +451,20 @@ test("tanggal default di UI memakai kalender lokal, bukan UTC", () => {
   assert.match(financePage, /entryDate: toLocalIsoDate\(\),/);
   assert.match(financePage, /entryDate: toLocalIsoDate\(new Date\(entry\.entryDate\)\)/);
 });
+
+test("pendaftaran mitra referral tidak membocorkan data mitra lain", () => {
+  const register = route("referrals/register");
+
+  assert.match(register, /checkRateLimit\(/, "endpoint publik wajib dibatasi per IP");
+  assert.match(
+    register,
+    /const isSamePerson =\s*existing\.phone === validated\.phone &&\s*existing\.email\.toLowerCase\(\) === validated\.email\.toLowerCase\(\)/,
+    "detail mitra hanya untuk pemilik data (nomor DAN email cocok)"
+  );
+  assert.match(register, /isCodeCollision/, "tabrakan kode referral harus diulang, bukan gagal");
+  assert.doesNotMatch(
+    register,
+    /if \(existing\) \{\s*return NextResponse\.json\(\{\s*success: true,\s*isExisting: true,\s*data:/,
+    "jangan langsung membalas data lengkap saat duplikat"
+  );
+});

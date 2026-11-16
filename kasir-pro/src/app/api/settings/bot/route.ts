@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { hasRequiredRole, SUPER_ADMIN_ROLES } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import {
   buildBotSecretUpdate,
@@ -17,9 +17,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+    // Bot PLATFORM (satu baris global + token/API key platform) → khusus SUPER_ADMIN.
+    if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
       return NextResponse.json(
-        { error: "Hanya admin yang dapat mengelola bot" },
+        { error: "Pengaturan bot dikelola di level platform (Super Admin)" },
         { status: 403 }
       );
     }
@@ -42,9 +43,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
+    // Bot PLATFORM (satu baris global + token/API key platform) → khusus SUPER_ADMIN.
+    if (!hasRequiredRole(sessionUser.role, SUPER_ADMIN_ROLES)) {
       return NextResponse.json(
-        { error: "Hanya admin yang dapat mengelola bot" },
+        { error: "Pengaturan bot dikelola di level platform (Super Admin)" },
         { status: 403 }
       );
     }

@@ -69,13 +69,25 @@ export function handleApiError(
     logger.error(`Database error at ${context} [${error.code}]`, error, context);
 
     if (error.code === "P2002") {
-      const target = (error.meta?.target as string[])?.join(", ") || "field";
-      return jsonError(
-        `Data dengan ${target} tersebut sudah digunakan`,
-        409,
-        undefined,
-        "CONFLICT"
-      );
+      // Nama kolom internal (mis. `storeId`) tidak boleh bocor ke pesan pengguna.
+      const FIELD_LABELS: Record<string, string> = {
+        phone: "Nomor telepon",
+        sku: "SKU",
+        barcode: "Barcode",
+        name: "Nama",
+        email: "Email",
+        code: "Kode",
+        normalizedName: "Nama satuan",
+        jobCode: "Kode pekerjaan",
+      };
+      const rawFields = ((error.meta?.target as string[]) ?? []).filter(Boolean);
+      const labels = [
+        ...new Set(
+          rawFields.filter((field) => field !== "storeId").map((field) => FIELD_LABELS[field] ?? field)
+        ),
+      ];
+      const label = labels.length > 0 ? labels.join(" & ") : "Data";
+      return jsonError(`${label} tersebut sudah digunakan`, 409, undefined, "CONFLICT");
     }
 
     if (error.code === "P2025") {

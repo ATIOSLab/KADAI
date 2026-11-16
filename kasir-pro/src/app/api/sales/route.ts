@@ -125,6 +125,28 @@ function pruneSalesIdempotency() {
 }
 
 // POST /api/sales — Create sale with FIFO deduction
+// Nomor invoice dihitung dari jumlah penjualan tenant pada hari itu. Bila dua kasir
+// checkout bersamaan, keduanya bisa mendapat nomor sama → P2002 → ulangi transaksi
+// (hitungan di dalam transaksi ikut maju, jadi percobaan kedua pasti mendapat nomor baru).
+const MAX_INVOICE_ATTEMPTS = 3;
+
+async function createSaleWithRetry<T>(run: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await run();
+    } catch (error) {
+      const isInvoiceCollision =
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002" &&
+        (((error.meta?.target as string[]) ?? []).includes("invoiceNumber") ||
+          ((error.meta?.target as string[]) ?? []).includes("storeId_invoiceNumber"));
+      if (!isInvoiceCollision || attempt >= MAX_INVOICE_ATTEMPTS) {
+        throw error;
+      }
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
@@ -182,8 +204,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Batas transaksi terlampaui" }, { status: 400 });
     }
 
-    // Process sale in a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    // Process sale in a transaction.
+    // Nomor invoice unik PER TENANT (storeId + invoiceNumber); retry menutup balapan
+    // dua kasir yang checkout pada detik yang sama (Serializable + P2002).
+    const result = await createSaleWithRetry(() =>
+      prisma.$transaction(async (tx) => {
       // Resolve effective outlet, costing method, and kitchen workflow
       let effectiveOutletId = data.outletId || null;
       if (!effectiveOutletId) {
@@ -385,6 +410,7 @@ export async function POST(request: NextRequest) {
       const sale = await tx.sale.create({
         data: {
           invoiceNumber,
+          storeId: scope.storeId,
           orderType: data.orderType || "DINE_IN",
           outletId: effectiveOutletId,
           tableId: data.tableId || null,
@@ -549,7 +575,8 @@ export async function POST(request: NextRequest) {
       return sale;
     }, {
       isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-    });
+    })
+    );
 
     await logActivity({
       userId: sessionUser.id,
@@ -585,12 +612,22 @@ export async function POST(request: NextRequest) {
       message.includes("Stok tidak cukup") || message.includes("Kurang");
     const isNotFound = message.includes("tidak ditemukan");
     const isUnavailable = message === "Produk tidak tersedia";
-    const status = isStockError ? 400 : isNotFound ? 404 : isUnavailable ? 400 : 500;
+    const isConflict =
+      error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+    const status = isStockError
+      ? 400
+      : isNotFound
+        ? 404
+        : isUnavailable || isConflict
+          ? 400
+          : 500;
     const clientMessage = isStockError
       ? "Stok tidak mencukupi"
-      : status === 500
-        ? "Gagal membuat transaksi"
-        : message;
+      : isConflict
+        ? "Nomor transaksi bentrok, silakan ulangi"
+        : status === 500
+          ? "Gagal membuat transaksi"
+          : message;
     return NextResponse.json({ error: clientMessage }, { status });
   }
 }

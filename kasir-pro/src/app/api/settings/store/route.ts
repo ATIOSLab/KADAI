@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 const storeUpdateSchema = z.object({
   name: z.string().min(1, "Nama toko wajib diisi").optional(),
@@ -51,18 +52,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let store = await prisma.store.findFirst();
-    if (!store) {
-      store = await prisma.store.create({
-        data: {
-          name: "Toko Saya",
-          taxStatus: "NON_PKP",
-          legalEntityType: "PERORANGAN",
-          taxType: "NONE",
-          taxRate: 0,
-        },
-      });
+    // Lingkup tenant: hanya store milik tenant pemanggil (SUPER_ADMIN ditolak 403).
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
+
+    const store = await prisma.store.findUnique({
+      where: { id: scope.storeId },
+    });
+    if (!store) {
+      return NextResponse.json({ error: "Toko tidak ditemukan" }, { status: 404 });
+    }
+
     return NextResponse.json({ data: store });
   } catch (error) {
     console.error("GET /api/settings/store error:", error);
@@ -83,6 +85,12 @@ export async function PUT(request: NextRequest) {
         { error: "Hanya admin yang dapat mengubah pengaturan toko" },
         { status: 403 }
       );
+    }
+
+    // Lingkup tenant: hanya store milik tenant pemanggil (SUPER_ADMIN ditolak 403).
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
     const rawBody = await request.json();
@@ -110,21 +118,18 @@ export async function PUT(request: NextRequest) {
       ...(validated.costingMethod !== undefined && { costingMethod: validated.costingMethod }),
     };
 
-    let store = await prisma.store.findFirst();
-
-    if (store) {
-      store = await prisma.store.update({
-        where: { id: store.id },
-        data: updateData,
-      });
-    } else {
-      store = await prisma.store.create({
-        data: {
-          name: validated.name || "Toko Saya",
-          ...updateData,
-        },
-      });
+    const existingStore = await prisma.store.findUnique({
+      where: { id: scope.storeId },
+      select: { id: true },
+    });
+    if (!existingStore) {
+      return NextResponse.json({ error: "Toko tidak ditemukan" }, { status: 404 });
     }
+
+    const store = await prisma.store.update({
+      where: { id: scope.storeId },
+      data: updateData,
+    });
 
     return NextResponse.json({ success: true, data: store });
   } catch (error) {

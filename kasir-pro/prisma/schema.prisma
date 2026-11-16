@@ -310,6 +310,7 @@ model Store {
   financeCategories FinanceCategory[]
   financeEntries    FinanceEntry[]
   stockAdjustments  StockAdjustment[]
+  sales             Sale[]
 
   @@map("stores")
 }
@@ -605,10 +606,12 @@ model RestaurantTable {
 
 model Sale {
   id             String           @id @default(cuid())
-  invoiceNumber  String           @unique
+  invoiceNumber  String
   orderType      OrderType        @default(DINE_IN)
   outletId       String?
   outlet         Outlet?          @relation(fields: [outletId], references: [id])
+  storeId        String?
+  store          Store?           @relation(fields: [storeId], references: [id], onDelete: SetNull)
   tableId        String?
   table          RestaurantTable? @relation(fields: [tableId], references: [id])
   subtotal       Decimal          @db.Decimal(15, 2)
@@ -639,8 +642,10 @@ model Sale {
   kdsOrders      KDSOrder[]
   laundryJob     LaundryJobOrder?
 
+  @@unique([storeId, invoiceNumber])
   @@index([cashierId])
   @@index([outletId])
+  @@index([storeId])
   @@index([createdAt])
   @@index([invoiceNumber])
   @@map("sales")

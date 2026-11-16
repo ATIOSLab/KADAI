@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { LaundryStatus, JobPaymentStatus, PaymentType } from "@prisma/client";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,11 +11,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") as LaundryStatus | null;
     const search = searchParams.get("search");
 
-    const where: any = {};
+    // Scope tenant lewat relasi: LaundryJobOrder -> Outlet -> Store
+    const where: any = { outlet: { storeId: scope.storeId } };
     if (status) {
       where.status = status;
     }
@@ -53,6 +61,12 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
     const body = await req.json();
     const { id, status, rackLocation, pickupPaymentMethod, pickupPaymentRef } = body;
 
@@ -60,8 +74,9 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Job ID diperlukan" }, { status: 400 });
     }
 
-    const existing = await prisma.laundryJobOrder.findUnique({
-      where: { id },
+    // Guard kepemilikan: job hanya boleh disentuh bila outlet-nya milik tenant pemanggil.
+    const existing = await prisma.laundryJobOrder.findFirst({
+      where: { id, outlet: { storeId: scope.storeId } },
     });
 
     if (!existing) {

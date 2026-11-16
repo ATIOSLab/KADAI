@@ -1,54 +1,104 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
+
+// Kredensial pelacakan:
+// - `token`: token QR acak (trackingToken) — tidak bisa ditebak.
+// - `code` : nomor resi (jobCode) — HANYA valid bila disertai `phone`/`customerPhone`.
+// Batas panjang kredensial mencegah abuse/enumerasi massal.
+const MAX_CREDENTIAL_LENGTH = 64;
+const MIN_PHONE_DIGITS = 8;
+
+const JOB_INCLUDE = {
+  outlet: {
+    select: {
+      name: true,
+      address: true,
+      phone: true,
+    },
+  },
+  sale: {
+    select: {
+      invoiceNumber: true,
+      createdAt: true,
+      items: {
+        select: {
+          quantity: true,
+          unitPrice: true,
+          totalPrice: true,
+          product: {
+            select: {
+              name: true,
+              unit: true,
+            },
+          },
+        },
+      },
+    },
+  },
+} satisfies Prisma.LaundryJobOrderInclude;
+
+type TrackedJob = Prisma.LaundryJobOrderGetPayload<{ include: typeof JOB_INCLUDE }>;
+
+// Normalisasi nomor HP: hanya digit, prefix 62 -> 0, agar toleran format.
+function normalizePhone(value: string | null | undefined): string {
+  const digits = (value ?? "").replace(/\D/g, "");
+  if (digits.startsWith("62")) return "0" + digits.slice(2);
+  return digits;
+}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const token = searchParams.get("token") || searchParams.get("code");
+    const credential = (searchParams.get("token") || searchParams.get("code") || "").trim();
+    const phone = (searchParams.get("phone") || searchParams.get("customerPhone") || "").trim();
 
-    if (!token) {
+    if (!credential) {
       return NextResponse.json(
         { error: "Token pelacakan atau nomor resi diperlukan" },
         { status: 400 }
       );
     }
 
-    const job = await prisma.laundryJobOrder.findFirst({
-      where: {
-        OR: [
-          { trackingToken: token },
-          { jobCode: token.toUpperCase() },
-        ],
-      },
-      include: {
-        outlet: {
-          select: {
-            name: true,
-            address: true,
-            phone: true,
-          },
+    if (credential.length > MAX_CREDENTIAL_LENGTH || phone.length > MAX_CREDENTIAL_LENGTH) {
+      return NextResponse.json(
+        { error: "Kredensial pelacakan tidak valid" },
+        { status: 400 }
+      );
+    }
+
+    let job: TrackedJob | null = null;
+
+    if (phone) {
+      // Jalur nomor resi: wajib pasangan resi + nomor HP pemesan.
+      const expectedPhone = normalizePhone(phone);
+      if (expectedPhone.length < MIN_PHONE_DIGITS) {
+        return NextResponse.json(
+          { error: "Nomor HP pelacakan tidak valid" },
+          { status: 400 }
+        );
+      }
+
+      const candidate = await prisma.laundryJobOrder.findFirst({
+        where: {
+          OR: [{ jobCode: credential.toUpperCase() }, { trackingToken: credential }],
         },
-        sale: {
-          select: {
-            invoiceNumber: true,
-            createdAt: true,
-            items: {
-              select: {
-                quantity: true,
-                unitPrice: true,
-                totalPrice: true,
-                product: {
-                  select: {
-                    name: true,
-                    unit: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
+        include: JOB_INCLUDE,
+      });
+
+      // Nomor HP dibandingkan setelah normalisasi. Resi ada tapi HP tidak cocok
+      // menghasilkan 404 identik dengan resi tidak ada, sehingga endpoint tidak
+      // jadi oracle untuk memetakan resi tenant lain.
+      if (candidate && normalizePhone(candidate.customerPhone) === expectedPhone) {
+        job = candidate;
+      }
+    } else {
+      // Jalur token QR acak: kredensial rahasia tunggal.
+      job = await prisma.laundryJobOrder.findFirst({
+        where: { trackingToken: credential },
+        include: JOB_INCLUDE,
+      });
+    }
 
     if (!job) {
       return NextResponse.json(

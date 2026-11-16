@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const cartItemSchema = z.object({
-  productId: z.string().min(1),
-  productName: z.string(),
-  quantity: z.number().int().min(1),
-  unitPrice: z.number().positive(),
-  discountAmount: z.number().min(0).default(0),
+  productId: z.string().min(1, "Produk wajib dipilih"),
+  productName: z.string().min(1, "Nama produk wajib diisi"),
+  quantity: z.number().int("Jumlah harus bilangan bulat").min(1, "Jumlah minimal 1 unit"),
+  unitPrice: z.number("Harga satuan harus berupa angka").positive("Harga satuan harus lebih dari 0"),
+  discountAmount: z.number("Diskon harus berupa angka").min(0, "Diskon tidak boleh negatif").default(0),
   selectedBatchId: z.string().optional().nullable(),
 });
 

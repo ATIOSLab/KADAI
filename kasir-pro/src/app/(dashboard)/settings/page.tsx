@@ -128,6 +128,9 @@ export default function SettingsPage() {
   });
   const [botChats, setBotChats] = useState<TelegramChatBindingData[]>([]);
 
+  // Peran pengguna saat ini — panel bot adalah konfigurasi platform (khusus Super Admin)
+  const [currentRole, setCurrentRole] = useState<string | null>(null);
+
   // Users state
   const [users, setUsers] = useState<UserData[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -239,10 +242,21 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    queueMicrotask(() => {
+    queueMicrotask(async () => {
       void fetchStore();
-      void fetchBot();
       void fetchUsers();
+      // Bot adalah konfigurasi level platform: hanya Super Admin yang boleh memuatnya
+      try {
+        const session = await apiFetch<{ data: { role: string } }>("/api/auth/session");
+        setCurrentRole(session.data.role);
+        if (session.data.role === "SUPER_ADMIN") {
+          void fetchBot();
+        } else {
+          setLoadingBot(false);
+        }
+      } catch {
+        setLoadingBot(false);
+      }
     });
   }, [fetchBot, fetchStore, fetchUsers]);
 
@@ -747,6 +761,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {currentRole === "SUPER_ADMIN" && (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1009,6 +1024,7 @@ export default function SettingsPage() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* ═══ User Management ═══ */}
       <Card>

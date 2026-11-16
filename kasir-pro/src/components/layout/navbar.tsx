@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -47,11 +47,21 @@ export function Navbar({
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { logout, isPending } = useLogout();
-  const todayLabel = new Intl.DateTimeFormat("id-ID", {
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-  }).format(new Date());
+  // Tanggal dirender hanya setelah mount: nilai yang dihitung saat render awal
+  // memakai jam server sementara klien memakai jam browser → hydration mismatch
+  // (React error #418) di SEMUA halaman ber-navbar.
+  const [todayLabel, setTodayLabel] = useState("");
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat("id-ID", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+    });
+    const tick = () => setTodayLabel(formatter.format(new Date()));
+    tick();
+    const timer = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const initials =
     currentUser?.name
       .split(" ")

@@ -4,6 +4,9 @@ import { PaymentType } from "@prisma/client";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
+import { resolveTenantScope } from "@/lib/tenant-scope";
+
+const CASHIER_SELECT = { id: true, name: true, role: true, outletId: true };
 
 // GET /api/pos/shift-summary - Get current shift sales breakdown for the cashier
 export async function GET(request: NextRequest) {
@@ -11,6 +14,12 @@ export async function GET(request: NextRequest) {
     const sessionUser = getSessionUserFromRequest(request);
     if (!sessionUser) {
       return jsonError("Unauthorized", 401);
+    }
+
+    // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
     }
 
     const { searchParams } = new URL(request.url);
@@ -23,22 +32,39 @@ export async function GET(request: NextRequest) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
-    const [sales, cashierUser, store] = await Promise.all([
+    const [sales, scopedCashier, store] = await Promise.all([
+      // Semua agregasi shift dibatasi ke tenant pemanggil (sale.outlet.storeId)
       prisma.sale.findMany({
         where: {
           cashierId: targetCashierId,
           createdAt: { gte: todayStart },
+          outlet: { storeId: scope.storeId },
         },
         orderBy: { createdAt: "asc" },
       }),
-      prisma.user.findUnique({
-        where: { id: targetCashierId },
-        select: { id: true, name: true, role: true, outletId: true },
+      // Kasir yang dilihat wajib anggota tenant pemanggil
+      prisma.user.findFirst({
+        where: { id: targetCashierId, storeId: scope.storeId },
+        select: CASHIER_SELECT,
       }),
-      prisma.store.findFirst({
+      // Store mengikuti tenant pemanggil, bukan "store pertama di DB"
+      prisma.store.findUnique({
+        where: { id: scope.storeId },
         select: { name: true, address: true, phone: true },
       }),
     ]);
+
+    // Fallback aman: hanya untuk diri sendiri (tidak pernah membuka data tenant lain)
+    let cashierUser = scopedCashier;
+    if (!cashierUser && targetCashierId === sessionUser.id) {
+      cashierUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: CASHIER_SELECT,
+      });
+    }
+    if (!cashierUser) {
+      return jsonError("Kasir tidak ditemukan pada tenant Anda", 404);
+    }
 
     const activeSales = sales.filter((s) => !s.isVoided);
     const voidedSales = sales.filter((s) => s.isVoided);
@@ -99,6 +125,12 @@ export async function POST(request: NextRequest) {
       return jsonError("Unauthorized", 401);
     }
 
+    // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await request.json();
     const { startingCash, actualCash, notes } = body;
 
@@ -106,7 +138,7 @@ export async function POST(request: NextRequest) {
       return jsonError("Nilai modal awal dan fisik kas harus berupa angka", 400);
     }
 
-    // Query active sales for today
+    // Query active sales for today — dibatasi ke tenant pemanggil
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
@@ -115,6 +147,7 @@ export async function POST(request: NextRequest) {
         cashierId: sessionUser.id,
         createdAt: { gte: todayStart },
         isVoided: false,
+        outlet: { storeId: scope.storeId },
       },
     });
 

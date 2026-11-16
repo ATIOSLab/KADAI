@@ -47,9 +47,11 @@ export async function POST(request: NextRequest) {
     }
 
     const batch = await prisma.$transaction(async (tx) => {
+      // `batchNumber` = BATCH-<SKU>-<TANGGAL>-<urut> dan indeksnya unik GLOBAL,
+      // sementara SKU hanya unik per tenant. Karena itu urutan dihitung global:
+      // dua tenant dengan SKU sama tidak lagi saling menabrak (P2002).
       const todayBatchCount = await tx.productBatch.count({
         where: {
-          productId: data.productId,
           createdAt: {
             gte: new Date(new Date().setHours(0, 0, 0, 0)),
           },

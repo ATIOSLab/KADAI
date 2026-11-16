@@ -4,6 +4,7 @@ import { getServerSessionUser } from "@/lib/session";
 import { POS_ROLES, ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createTableSchema, updateTableSchema } from "@/lib/validators/table";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
+import { resolveTenantScope } from "@/lib/tenant-scope";
 import crypto from "crypto";
 
 // GET /api/tables
@@ -14,11 +15,27 @@ export async function GET(req: NextRequest) {
       return jsonError("Unauthorized", 401);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { searchParams } = new URL(req.url);
     const outletId = searchParams.get("outletId");
 
+    if (outletId && outletId !== "ALL") {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: outletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
+      }
+    }
+
     const tables = await prisma.restaurantTable.findMany({
       where: {
+        outlet: { storeId: scope.storeId },
         ...(outletId && outletId !== "ALL" ? { outletId } : {}),
       },
       orderBy: { tableNo: "asc" },
@@ -43,19 +60,35 @@ export async function POST(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = createTableSchema.parse(body);
 
     let effectiveOutletId = validated.outletId || null;
     if (!effectiveOutletId) {
-      const defaultOutlet = await prisma.outlet.findFirst({ where: { isMain: true } });
+      const defaultOutlet = await prisma.outlet.findFirst({
+        where: { isMain: true, storeId: scope.storeId },
+      });
       effectiveOutletId = defaultOutlet?.id || null;
+    } else {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: effectiveOutletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
+      }
     }
 
     const existing = await prisma.restaurantTable.findFirst({
       where: {
         tableNo: validated.tableNo,
         outletId: effectiveOutletId,
+        ...(effectiveOutletId ? { outlet: { storeId: scope.storeId } } : {}),
       },
     });
 
@@ -95,8 +128,31 @@ export async function PUT(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const body = await req.json();
     const validated = updateTableSchema.parse(body);
+
+    const owned = await prisma.restaurantTable.findFirst({
+      where: { id: validated.id, outlet: { storeId: scope.storeId } },
+      select: { id: true },
+    });
+    if (!owned) {
+      return jsonError("Meja tidak ditemukan pada tenant Anda", 404);
+    }
+
+    if (validated.outletId) {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: validated.outletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
+      }
+    }
 
     const updated = await prisma.restaurantTable.update({
       where: { id: validated.id },
@@ -123,11 +179,24 @@ export async function DELETE(req: NextRequest) {
       return jsonError("Forbidden", 403);
     }
 
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return jsonError("ID meja wajib disertakan", 400);
+    }
+
+    const owned = await prisma.restaurantTable.findFirst({
+      where: { id, outlet: { storeId: scope.storeId } },
+      select: { id: true },
+    });
+    if (!owned) {
+      return jsonError("Meja tidak ditemukan pada tenant Anda", 404);
     }
 
     await prisma.restaurantTable.delete({

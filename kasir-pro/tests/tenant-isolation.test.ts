@@ -423,3 +423,31 @@ test("produksi batch mewarisi harga jual nyata & menolak bahan kurang sebagai 40
   assert.match(produce, /formatInTimeZone\(new Date\(\), timezone, "yyyyMMdd"\)/);
   assert.doesNotMatch(produce, /new Date\(\)\.toISOString\(\)\.slice\(0, 10\)/);
 });
+
+test("tanggal default di UI memakai kalender lokal, bukan UTC", () => {
+  const financePage = read("src/app/(dashboard)/finance/page.tsx");
+  const salesPage = read("src/app/(dashboard)/sales/page.tsx");
+  const businessDay = read("src/lib/business-day.ts");
+
+  assert.match(
+    businessDay,
+    /export function toLocalIsoDate\(/,
+    "helper tanggal kalender lokal harus tersedia"
+  );
+
+  for (const [name, page] of [
+    ["finance", financePage],
+    ["sales", salesPage],
+  ] as const) {
+    assert.doesNotMatch(
+      page,
+      /toISOString\(\)\.slice\(0, ?10\)/,
+      `${name}: tanggal default tidak boleh memakai UTC`
+    );
+    assert.match(page, /import \{ toLocalIsoDate \} from "@\/lib\/business-day"/);
+  }
+
+  // Default tanggal entri baru & form edit buku kas memakai tanggal lokal
+  assert.match(financePage, /entryDate: toLocalIsoDate\(\),/);
+  assert.match(financePage, /entryDate: toLocalIsoDate\(new Date\(entry\.entryDate\)\)/);
+});

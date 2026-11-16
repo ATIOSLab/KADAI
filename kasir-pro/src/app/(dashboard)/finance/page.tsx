@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { KADAI_CHART_THEME } from "@/lib/chart-theme";
+import { toLocalIsoDate } from "@/lib/business-day";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -93,8 +94,10 @@ function getCurrentMonthRange() {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), 1);
   return {
-    startDate: start.toISOString().slice(0, 10),
-    endDate: now.toISOString().slice(0, 10),
+    // Tanggal default = kalender lokal kasir, bukan UTC (hindari rentang mundur
+    // sehari pada 00:00-07:00 WIB)
+    startDate: toLocalIsoDate(start),
+    endDate: toLocalIsoDate(now),
   };
 }
 
@@ -244,7 +247,7 @@ function getEntryFormDefaults() {
     direction: "IN" as FinanceDirection,
     categoryId: "",
     amount: "",
-    entryDate: new Date().toISOString().slice(0, 10),
+    entryDate: toLocalIsoDate(),
     title: "",
     notes: "",
   };
@@ -454,7 +457,7 @@ export default function FinancePage() {
       direction: entry.direction as FinanceDirection,
       categoryId: entry.category.id,
       amount: String(Number(entry.amount)),
-      entryDate: new Date(entry.entryDate).toISOString().slice(0, 10),
+      entryDate: toLocalIsoDate(new Date(entry.entryDate)),
       title: entry.title,
       notes: entry.notes ?? "",
     });

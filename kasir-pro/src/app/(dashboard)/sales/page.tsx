@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
+import { toLocalIsoDate } from "@/lib/business-day";
 import { EmptyState } from "@/components/shared/empty-state";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { Card } from "@/components/ui/card";
@@ -95,17 +96,18 @@ export default function SalesPage() {
 
         if (dateFilter !== "ALL") {
           const now = new Date();
-          const todayStr = now.toISOString().slice(0, 10);
+          // Tanggal kalender lokal, bukan UTC (lihat toLocalIsoDate)
+          const todayStr = toLocalIsoDate(now);
           if (dateFilter === "TODAY") {
             params.set("startDate", todayStr);
             params.set("endDate", todayStr);
           } else if (dateFilter === "WEEK") {
             const past7 = new Date(now.getTime() - 7 * 86400000);
-            params.set("startDate", past7.toISOString().slice(0, 10));
+            params.set("startDate", toLocalIsoDate(past7));
             params.set("endDate", todayStr);
           } else if (dateFilter === "MONTH") {
             const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            params.set("startDate", startMonth.toISOString().slice(0, 10));
+            params.set("startDate", toLocalIsoDate(startMonth));
             params.set("endDate", todayStr);
           }
         }
@@ -160,7 +162,7 @@ export default function SalesPage() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `kadai-sales-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `kadai-sales-${toLocalIsoDate()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

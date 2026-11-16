@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Bot,
   CircleDollarSign,
   LayoutDashboard,
   Package,
@@ -236,6 +237,14 @@ export const navigationSections: NavigationSection[] = [
         roles: ["SUPER_ADMIN"],
       },
       {
+        href: "/platform/bot",
+        label: "Pengaturan Bot Platform",
+        shortLabel: "Bot",
+        description: "Zona waktu bisnis, jam tutup buku, kunci API, dan token bot Telegram platform.",
+        icon: Bot,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
         href: "/demo-requests",
         label: "Permohonan Demo (Leads)",
         shortLabel: "Demo Leads",
@@ -406,6 +415,12 @@ const pageMetaMap: Record<string, PageMeta> = {
     description: "Kelola akun pemilik tenant: buat akun baru, reset kata sandi, aktif/nonaktifkan, dan lihat tenant yang dikelola.",
     section: "Platform KADAI",
     eyebrow: "Manajemen Owner",
+  },
+  "/platform/bot": {
+    title: "Pengaturan Bot Platform",
+    description: "Konfigurasi platform: zona waktu bisnis, jam tutup buku, kunci API, dan token bot Telegram.",
+    section: "Platform KADAI",
+    eyebrow: "Operator Platform",
   },
   "/platform/plans": {
     title: "Paket Langganan",

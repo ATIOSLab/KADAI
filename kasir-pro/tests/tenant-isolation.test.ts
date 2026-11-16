@@ -481,3 +481,24 @@ test("stok kurang dan void ganda menjawab 409 beserta kodenya", () => {
   assert.match(voidRoute, /SALE_ALREADY_VOIDED/);
   assert.match(voidRoute, /"Transaksi sudah di-void"[\s\S]{0,120}?\{ status: 409 \}/);
 });
+
+test("pengaturan bot platform punya halaman SUPER_ADMIN sendiri", () => {
+  const page = read("src/app/(dashboard)/platform/bot/page.tsx");
+  const settingsPage = read("src/app/(dashboard)/settings/page.tsx");
+  const rbac = read("src/lib/rbac.ts");
+  const nav = read("src/components/layout/navigation.ts");
+
+  assert.match(page, /\/api\/settings\/bot/, "halaman bot memanggil API bot");
+  assert.match(page, /PageHeader/, "halaman memakai PageHeader standar");
+  assert.doesNotMatch(
+    settingsPage,
+    /api\/settings\/bot/,
+    "panel bot tidak boleh tertinggal di /settings (halaman tenant)"
+  );
+  assert.match(
+    rbac,
+    /\{ path: "\/platform\/bot", roles: SUPER_ADMIN_ROLES \}/,
+    "/platform/bot hanya untuk SUPER_ADMIN"
+  );
+  assert.match(nav, /href: "\/platform\/bot"/, "menu platform memuat tautan bot");
+});

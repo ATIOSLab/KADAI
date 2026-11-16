@@ -45,6 +45,11 @@ export async function getTenantPlanLimits(
     select: { limits: true },
   });
   if (!plan) {
+    // Fail-open tetap dipertahankan (tenant lama tidak boleh mati), tetapi tier
+    // yang tidak punya paket adalah salah konfigurasi — jangan sampai senyap.
+    console.warn(
+      `[plan-limits] Store ${storeId} bertier "${store.tier}" tanpa SubscriptionPlan yang cocok; batas paket dilewati.`
+    );
     return null;
   }
 

@@ -47,20 +47,22 @@ export async function POST(req: NextRequest) {
       return jsonError(scope.message, scope.status);
     }
 
-    const limitCheck = await checkOutletLimit(scope.storeId);
-    if (!limitCheck.allowed) {
-      return jsonError(limitCheck.message, 403);
-    }
-
     const body = await req.json();
     const validated = createOutletSchema.parse(body);
 
-    // Dapur pusat adalah fitur paket tersendiri (bukan sekadar tipe cabang)
+    // Urutan gerbang: fitur paket dulu, baru kuota. Fitur yang tidak dijual pada
+    // paket harus menjawab "tidak tersedia", bukan "kuota cabang habis" — pesan
+    // kuota akan menyesatkan tenant yang memang tak pernah boleh punya dapur pusat.
     if (validated.outletType === "CENTRAL_KITCHEN") {
       const featureCheck = await checkFeature(scope.storeId, "centralKitchen");
       if (!featureCheck.allowed) {
         return jsonError(featureCheck.message, 403);
       }
+    }
+
+    const limitCheck = await checkOutletLimit(scope.storeId);
+    if (!limitCheck.allowed) {
+      return jsonError(limitCheck.message, 403);
     }
 
     // Check duplicate code dalam tenant

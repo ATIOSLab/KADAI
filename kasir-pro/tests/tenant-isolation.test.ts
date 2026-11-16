@@ -509,6 +509,8 @@ test("fitur paket (KDS, transfer stok, dapur pusat, SKU) benar-benar ditegakkan"
   // Hanya `false` eksplisit yang memblokir — paket lama tanpa kunci tetap jalan
   assert.match(limits, /export async function checkFeature\(/);
   assert.match(limits, /limits\[feature\] !== false/);
+  // Fail-open tidak boleh senyap: tier tanpa paket harus menulis peringatan
+  assert.match(limits, /tanpa SubscriptionPlan yang cocok/);
   assert.match(limits, /export async function checkSkuLimit\(/);
 
   const enforced: [string, RegExp][] = [

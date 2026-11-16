@@ -125,3 +125,57 @@ export async function checkProductLimit(
   }
   return { allowed: true };
 }
+
+/**
+ * Fitur paket yang dijual sebagai flag (KDS, transfer stok, dapur pusat).
+ * Semantik: hanya `false` EKSPLISIT yang memblokir — `true`, `undefined`, atau
+ * paket yang belum punya kunci tersebut tetap diizinkan (fail-open), supaya
+ * tenant lama tidak mati ketika katalog paket belum lengkap.
+ */
+export type PlanFeature = "kds" | "transferStock" | "centralKitchen";
+
+const PLAN_FEATURE_LABELS: Record<PlanFeature, string> = {
+  kds: "Kitchen Display System (KDS)",
+  transferStock: "transfer stok antar cabang",
+  centralKitchen: "dapur pusat (central kitchen)",
+};
+
+export async function checkFeature(
+  storeId: string | null | undefined,
+  feature: PlanFeature
+): Promise<LimitCheck> {
+  const limits = await getTenantPlanLimits(storeId);
+  if (!limits || limits[feature] !== false) {
+    return { allowed: true };
+  }
+
+  return {
+    allowed: false,
+    message: `Paket Anda tidak mencakup fitur ${PLAN_FEATURE_LABELS[feature]}. Upgrade paket untuk mengaktifkannya.`,
+  };
+}
+
+/**
+ * Cek kuota SKU (produk yang punya kode SKU). null / tidak ada = tanpa batas.
+ */
+export async function checkSkuLimit(
+  storeId: string | null | undefined,
+  additional = 1
+): Promise<LimitCheck> {
+  const limits = await getTenantPlanLimits(storeId);
+  if (!limits || limits.maxSku == null) {
+    return { allowed: true };
+  }
+
+  // Product.sku wajib (String non-null) → setiap produk aktif = satu SKU
+  const count = await prisma.product.count({
+    where: { storeId, isActive: true },
+  });
+  if (count + additional > limits.maxSku) {
+    return {
+      allowed: false,
+      message: `Paket Anda dibatasi maksimal ${limits.maxSku} SKU.`,
+    };
+  }
+  return { allowed: true };
+}

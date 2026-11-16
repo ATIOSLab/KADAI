@@ -5,7 +5,7 @@ import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createOutletSchema, updateOutletSchema } from "@/lib/validators/outlet";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { resolveTenantScope } from "@/lib/tenant-scope";
-import { checkOutletLimit } from "@/lib/plan-limits";
+import { checkFeature, checkOutletLimit } from "@/lib/plan-limits";
 
 // GET /api/outlets — daftar cabang milik tenant pemanggil
 export async function GET() {
@@ -54,6 +54,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const validated = createOutletSchema.parse(body);
+
+    // Dapur pusat adalah fitur paket tersendiri (bukan sekadar tipe cabang)
+    if (validated.outletType === "CENTRAL_KITCHEN") {
+      const featureCheck = await checkFeature(scope.storeId, "centralKitchen");
+      if (!featureCheck.allowed) {
+        return jsonError(featureCheck.message, 403);
+      }
+    }
 
     // Check duplicate code dalam tenant
     const existing = await prisma.outlet.findFirst({

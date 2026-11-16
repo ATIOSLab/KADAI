@@ -4,6 +4,7 @@ import { getServerSessionUser } from "@/lib/session";
 import { KDS_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { Prisma } from "@prisma/client";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { checkFeature } from "@/lib/plan-limits";
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,6 +23,12 @@ export async function GET(req: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    // KDS adalah fitur paket; paket tanpa flag ini tidak boleh membuka papan dapur
+    const featureCheck = await checkFeature(scope.storeId, "kds");
+    if (!featureCheck.allowed) {
+      return NextResponse.json({ error: featureCheck.message }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -94,6 +101,12 @@ export async function PUT(req: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    // KDS adalah fitur paket; paket tanpa flag ini tidak boleh membuka papan dapur
+    const featureCheck = await checkFeature(scope.storeId, "kds");
+    if (!featureCheck.allowed) {
+      return NextResponse.json({ error: featureCheck.message }, { status: 403 });
     }
 
     const body = await req.json();

@@ -502,3 +502,29 @@ test("pengaturan bot platform punya halaman SUPER_ADMIN sendiri", () => {
   );
   assert.match(nav, /href: "\/platform\/bot"/, "menu platform memuat tautan bot");
 });
+
+test("fitur paket (KDS, transfer stok, dapur pusat, SKU) benar-benar ditegakkan", () => {
+  const limits = read("src/lib/plan-limits.ts");
+
+  // Hanya `false` eksplisit yang memblokir — paket lama tanpa kunci tetap jalan
+  assert.match(limits, /export async function checkFeature\(/);
+  assert.match(limits, /limits\[feature\] !== false/);
+  assert.match(limits, /export async function checkSkuLimit\(/);
+
+  const enforced: [string, RegExp][] = [
+    ["src/app/api/inventory/transfers/route.ts", /checkFeature\(scope\.storeId, "transferStock"\)/],
+    ["src/app/api/outlets/route.ts", /checkFeature\(scope\.storeId, "centralKitchen"\)/],
+    ["src/app/api/kds/route.ts", /checkFeature\(scope\.storeId, "kds"\)/],
+    ["src/app/api/products/route.ts", /checkSkuLimit\(scope\.storeId\)/],
+  ];
+
+  for (const [file, pattern] of enforced) {
+    assert.match(read(file), pattern, `${file}: fitur paket harus dicek`);
+  }
+
+  // Dapur pusat hanya dicek untuk tipe outlet yang benar
+  assert.match(
+    read("src/app/api/outlets/route.ts"),
+    /validated\.outletType === "CENTRAL_KITCHEN"/
+  );
+});

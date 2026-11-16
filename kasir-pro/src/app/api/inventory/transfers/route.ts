@@ -12,6 +12,7 @@ import {
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "@prisma/client";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { checkFeature } from "@/lib/plan-limits";
 import { formatInTimeZone } from "date-fns-tz";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 
@@ -110,6 +111,12 @@ export async function POST(request: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return jsonError(scope.message, scope.status);
+    }
+
+    // Transfer stok adalah fitur paket: paket tanpa flag ini ditolak 403
+    const featureCheck = await checkFeature(scope.storeId, "transferStock");
+    if (!featureCheck.allowed) {
+      return jsonError(featureCheck.message, 403);
     }
 
     const body = await request.json();

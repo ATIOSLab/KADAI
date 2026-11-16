@@ -7,7 +7,7 @@ import { logActivity } from "@/lib/activity-logger";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
-import { checkProductLimit } from "@/lib/plan-limits";
+import { checkFeature, checkProductLimit, checkSkuLimit } from "@/lib/plan-limits";
 import { ZodError } from "zod";
 
 function normalizeUnitName(name: string) {
@@ -141,6 +141,14 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const data = createProductSchema.parse(body);
+
+    // Kuota SKU paket (null = tanpa batas) hanya dihitung untuk produk ber-SKU
+    if (data.sku) {
+      const skuCheck = await checkSkuLimit(scope.storeId);
+      if (!skuCheck.allowed) {
+        return NextResponse.json({ error: skuCheck.message }, { status: 403 });
+      }
+    }
 
     // SKU unik per tenant; barcode tetap unik global (identitas fisik barang)
     const existingProduct = await prisma.product.findFirst({

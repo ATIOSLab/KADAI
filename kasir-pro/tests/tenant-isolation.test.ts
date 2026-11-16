@@ -250,3 +250,53 @@ test("pesan kesalahan tidak membocorkan nama kolom database", () => {
   assert.match(api, /FIELD_LABELS/);
   assert.doesNotMatch(api, /Data dengan \$\{target\} tersebut sudah digunakan/);
 });
+
+// ── Regresi UAT round 3: tampilan & zona waktu ─────────────────────────────────
+
+test("dialog sukses kasir memakai nilai dari server, bukan keranjang yang kosong", () => {
+  const dialog = read("src/components/pos/checkout-dialog.tsx");
+  assert.match(
+    dialog,
+    /const settledTotal = completedSale \? Number\(completedSale\.totalAmount\) : grandTotal/,
+    "keranjang dikosongkan saat sukses -> total harus diambil dari respons server"
+  );
+  assert.match(dialog, /\{formatCurrency\(settledTotal\)\}/);
+  assert.match(dialog, /formatCurrency\(settledChange\)/);
+});
+
+test("batas hari, rentang, dan bucket grafik memakai zona waktu toko", () => {
+  const dashboard = read("src/lib/dashboard.ts");
+  assert.match(dashboard, /resolveBusinessTimezone/);
+  assert.doesNotMatch(
+    dashboard,
+    /startOfDay\(now\)/,
+    "hari 'ini' tidak boleh memakai jam server (UTC) untuk toko WIB"
+  );
+  assert.match(dashboard, /toLocalDate\(sale\.createdAt, timezone\)/, "bucket harian wajib zona bisnis");
+  assert.match(
+    dashboard,
+    /formatInTimeZone\(sale\.createdAt, timezone, "HH"\)/,
+    "grafik per jam wajib zona bisnis"
+  );
+
+  const reporting = read("src/lib/reporting.ts");
+  assert.match(
+    reporting,
+    /formatInTimeZone\(dateValue, timezone, "yyyy-MM-dd"\)/,
+    "kunci hari pada grafik laporan tidak boleh memakai jam server"
+  );
+
+  const periods = read("src/lib/dashboard-periods.ts");
+  assert.match(periods, /formatInTimeZone\(value, timezone, "yyyy-MM-dd"\)/);
+  assert.match(periods, /DEFAULT_BUSINESS_TIMEZONE/);
+
+  const reports = route("reports");
+  assert.match(reports, /resolveBusinessTimezone\(\)/);
+  assert.match(reports, /timezone,/);
+});
+
+test("zona waktu bisnis dibaca dari pengaturan platform", () => {
+  const helper = read("src/lib/business-timezone.ts");
+  assert.match(helper, /botSettings\.findFirst/);
+  assert.match(helper, /DEFAULT_BUSINESS_TIMEZONE/);
+});

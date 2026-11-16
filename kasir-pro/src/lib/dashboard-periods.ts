@@ -1,19 +1,17 @@
-import {
-  addDays,
-  endOfWeek,
-  format,
-  startOfWeek,
-  subDays,
-} from "date-fns";
+import { addDays, endOfWeek, format, startOfWeek, subDays } from "date-fns";
 import { id as indonesianLocale } from "date-fns/locale";
+import { formatInTimeZone } from "date-fns-tz";
+import { DEFAULT_BUSINESS_TIMEZONE } from "./business-day";
 
 export interface DashboardDateRange {
   startDate: string;
   endDate: string;
 }
 
-function toIsoDate(value: Date) {
-  return format(value, "yyyy-MM-dd");
+function toIsoDate(value: Date, timezone = DEFAULT_BUSINESS_TIMEZONE) {
+  // Zona waktu toko: server produksi di UTC, sehingga tanggal default rentang
+  // akan mundur satu hari untuk toko WIB pada 00:00-07:00 lokal.
+  return formatInTimeZone(value, timezone, "yyyy-MM-dd");
 }
 
 function fromIsoDate(value: string) {
@@ -36,10 +34,13 @@ export function createDateRange(startDate: string, endDate: string): DashboardDa
   return { startDate, endDate };
 }
 
-export function getDefaultDashboardRange(now = new Date()): DashboardDateRange {
+export function getDefaultDashboardRange(
+  now = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+): DashboardDateRange {
   return {
-    startDate: toIsoDate(subDays(now, 6)),
-    endDate: toIsoDate(now),
+    startDate: toIsoDate(subDays(now, 6), timezone),
+    endDate: toIsoDate(now, timezone),
   };
 }
 
@@ -54,8 +55,11 @@ export function getWeekRangeFromDate(dateValue: string): DashboardDateRange {
   };
 }
 
-export function getCurrentWeekRange(now = new Date()): DashboardDateRange {
-  return getWeekRangeFromDate(toIsoDate(now));
+export function getCurrentWeekRange(
+  now = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+): DashboardDateRange {
+  return getWeekRangeFromDate(toIsoDate(now, timezone));
 }
 
 export function getPreviousWeekRange(now = new Date()): DashboardDateRange {

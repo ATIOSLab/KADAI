@@ -394,8 +394,10 @@ export async function getReportSnapshot(params: {
   ]);
 
   const revenueMap = new Map<string, { revenue: number; profit: number; hpp: number }>();
+  // Kunci grafik diisi memakai ZONA BISNIS. format() memakai jam server (UTC di
+  // kontainer) sehingga label hari bergeser satu hari dari tanggal operasional toko.
   for (const dateValue of eachDayOfInterval({ start: weekStartDate, end: weekEndDate })) {
-    const key = format(dateValue, "yyyy-MM-dd");
+    const key = formatInTimeZone(dateValue, timezone, "yyyy-MM-dd");
     revenueMap.set(key, { revenue: 0, profit: 0, hpp: 0 });
   }
 
@@ -460,7 +462,7 @@ export async function getReportSnapshot(params: {
       },
       week: {
         startDate: params.weekDate,
-        endDate: format(weekEndDate, "yyyy-MM-dd"),
+        endDate: formatInTimeZone(weekEndDate, timezone, "yyyy-MM-dd"),
       },
     },
     kpi: {
@@ -473,7 +475,7 @@ export async function getReportSnapshot(params: {
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([rawDate, data]) => ({
         rawDate,
-        date: formatDayLabel(new Date(`${rawDate}T00:00:00.000Z`), timezone),
+        date: formatDayLabel(new Date(`${rawDate}T12:00:00.000Z`), timezone),
         ...data,
       })),
     categoryDistribution: Array.from(categoryMap.values()).sort(

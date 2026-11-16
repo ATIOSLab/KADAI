@@ -231,6 +231,15 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   };
 
   if (success) {
+    // Keranjang dikosongkan (clearCart) begitu checkout sukses, sehingga grandTotal
+    // dan changeAmount di sini sudah 0. Pakai nilai final dari server agar struk
+    // konfirmasi tidak menampilkan "Rp 0" dan kembalian palsu.
+    const settledTotal = completedSale ? Number(completedSale.totalAmount) : grandTotal;
+    const settledChange =
+      paymentType === "CASH" && cashAmount
+        ? Math.max(0, Number(cashAmount) - settledTotal)
+        : 0;
+
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-sm text-center">
@@ -240,8 +249,11 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
             </div>
             <div>
               <h3 className="text-xl font-bold text-foreground">Pembayaran Berhasil!</h3>
-              <p className="text-2xl font-black text-primary tabular-nums mt-1">
-                {formatCurrency(grandTotal)}
+              <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Total Dibayar
+              </p>
+              <p className="text-2xl font-black text-primary tabular-nums">
+                {formatCurrency(settledTotal)}
               </p>
               {invoiceNumber && (
                 <p className="mt-1 text-xs font-mono font-bold text-muted-foreground">
@@ -250,11 +262,11 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               )}
             </div>
 
-            {paymentType === "CASH" && changeAmount > 0 && (
+            {paymentType === "CASH" && settledChange > 0 && (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs">
                 <span className="text-muted-foreground block">Uang Kembalian:</span>
                 <span className="text-base font-black text-emerald-700 tabular-nums">
-                  {formatCurrency(changeAmount)}
+                  {formatCurrency(settledChange)}
                 </span>
               </div>
             )}

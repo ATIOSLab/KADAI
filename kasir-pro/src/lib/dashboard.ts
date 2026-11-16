@@ -1,14 +1,10 @@
 import { PaymentType } from "@prisma/client";
-import {
-  eachDayOfInterval,
-  endOfDay,
-  format,
-  isWithinInterval,
-  startOfDay,
-  subDays,
-} from "date-fns";
+import { format, isWithinInterval } from "date-fns";
 import { id as indonesianLocale } from "date-fns/locale";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { shiftIsoDate, toLocalDate } from "./business-day";
 import { prisma } from "./prisma";
+import { resolveBusinessTimezone } from "./business-timezone";
 import type {
   CategorySalesData,
   DashboardOverview,
@@ -34,8 +30,11 @@ const PAYMENT_COLORS: Record<PaymentType, string> = {
   TEMPO: "#64748B",        // Slate Slate-500
 };
 
-function toDayLabel(date: Date) {
-  return format(date, "EEE", { locale: indonesianLocale });
+function toDayLabel(calendarDate: string) {
+  // Tengah hari UTC: nama hari tidak bergeser oleh perbedaan zona waktu.
+  return format(new Date(`${calendarDate}T12:00:00.000Z`), "EEE", {
+    locale: indonesianLocale,
+  });
 }
 
 function toHourLabel(hour: number) {
@@ -43,22 +42,35 @@ function toHourLabel(hour: number) {
 }
 
 interface DashboardOverviewOptions {
-  startDate?: Date;
-  endDate?: Date;
+  /** Tanggal kalender awal rentang (YYYY-MM-DD) pada zona waktu toko. */
+  startDateLocal?: string;
+  /** Tanggal kalender akhir rentang (YYYY-MM-DD), inklusif. */
+  endDateLocal?: string;
   // Isolasi tenant: bila diisi, seluruh agregasi dibatasi ke store ini
   storeId?: string | null;
+  /** Override zona waktu; default mengikuti pengaturan toko. */
+  timezone?: string | null;
 }
 
 export async function getDashboardOverview(
   options: DashboardOverviewOptions = {}
 ): Promise<DashboardOverview> {
+  // Batas hari mengikuti zona waktu toko, bukan jam server: kontainer produksi
+  // berjalan di UTC sehingga "Penjualan Hari Ini", bucket harian, dan grafik per
+  // jam akan bergeser 7 jam untuk toko WIB (dan berbeda dari modul laporan).
+  const timezone = options.timezone || (await resolveBusinessTimezone());
   const now = new Date();
-  const startDate = options.startDate
-    ? startOfDay(options.startDate)
-    : startOfDay(subDays(now, 6));
-  const endDate = options.endDate ? endOfDay(options.endDate) : endOfDay(now);
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
+  const localToday = toLocalDate(now, timezone);
+  const startLocal = options.startDateLocal ?? shiftIsoDate(localToday, -6);
+  const endLocal = options.endDateLocal ?? localToday;
+  const startDate = fromZonedTime(`${startLocal}T00:00:00.000`, timezone);
+  const endDate = new Date(
+    fromZonedTime(`${shiftIsoDate(endLocal, 1)}T00:00:00.000`, timezone).getTime() - 1
+  );
+  const todayStart = fromZonedTime(`${localToday}T00:00:00.000`, timezone);
+  const todayEnd = new Date(
+    fromZonedTime(`${shiftIsoDate(localToday, 1)}T00:00:00.000`, timezone).getTime() - 1
+  );
 
   const [sales, products, totalActiveProducts] = await Promise.all([
     prisma.sale.findMany({
@@ -123,9 +135,9 @@ export async function getDashboardOverview(
 
   const dailyMap = new Map<string, RevenueChartData>();
   const hppRevenueMap = new Map<string, HppRevenueData>();
-  for (const currentDate of eachDayOfInterval({ start: startDate, end: endDate })) {
-    const key = format(currentDate, "yyyy-MM-dd");
-    const label = toDayLabel(currentDate);
+  for (let day = startLocal; day <= endLocal; day = shiftIsoDate(day, 1)) {
+    const key = day;
+    const label = toDayLabel(day);
 
     dailyMap.set(key, {
       date: label,
@@ -159,7 +171,7 @@ export async function getDashboardOverview(
   let todayTransactions = 0;
 
   for (const sale of sales) {
-    const saleDateKey = format(sale.createdAt, "yyyy-MM-dd");
+    const saleDateKey = toLocalDate(sale.createdAt, timezone);
     const saleRevenue = Number(sale.totalAmount);
     const saleProfit = Number(sale.grossProfit);
     const saleCost = Number(sale.totalCost);
@@ -191,7 +203,9 @@ export async function getDashboardOverview(
       todayTransactions += 1;
     }
 
-    const hourKey = toHourLabel(sale.createdAt.getHours());
+    const hourKey = toHourLabel(
+      Number(formatInTimeZone(sale.createdAt, timezone, "HH"))
+    );
     hourlySalesMap.set(
       hourKey,
       (hourlySalesMap.get(hourKey) ?? 0) + 1

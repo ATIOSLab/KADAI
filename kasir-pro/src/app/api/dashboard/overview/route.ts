@@ -4,13 +4,17 @@ import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 
-function parseDateParam(value: string | null, endOfDay = false) {
+const CALENDAR_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+// Tanggal dashboard diperlakukan sebagai tanggal KALENDER di zona waktu toko,
+// bukan instant UTC: server produksi berjalan di UTC sehingga
+// "2026-11-16T00:00:00Z" berarti 07:00 WIB dan memotong penjualan pagi.
+function parseDateParam(value: string | null) {
   if (!value) {
     return undefined;
   }
 
-  const parsed = new Date(`${value}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}Z`);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
+  return CALENDAR_DATE_PATTERN.test(value) ? value : null;
 }
 
 export async function GET(request: NextRequest) {
@@ -36,7 +40,7 @@ export async function GET(request: NextRequest) {
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
     const startDate = parseDateParam(startDateParam);
-    const endDate = parseDateParam(endDateParam, true);
+    const endDate = parseDateParam(endDateParam);
 
     if (startDate === null || endDate === null) {
       return NextResponse.json(
@@ -53,8 +57,8 @@ export async function GET(request: NextRequest) {
     }
 
     const overview = await getDashboardOverview({
-      startDate: startDate,
-      endDate: endDate,
+      startDateLocal: startDate,
+      endDateLocal: endDate,
       storeId: scope.storeId,
     });
     return NextResponse.json({ data: overview });

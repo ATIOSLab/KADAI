@@ -4,6 +4,7 @@ import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { getDefaultDashboardRange, getCurrentWeekRange, getWeekRangeFromDate } from "@/lib/dashboard-periods";
 import { getReportSnapshot } from "@/lib/reporting";
+import { resolveBusinessTimezone } from "@/lib/business-timezone";
 
 // GET /api/reports?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&weekDate=YYYY-MM-DD
 export async function GET(request: NextRequest) {
@@ -26,8 +27,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const defaultRange = getDefaultDashboardRange();
-    const defaultWeek = getCurrentWeekRange();
+    // Zona waktu toko: rentang default & bucket harian tidak boleh memakai jam server.
+    const timezone = await resolveBusinessTimezone();
+    const defaultRange = getDefaultDashboardRange(new Date(), timezone);
+    const defaultWeek = getCurrentWeekRange(new Date(), timezone);
 
     const startDateParam = searchParams.get("startDate") ?? defaultRange.startDate;
     const endDateParam = searchParams.get("endDate") ?? defaultRange.endDate;
@@ -51,6 +54,7 @@ export async function GET(request: NextRequest) {
       outletId: outletIdParam,
       // Isolasi tenant: lib reporting.ts memfilter penjualan lewat outlet.storeId
       storeId: scope.storeId,
+      timezone,
     });
 
     return NextResponse.json({

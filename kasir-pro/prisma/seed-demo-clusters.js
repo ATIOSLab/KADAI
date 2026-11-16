@@ -321,7 +321,11 @@ async function seedDemoClusters() {
         isDemo: true,
         storeId: tenantId,
       };
-      const legacyProduct = await prisma.product.findFirst({ where: { sku: prod.sku } });
+      // Klaim per tenant: utamakan baris legacy global (storeId NULL), lalu baris tenant ini.
+      // findFirst tanpa scope akan "mencuri" produk milik tenant lain (isolasi tenant).
+      const legacyProduct =
+        (await prisma.product.findFirst({ where: { sku: prod.sku, storeId: null } })) ??
+        (await prisma.product.findFirst({ where: { sku: prod.sku, storeId: tenantId } }));
       const p = legacyProduct
         ? await prisma.product.update({ where: { id: legacyProduct.id }, data: productData })
         : await prisma.product.create({

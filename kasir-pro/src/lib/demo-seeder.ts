@@ -297,10 +297,17 @@ export async function runDemoSeeding() {
         isDemo: true,
         storeId: tenantId,
       };
-      const legacyProduct = await prisma.product.findFirst({
-        where: { sku: prod.sku },
-        select: { id: true },
-      });
+      // Klaim per tenant: baris legacy global (storeId NULL) dulu, lalu baris tenant ini —
+      // mencegah produk tenant lain ikut ter-claim (isolasi tenant).
+      const legacyProduct =
+        (await prisma.product.findFirst({
+          where: { sku: prod.sku, storeId: null },
+          select: { id: true },
+        })) ??
+        (await prisma.product.findFirst({
+          where: { sku: prod.sku, storeId: tenantId },
+          select: { id: true },
+        }));
       const p = legacyProduct
         ? await prisma.product.update({
             where: { id: legacyProduct.id },

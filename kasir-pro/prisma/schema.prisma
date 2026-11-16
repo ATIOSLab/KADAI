@@ -495,7 +495,7 @@ model Product {
   id                String       @id @default(cuid())
   name              String
   sku               String
-  barcode           String?      @unique
+  barcode           String?
   description       String?
   productType       ProductType  @default(FINISHED_GOOD)
   station           StationType  @default(GENERAL)
@@ -522,6 +522,8 @@ model Product {
   stockTransferItems  StockTransferItem[]
 
   @@unique([storeId, sku])
+  // Barcode unik PER TENANT: dua tenant sah menjual barang fisik yang sama
+  @@unique([storeId, barcode])
   @@index([storeId])
   @@index([categoryId])
   @@index([name])

@@ -166,3 +166,87 @@ test("endpoint publik QR tetap tanpa sesi dan memvalidasi meja", () => {
   assert.match(order, /storeId/);
   assert.match(order, /table/i);
 });
+
+// ── Regresi UAT produksi (16 Nov 2026) ─────────────────────────────────────────
+// Temuan UAT: beberapa sumbu sistem belum ter-scope, dan satu perbaikan isolasi
+// sebelumnya membuat POS gagal checkout. Tes di bawah mengunci semua itu.
+
+test("nomor invoice penjualan unik per tenant, bukan global (regresi checkout 500)", () => {
+  const schema = read("prisma/schema.prisma");
+  const sale = modelBlock(schema, "Sale");
+  assert.doesNotMatch(
+    sale,
+    /invoiceNumber\s+String\s+@unique/,
+    "invoiceNumber unik global bertabrakan dengan penomoran per tenant → POS 500"
+  );
+  assert.match(sale, /storeId\s+String\?/, "Sale wajib menyimpan storeId pemilik");
+  assert.match(sale, /@@unique\(\[storeId, invoiceNumber\]\)/, "keunikan invoice harus per tenant");
+
+  const sales = route("sales");
+  assert.match(sales, /storeId: scope\.storeId/, "baris penjualan wajib menyertakan storeId tenant");
+  assert.match(sales, /createSaleWithRetry/, "checkout wajib retry saat nomor invoice bentrok");
+  assert.match(sales, /\.includes\("invoiceNumber"\)/, "retry hanya untuk bentrok nomor invoice");
+});
+
+test("penomoran dokumen yang indeksnya unik global memakai hitungan global", () => {
+  const schema = read("prisma/schema.prisma");
+  assert.match(modelBlock(schema, "StockTransfer"), /transferNumber\s+String\s+@unique/);
+  assert.match(modelBlock(schema, "ProductBatch"), /batchNumber\s+String\s+@unique/);
+
+  assert.match(route("inventory/transfers"), /prisma\.stockTransfer\.count\(\)/);
+  assert.doesNotMatch(
+    route("batches"),
+    /todayBatchCount = await tx\.productBatch\.count\(\{\s*where: \{\s*productId/,
+    "batchNumber unik global tetapi SKU hanya unik per tenant → hitungan wajib global"
+  );
+});
+
+test("konfigurasi bot platform hanya untuk SUPER_ADMIN", () => {
+  const bot = route("settings/bot");
+  assert.match(bot, /SUPER_ADMIN_ROLES/, "bot platform tidak boleh dikelola peran tenant");
+  assert.doesNotMatch(bot, /ADMIN_ONLY_ROLES/);
+  assert.match(bot, /Pengaturan bot dikelola di level platform/);
+});
+
+test("toko, meja, shift, dan laundry selalu ter-scope ke tenant pemanggil", () => {
+  const store = route("settings/store");
+  assert.match(store, /resolveTenantScope/);
+  assert.doesNotMatch(store, /store\.findFirst\(\)/, "toko pertama di DB bukan milik tenant");
+
+  const tables = route("tables");
+  assert.match(tables, /outlet: \{ storeId: scope\.storeId \}/);
+  assert.match(tables, /"Cabang tidak ditemukan pada tenant Anda"/);
+
+  const shift = route("pos/shift-summary");
+  assert.match(shift, /outlet: \{ storeId: scope\.storeId \}/);
+
+  const laundry = route("laundry/jobs");
+  assert.match(laundry, /outlet: \{ storeId: scope\.storeId \}/);
+  assert.doesNotMatch(
+    laundry,
+    /laundryJobOrder\.findUnique\(\{\s*where: \{ id \}/,
+    "PATCH laundry tidak boleh findUnique({ id }) tanpa guard tenant"
+  );
+});
+
+test("pelacakan publik butuh token acak atau pasangan resi + nomor HP", () => {
+  const track = route("laundry/track");
+  assert.match(track, /trackingToken/);
+  assert.match(track, /normalizePhone/, "nomor HP dibandingkan setelah normalisasi");
+});
+
+test("tanggal navbar dirender setelah mount (hindari hydration error #418)", () => {
+  const navbar = read("src/components/layout/navbar.tsx");
+  assert.match(navbar, /const \[todayLabel, setTodayLabel\] = useState\(""\)/);
+  assert.doesNotMatch(
+    navbar,
+    /const todayLabel = new Intl\.DateTimeFormat/,
+    "tanggal tidak boleh dihitung saat render: nilai SSR memakai jam server"
+  );
+});
+
+test("pesan kesalahan tidak membocorkan nama kolom database", () => {
+  const api = read("src/lib/api-response.ts");
+  assert.match(api, /FIELD_LABELS/);
+  assert.doesNotMatch(api, /Data dengan \$\{target\} tersebut sudah digunakan/);
+});

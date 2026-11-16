@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { prisma } from "./prisma";
+import { ApiBusinessError } from "./api-response";
 
 export interface FIFOAllocation {
   batchId: string;
@@ -68,8 +69,11 @@ export async function processFIFODeduction(
 
   const totalAvailable = sortedBatches.reduce((acc, b) => acc + b.remainingQty, 0);
   if (totalAvailable < requestedQty) {
-    throw new Error(
-      `Stok tidak cukup untuk produk ini. Tersedia ${totalAvailable} unit, diminta ${requestedQty} unit.`
+    // Kekurangan stok adalah aturan bisnis (409), bukan kegagalan server (500)
+    throw new ApiBusinessError(
+      `Stok tidak cukup untuk produk ini. Tersedia ${totalAvailable} unit, diminta ${requestedQty} unit.`,
+      409,
+      "INSUFFICIENT_STOCK"
     );
   }
 
@@ -126,23 +130,35 @@ export async function processSelectedBatchDeduction(
   db: PrismaExecutor,
   productId: string,
   batchId: string,
-  requestedQty: number
+  requestedQty: number,
+  options?: { outletId?: string | null }
 ): Promise<FIFOResult> {
+  const outletId = options?.outletId ?? null;
+
   const batch = await db.productBatch.findFirst({
     where: {
       id: batchId,
       productId,
       remainingQty: { gt: 0 },
+      // Batch cabang lain tidak boleh dijual dari cabang ini (stok antar-cabang
+      // hanya berpindah lewat transfer, bukan lewat kasir).
+      ...(outletId ? { OR: [{ outletId }, { outletId: null }] } : {}),
     },
   });
 
   if (!batch) {
-    throw new Error("Batch yang dipilih tidak ditemukan atau stoknya habis.");
+    throw new ApiBusinessError(
+      "Batch yang dipilih tidak ditemukan atau stoknya habis.",
+      409,
+      "BATCH_UNAVAILABLE"
+    );
   }
 
   if (batch.remainingQty < requestedQty) {
-    throw new Error(
-      `Stok batch ${batch.batchNumber} tidak cukup. Tersisa ${batch.remainingQty} unit.`
+    throw new ApiBusinessError(
+      `Stok batch ${batch.batchNumber} tidak cukup. Tersisa ${batch.remainingQty} unit.`,
+      409,
+      "INSUFFICIENT_STOCK"
     );
   }
 

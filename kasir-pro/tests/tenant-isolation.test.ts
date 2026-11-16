@@ -150,7 +150,12 @@ test("migrasi scoping + backfill tersedia dan backfill tidak menebak", () => {
 
 test("penjualan lintas tenant ditolak dengan 404, bukan 500", () => {
   const sales = route("sales");
-  assert.match(sales, /if \(!product\) throw new Error\("Produk tidak ditemukan pada tenant Anda"\)/);
+  // Id produk tenant lain harus tampak "tidak ada" (404), bukan kegagalan server
+  assert.match(
+    sales,
+    /if \(!product\) \{\s*throw new ApiBusinessError\(\s*"Produk tidak ditemukan pada tenant Anda",\s*404/
+  );
+  assert.doesNotMatch(sales, /if \(!product\) throw new Error\(/);
   assert.match(sales, /const isNotFound = message\.includes\("tidak ditemukan"\)/);
   assert.match(sales, /storeId: scope\.storeId/);
   assert.match(

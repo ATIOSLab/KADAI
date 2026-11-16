@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
@@ -45,37 +46,52 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
     }
 
-    // Create adjustment record
-    const adjustment = await prisma.stockAdjustment.create({
-      data: {
-        productId: data.productId,
-        quantityChange: data.quantityChange,
-        reason: data.reason,
-        notes: data.notes,
-        userId: sessionUser.id,
-        storeId: scope.storeId,
-      },
-      include: { product: true, user: true },
-    });
-
-    // If negative adjustment, reduce from oldest batch (FIFO)
-    if (data.quantityChange < 0) {
-      let remaining = Math.abs(data.quantityChange);
-      const batches = await prisma.productBatch.findMany({
-        where: { productId: data.productId, remainingQty: { gt: 0 } },
-        orderBy: { purchaseDate: "asc" },
+    // Catatan penyesuaian dan pemotongan batch harus satu transaksi: kalau
+    // pemotongan gagal, catatan -N tanpa stok yang keluar akan menyesatkan opname.
+    const adjustment = await prisma.$transaction(async (tx) => {
+      const created = await tx.stockAdjustment.create({
+        data: {
+          productId: data.productId,
+          quantityChange: data.quantityChange,
+          reason: data.reason,
+          notes: data.notes,
+          userId: sessionUser.id,
+          storeId: scope.storeId,
+        },
+        include: { product: true, user: true },
       });
 
-      for (const batch of batches) {
-        if (remaining <= 0) break;
-        const deduct = Math.min(remaining, batch.remainingQty);
-        await prisma.productBatch.update({
-          where: { id: batch.id },
-          data: { remainingQty: { decrement: deduct } },
+      // Penyesuaian negatif memotong batch tertua (FIFO)
+      if (data.quantityChange < 0) {
+        let remaining = Math.abs(data.quantityChange);
+        const batches = await tx.productBatch.findMany({
+          where: { productId: data.productId, remainingQty: { gt: 0 } },
+          orderBy: { purchaseDate: "asc" },
         });
-        remaining -= deduct;
+
+        for (const batch of batches) {
+          if (remaining <= 0) break;
+          const deduct = Math.min(remaining, batch.remainingQty);
+          await tx.productBatch.update({
+            where: { id: batch.id },
+            data: { remainingQty: { decrement: deduct } },
+          });
+          remaining -= deduct;
+        }
+
+        // Stok fisik kurang dari yang dicatat: tolak, jangan catat angka yang
+        // tidak pernah keluar dari gudang (stok sistem jadi menggelembung).
+        if (remaining > 0) {
+          throw new ApiBusinessError(
+            `Stok ${created.product.name} tidak mencukupi untuk penyesuaian ${Math.abs(data.quantityChange)}: hanya tersedia ${Math.abs(data.quantityChange) - remaining}.`,
+            409,
+            "INSUFFICIENT_STOCK"
+          );
+        }
       }
-    }
+
+      return created;
+    });
 
     await logActivity({
       userId: sessionUser.id,
@@ -91,8 +107,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: adjustment }, { status: 201 });
   } catch (error) {
-    console.error("POST /api/inventory/adjustment error:", error);
-    return NextResponse.json({ error: "Gagal adjustment stok" }, { status: 500 });
+    // Aturan bisnis (mis. stok kurang) harus 4xx, bukan 500
+    return handleApiError(error, "POST /api/inventory/adjustment", "Gagal adjustment stok");
   }
 }
 

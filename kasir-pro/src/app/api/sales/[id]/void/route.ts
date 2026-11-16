@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ApiBusinessError } from "@/lib/api-response";
 import { prisma } from "@/lib/prisma";
 import { voidSaleSchema } from "@/lib/validators/sale";
 import { restoreFIFODeductions } from "@/lib/fifo";
@@ -90,7 +91,13 @@ export async function POST(
         where: { id, isVoided: false, outlet: { storeId: scope.storeId } },
         data: { isVoided: true },
       });
-      if (claim.count !== 1) throw new Error("SALE_ALREADY_VOIDED");
+      if (claim.count !== 1) {
+        throw new ApiBusinessError(
+          "Transaksi ini sudah dibatalkan sebelumnya",
+          409,
+          "SALE_ALREADY_VOIDED"
+        );
+      }
       // Mark sale as voided
       const voidedSale = await tx.sale.update({
         where: { id },

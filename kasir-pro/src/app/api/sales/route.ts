@@ -9,6 +9,7 @@ import {
   applyFIFODeductions,
 } from "@/lib/fifo";
 import { generateInvoiceNumber } from "@/lib/utils";
+import { ApiBusinessError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
 import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
@@ -267,8 +268,18 @@ export async function POST(request: NextRequest) {
         });
 
         // Isolasi tenant: produk tenant lain tidak boleh bisa dijual (404, bukan 500)
-        if (!product) throw new Error("Produk tidak ditemukan pada tenant Anda");
-        if (!product.isActive) throw new Error("Produk tidak tersedia");
+        // Isolasi tenant: id produk tenant lain harus tampak "tidak ada" (404),
+        // bukan kegagalan server (500) - dan tidak membocorkan keberadaannya.
+        if (!product) {
+          throw new ApiBusinessError(
+            "Produk tidak ditemukan pada tenant Anda",
+            404,
+            "PRODUCT_NOT_FOUND"
+          );
+        }
+        if (!product.isActive) {
+          throw new ApiBusinessError("Produk tidak tersedia", 409, "PRODUCT_INACTIVE");
+        }
 
         if (product.productType === "MANUFACTURED" && product.recipesAsParent.length > 0) {
           // F&B Manufactured Product with Recipe (e.g. Makanan, Kopi)
@@ -300,7 +311,13 @@ export async function POST(request: NextRequest) {
             },
             orderBy: { purchaseDate: "asc" },
           });
-          if (!priceBatch) throw new Error("Harga produk belum tersedia");
+          if (!priceBatch) {
+            throw new ApiBusinessError(
+              "Harga produk belum tersedia",
+              409,
+              "PRICE_UNAVAILABLE"
+            );
+          }
           const unitSellingPrice = priceBatch.sellingPrice;
           const lineRevenue = unitSellingPrice.mul(item.quantity);
           const itemDiscount = new Decimal(item.discountAmount || 0);
@@ -326,7 +343,8 @@ export async function POST(request: NextRequest) {
                 tx,
                 item.productId,
                 item.selectedBatchId,
-                item.quantity
+                item.quantity,
+                { outletId: effectiveOutletId }
               )
             : await processFIFODeduction(tx, item.productId, item.quantity, {
                 outletId: effectiveOutletId,
@@ -381,7 +399,11 @@ export async function POST(request: NextRequest) {
       const discountAmount = itemDiscountTotal.add(transactionDiscount);
       const netSubtotal = subtotal.sub(discountAmount);
       if (netSubtotal.isNegative() || processedItems.some((item) => item.totalPrice.isNegative())) {
-        throw new Error("Diskon melebihi nilai transaksi");
+        throw new ApiBusinessError(
+          "Diskon melebihi nilai transaksi",
+          400,
+          "INVALID_DISCOUNT"
+        );
       }
 
       let serviceCharge = new Decimal(0);

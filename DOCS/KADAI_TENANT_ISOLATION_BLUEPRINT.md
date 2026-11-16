@@ -160,7 +160,7 @@ per klaster · `Sale.storeId` tidak didenormalisasi · deploy langsung setelah t
   `categories_storeId_name_key`, `units_storeId_normalizedName_key`,
   `customers_storeId_phone_key`, `finance_categories_storeId_name_direction_key`,
   `finance_categories_systemKey_key` (global) |
-| `npm run test:security` | **37/37 lolos**; `tsc --noEmit` bersih |
+| `npm run test:security` | **44/44 lolos** — termasuk `tests/tenant-isolation.test.ts` (7 kasus isolasi, §3.5); `tsc --noEmit` bersih |
 
 Migrasi diuji lebih dulu sebagai **dry-run transaksional pada DB produksi**
 (`BEGIN … ROLLBACK` via `postgres:16-alpine` di `dokploy-network`) sebelum deploy.

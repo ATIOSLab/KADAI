@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { POS_ROLES, hasRequiredRole } from "@/lib/rbac";
-import { createCustomerSchema, updateCustomerSchema } from "@/lib/validators/customer";
+import { MEMBER_TIERS, createCustomerSchema, updateCustomerSchema } from "@/lib/validators/customer";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 
@@ -21,10 +21,15 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search")?.trim() || "";
+    // Filter tier dari halaman Pelanggan dikirim sebagai ?tier=SILVER, dulu
+    // diabaikan sehingga memilih tier apa pun tetap menampilkan semua pelanggan.
+    const tierParam = (searchParams.get("tier") || "").trim().toUpperCase();
+    const tier = MEMBER_TIERS.find((t) => t === tierParam);
 
     const customers = await prisma.customer.findMany({
       where: {
         storeId: scope.storeId,
+        ...(tier && { memberTier: tier }),
         ...(search && {
           OR: [
             { name: { contains: search, mode: "insensitive" } },
@@ -65,6 +70,7 @@ export async function POST(req: NextRequest) {
         phone: validated.phone || null,
         email: validated.email || null,
         address: validated.address || null,
+        notes: validated.notes || null,
         memberTier: validated.memberTier,
         loyaltyPoints: validated.loyaltyPoints,
         storeId: scope.storeId,
@@ -108,6 +114,10 @@ export async function PUT(req: NextRequest) {
         ...(validated.phone !== undefined && { phone: validated.phone || null }),
         ...(validated.email !== undefined && { email: validated.email || null }),
         ...(validated.address !== undefined && { address: validated.address || null }),
+        // Catatan pelanggan ("Preferensi meja atau alergi") ada di form dan di
+        // tabel, tetapi tidak pernah ikut tersimpan karena tidak ada di skema
+        // validasi - input pengguna hilang tanpa pesan.
+        ...(validated.notes !== undefined && { notes: validated.notes || null }),
         ...(validated.memberTier && { memberTier: validated.memberTier }),
         ...(validated.loyaltyPoints !== undefined && { loyaltyPoints: validated.loyaltyPoints }),
       },

@@ -73,8 +73,12 @@ export function handleApiError(
     logger.warn(`Validation failed at ${context}`, context, {
       errors: error.flatten().fieldErrors,
     });
+    // Pesan generik "Format data yang dikirim tidak valid" tidak memberi tahu
+    // staf kolom mana yang salah. Pakai pesan spesifik dari validator (sudah
+    // berbahasa Indonesia), detail per kolom tetap dikirim untuk form.
+    const firstIssue = error.issues[0]?.message;
     return jsonError(
-      "Format data yang dikirim tidak valid",
+      firstIssue || "Format data yang dikirim tidak valid",
       400,
       error.flatten().fieldErrors,
       "VALIDATION_ERROR"

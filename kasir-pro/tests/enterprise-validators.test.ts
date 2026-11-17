@@ -86,12 +86,17 @@ test("Supplier validation: validates email format and required name", () => {
   });
 });
 
-test("Customer validation: defaults to REGULAR tier and 0 points", () => {
+test("Customer validation: defaults to BRONZE tier and 0 points", () => {
   const valid = createCustomerSchema.parse({
     name: "Ahmad Dahlan",
   });
-  assert.equal(valid.memberTier, "REGULAR");
+  assert.equal(valid.memberTier, "BRONZE");
   assert.equal(valid.loyaltyPoints, 0);
+
+  // Nilai lawas "REGULAR" dipetakan ke BRONZE, dan huruf kecil dinormalkan
+  assert.equal(createCustomerSchema.parse({ name: "Budi", memberTier: "REGULAR" }).memberTier, "BRONZE");
+  assert.equal(createCustomerSchema.parse({ name: "Budi", memberTier: "silver" }).memberTier, "SILVER");
+  assert.equal(createCustomerSchema.parse({ name: "Budi", memberTier: "GOLD", notes: "alergi kacang" }).notes, "alergi kacang");
 });
 
 test("Table validation: enforces capacity limits", () => {
@@ -115,7 +120,9 @@ test("handleApiError: cleanly formats ZodError without leaking internal details"
     assert.equal(res.status, 400);
     const body = await res.json();
     assert.equal(body.code, "VALIDATION_ERROR");
-    assert.equal(body.error, "Format data yang dikirim tidak valid");
+    // Pesan spesifik dari validator (Bahasa Indonesia) dipakai agar staf tahu
+    // kolom mana yang salah; detail per kolom tetap tersedia di `details`.
+    assert.equal(body.error, "Nama cabang minimal 2 karakter");
     assert(body.details !== undefined);
   }
 });

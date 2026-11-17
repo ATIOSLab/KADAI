@@ -256,3 +256,37 @@ test("konfirmasi memakai dialog aplikasi, bukan window.confirm", () => {
     assert.doesNotMatch(source, /[^A-Za-z]window\.confirm\(/, `${name}: window.confirm sudah tidak dipakai`);
   }
 });
+
+// --- Pelanggan: tier, catatan, dan filter ---------------------------------------
+
+test("tier pelanggan memakai nilai yang sama dengan UI dan database", () => {
+  const validator = readFileSync(new URL("../src/lib/validators/customer.ts", import.meta.url), "utf8");
+  assert.match(validator, /export const MEMBER_TIERS = \["BRONZE", "SILVER", "GOLD", "PLATINUM"\]/);
+  assert.match(validator, /\.default\("BRONZE"\)/);
+  assert.doesNotMatch(validator, /z\.enum\(\["REGULAR"/, "enum REGULAR sudah tidak dipakai");
+  // Nilai lawas tetap diterima agar integrasi lama tidak putus
+  assert.match(validator, /REGULAR: "BRONZE"/);
+});
+
+test("catatan pelanggan tidak lagi hilang saat disimpan", () => {
+  const validator = readFileSync(new URL("../src/lib/validators/customer.ts", import.meta.url), "utf8");
+  const route = readFileSync(new URL("../src/app/api/customers/route.ts", import.meta.url), "utf8");
+  assert.match(validator, /notes: z\.string\(\)\.trim\(\)\.max\(500/, "notes harus divalidasi");
+  assert.match(route, /notes: validated\.notes \|\| null/, "POST menyimpan catatan");
+  assert.match(route, /validated\.notes !== undefined && \{ notes: validated\.notes \|\| null \}/, "PUT menyimpan catatan");
+});
+
+test("filter tier pelanggan diproses di server", () => {
+  const route = readFileSync(new URL("../src/app/api/customers/route.ts", import.meta.url), "utf8");
+  assert.match(route, /searchParams\.get\("tier"\)/, "parameter tier dibaca");
+  assert.match(route, /MEMBER_TIERS\.find/, "nilai tier divalidasi terhadap daftar resmi");
+  assert.match(route, /\.\.\.\(tier && \{ memberTier: tier \}\)/, "filter diterapkan ke query");
+  const page = readFileSync(new URL("../src/app/(dashboard)/customers/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /url \+= `&tier=\$\{tierFilter\}`/, "UI mengirim parameter tier");
+});
+
+test("pesan validasi Zod yang spesifik diteruskan ke pengguna", () => {
+  const apiResponse = readFileSync(new URL("../src/lib/api-response.ts", import.meta.url), "utf8");
+  assert.match(apiResponse, /const firstIssue = error\.issues\[0\]\?\.message/);
+  assert.match(apiResponse, /firstIssue \|\| "Format data yang dikirim tidak valid"/);
+});

@@ -90,6 +90,29 @@ test("restock memakai nomor batch dengan percobaan ulang, bukan 500", () => {
   assert.match(batches, /if \(error instanceof ApiBusinessError\)/);
 });
 
+// --- Audit: penutupan shift kasir punya aksi sendiri -------------------------
+
+test("penutupan shift dicatat sebagai SHIFT_CLOSED, bukan SALE_CREATED", () => {
+  const shift = route("pos/shift-summary");
+  assert.match(shift, /action: "SHIFT_CLOSED"/);
+  assert.doesNotMatch(shift, /action: "SALE_CREATED"/);
+
+  const presenter = lib("activity-log-presenter.ts");
+  assert.match(presenter, /SHIFT_CLOSED: "Shift Kasir Ditutup"/);
+  assert.match(presenter, /case "SHIFT_CLOSED":/);
+
+  const page = readFileSync(new URL("../src/app/(dashboard)/activity-log/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /value: "SHIFT_CLOSED"/);
+
+  const schema = readFileSync(new URL("../prisma/schema.prisma", import.meta.url), "utf8");
+  assert.match(schema, /enum ActionType \{[\s\S]*?SHIFT_CLOSED/);
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20261117060000_shift_closed_action/migration.sql", import.meta.url),
+    "utf8"
+  );
+  assert.match(migration, /ALTER TYPE "ActionType" ADD VALUE IF NOT EXISTS 'SHIFT_CLOSED'/);
+});
+
 // --- Akuntansi: PB1 titipan negara, service charge pendapatan jasa ------------
 
 test("laba kotor menyertakan service charge tetapi tidak PB1", () => {

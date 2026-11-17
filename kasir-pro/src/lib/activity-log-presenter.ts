@@ -28,6 +28,7 @@ const STOCK_REASON_LABELS: Record<string, string> = {
 export const ACTIVITY_ACTION_LABELS: Record<string, string> = {
   SALE_CREATED: "Transaksi Dibuat",
   SALE_VOIDED: "Transaksi Dibatalkan",
+  SHIFT_CLOSED: "Shift Kasir Ditutup",
   PRODUCT_CREATED: "Produk Ditambahkan",
   PRODUCT_UPDATED: "Produk Diperbarui",
   PRODUCT_DELETED: "Produk Dihapus",
@@ -52,6 +53,7 @@ export const ACTIVITY_ACTION_STYLES: Record<
 > = {
   SALE_CREATED: { icon: ShoppingCart, color: "bg-accent-success" },
   SALE_VOIDED: { icon: ShoppingCart, color: "bg-accent-danger" },
+  SHIFT_CLOSED: { icon: ScrollText, color: "bg-accent-warning" },
   PRODUCT_CREATED: { icon: Package, color: "bg-accent-primary" },
   PRODUCT_UPDATED: { icon: Package, color: "bg-accent-warning" },
   PRODUCT_DELETED: { icon: Trash2, color: "bg-accent-danger" },
@@ -160,6 +162,27 @@ export function formatActivityDescription(log: ActivityLogLike) {
       const reason = getStringValue(details, "reason");
 
       const summary = [invoiceNumber, reason ? `Alasan: ${reason}` : null]
+        .filter(Boolean)
+        .join(" • ");
+
+      return summary || buildFallbackDescription(log);
+    }
+    case "SHIFT_CLOSED": {
+      const startingCash = getNumberValue(details, "startingCash");
+      const cashSalesTotal = getNumberValue(details, "cashSalesTotal");
+      const actualCash = getNumberValue(details, "actualCash");
+      const variance = getNumberValue(details, "variance");
+
+      const summary = [
+        startingCash !== null ? `Modal awal ${formatCurrency(startingCash)}` : null,
+        cashSalesTotal !== null ? `Tunai ${formatCurrency(cashSalesTotal)}` : null,
+        actualCash !== null ? `Fisik ${formatCurrency(actualCash)}` : null,
+        variance !== null
+          ? variance === 0
+            ? "Selisih pas"
+            : `Selisih ${variance > 0 ? "lebih" : "kurang"} ${formatCurrency(Math.abs(variance))}`
+          : null,
+      ]
         .filter(Boolean)
         .join(" • ");
 

@@ -42,6 +42,7 @@ const ACTION_OPTIONS = [
   { value: "ALL", label: "Semua Aksi" },
   { value: "SALE_CREATED", label: "Transaksi Dibuat" },
   { value: "SALE_VOIDED", label: "Transaksi Dibatalkan" },
+  { value: "SHIFT_CLOSED", label: "Shift Kasir Ditutup" },
   { value: "PRODUCT_CREATED", label: "Produk Ditambahkan" },
   { value: "PRODUCT_UPDATED", label: "Produk Diperbarui" },
   { value: "PRODUCT_DELETED", label: "Produk Dihapus" },

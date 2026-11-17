@@ -163,7 +163,9 @@ export async function POST(request: NextRequest) {
     // Log the closing event to immutable ActivityLog
     await logActivity({
       userId: sessionUser.id,
-      action: "SALE_CREATED", // reuse existing action or audit log
+      // Aksi sendiri: sebelumnya memakai SALE_CREATED, sehingga riwayat
+      // aktivitas melaporkan "Transaksi Dibuat" untuk penutupan kas.
+      action: "SHIFT_CLOSED",
       entity: "CashShift",
       entityId: `SHIFT-${sessionUser.id}-${Date.now()}`,
       details: {

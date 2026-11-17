@@ -158,6 +158,8 @@ enum ActionType {
   // Sale actions
   SALE_CREATED
   SALE_VOIDED
+  // Shift / cash drawer
+  SHIFT_CLOSED
   // Product actions
   PRODUCT_CREATED
   PRODUCT_UPDATED

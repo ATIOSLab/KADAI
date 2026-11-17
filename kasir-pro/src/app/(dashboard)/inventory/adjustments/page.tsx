@@ -188,9 +188,20 @@ export default function AdjustmentsPage() {
       setProducts([]);
       loadAdjustments();
     } catch (err) {
-      const message =
-        err instanceof ApiError ? err.message : "Gagal mencatat penyesuaian stok";
-      toast.error(message);
+      // 502/504 atau koneksi putus: server bisa saja sudah mencatat
+      // penyesuaiannya sebelum jawabannya hilang di jalan. Jangan menyatakan
+      // gagal; muat ulang riwayat supaya terlihat apakah barisnya ada.
+      const hasilTakDiketahui = !(err instanceof ApiError) || err.status >= 500;
+      if (hasilTakDiketahui) {
+        toast.error(
+          "Jawaban server tidak sampai. Riwayat dimuat ulang — periksa apakah penyesuaian sudah tercatat sebelum menyimpan lagi."
+        );
+        loadAdjustments();
+      } else {
+        const message =
+          err instanceof ApiError ? err.message : "Gagal mencatat penyesuaian stok";
+        toast.error(message);
+      }
     } finally {
       setSubmitting(false);
     }

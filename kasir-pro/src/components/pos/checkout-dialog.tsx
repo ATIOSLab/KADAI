@@ -157,21 +157,31 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
         },
         });
 
+      // Percobaan ulang aman karena kuncinya sama: server mengenali transaksi
+      // yang sudah tersimpan, jadi pembayaran tidak bisa tercatat dua kali.
+      const bolehDiulang = (error: unknown) =>
+        // Koneksi putus atau 5xx: hasilnya belum diketahui, jadi mencoba ulang
+        // dengan kunci yang sama justru menyelesaikan ketidakpastian itu.
+        !(error instanceof ApiError) ||
+        error.status === 409 ||
+        error.status >= 500 ||
+        error.code === "TRANSACTION_CONFLICT";
+
       let response;
-      try {
-        response = await submitSale();
-      } catch (error) {
-        // Kasir tidak boleh disuruh menekan Bayar dua kali hanya karena kasir
-        // lain menyimpan transaksi pada detik yang sama. Kunci idempotensi
-        // dipakai ulang, jadi percobaan kedua tidak bisa menggandakan transaksi.
-        const bentrok =
-          error instanceof ApiError &&
-          (error.status === 409 || error.code === "TRANSACTION_CONFLICT");
-        if (!bentrok) {
-          throw error;
+      let percobaanUlang = 0;
+      for (;;) {
+        try {
+          response = await submitSale();
+          break;
+        } catch (error) {
+          if (percobaanUlang >= 2 || !bolehDiulang(error)) {
+            throw error;
+          }
+          await new Promise((resolve) =>
+            setTimeout(resolve, 900 * (percobaanUlang + 1))
+          );
+          percobaanUlang += 1;
         }
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        response = await submitSale();
       }
 
       setInvoiceNumber(response.data.invoiceNumber);

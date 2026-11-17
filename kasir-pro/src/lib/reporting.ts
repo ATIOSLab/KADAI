@@ -28,6 +28,12 @@ export interface ProfitSummaryResult {
   period: BotAnalyticsPeriod;
   label: string;
   revenue: number;
+  /** PB1 yang dipungut dari tamu (titipan negara, bukan pendapatan usaha). */
+  taxCollected: number;
+  /** Service charge yang dipungut (pendapatan jasa usaha). */
+  serviceChargeCollected: number;
+  /** Omzet neto = revenue - taxCollected; basis margin laba kotor. */
+  netRevenue: number;
   hpp: number;
   profit: number;
   margin: number;
@@ -67,7 +73,14 @@ export interface ReportSnapshot {
     week: ReportDateRange;
   };
   kpi: {
+    /** Uang yang benar-benar diterima dari tamu (termasuk PB1 & service charge). */
     totalRevenue: number;
+    /** PB1 titipan negara: masuk kas, bukan pendapatan usaha. */
+    taxCollected: number;
+    /** Service charge: pendapatan jasa milik usaha. */
+    serviceChargeCollected: number;
+    /** Omzet neto = totalRevenue - pajak. Basis margin laba kotor. */
+    netRevenue: number;
     totalHpp: number;
     totalProfit: number;
     margin: string;
@@ -178,6 +191,8 @@ export async function getProfitSummary(
     where: getSaleWhereInput(range, storeId),
     _sum: {
       totalAmount: true,
+      taxAmount: true,
+      serviceCharge: true,
       totalCost: true,
       grossProfit: true,
     },
@@ -187,6 +202,9 @@ export async function getProfitSummary(
   });
 
   const revenue = Number(aggregate._sum.totalAmount ?? 0);
+  const taxCollected = Number(aggregate._sum.taxAmount ?? 0);
+  const serviceChargeCollected = Number(aggregate._sum.serviceCharge ?? 0);
+  const netRevenue = revenue - taxCollected;
   const hpp = Number(aggregate._sum.totalCost ?? 0);
   const profit = Number(aggregate._sum.grossProfit ?? 0);
 
@@ -194,9 +212,13 @@ export async function getProfitSummary(
     period: range.period,
     label: range.label,
     revenue,
+    taxCollected,
+    serviceChargeCollected,
+    netRevenue,
     hpp,
     profit,
-    margin: revenue > 0 ? Number(((profit / revenue) * 100).toFixed(1)) : 0,
+    // Margin laba kotor selalu dihitung dari omzet neto (tanpa PB1 titipan negara)
+    margin: netRevenue > 0 ? Number(((profit / netRevenue) * 100).toFixed(1)) : 0,
     transactions: aggregate._count._all,
     periodStart: formatRangeStart(range.start, timezone),
     periodEnd: formatRangeEnd(range.endExclusive, timezone),
@@ -448,6 +470,15 @@ export async function getReportSnapshot(params: {
     (sum, sale) => sum + Number(sale.totalAmount),
     0
   );
+  // PB1 adalah titipan ke negara dan service charge pendapatan jasa: keduanya
+  // harus terlihat terpisah, kalau tidak omzet tampak lebih besar dari
+  // pendapatan usaha dan margin laba kotor ikut tertekan.
+  const taxCollected = rangeSales.reduce((sum, sale) => sum + Number(sale.taxAmount), 0);
+  const serviceChargeCollected = rangeSales.reduce(
+    (sum, sale) => sum + Number(sale.serviceCharge),
+    0
+  );
+  const netRevenue = totalRevenue - taxCollected;
   const totalHpp = rangeSales.reduce((sum, sale) => sum + Number(sale.totalCost), 0);
   const totalProfit = rangeSales.reduce(
     (sum, sale) => sum + Number(sale.grossProfit),
@@ -467,9 +498,12 @@ export async function getReportSnapshot(params: {
     },
     kpi: {
       totalRevenue,
+      taxCollected,
+      serviceChargeCollected,
+      netRevenue,
       totalHpp,
       totalProfit,
-      margin: totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : "0",
+      margin: netRevenue > 0 ? ((totalProfit / netRevenue) * 100).toFixed(1) : "0",
     },
     revenueTrend: Array.from(revenueMap.entries())
       .sort(([left], [right]) => left.localeCompare(right))

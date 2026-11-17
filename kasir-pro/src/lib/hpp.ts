@@ -44,8 +44,13 @@ export async function calculateSaleHPP(saleId: string) {
     saleId,
     invoiceNumber: sale.invoiceNumber,
     totalRevenue: sale.totalAmount,
+    taxCollected: sale.taxAmount,
+    // Omzet neto = uang diterima - PB1 (pajak bukan pendapatan usaha)
+    netRevenue: sale.totalAmount.sub(sale.taxAmount),
     totalHPP,
-    grossProfit: sale.totalAmount.sub(totalHPP),
+    // Definisi laba kotor harus identik dengan yang disimpan di Sale.grossProfit:
+    // pendapatan usaha (subtotal - diskon + service charge) dikurangi HPP.
+    grossProfit: sale.totalAmount.sub(sale.taxAmount).sub(totalHPP),
     items: itemDetails,
   };
 }

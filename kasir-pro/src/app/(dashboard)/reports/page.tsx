@@ -53,6 +53,9 @@ interface ReportData {
   };
   kpi: {
     totalRevenue: number;
+    taxCollected: number;
+    serviceChargeCollected: number;
+    netRevenue: number;
     totalHpp: number;
     totalProfit: number;
     margin: string;
@@ -66,8 +69,8 @@ interface ReportData {
 
 function KPILoading() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-7">
+      {Array.from({ length: 7 }).map((_, index) => (
         <Card key={index}>
           <CardContent className="p-4 text-center">
             <Skeleton className="mx-auto mb-2 h-3 w-20" />
@@ -277,14 +280,44 @@ export default function ReportsPage() {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-7">
             <Card>
               <CardContent className="p-4 text-center">
                 <p className="text-xs font-bold uppercase text-text-muted">
-                  Total Revenue
+                  Omzet (kas masuk)
                 </p>
                 <p className="text-xl font-black text-accent-primary">
                   {formatCurrency(report.kpi.totalRevenue)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <p className="text-xs font-bold uppercase text-text-muted">
+                  Pajak PB1
+                </p>
+                <p className="text-xl font-black text-text-muted">
+                  {formatCurrency(report.kpi.taxCollected)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <p className="text-xs font-bold uppercase text-text-muted">
+                  Service Charge
+                </p>
+                <p className="text-xl font-black text-text-muted">
+                  {formatCurrency(report.kpi.serviceChargeCollected)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <p className="text-xs font-bold uppercase text-text-muted">
+                  Omzet Neto
+                </p>
+                <p className="text-xl font-black text-accent-primary">
+                  {formatCurrency(report.kpi.netRevenue)}
                 </p>
               </CardContent>
             </Card>
@@ -301,7 +334,7 @@ export default function ReportsPage() {
             <Card>
               <CardContent className="p-4 text-center">
                 <p className="text-xs font-bold uppercase text-text-muted">
-                  Gross Profit
+                  Laba Kotor
                 </p>
                 <p className="text-xl font-black text-accent-success">
                   {formatCurrency(report.kpi.totalProfit)}
@@ -311,7 +344,7 @@ export default function ReportsPage() {
             <Card>
               <CardContent className="p-4 text-center">
                 <p className="text-xs font-bold uppercase text-text-muted">
-                  Margin
+                  Margin (omzet neto)
                 </p>
                 <p className="text-xl font-black">{report.kpi.margin}%</p>
               </CardContent>

@@ -3,10 +3,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const route = (p: string) => readFileSync(new URL(`../src/app/api/${p}/route.ts`, import.meta.url), "utf8");
+const lib = (p: string) => readFileSync(new URL(`../src/lib/${p}`, import.meta.url), "utf8");
 const sales = route("sales");
 const voidRoute = route("sales/[id]/void");
 const kds = route("kds");
 const transfers = route("inventory/transfers");
+const reporting = lib("reporting.ts");
+const hpp = lib("hpp.ts");
+const reportsPage = readFileSync(new URL("../src/app/(dashboard)/reports/page.tsx", import.meta.url), "utf8");
 
 // --- Checkout: tabrakan tulis PostgreSQL (P2034) bukan kegagalan server -------
 
@@ -73,4 +77,32 @@ test("status transfer tidak lagi diubah non-atomik di akhir transaksi", () => {
     transfers,
     /tx\.stockTransfer\.update\(\{\s*where: \{ id: validated\.id \},[\s\S]{0,160}status: "RECEIVED"/
   );
+});
+
+// --- Akuntansi: PB1 titipan negara, service charge pendapatan jasa ------------
+
+test("laba kotor menyertakan service charge tetapi tidak PB1", () => {
+  // Sale.grossProfit = (subtotal - diskon) + service charge - HPP
+  assert.match(sales, /const grossProfit = netSubtotal\.add\(serviceCharge\)\.sub\(totalCost\)/);
+  // HPP per transaksi memakai definisi yang sama: uang masuk - PB1 - HPP
+  assert.match(hpp, /grossProfit: sale\.totalAmount\.sub\(sale\.taxAmount\)\.sub\(totalHPP\)/);
+});
+
+test("laporan memisahkan PB1 dan service charge serta memakai omzet neto", () => {
+  assert.match(reporting, /const netRevenue = totalRevenue - taxCollected;/);
+  assert.match(reporting, /taxCollected,/);
+  assert.match(reporting, /serviceChargeCollected,/);
+  assert.match(reporting, /netRevenue,/);
+  // Margin tidak boleh lagi dibagi omzet bruto (yang masih mengandung PB1)
+  assert.doesNotMatch(reporting, /margin: totalRevenue > 0 \?/);
+  assert.match(reporting, /margin: netRevenue > 0 \?/);
+  assert.match(reporting, /margin: netRevenue > 0 \? Number\(\(\(profit \/ netRevenue\) \* 100\)\.toFixed\(1\)\) : 0/);
+});
+
+test("halaman laporan menampilkan pajak, service charge, dan omzet neto", () => {
+  assert.match(reportsPage, /Pajak PB1/);
+  assert.match(reportsPage, /Omzet Neto/);
+  assert.match(reportsPage, /Service Charge/);
+  assert.match(reportsPage, /report\.kpi\.taxCollected/);
+  assert.match(reportsPage, /report\.kpi\.netRevenue/);
 });

@@ -24,7 +24,7 @@ export function isWriteConflictError(error: unknown): boolean {
 }
 
 type RetryOptions = {
-  /** Jumlah percobaan total (termasuk percobaan pertama). Default 3. */
+  /** Jumlah percobaan total (termasuk percobaan pertama). Default 5. */
   attempts?: number;
   /** Kode pesan 409 yang dipakai bila percobaan habis. */
   exhaustedCode?: string;
@@ -40,7 +40,7 @@ export async function withWriteConflictRetry<T>(
   operation: () => Promise<T>,
   options: RetryOptions = {}
 ): Promise<T> {
-  const attempts = options.attempts ?? 3;
+  const attempts = options.attempts ?? 5;
   const exhaustedCode = options.exhaustedCode ?? "WRITE_CONFLICT";
   const exhaustedMessage =
     options.exhaustedMessage ??
@@ -57,8 +57,9 @@ export async function withWriteConflictRetry<T>(
         `${options.context ?? "write"} bentrok tulis (percobaan ${attempt}/${attempts}): ${(error as Error)?.message ?? error}`
       );
       if (attempt < attempts) {
-        // Jeda acak 25-125 ms agar dua permintaan tidak bertabrakan lagi.
-        await sleep(25 + Math.floor(Math.random() * 100));
+        // Jeda tumbuh + acak: penantang mundur makin jauh, sehingga 8-12
+        // permintaan serentak tidak terus bertabrakan pada baris yang sama.
+        await sleep(Math.min(400, 30 * attempt) + Math.floor(Math.random() * 80));
       }
     }
   }

@@ -156,7 +156,10 @@ function pruneSalesIdempotency() {
 // Nomor invoice dihitung dari jumlah penjualan tenant pada hari itu. Bila dua kasir
 // checkout bersamaan, keduanya bisa mendapat nomor sama → P2002 → ulangi transaksi
 // (hitungan di dalam transaksi ikut maju, jadi percobaan kedua pasti mendapat nomor baru).
-const MAX_INVOICE_ATTEMPTS = 3;
+// Kasir paralel (beberapa perangkat, satu cabang) sempat gagal 8 dari 12
+// transaksi serentak dengan 3 percobaan. Jeda tumbuh per percobaan supaya
+// penantang mundur, bukan menabrak lagi di milidetik yang sama.
+const MAX_INVOICE_ATTEMPTS = 6;
 
 /**
  * Transaksi Serializable yang bertabrakan ditolak PostgreSQL dengan P2034
@@ -187,7 +190,10 @@ async function createSaleWithRetry<T>(run: () => Promise<T>): Promise<T> {
       // Jeda pendek berjitter: dua transaksi yang bentrok tidak boleh mengulang
       // pada milidetik yang sama lalu bentrok lagi.
       await new Promise((resolve) =>
-        setTimeout(resolve, 15 * attempt + Math.floor(Math.random() * 25))
+        setTimeout(
+          resolve,
+          Math.min(400, 25 * attempt) + Math.floor(Math.random() * 40)
+        )
       );
     }
   }

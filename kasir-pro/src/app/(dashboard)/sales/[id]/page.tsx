@@ -60,6 +60,9 @@ interface SaleDetail {
   customerName: string | null;
   subtotal: number;
   discountAmount: number;
+  serviceCharge: number;
+  taxAmount: number;
+  roundingAmount: number;
   totalAmount: number;
   totalCost: number;
   grossProfit: number;
@@ -217,9 +220,16 @@ export default function SaleDetailPage({
   }
 
   const totalAmount = Number(sale.totalAmount);
-  const grossProfit = Number(sale.grossProfit);
+  const serviceChargeAmount = Number(sale.serviceCharge || 0);
+  const taxAmount = Number(sale.taxAmount || 0);
+  const roundingAmount = Number(sale.roundingAmount || 0);
+  // Transaksi yang dibatalkan tidak menghasilkan laba: stok sudah dikembalikan
+  // dan uangnya tidak masuk, jadi menampilkan laba 24.000 di struk batal
+  // menyesatkan pemilik yang membuka riwayat.
+  const grossProfit = sale.isVoided ? 0 : Number(sale.grossProfit);
+  const netRevenue = totalAmount - taxAmount;
   const marginPercent =
-    totalAmount > 0 ? ((grossProfit / totalAmount) * 100).toFixed(1) : "0";
+    !sale.isVoided && netRevenue > 0 ? ((grossProfit / netRevenue) * 100).toFixed(1) : "0";
   const canVoidSale =
     user?.role === "ADMIN" ||
     user?.role === "MANAGER" ||
@@ -256,6 +266,9 @@ export default function SaleDetailPage({
           })),
           subtotal: Number(sale.subtotal),
           discountAmount: Number(sale.discountAmount),
+          serviceCharge: serviceChargeAmount,
+          taxAmount: taxAmount,
+          roundingAmount: roundingAmount,
           totalAmount: Number(sale.totalAmount),
           paymentType: sale.paymentType,
           paymentRef: sale.paymentRef,
@@ -411,8 +424,26 @@ export default function SaleDetailPage({
               <span>Diskon</span>
               <span>-{formatCurrency(Number(sale.discountAmount))}</span>
             </div>
+            {serviceChargeAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span>Service Charge</span>
+                <span>{formatCurrency(serviceChargeAmount)}</span>
+              </div>
+            )}
+            {taxAmount > 0 && (
+              <div className="flex justify-between text-sm">
+                <span>PB1</span>
+                <span>{formatCurrency(taxAmount)}</span>
+              </div>
+            )}
+            {roundingAmount !== 0 && (
+              <div className="flex justify-between text-sm">
+                <span>Pembulatan</span>
+                <span>{formatCurrency(roundingAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-lg font-extrabold border-t-[2px] border-border-default pt-2">
-              <span>Total</span>
+              <span>Total Dibayar</span>
               <span className="text-accent-primary">
                 {formatCurrency(totalAmount)}
               </span>
@@ -525,6 +556,9 @@ export default function SaleDetailPage({
               }))}
               subtotal={Number(sale.subtotal)}
               discountAmount={Number(sale.discountAmount)}
+              serviceCharge={serviceChargeAmount}
+              taxAmount={taxAmount}
+              roundingAmount={roundingAmount}
               totalAmount={Number(sale.totalAmount)}
               paymentType={sale.paymentType}
               paymentRef={sale.paymentRef}
@@ -567,6 +601,9 @@ export default function SaleDetailPage({
         }))}
         subtotal={Number(sale.subtotal)}
         discountAmount={Number(sale.discountAmount)}
+        serviceCharge={serviceChargeAmount}
+        taxAmount={taxAmount}
+        roundingAmount={roundingAmount}
         totalAmount={Number(sale.totalAmount)}
         paymentType={sale.paymentType}
         paymentRef={sale.paymentRef}

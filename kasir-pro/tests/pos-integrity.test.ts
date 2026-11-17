@@ -210,3 +210,30 @@ test("kasir dan struk memakai tarif yang sama", () => {
 test("keranjang memakai total bertagih untuk tombol uang pas", () => {
   assert.match(cartHook, /return get\(\)\.getTotals\(\)\.totalAmount;/);
 });
+
+// --- Cetak ulang & riwayat: rincian tagihan tidak boleh hilang -----------------
+
+test("cetak ulang struk tetap memuat PB1, service charge, dan pembulatan", () => {
+  const saleDetailPage = readFileSync(
+    new URL("../src/app/(dashboard)/sales/[id]/page.tsx", import.meta.url),
+    "utf8"
+  );
+  const occurrences = saleDetailPage.match(/serviceCharge: serviceChargeAmount|serviceCharge={serviceChargeAmount}/g) ?? [];
+  assert.ok(occurrences.length >= 3, `pratinjau struk, cetak thermal, dan printer ESC/POS harus memuat service charge (ditemukan ${occurrences.length})`);
+  assert.match(saleDetailPage, /taxAmount: taxAmount|taxAmount={taxAmount}/);
+  assert.match(saleDetailPage, /roundingAmount: roundingAmount|roundingAmount={roundingAmount}/);
+  // Ringkasan transaksi juga menampilkan baris PB1 & service charge
+  assert.match(saleDetailPage, /<span>Service Charge<\/span>/);
+  assert.match(saleDetailPage, /<span>PB1<\/span>/);
+});
+
+test("transaksi batal tidak menampilkan laba", () => {
+  const saleDetailPage = readFileSync(
+    new URL("../src/app/(dashboard)/sales/[id]/page.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(saleDetailPage, /const grossProfit = sale\.isVoided \? 0 : Number\(sale\.grossProfit\)/);
+  // Margin dihitung dari omzet neto (setelah PB1), bukan total bruto
+  assert.match(saleDetailPage, /const netRevenue = totalAmount - taxAmount/);
+  assert.match(saleDetailPage, /!sale\.isVoided && netRevenue > 0 \? \(\(grossProfit \/ netRevenue\) \* 100\)/);
+});

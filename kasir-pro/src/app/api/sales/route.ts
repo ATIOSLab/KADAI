@@ -159,7 +159,10 @@ function pruneSalesIdempotency() {
 // Kasir paralel (beberapa perangkat, satu cabang) sempat gagal 8 dari 12
 // transaksi serentak dengan 3 percobaan. Jeda tumbuh per percobaan supaya
 // penantang mundur, bukan menabrak lagi di milidetik yang sama.
-const MAX_INVOICE_ATTEMPTS = 6;
+// Jam sibuk: 12 kasir serentak pada satu batch FIFO sempat menyisakan 5
+// penolakan walau semuanya hanya bentrok tulis. Anggaran percobaan dinaikkan
+// supaya kasir menunggu (maks ~2 detik) alih-alih diminta mengulang manual.
+const MAX_INVOICE_ATTEMPTS = 10;
 
 /**
  * Transaksi Serializable yang bertabrakan ditolak PostgreSQL dengan P2034
@@ -194,7 +197,7 @@ async function createSaleWithRetry<T>(
       await new Promise((resolve) =>
         setTimeout(
           resolve,
-          Math.min(400, 25 * attempt) + Math.floor(Math.random() * 40)
+          Math.min(120, 20 * attempt) + Math.floor(Math.random() * 60)
         )
       );
     }

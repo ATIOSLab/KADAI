@@ -125,8 +125,12 @@ test("penutupan shift dicatat sebagai SHIFT_CLOSED, bukan SALE_CREATED", () => {
 // --- Akuntansi: PB1 titipan negara, service charge pendapatan jasa ------------
 
 test("laba kotor menyertakan service charge tetapi tidak PB1", () => {
-  // Sale.grossProfit = (subtotal - diskon) + service charge - HPP
-  assert.match(sales, /const grossProfit = netSubtotal\.add\(serviceCharge\)\.sub\(totalCost\)/);
+  // Sale.grossProfit = (subtotal - diskon) + service charge + pembulatan - HPP
+  // Pembulatan ikut karena ia uang yang benar-benar diterima kasir.
+  assert.match(
+    sales,
+    /const grossProfit = netSubtotal[\s\S]{0,120}?\.add\(roundingAmount\)[\s\S]{0,40}?\.sub\(totalCost\)/
+  );
   // HPP per transaksi memakai definisi yang sama: uang masuk - PB1 - HPP
   assert.match(hpp, /grossProfit: sale\.totalAmount\.sub\(sale\.taxAmount\)\.sub\(totalHPP\)/);
 });

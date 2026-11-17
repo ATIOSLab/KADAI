@@ -206,7 +206,9 @@ export async function getProfitSummary(
   const serviceChargeCollected = Number(aggregate._sum.serviceCharge ?? 0);
   const netRevenue = revenue - taxCollected;
   const hpp = Number(aggregate._sum.totalCost ?? 0);
-  const profit = Number(aggregate._sum.grossProfit ?? 0);
+  // Laba kotor diturunkan dari omzet neto - HPP agar identitas laporan selalu
+  // berlaku (pembulatan tunai sudah masuk omzet neto).
+  const profit = netRevenue - hpp;
 
   return {
     period: range.period,
@@ -480,10 +482,9 @@ export async function getReportSnapshot(params: {
   );
   const netRevenue = totalRevenue - taxCollected;
   const totalHpp = rangeSales.reduce((sum, sale) => sum + Number(sale.totalCost), 0);
-  const totalProfit = rangeSales.reduce(
-    (sum, sale) => sum + Number(sale.grossProfit),
-    0
-  );
+  // Omzet neto - HPP: angka di laporan harus bisa dijumlahkan sendiri oleh
+  // pemilik tanpa selisih pembulatan.
+  const totalProfit = netRevenue - totalHpp;
 
   return {
     meta: {

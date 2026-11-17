@@ -479,7 +479,13 @@ export async function POST(request: NextRequest) {
       // Laba kotor = pendapatan usaha dikurangi HPP. Service charge adalah
       // pendapatan jasa milik usaha, jadi ikut dihitung; PB1 tidak, karena
       // uang itu titipan negara dan hanya lewat di kas.
-      const grossProfit = netSubtotal.add(serviceCharge).sub(totalCost);
+      // Pembulatan tunai adalah uang yang benar-benar diterima kasir, jadi ikut
+      // dihitung. Tanpa ini laba kotor + HPP tidak akan pernah sama dengan
+      // omzet neto (selisih sebesar total pembulatan pada laporan).
+      const grossProfit = netSubtotal
+        .add(serviceCharge)
+        .add(roundingAmount)
+        .sub(totalCost);
 
       // 5. Create sale record
       const sale = await tx.sale.create({

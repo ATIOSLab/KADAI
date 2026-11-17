@@ -173,8 +173,10 @@ export async function getDashboardOverview(
   for (const sale of sales) {
     const saleDateKey = toLocalDate(sale.createdAt, timezone);
     const saleRevenue = Number(sale.totalAmount);
-    const saleProfit = Number(sale.grossProfit);
     const saleCost = Number(sale.totalCost);
+    // Laba kotor = yang dibayar pembeli - PB1 (titipan) - HPP; identitas yang
+    // sama dengan laporan agar kartu dashboard tidak berbeda angka.
+    const saleProfit = saleRevenue - Number(sale.taxAmount) - saleCost;
 
     const dailyEntry = dailyMap.get(saleDateKey);
     if (dailyEntry) {

@@ -102,7 +102,9 @@ export async function GET(req: NextRequest) {
       const srv = Number(sale.serviceCharge);
       const tax = Number(sale.taxAmount);
       const hpp = Number(sale.totalCost);
-      const profit = Number(sale.grossProfit);
+      // Laba kotor = total dibayar - PB1 - HPP. Diturunkan, bukan dibaca dari
+      // kolom tersimpan, supaya pembulatan tunai dan baris lama tetap konsisten.
+      const profit = Number(sale.totalAmount) - tax - hpp;
 
       monthlySummary[monthIdx].transactionCount += 1;
       // Peredaran bruto (PP 55/2022) = nilai penyerahan ke pembeli, yaitu

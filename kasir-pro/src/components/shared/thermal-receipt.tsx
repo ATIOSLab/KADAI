@@ -29,6 +29,9 @@ export interface ThermalReceiptProps {
   paymentType: string;
   paymentRef?: string | null;
   cashReceived?: number | null;
+  isVoided?: boolean;
+  voidReason?: string | null;
+  voidedAt?: string | null;
   changeAmount?: number | null;
   preview?: boolean;
   laundryTrackingToken?: string | null;
@@ -56,6 +59,9 @@ export function ThermalReceipt({
   paymentType,
   paymentRef,
   cashReceived,
+  isVoided,
+  voidReason,
+  voidedAt,
   changeAmount,
   preview = false,
   laundryTrackingToken,
@@ -99,6 +105,23 @@ export function ThermalReceipt({
         {outletAddress && <p className="text-[11px] text-black/80 leading-tight max-w-[280px] mx-auto">{outletAddress}</p>}
         {outletPhone && <p className="text-[11px] text-black/80">Telp: {outletPhone}</p>}
       </div>
+
+      {/* Transaksi batal wajib terbaca dari kertasnya: cetak ulang tidak boleh
+          tampak seperti bukti pembelian yang sah. */}
+      {isVoided && (
+        <div className="my-2 border-2 border-black py-1.5 text-center">
+          <p className="font-black tracking-widest text-xs">*** TRANSAKSI DIBATALKAN ***</p>
+          {voidedAt && (
+            <p className="text-[10px] font-semibold">
+              {new Date(voidedAt).toLocaleString("id-ID", {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}
+            </p>
+          )}
+          {voidReason && <p className="text-[10px] leading-tight px-2">{voidReason}</p>}
+        </div>
+      )}
 
       {/* Meta Info */}
       <div className="py-2.5 border-b border-dashed border-black/60 text-[11px] space-y-1">

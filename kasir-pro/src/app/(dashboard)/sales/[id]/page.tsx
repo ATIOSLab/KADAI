@@ -278,6 +278,9 @@ export default function SaleDetailPage({
           paymentRef: sale.paymentRef,
           cashReceived: sale.paidAmount ? Number(sale.paidAmount) : null,
           changeAmount: sale.changeAmount ? Number(sale.changeAmount) : null,
+          isVoided: sale.isVoided,
+          voidReason: sale.voidReason,
+          voidedAt: sale.voidedAt,
         });
         toast.success(`Struk berhasil dicetak ke ${thermalPrinter.config.deviceName || "Printer"}`, { id: "print-sale" });
         return;
@@ -574,6 +577,9 @@ export default function SaleDetailPage({
               paymentRef={sale.paymentRef}
               cashReceived={sale.paidAmount ? Number(sale.paidAmount) : null}
               changeAmount={sale.changeAmount ? Number(sale.changeAmount) : null}
+              isVoided={sale.isVoided}
+              voidReason={sale.voidReason}
+              voidedAt={sale.voidedAt}
               preview={true}
             />
           </div>
@@ -621,6 +627,9 @@ export default function SaleDetailPage({
         paymentRef={sale.paymentRef}
         cashReceived={sale.paidAmount ? Number(sale.paidAmount) : null}
         changeAmount={sale.changeAmount ? Number(sale.changeAmount) : null}
+        isVoided={sale.isVoided}
+        voidReason={sale.voidReason}
+        voidedAt={sale.voidedAt}
       />
     </div>
   );

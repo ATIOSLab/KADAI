@@ -31,6 +31,9 @@ export interface ReceiptData {
   paymentRef?: string | null;
   cashReceived?: number | null;
   changeAmount?: number | null;
+  isVoided?: boolean;
+  voidReason?: string | null;
+  voidedAt?: string | null;
   laundryTrackingToken?: string | null;
   laundryJobCode?: string | null;
 }
@@ -169,7 +172,20 @@ export function buildEscPosReceipt(data: ReceiptData, paperWidth: PaperWidth = 5
   enc.divider("-");
 
   // 3. Metadata (Key-Value)
-  enc.alignLeft();
+  // Transaksi yang dibatalkan wajib kelihatan dari kertasnya. Tanpa tanda ini
+  // struk cetak ulang tampak sah dan bisa dipakai sebagai bukti pembelian.
+  if (data.isVoided) {
+    enc.alignCenter();
+    enc.bold(true);
+    enc.line("*** TRANSAKSI DIBATALKAN ***");
+    enc.bold(false);
+    if (data.voidedAt) {
+      const d = new Date(data.voidedAt);
+      enc.line(d.toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }));
+    }
+    if (data.voidReason) enc.line(data.voidReason.slice(0, 40));
+    enc.alignLeft();
+  }
   enc.twoColumns("No. Invoice", data.invoiceNumber);
 
   const dateStr = data.createdAt

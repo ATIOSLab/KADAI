@@ -30,8 +30,8 @@ test("checkout mengulang tabrakan tulis Serializable (P2034) sebelum menyerah", 
   // Retry harus punya jeda berjitter yang tumbuh per percobaan; mengulang
   // pada milidetik yang sama membuat dua kasir bentrok lagi, dan 3 percobaan
   // saja membuat 8 dari 12 transaksi serentak gagal 409.
-  assert.match(sales, /Math\.min\(120, 20 \* attempt\) \+ Math\.floor\(Math\.random\(\) \* 60\)/);
-  assert.match(sales, /const MAX_INVOICE_ATTEMPTS = 10;/);
+  assert.match(sales, /Math\.min\(400, 40 \* attempt\) \+ Math\.floor\(Math\.random\(\) \* 120\)/);
+  assert.match(sales, /const MAX_INVOICE_ATTEMPTS = 14;/);
 });
 
 test("tabrakan tulis yang menetap dijawab 409 TRANSACTION_CONFLICT, bukan 500", () => {

@@ -127,10 +127,11 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           ? crypto.randomUUID()
           : `sale-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-      const response = await apiFetch<{
-        success: true;
-        data: any;
-      }>("/api/sales", {
+      const submitSale = () =>
+        apiFetch<{
+          success: true;
+          data: any;
+        }>("/api/sales", {
         method: "POST",
         headers: {
           "x-idempotency-key": clientAttemptKey,
@@ -154,7 +155,24 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           notes: notes || null,
           idempotencyKey: clientAttemptKey,
         },
-      });
+        });
+
+      let response;
+      try {
+        response = await submitSale();
+      } catch (error) {
+        // Kasir tidak boleh disuruh menekan Bayar dua kali hanya karena kasir
+        // lain menyimpan transaksi pada detik yang sama. Kunci idempotensi
+        // dipakai ulang, jadi percobaan kedua tidak bisa menggandakan transaksi.
+        const bentrok =
+          error instanceof ApiError &&
+          (error.status === 409 || error.code === "TRANSACTION_CONFLICT");
+        if (!bentrok) {
+          throw error;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 900));
+        response = await submitSale();
+      }
 
       setInvoiceNumber(response.data.invoiceNumber);
       setCompletedSale(response.data);

@@ -336,26 +336,32 @@ async function seedDemoClusters() {
             },
           });
 
-      // Seed Product Batch (FIFO tracking)
+      // Seed Product Batch (FIFO tracking) - HANYA kalau belum ada.
+      // Dulu memakai upsert dengan remainingQty: prod.stock, sehingga setiap
+      // container restart mengembalikan stok demo ke angka seed. Batch yang
+      // sudah dipotong penjualan jadi terlihat penuh lagi, padahal alokasi
+      // saleItemBatch-nya masih ada: remainingQty tidak lagi sama dengan
+      // quantity - total alokasi, dan FIFO memotong stok yang sudah terjual.
       const batchNo = `BATCH-${prod.sku}-202611`;
-      await prisma.productBatch.upsert({
+      const existingBatch = await prisma.productBatch.findUnique({
         where: { batchNumber: batchNo },
-        update: {
-          quantity: prod.stock,
-          remainingQty: prod.stock,
-          costPrice: prod.cost,
-          sellingPrice: prod.price,
-        },
-        create: {
-          productId: p.id,
-          batchNumber: batchNo,
-          quantity: prod.stock,
-          remainingQty: prod.stock,
-          costPrice: prod.cost,
-          sellingPrice: prod.price,
-          purchaseDate: new Date(),
-        },
+        select: { id: true },
       });
+      if (!existingBatch) {
+        await prisma.productBatch.create({
+          data: {
+            productId: p.id,
+            batchNumber: batchNo,
+            quantity: prod.stock,
+            remainingQty: prod.stock,
+            costPrice: prod.cost,
+            sellingPrice: prod.price,
+            purchaseDate: new Date(),
+            // Batch demo terikat cabang utama supaya tidak jadi stok global.
+            outletId: mainOutlet?.id ?? null,
+          },
+        });
+      }
       console.log(`  [Product] ${prod.name} (Rp ${prod.price.toLocaleString("id-ID")})`);
     }
 

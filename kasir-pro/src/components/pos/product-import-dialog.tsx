@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   UploadCloud,
@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiFetch, ApiError } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
+import { SearchableSelect } from "@/components/shared/searchable-select";
+import { Label } from "@/components/ui/label";
 
 interface ParsedProduct {
   name: string;
@@ -47,6 +49,30 @@ export function ProductImportDialog({
   onSuccess,
 }: ImportDialogProps) {
   const [file, setFile] = useState<File | null>(null);
+  // Stok hasil impor harus jelas cabangnya: tanpa pilihan ini seluruh stok
+  // masuk ke cabang pengguna (biasanya cabang utama).
+  const [outlets, setOutlets] = useState<{ id: string; code: string; name: string }[]>([]);
+  const [outletId, setOutletId] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/outlets");
+        const data = await res.json();
+        const list = (data.data || []) as {
+          id: string;
+          code: string;
+          name: string;
+          isMain?: boolean;
+        }[];
+        setOutlets(list);
+        const preferred = list.find((o) => o.isMain) ?? list[0];
+        if (preferred) setOutletId((current) => current || preferred.id);
+      } catch {
+        // tanpa cabang, API memakai cabang pengguna sebagai default
+      }
+    })();
+  }, []);
   const [parsedItems, setParsedItems] = useState<ParsedProduct[]>([]);
   const [parsing, setParsing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -191,6 +217,7 @@ export function ProductImportDialog({
         method: "POST",
         body: JSON.stringify({
           products: parsedItems,
+          ...(outletId ? { outletId } : {}),
         }),
       });
 
@@ -241,6 +268,22 @@ export function ProductImportDialog({
 
         {!importSummary ? (
           <div className="space-y-4 py-2">
+            {/* Cabang penerima stok hasil impor */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold">Cabang Penerima Stok</Label>
+              <SearchableSelect
+                options={outlets.map((o) => ({
+                  value: o.id,
+                  label: `${o.code} - ${o.name}`,
+                }))}
+                value={outletId}
+                onValueChange={setOutletId}
+                placeholder="Pilih cabang"
+              />
+              <p className="text-[11px] text-slate-500">
+                Stok awal tiap produk hasil impor dicatat atas cabang ini.
+              </p>
+            </div>
             {/* File Upload Dropzone */}
             <div
               onClick={() => fileInputRef.current?.click()}

@@ -3,6 +3,7 @@ import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { prisma } from "@/lib/prisma";
 import { voidSaleSchema } from "@/lib/validators/sale";
 import { restoreFIFODeductions } from "@/lib/fifo";
+import { Decimal } from "@prisma/client/runtime/library";
 import { logActivity } from "@/lib/activity-logger";
 import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
@@ -157,6 +158,28 @@ export async function POST(
       );
 
       await restoreFIFODeductions(tx, allocations);
+
+      // CRM: transaksi batal harus mengembalikan statistik pelanggan. Tanpa ini
+      // pelanggan yang uangnya dikembalikan tetap membawa total belanja,
+      // kunjungan, dan poin loyalitas dari transaksi yang tidak pernah terjadi.
+      if (sale.customerId) {
+        const customer = await tx.customer.findFirst({
+          where: { id: sale.customerId, storeId: scope.storeId },
+          select: { id: true, totalSpent: true, visitCount: true, loyaltyPoints: true },
+        });
+        if (customer) {
+          const spentAfterVoid = customer.totalSpent.sub(sale.totalAmount);
+          const pointsBack = Math.floor(Number(sale.totalAmount) / 10000);
+          await tx.customer.update({
+            where: { id: customer.id },
+            data: {
+              totalSpent: spentAfterVoid.isNegative() ? new Decimal(0) : spentAfterVoid,
+              visitCount: Math.max(0, customer.visitCount - 1),
+              loyaltyPoints: Math.max(0, customer.loyaltyPoints - pointsBack),
+            },
+          });
+        }
+      }
 
       // Tiket dapur milik transaksi batal wajib ikut dibatalkan. Tanpa ini
       // layar KDS tetap menampilkan pesanan yang uangnya sudah dikembalikan,

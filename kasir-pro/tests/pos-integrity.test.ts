@@ -47,6 +47,16 @@ test("papan KDS menyaring tiket milik transaksi yang sudah di-void", () => {
   assert.ok(hits.length >= 2, `filter isVoided hanya ${hits.length}x di route KDS`);
 });
 
+test("void mengembalikan statistik CRM pelanggan (belanja, kunjungan, poin)", () => {
+  assert.match(voidRoute, /if \(sale\.customerId\)/);
+  assert.match(voidRoute, /totalSpent: spentAfterVoid\.isNegative\(\) \? new Decimal\(0\) : spentAfterVoid/);
+  assert.match(voidRoute, /visitCount: Math\.max\(0, customer\.visitCount - 1\)/);
+  assert.match(voidRoute, /loyaltyPoints: Math\.max\(0, customer\.loyaltyPoints - pointsBack\)/);
+  // Poin yang ditarik harus memakai rumus yang sama dengan saat sale (floor 10.000)
+  assert.match(sales, /Math\.floor\(Number\(totalAmount\) \/ 10000\)/);
+  assert.match(voidRoute, /Math\.floor\(Number\(sale\.totalAmount\) \/ 10000\)/);
+});
+
 // --- Transfer: penerimaan stok harus diklaim atomik ---------------------------
 
 test("penerimaan transfer memakai klaim atomik IN_TRANSIT -> RECEIVED", () => {

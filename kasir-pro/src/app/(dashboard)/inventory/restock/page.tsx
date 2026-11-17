@@ -79,6 +79,12 @@ export default function RestockPage() {
   const [loadingProducts, setLoadingProducts] = useState(true);
 
   const [selectedProductId, setSelectedProductId] = useState("");
+  // Cabang penerima stok. Stok restock tanpa cabang tidak bisa dijual dan tidak
+  // muncul di laporan per cabang, jadi cabang dipilih eksplisit di sini.
+  const [outlets, setOutlets] = useState<
+    { id: string; name: string; code: string; isMain?: boolean }[]
+  >([]);
+  const [selectedOutletId, setSelectedOutletId] = useState("");
   const [costPrice, setCostPrice] = useState("");
   const [sellingPrice, setSellingPrice] = useState("");
   const [markupPercent, setMarkupPercent] = useState(
@@ -91,10 +97,26 @@ export default function RestockPage() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        const res = await apiFetch<{ data: ProductWithStock[] }>(
-          "/api/products?limit=100"
-        );
+        const [res, outletsRes] = await Promise.all([
+          apiFetch<{ data: ProductWithStock[] }>("/api/products?limit=100"),
+          fetch("/api/outlets"),
+        ]);
         setProducts(res.data);
+
+        if (outletsRes.ok) {
+          const payload = await outletsRes.json();
+          const list = (payload.data || []) as {
+            id: string;
+            name: string;
+            code: string;
+            isMain?: boolean;
+          }[];
+          setOutlets(list);
+          if (list.length > 0) {
+            const main = list.find((o) => o.isMain) || list[0];
+            setSelectedOutletId(main.id);
+          }
+        }
       } catch {
         toast.error("Gagal memuat daftar produk");
       } finally {
@@ -220,6 +242,7 @@ export default function RestockPage() {
         method: "POST",
         body: {
           productId: selectedProductId,
+          outletId: selectedOutletId || undefined,
           quantity: parseInt(formData.get("quantity") as string),
           costPrice: parseFloat(costPrice),
           sellingPrice: parseFloat(sellingPrice),
@@ -264,6 +287,31 @@ export default function RestockPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Outlet Select: ke cabang mana stok ini masuk */}
+            {outlets.length > 0 && (
+              <div className="space-y-2">
+                <Label>Cabang Penerima Stok *</Label>
+                <SearchableSelect
+                  value={selectedOutletId}
+                  onValueChange={setSelectedOutletId}
+                  placeholder="Pilih cabang"
+                  searchPlaceholder="Cari cabang..."
+                  emptyMessage="Cabang tidak ditemukan."
+                  options={outlets.map((outlet) => ({
+                    value: outlet.id,
+                    label: outlet.name,
+                    description: outlet.code,
+                    searchText: `${outlet.name} ${outlet.code}`,
+                    triggerLabel: `${outlet.name} (${outlet.code})`,
+                  }))}
+                />
+                <p className="text-xs text-text-muted">
+                  Stok hanya bisa dijual di cabang yang dipilih. Pindahkan antar
+                  cabang lewat menu Transfer Stok.
+                </p>
+              </div>
+            )}
+
             {/* Product Select */}
             <div className="space-y-2">
               <Label>Produk *</Label>

@@ -12,6 +12,7 @@ import {
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "@prisma/client";
 import { withUniqueNumberRetry } from "@/lib/unique-number-retry";
+import { withWriteConflictRetry } from "@/lib/write-conflict-retry";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { checkFeature } from "@/lib/plan-limits";
 import { formatInTimeZone } from "date-fns-tz";
@@ -243,7 +244,10 @@ export async function PUT(request: NextRequest) {
     }
 
     if (validated.action === "RECEIVE") {
-      await prisma.$transaction(async (tx) => {
+      // Dua kasir menekan "Terima" bersamaan: satu menang, satu kalah. Yang kalah
+      // bisa ditolak PostgreSQL sebagai serialization failure (40001/P2034) dan
+      // dulu muncul sebagai 500. Coba ulang singkat, lalu jawab 409 yang jelas.
+      await withWriteConflictRetry(() => prisma.$transaction(async (tx) => {
         // Klaim atomik: hanya SATU permintaan yang boleh mengubah IN_TRANSIT →
         // RECEIVED. Sebelumnya dua klik "Terima" bersamaan sama-sama lolos
         // pemeriksaan status di luar transaksi, dan satu-satunya pengaman adalah
@@ -382,7 +386,12 @@ export async function PUT(request: NextRequest) {
             },
           },
         });
-      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }), {
+        context: "transfer.receive",
+        exhaustedCode: "TRANSFER_BUSY",
+        exhaustedMessage:
+          "Transfer ini sedang diproses oleh permintaan lain. Muat ulang halaman lalu coba lagi.",
+      });
 
       return jsonOk(
         null,

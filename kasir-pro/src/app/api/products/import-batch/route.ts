@@ -23,6 +23,9 @@ const importItemSchema = z.object({
 const batchImportPayloadSchema = z.object({
   products: z.array(importItemSchema).min(1, "Minimal 1 produk untuk diimpor"),
   defaultUnit: z.string().default("pcs"),
+  // Cabang tempat stok awal masuk (opsional). Tanpa ini stok awal tersimpan
+  // tanpa cabang sehingga tidak bisa dijual di cabang mana pun.
+  outletId: z.string().min(1).optional().nullable(),
 });
 
 // POST /api/products/import-batch — Import produk dari kasir lama (Excel/CSV)
@@ -44,6 +47,41 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const validated = batchImportPayloadSchema.parse(body);
+
+    // Resolusi cabang sekali di depan: eksplisit dari klien, kalau tidak ada
+    // pakai cabang pengguna, terakhir cabang utama tenant.
+    let targetOutletId: string | null = null;
+    if (validated.outletId) {
+      const owned = await prisma.outlet.findFirst({
+        where: { id: validated.outletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!owned) {
+        return jsonError("Cabang tidak ditemukan pada tenant ini", 400);
+      }
+      targetOutletId = owned.id;
+    } else {
+      const userRec = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { outletId: true },
+      });
+      targetOutletId =
+        userRec?.outletId ??
+        (
+          await prisma.outlet.findFirst({
+            where: { isMain: true, isActive: true, storeId: scope.storeId },
+            select: { id: true },
+          })
+        )?.id ??
+        null;
+    }
+
+    if (!targetOutletId) {
+      return jsonError(
+        "Cabang penerima stok awal belum ditentukan. Buat cabang lebih dulu atau pilih cabang saat impor.",
+        400
+      );
+    }
 
     const results = {
       importedCount: 0,
@@ -139,6 +177,7 @@ export async function POST(request: NextRequest) {
           await tx.productBatch.create({
             data: {
               productId: product.id,
+              outletId: targetOutletId,
               batchNumber,
               purchaseDate: new Date(),
               quantity: initialQty,

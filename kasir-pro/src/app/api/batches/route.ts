@@ -53,6 +53,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
     }
 
+    // Cabang penerima stok: eksplisit dari klien, kalau tidak ada pakai cabang
+    // pengguna, terakhir cabang utama tenant. Batch tanpa cabang tidak bisa
+    // dijual di cabang mana pun (FIFO menyaring per cabang) dan tidak muncul di
+    // laporan stok per cabang, jadi nilai ini WAJIB terisi.
+    let effectiveOutletId: string | null = null;
+    if (data.outletId) {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: data.outletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return NextResponse.json({ error: "Cabang tidak ditemukan pada tenant ini" }, { status: 400 });
+      }
+      effectiveOutletId = ownedOutlet.id;
+    } else {
+      const userRec = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { outletId: true },
+      });
+      effectiveOutletId =
+        userRec?.outletId ??
+        (
+          await prisma.outlet.findFirst({
+            where: { isMain: true, isActive: true, storeId: scope.storeId },
+            select: { id: true },
+          })
+        )?.id ??
+        null;
+    }
+
+    if (!effectiveOutletId) {
+      return NextResponse.json(
+        {
+          error:
+            "Cabang penerima stok belum ditentukan. Buat/aktifkan cabang lebih dulu, atau pilih cabang saat restock.",
+          code: "OUTLET_REQUIRED",
+        },
+        { status: 400 }
+      );
+    }
+
     // Restock bersamaan: nomor batch dihitung dari jumlah batch hari ini, jadi
     // dua staff yang menyimpan restock pada saat yang sama bisa menghitung nomor
     // yang sama dan satu di antaranya gagal (500) padahal stok fisik sudah masuk.
@@ -78,6 +119,7 @@ export async function POST(request: NextRequest) {
       const createdBatch = await tx.productBatch.create({
         data: {
           batchNumber,
+          outletId: effectiveOutletId,
           productId: data.productId,
           quantity: data.quantity,
           remainingQty: data.quantity,

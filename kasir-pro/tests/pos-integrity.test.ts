@@ -290,3 +290,60 @@ test("pesan validasi Zod yang spesifik diteruskan ke pengguna", () => {
   assert.match(apiResponse, /const firstIssue = error\.issues\[0\]\?\.message/);
   assert.match(apiResponse, /firstIssue \|\| "Format data yang dikirim tidak valid"/);
 });
+
+// --- Stok wajib punya cabang & retry bentrok tulis ---------------------------------
+
+test("restock selalu menempelkan stok ke cabang", () => {
+  const route = readFileSync(new URL("../src/app/api/batches/route.ts", import.meta.url), "utf8");
+  assert.match(route, /let effectiveOutletId: string \| null = null/, "cabang efektif dihitung");
+  assert.match(route, /outletId: effectiveOutletId/, "batch disimpan dengan cabang");
+  assert.match(route, /OUTLET_REQUIRED/, "tanpa cabang ditolak, bukan disimpan tanpa cabang");
+  const validator = readFileSync(new URL("../src/lib/validators/batch.ts", import.meta.url), "utf8");
+  assert.match(validator, /outletId: z\.string\(\)\.min\(1, "Cabang tidak valid"\)\.optional\(\)\.nullable\(\)/);
+});
+
+test("impor produk menempelkan stok awal ke cabang", () => {
+  const route = readFileSync(new URL("../src/app/api/products/import-batch/route.ts", import.meta.url), "utf8");
+  assert.match(route, /let targetOutletId: string \| null = null/);
+  assert.match(route, /outletId: targetOutletId/, "batch impor punya cabang");
+});
+
+test("stok lama tanpa cabang dipindahkan ke cabang utama", () => {
+  const sql = readFileSync(
+    new URL("../prisma/migrations/20261117130000_batch_outlet_backfill/migration.sql", import.meta.url),
+    "utf8"
+  );
+  assert.match(sql, /UPDATE product_batches/);
+  assert.match(sql, /WHERE pb\."outletId" IS NULL/);
+  assert.match(sql, /o\."isMain" = true/);
+});
+
+test("transaksi Serializable dicoba ulang sebelum 500", () => {
+  const helper = readFileSync(new URL("../src/lib/write-conflict-retry.ts", import.meta.url), "utf8");
+  assert.match(helper, /code === "P2034" \|\| code === "P2028"/, "kode Prisma dikenali");
+  assert.match(helper, /could not serialize/, "pesan PostgreSQL dikenali");
+  assert.match(helper, /new ApiBusinessError\(exhaustedMessage, 409, exhaustedCode\)/, "habis percobaan -> 409");
+
+  const transfers = readFileSync(new URL("../src/app/api/inventory/transfers/route.ts", import.meta.url), "utf8");
+  assert.match(transfers, /withWriteConflictRetry\(\(\) => prisma\.\$transaction\(async \(tx\) => \{\s*\/\/ Klaim atomik/);
+  assert.match(transfers, /exhaustedCode: "TRANSFER_BUSY"/);
+
+  for (const [file, code] of [
+    ["../src/app/api/inventory/adjustment/route.ts", "ADJUSTMENT_BUSY"],
+    ["../src/app/api/products/[id]/produce/route.ts", "PRODUCTION_BUSY"],
+  ]) {
+    const src = readFileSync(new URL(file, import.meta.url), "utf8");
+    assert.match(src, /withWriteConflictRetry\(\(\) => prisma\.\$transaction/, `${file} memakai retry`);
+    assert(src.includes(code), `${file} punya kode 409 ${code}`);
+  }
+});
+
+test("halaman restock memilih cabang penerima stok", () => {
+  const page = readFileSync(
+    new URL("../src/app/(dashboard)/inventory/restock/page.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(page, /Cabang Penerima Stok/);
+  assert.match(page, /outletId: selectedOutletId \|\| undefined/);
+  assert.match(page, /fetch\("\/api\/outlets"\)/);
+});

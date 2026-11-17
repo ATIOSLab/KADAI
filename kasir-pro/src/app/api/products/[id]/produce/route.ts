@@ -12,6 +12,7 @@ import {
 import { formatInTimeZone } from "date-fns-tz";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { Prisma } from "@prisma/client";
+import { withWriteConflictRetry } from "@/lib/write-conflict-retry";
 import { Decimal } from "@prisma/client/runtime/library";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 
@@ -114,7 +115,7 @@ export async function POST(
       validated.batchNumber?.trim() || `PROD-${product.sku}-${dateStr}-${randomSuffix}`;
 
     // 3. Execute atomic production transaction
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await withWriteConflictRetry(() => prisma.$transaction(async (tx) => {
       let totalBatchCost = new Decimal(0);
 
       for (const recipe of product.recipesAsParent) {
@@ -236,7 +237,12 @@ export async function POST(
       };
       // Serializable: dua produksi bersamaan tidak boleh menarik bahan yang sama
       // (klaim batch di dalamnya akan menolak dengan 409 kalau stok berubah).
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }), {
+      context: "product.produce",
+      exhaustedCode: "PRODUCTION_BUSY",
+      exhaustedMessage:
+        "Produksi ini sedang diproses oleh permintaan lain. Ulangi sesaat lagi.",
+    });
 
     return jsonOk(
       result,

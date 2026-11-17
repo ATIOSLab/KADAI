@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { withWriteConflictRetry } from "@/lib/write-conflict-retry";
 import { prisma } from "@/lib/prisma";
 import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     // pemotongan gagal, catatan -N tanpa stok yang keluar akan menyesatkan opname.
     // Serializable + klaim batch: dua opname bersamaan tidak boleh memotong batch
     // yang sama sampai minus.
-    const adjustment = await prisma.$transaction(async (tx) => {
+    const adjustment = await withWriteConflictRetry(() => prisma.$transaction(async (tx) => {
       const created = await tx.stockAdjustment.create({
         data: {
           productId: data.productId,
@@ -101,7 +102,12 @@ export async function POST(request: NextRequest) {
       }
 
       return created;
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }), {
+      context: "inventory.adjustment",
+      exhaustedCode: "ADJUSTMENT_BUSY",
+      exhaustedMessage:
+        "Penyesuaian stok ini sedang diproses oleh permintaan lain. Muat ulang halaman lalu simpan ulang.",
+    });
 
     await logActivity({
       userId: sessionUser.id,

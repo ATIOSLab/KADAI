@@ -37,6 +37,16 @@ export async function GET(request: NextRequest) {
     const weekDateParam = searchParams.get("weekDate") ?? defaultWeek.startDate;
     const outletIdParam = searchParams.get("outletId");
 
+    // Format dicek lebih dulu: perbandingan string membuat "kemarin" > "2026-11-18"
+    // dan dilaporkan sebagai tanggal terbalik, padahal masalahnya format.
+    const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+    if (!DATE_ONLY.test(startDateParam) || !DATE_ONLY.test(endDateParam)) {
+      return NextResponse.json(
+        { error: "Format tanggal laporan tidak valid (YYYY-MM-DD)" },
+        { status: 400 }
+      );
+    }
+
     if (startDateParam > endDateParam) {
       return NextResponse.json(
         { error: "Tanggal mulai tidak boleh melebihi tanggal akhir" },

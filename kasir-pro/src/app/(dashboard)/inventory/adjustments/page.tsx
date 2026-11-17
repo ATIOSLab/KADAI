@@ -26,6 +26,7 @@ import {
   DialogFooter,
   DialogBody,
 } from "@/components/ui/dialog";
+import { SearchableSelect } from "@/components/shared/searchable-select";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { formatNumber } from "@/lib/utils";
@@ -40,6 +41,7 @@ interface AdjustmentEntry {
   createdAt: string;
   product: { id: string; name: string; sku: string };
   user: { id: string; name: string } | null;
+  outlet: { id: string; name: string; code: string } | null;
 }
 
 interface InventoryProduct {
@@ -83,6 +85,13 @@ export default function AdjustmentsPage() {
   const [productSearch, setProductSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Cabang penyesuaian: barang rusak/hilang milik satu cabang, jadi potongannya
+  // tidak boleh menyapu batch cabang lain.
+  const [outlets, setOutlets] = useState<
+    { id: string; name: string; code: string; isMain?: boolean }[]
+  >([]);
+  const [selectedOutletId, setSelectedOutletId] = useState("");
+
   const [formData, setFormData] = useState({
     productId: "",
     quantityChange: "",
@@ -111,6 +120,25 @@ export default function AdjustmentsPage() {
   useEffect(() => {
     loadAdjustments();
   }, [loadAdjustments]);
+
+  useEffect(() => {
+    fetch("/api/outlets")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        const list = (payload?.data || []) as {
+          id: string;
+          name: string;
+          code: string;
+          isMain?: boolean;
+        }[];
+        setOutlets(list);
+        if (list.length > 0) {
+          const main = list.find((o) => o.isMain) || list[0];
+          setSelectedOutletId((current) => current || main.id);
+        }
+      })
+      .catch(() => setOutlets([]));
+  }, []);
 
   useEffect(() => {
     if (!productSearch.trim()) {
@@ -143,6 +171,7 @@ export default function AdjustmentsPage() {
         method: "POST",
         body: {
           productId: formData.productId,
+          outletId: selectedOutletId || undefined,
           quantityChange: Number(formData.quantityChange),
           reason: formData.reason,
           notes: formData.notes || undefined,
@@ -192,6 +221,7 @@ export default function AdjustmentsPage() {
                 <tr>
                   <th className="text-left p-3 font-bold">Produk</th>
                   <th className="text-left p-3 font-bold">SKU</th>
+                  <th className="text-left p-3 font-bold">Cabang</th>
                   <th className="text-right p-3 font-bold">Perubahan</th>
                   <th className="text-left p-3 font-bold">Alasan</th>
                   <th className="text-left p-3 font-bold">Catatan</th>
@@ -202,7 +232,7 @@ export default function AdjustmentsPage() {
               <tbody>
                 {adjustments.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center p-12 text-text-muted">
+                    <td colSpan={8} className="text-center p-12 text-text-muted">
                       <AlertTriangle className="w-10 h-10 mx-auto mb-2 opacity-30" />
                       Belum ada riwayat penyesuaian stok
                     </td>
@@ -212,6 +242,9 @@ export default function AdjustmentsPage() {
                     <tr key={adj.id} className="border-b border-border-default last:border-0">
                       <td className="p-3 font-semibold">{adj.product.name}</td>
                       <td className="p-3 text-text-muted">{adj.product.sku}</td>
+                      <td className="p-3 text-text-muted text-xs">
+                        {adj.outlet ? `${adj.outlet.code}` : "-"}
+                      </td>
                       <td className="p-3 text-right">
                         <span
                           className={
@@ -272,6 +305,30 @@ export default function AdjustmentsPage() {
           <DialogBody>
             <div className="space-y-4 py-2">
               <div className="space-y-2">
+                {outlets.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Cabang *</Label>
+                    <SearchableSelect
+                      value={selectedOutletId}
+                      onValueChange={setSelectedOutletId}
+                      placeholder="Pilih cabang"
+                      searchPlaceholder="Cari cabang..."
+                      emptyMessage="Cabang tidak ditemukan."
+                      options={outlets.map((outlet) => ({
+                        value: outlet.id,
+                        label: outlet.name,
+                        description: outlet.code,
+                        searchText: `${outlet.name} ${outlet.code}`,
+                        triggerLabel: `${outlet.name} (${outlet.code})`,
+                      }))}
+                    />
+                    <p className="text-xs text-text-muted">
+                      Potongan stok hanya diambil dari batch cabang ini, bukan
+                      dari cabang lain.
+                    </p>
+                  </div>
+                )}
+
                 <Label>Cari Produk</Label>
                 <Input
                   placeholder="Ketik nama atau SKU produk..."

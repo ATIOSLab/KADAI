@@ -485,6 +485,7 @@ model Outlet {
   users             User[]
   batches           ProductBatch[]
   sales             Sale[]
+  stockAdjustments  StockAdjustment[]
   tables            RestaurantTable[]
   transfersSent     StockTransfer[]   @relation("SourceOutlet")
   transfersReceived StockTransfer[]   @relation("DestinationOutlet")
@@ -788,6 +789,11 @@ model StockAdjustment {
   reason         AdjustmentReason
   notes          String?
   createdAt      DateTime         @default(now())
+
+  // Cabang tempat barang hilang/rusak/opname. Tanpa ini, potongan FIFO
+  // menyapu batch semua cabang dan kerugian satu cabang menggerus stok cabang lain.
+  outletId String?
+  outlet   Outlet? @relation(fields: [outletId], references: [id], onDelete: SetNull)
 
   // Tenant
   storeId String?

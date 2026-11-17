@@ -358,6 +358,7 @@ export async function PUT(request: NextRequest) {
               notes: `Mutasi transfer keluar ke ${transfer.destinationOutlet.name} (${transfer.transferNumber})`,
               userId: sessionUser.id,
               storeId: scope.storeId,
+              outletId: transfer.sourceOutletId,
             },
           });
 
@@ -369,6 +370,7 @@ export async function PUT(request: NextRequest) {
               notes: `Penerimaan transfer stok dari ${transfer.sourceOutlet.name} (${transfer.transferNumber})`,
               userId: sessionUser.id,
               storeId: scope.storeId,
+              outletId: transfer.destinationOutletId,
             },
           });
         }

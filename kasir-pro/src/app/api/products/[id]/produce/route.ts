@@ -178,6 +178,7 @@ export async function POST(
               notes: `Konsumsi bahan baku untuk produksi ${qty} unit ${product.name} (Batch: ${finalBatchNumber})`,
               userId: sessionUser.id,
               storeId: scope.storeId,
+              outletId: effectiveOutletId,
             },
           });
 
@@ -210,6 +211,7 @@ export async function POST(
           notes: `Hasil produksi batch ${finalBatchNumber} (${qty} unit)`,
           userId: sessionUser.id,
           storeId: scope.storeId,
+          outletId: effectiveOutletId,
         },
       });
 

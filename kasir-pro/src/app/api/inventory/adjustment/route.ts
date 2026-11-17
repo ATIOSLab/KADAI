@@ -11,6 +11,9 @@ import { z } from "zod";
 
 const adjustmentSchema = z.object({
   productId: z.string().min(1),
+  // Cabang tempat barang hilang/rusak. Tanpa ini potongan FIFO menyapu batch
+  // seluruh cabang sehingga kerugian satu cabang menggerus stok cabang lain.
+  outletId: z.string().optional().nullable(),
   quantityChange: z.number().int(),
   reason: z.enum(["DAMAGED", "LOST", "EXPIRED", "STOCK_OPNAME", "OTHER"]),
   notes: z.string().optional(),
@@ -48,6 +51,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
     }
 
+    // Cabang penyesuaian: permintaan -> cabang pengguna -> cabang utama.
+    let effectiveOutletId = data.outletId || null;
+    if (effectiveOutletId) {
+      const outlet = await prisma.outlet.findFirst({
+        where: { id: effectiveOutletId, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!outlet) {
+        return NextResponse.json(
+          { error: "Cabang tidak ditemukan pada tenant ini" },
+          { status: 400 }
+        );
+      }
+    } else {
+      const userRec = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { outletId: true },
+      });
+      effectiveOutletId = userRec?.outletId ?? null;
+      if (!effectiveOutletId) {
+        const mainOutlet = await prisma.outlet.findFirst({
+          where: { isMain: true, isActive: true, storeId: scope.storeId },
+          select: { id: true },
+        });
+        effectiveOutletId = mainOutlet?.id ?? null;
+      }
+    }
+
+    if (!effectiveOutletId) {
+      throw new ApiBusinessError(
+        "Pilih cabang terlebih dahulu: penyesuaian stok harus jelas cabangnya",
+        400,
+        "OUTLET_REQUIRED"
+      );
+    }
+
     // Catatan penyesuaian dan pemotongan batch harus satu transaksi: kalau
     // pemotongan gagal, catatan -N tanpa stok yang keluar akan menyesatkan opname.
     // Serializable + klaim batch: dua opname bersamaan tidak boleh memotong batch
@@ -61,6 +100,7 @@ export async function POST(request: NextRequest) {
           notes: data.notes,
           userId: sessionUser.id,
           storeId: scope.storeId,
+          outletId: effectiveOutletId,
         },
         include: { product: true, user: true },
       });
@@ -68,8 +108,14 @@ export async function POST(request: NextRequest) {
       // Penyesuaian negatif memotong batch tertua (FIFO)
       if (data.quantityChange < 0) {
         let remaining = Math.abs(data.quantityChange);
+        // Hanya batch cabang ini (plus batch tanpa cabang sebagai jaring
+        // pengaman data lama) yang boleh dipotong.
         const batches = await tx.productBatch.findMany({
-          where: { productId: data.productId, remainingQty: { gt: 0 } },
+          where: {
+            productId: data.productId,
+            remainingQty: { gt: 0 },
+            OR: [{ outletId: effectiveOutletId }, { outletId: null }],
+          },
           orderBy: { purchaseDate: "asc" },
         });
 
@@ -152,7 +198,11 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
-    const where = { storeId: scope.storeId };
+    const outletFilter = searchParams.get("outletId");
+    const where = {
+      storeId: scope.storeId,
+      ...(outletFilter && outletFilter !== "ALL" ? { outletId: outletFilter } : {}),
+    };
 
     const [adjustments, total] = await Promise.all([
       prisma.stockAdjustment.findMany({
@@ -160,6 +210,7 @@ export async function GET(request: NextRequest) {
         include: {
           product: { select: { id: true, name: true, sku: true } },
           user: { select: { id: true, name: true } },
+          outlet: { select: { id: true, name: true, code: true } },
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,

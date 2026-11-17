@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchableSelect } from "@/components/shared/searchable-select";
 import { toast } from "sonner";
 
 interface TableItem {
@@ -33,6 +34,7 @@ interface TableItem {
   capacity: number;
   qrToken: string;
   isOccupied: boolean;
+  outlet?: { id: string; code: string; name: string } | null;
   sales?: Array<{
     id: string;
     invoiceNumber: string;
@@ -53,6 +55,25 @@ export default function TablesPage() {
   const [section, setSection] = useState("Lantai 1");
   const [capacity, setCapacity] = useState("4");
   const [submitting, setSubmitting] = useState(false);
+  // Meja tanpa cabang membuat QR-nya menampilkan harga & stok cabang lain,
+  // jadi cabang wajib dipilih saat meja dibuat.
+  const [outlets, setOutlets] = useState<{ id: string; code: string; name: string }[]>([]);
+  const [outletId, setOutletId] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/outlets");
+        const data = await res.json();
+        const list = (data.data || []) as { id: string; code: string; name: string; isMain?: boolean }[];
+        setOutlets(list);
+        const preferred = list.find((o) => o.isMain) ?? list[0];
+        if (preferred) setOutletId((current) => current || preferred.id);
+      } catch {
+        // biarkan kosong; API akan memakai cabang utama sebagai default
+      }
+    })();
+  }, []);
 
   const fetchTables = async () => {
     try {
@@ -89,6 +110,7 @@ export default function TablesPage() {
           tableNo,
           section,
           capacity: Number(capacity) || 4,
+          ...(outletId ? { outletId } : {}),
         }),
       });
 
@@ -184,7 +206,10 @@ export default function TablesPage() {
                 <CardHeader className="pb-3 border-b border-border/50 flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-lg font-black">{t.tableNo}</CardTitle>
-                    <span className="text-xs font-semibold text-muted-foreground">{t.section}</span>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {t.section}
+                      {t.outlet ? ` · ${t.outlet.code}` : " · tanpa cabang"}
+                    </span>
                   </div>
                   <Badge
                     variant={t.isOccupied ? "danger" : "secondary"}
@@ -255,6 +280,21 @@ export default function TablesPage() {
             <DialogTitle className="text-xl font-black">Tambah Meja Baru</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateTable} className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label className="font-bold">Cabang *</Label>
+              <SearchableSelect
+                options={outlets.map((o) => ({
+                  value: o.id,
+                  label: `${o.code} - ${o.name}`,
+                }))}
+                value={outletId}
+                onValueChange={setOutletId}
+                placeholder="Pilih cabang meja ini"
+              />
+              <p className="text-xs text-text-muted">
+                QR meja menampilkan menu, harga, dan stok dari cabang ini.
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="tableNo" className="font-bold">Nomor / Nama Meja</Label>
               <Input

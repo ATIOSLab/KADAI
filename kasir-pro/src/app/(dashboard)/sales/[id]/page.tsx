@@ -459,7 +459,11 @@ export default function SaleDetailPage({
                 </div>
                 <div className="flex justify-between text-sm font-bold text-accent-success">
                   <span>Gross Profit</span>
-                  <span>{formatCurrency(grossProfit)}</span>
+                  {/* Transaksi batal: laba tidak dihitung, tampilkan "-" seperti
+                      kolom Margin supaya tidak terbaca "laba 0". */}
+                  <span>
+                    {sale.isVoided ? "-" : formatCurrency(grossProfit)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-accent-success">
                   <span>Margin</span>

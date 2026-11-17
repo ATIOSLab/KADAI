@@ -26,7 +26,9 @@ export type ProductWithCategory = Product & {
 
 export type ProductWithBatches = Product & {
   category: Category;
-  batches: ProductBatch[];
+  batches: (ProductBatch & {
+    outlet?: { id: string; code: string; name: string } | null;
+  })[];
 };
 
 export type ProductWithStock = ProductWithCategory & {

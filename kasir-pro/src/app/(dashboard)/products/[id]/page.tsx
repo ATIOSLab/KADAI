@@ -539,6 +539,7 @@ export default function ProductDetailPage({
                   <thead>
                     <tr>
                       <th className="text-left p-3">Batch Number</th>
+                      <th className="text-left p-3">Cabang</th>
                       <th className="text-right p-3">Qty Awal</th>
                       <th className="text-right p-3">Sisa Stok</th>
                       <th className="text-right p-3">Harga Modal</th>
@@ -562,6 +563,13 @@ export default function ProductDetailPage({
                         <tr key={batch.id} className="hover:bg-bg-main/50">
                           <td className="p-3 font-mono text-xs font-bold">
                             {batch.batchNumber}
+                          </td>
+                          <td className="p-3 text-xs">
+                            {batch.outlet ? (
+                              <Badge variant="outline">{batch.outlet.code}</Badge>
+                            ) : (
+                              <span className="text-text-muted">Tanpa cabang</span>
+                            )}
                           </td>
                           <td className="p-3 text-right">{batch.quantity}</td>
                           <td className="p-3 text-right font-bold">

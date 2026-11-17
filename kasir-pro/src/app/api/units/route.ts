@@ -23,20 +23,47 @@ export async function GET() {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
-    const units = await prisma.unit.findMany({
-      where: {
-        isActive: true,
-        OR: [{ storeId: scope.storeId }, { storeId: null }],
-      },
-      orderBy: { name: "asc" },
-      select: {
-        id: true,
-        name: true,
-        normalizedName: true,
-      },
-    });
+    const [units, usedUnits] = await Promise.all([
+      prisma.unit.findMany({
+        where: {
+          isActive: true,
+          OR: [{ storeId: scope.storeId }, { storeId: null }],
+        },
+        orderBy: { name: "asc" },
+        select: {
+          id: true,
+          name: true,
+          normalizedName: true,
+        },
+      }),
+      prisma.product.groupBy({
+        by: ["unit"],
+        where: { storeId: scope.storeId },
+      }),
+    ]);
 
-    return NextResponse.json({ data: units });
+    // Satuan yang sudah dipakai produk tapi belum ada di tabel Unit (mis. hasil
+    // impor/seed) tetap harus bisa dipilih. Tanpa ini, membuka produk ber-satuan
+    // "gelas" memaksa pemilih jatuh ke mode "satuan baru".
+    const known = new Set(units.map((unit) => unit.normalizedName));
+    const extra = usedUnits
+      .map((row) => row.unit?.trim())
+      .filter((name): name is string => Boolean(name))
+      .filter((name) => {
+        const normalized = normalizeUnitName(name);
+        if (known.has(normalized)) return false;
+        known.add(normalized);
+        return true;
+      })
+      .map((name) => ({
+        id: `used:${normalizeUnitName(name)}`,
+        name,
+        normalizedName: normalizeUnitName(name),
+      }));
+
+    return NextResponse.json({
+      data: [...units, ...extra].sort((a, b) => a.name.localeCompare(b.name)),
+    });
   } catch (error) {
     console.error("GET /api/units error:", error);
     return NextResponse.json(

@@ -47,7 +47,12 @@ export async function GET(
         category: true,
         batches: {
           orderBy: { purchaseDate: "asc" },
-          include: { supplier: true },
+          // Cabang tiap batch ikut dikirim: stok per cabang hanya bisa dibaca
+          // pemilik kalau batch menyebut cabangnya.
+          include: {
+            supplier: true,
+            outlet: { select: { id: true, code: true, name: true } },
+          },
         },
       },
     });
@@ -115,13 +120,18 @@ export async function PUT(
     }
 
     if (data.sku || data.barcode) {
-      // SKU dicek per tenant; barcode tetap global
+      // SKU dan barcode dicek per tenant, sesuai @@unique([storeId, barcode]).
+      // Pengecekan barcode global membuat SEMUA penyuntingan produk gagal 409:
+      // katalog template platform (storeId null) memakai barcode yang sama
+      // dengan salinan tenant, jadi menyimpan tanpa mengubah apa pun ditolak.
       const conflictingProduct = await prisma.product.findFirst({
         where: {
           id: { not: id },
           OR: [
             ...(data.sku ? [{ sku: data.sku, storeId: scope.storeId }] : []),
-            ...(data.barcode ? [{ barcode: data.barcode }] : []),
+            ...(data.barcode
+              ? [{ barcode: data.barcode, storeId: scope.storeId }]
+              : []),
           ],
         },
       });

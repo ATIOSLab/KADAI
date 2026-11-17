@@ -150,12 +150,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // SKU unik per tenant; barcode tetap unik global (identitas fisik barang)
+    // SKU dan barcode unik per tenant (sama dengan @@unique([storeId, barcode])).
+    // Barcode tidak boleh dicek global: katalog template platform (storeId null)
+    // memakai barcode yang sama dengan salinan tenant, dan kasir hanya memindai
+    // barcode di dalam katalog tokonya sendiri.
     const existingProduct = await prisma.product.findFirst({
       where: {
         OR: [
           { sku: data.sku, storeId: scope.storeId },
-          ...(data.barcode ? [{ barcode: data.barcode }] : []),
+          ...(data.barcode
+            ? [{ barcode: data.barcode, storeId: scope.storeId }]
+            : []),
         ],
       },
     });

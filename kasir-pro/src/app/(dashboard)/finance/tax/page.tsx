@@ -128,17 +128,21 @@ export default function TaxSummaryPage() {
       {data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title={`Total Omzet Bruto (${year})`}
+            title={`Peredaran Bruto / DPP (${year})`}
             value={`Rp ${data.totals.totalGrossRevenue.toLocaleString("id-ID")}`}
-            description="Dasar Perhitungan Pajak (DPP)"
+            description="Subtotal + service charge; PB1 dikecualikan"
             badge="DPP"
             badgeVariant="default"
           />
 
           <StatCard
-            title={`Pajak Terpungut (${data.store.taxType})`}
+            title={`Pajak Terpungut (${data.store.taxLabel ?? data.store.taxType})`}
             value={`Rp ${data.totals.totalTaxCollected.toLocaleString("id-ID")}`}
-            description="Titipan Pajak Terhitung"
+            description={
+              data.store.taxProfileMixed
+                ? "Titipan pajak — tarif cabang berbeda, periksa pengaturan"
+                : "Titipan Pajak Terhitung"
+            }
             badge="Pajak"
             badgeVariant="neutral"
           />

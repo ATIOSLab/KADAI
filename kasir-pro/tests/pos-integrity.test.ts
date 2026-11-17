@@ -235,7 +235,9 @@ test("transaksi batal tidak menampilkan laba", () => {
   assert.match(saleDetailPage, /const grossProfit = sale\.isVoided \? 0 : Number\(sale\.grossProfit\)/);
   // Margin dihitung dari omzet neto (setelah PB1), bukan total bruto
   assert.match(saleDetailPage, /const netRevenue = totalAmount - taxAmount/);
-  assert.match(saleDetailPage, /!sale\.isVoided && netRevenue > 0 \? \(\(grossProfit \/ netRevenue\) \* 100\)/);
+  // Transaksi batal tidak menampilkan margin angka sama sekali.
+  assert.match(saleDetailPage, /sale\.isVoided \|\| netRevenue <= 0 \? "-"/);
+  assert.match(saleDetailPage, /marginPercent === "-" \? "-"/);
 });
 
 // --- Konfirmasi: jangan pakai dialog bawaan browser ---------------------------

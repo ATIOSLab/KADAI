@@ -228,8 +228,10 @@ export default function SaleDetailPage({
   // menyesatkan pemilik yang membuka riwayat.
   const grossProfit = sale.isVoided ? 0 : Number(sale.grossProfit);
   const netRevenue = totalAmount - taxAmount;
+  // "0%" pada transaksi batal bisa dibaca sebagai margin nol; tanda "-" lebih
+  // jelas bahwa tidak ada angka laba yang bisa dihitung.
   const marginPercent =
-    !sale.isVoided && netRevenue > 0 ? ((grossProfit / netRevenue) * 100).toFixed(1) : "0";
+    sale.isVoided || netRevenue <= 0 ? "-" : ((grossProfit / netRevenue) * 100).toFixed(1);
   const canVoidSale =
     user?.role === "ADMIN" ||
     user?.role === "MANAGER" ||
@@ -461,7 +463,7 @@ export default function SaleDetailPage({
                 </div>
                 <div className="flex justify-between text-sm font-bold text-accent-success">
                   <span>Margin</span>
-                  <span>{marginPercent}%</span>
+                  <span>{marginPercent === "-" ? "-" : `${marginPercent}%`}</span>
                 </div>
               </>
             )}

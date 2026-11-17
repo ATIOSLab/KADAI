@@ -5,6 +5,7 @@ import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { getServerSessionUser } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { FINANCE_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { describeEffectiveTaxProfile } from "@/lib/tax-labels";
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,7 +54,21 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     });
 
-    // Fetch store tax profile (tenant pemanggil)
+    // Tarif yang benar-benar ditagih kasir disimpan di Outlet (halaman Cabang),
+    // bukan di Store. Rekap pajak dulu membaca Store (default NONE) sehingga
+    // menampilkan "Pajak Terpungut (NONE)" padahal struk memungut PB1 10%.
+    const outlets = await prisma.outlet.findMany({
+      where: {
+        storeId: scope.storeId,
+        ...(outletId && outletId !== "ALL" ? { id: outletId } : {}),
+      },
+      select: { taxType: true, taxRate: true, serviceChargeRate: true },
+    });
+    const taxProfile = describeEffectiveTaxProfile(
+      outlets.map((o) => ({ taxType: o.taxType, taxRate: Number(o.taxRate) }))
+    );
+
+    // Fetch store tax profile (tenant pemanggil) - fallback bila belum ada cabang
     const store = await prisma.store.findUnique({
       where: { id: scope.storeId },
     });
@@ -90,7 +105,10 @@ export async function GET(req: NextRequest) {
       const profit = Number(sale.grossProfit);
 
       monthlySummary[monthIdx].transactionCount += 1;
-      monthlySummary[monthIdx].grossRevenue += gross;
+      // Peredaran bruto (PP 55/2022) = nilai penyerahan ke pembeli, yaitu
+      // subtotal + service charge. PB1/PPN tidak ikut karena hanya titipan
+      // negara yang lewat di kas (dasar pengenaan pajak daerah = angka ini).
+      monthlySummary[monthIdx].grossRevenue += gross + srv;
       monthlySummary[monthIdx].serviceCharge += srv;
       monthlySummary[monthIdx].taxCollected += tax;
       monthlySummary[monthIdx].totalHPP += hpp;
@@ -136,8 +154,10 @@ export async function GET(req: NextRequest) {
       year,
       store: {
         name: store?.name || "KADAI Indonesia",
-        taxType: store?.taxType || "PB1_10",
-        taxRate: Number(store?.taxRate || 10),
+        taxType: taxProfile.taxType,
+        taxRate: taxProfile.rate,
+        taxLabel: taxProfile.label,
+        taxProfileMixed: taxProfile.mixed,
       },
       summary: monthlySummary,
       totals,

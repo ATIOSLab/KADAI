@@ -11,7 +11,7 @@
     "bot:worker": "tsx src/bot/worker.ts",
     "bot:webhook:sync": "tsx src/bot/sync-webhook.ts",
     "test:bot": "tsx --test tests/bot/**/*.test.ts",
-    "test:security": "tsx --test tests/security.test.ts tests/api-hardening.test.ts tests/enterprise-validators.test.ts tests/platform-rbac.test.ts tests/plan-management.test.ts tests/tenant-isolation.test.ts tests/pos-integrity.test.ts tests/unique-number-retry.test.ts tests/sale-validation.test.ts tests/pricing-rates.test.ts tests/api-fetch.test.ts tests/tax-summary.test.ts",
+    "test:security": "tsx --test tests/security.test.ts tests/api-hardening.test.ts tests/enterprise-validators.test.ts tests/platform-rbac.test.ts tests/plan-management.test.ts tests/tenant-isolation.test.ts tests/pos-integrity.test.ts tests/unique-number-retry.test.ts tests/sale-validation.test.ts tests/pricing-rates.test.ts tests/api-fetch.test.ts tests/tax-summary.test.ts tests/api-validation-messages.test.ts",
     "test:referral": "tsx --test tests/referral-billing.test.ts",
     "platform:create-superadmin": "node scripts/create-superadmin.js",
     "lint": "eslint",

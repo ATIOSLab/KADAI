@@ -63,6 +63,62 @@ export class ApiBusinessError extends Error {
   }
 }
 
+/**
+ * Zod v4 memberi pesan bawaan berbahasa Inggris dan tanpa konteks untuk
+ * ketidakcocokan tipe ("Invalid input"). Staf hanya melihat "Invalid input"
+ * tanpa tahu kolom mana. Kolom disebut namanya, pesan kustom validator
+ * (sudah berbahasa Indonesia) tetap dipakai apa adanya.
+ */
+function describeZodIssue(issue?: { message?: string; path?: PropertyKey[]; code?: string }): string {
+  const GENERIC: Record<string, string> = {
+    invalid_type: "jenis data tidak sesuai",
+    invalid_union: "format nilai tidak sesuai",
+    invalid_format: "format nilai tidak sesuai",
+    too_small: "nilai terlalu kecil",
+    too_big: "nilai terlalu besar",
+  };
+  const FIELD_LABELS: Record<string, string> = {
+    purchaseDate: "Tanggal pembelian",
+    expiryDate: "Tanggal kedaluwarsa",
+    productId: "Produk",
+    outletId: "Cabang",
+    quantity: "Jumlah",
+    costPrice: "Harga modal",
+    sellingPrice: "Harga jual",
+    supplierId: "Pemasok",
+    notes: "Catatan",
+  };
+
+  if (!issue) {
+    return "Format data yang dikirim tidak valid";
+  }
+
+  const rawPath = (issue.path ?? []).find((segment) => typeof segment === "string");
+  const field = typeof rawPath === "string" ? rawPath : undefined;
+  const label = field ? (FIELD_LABELS[field] ?? field) : undefined;
+  const message = (issue.message ?? "").trim();
+
+  // Pesan validator yang sudah spesifik (Indonesia, menyebut aturan) dipakai
+  // langsung - jangan ditimpa label kolom buatan sendiri.
+  const isGenericMessage =
+    !message ||
+    /^invalid input/i.test(message) ||
+    /^invalid/i.test(message) ||
+    /^required$/i.test(message) ||
+    /^expected /i.test(message) ||
+    /^too (small|big)/i.test(message) ||
+    /^unrecognized/i.test(message);
+
+  if (!isGenericMessage) {
+    return message;
+  }
+
+  const reason = GENERIC[issue.code ?? ""] ?? "tidak valid";
+  return label
+    ? `${label} ${reason}. Periksa kembali isian tersebut.`
+    : `Format data yang dikirim tidak valid (${reason}).`;
+}
+
 export function handleApiError(
   error: unknown,
   context: string,
@@ -76,9 +132,9 @@ export function handleApiError(
     // Pesan generik "Format data yang dikirim tidak valid" tidak memberi tahu
     // staf kolom mana yang salah. Pakai pesan spesifik dari validator (sudah
     // berbahasa Indonesia), detail per kolom tetap dikirim untuk form.
-    const firstIssue = error.issues[0]?.message;
+    const firstIssue = error.issues[0];
     return jsonError(
-      firstIssue || "Format data yang dikirim tidak valid",
+      describeZodIssue(firstIssue),
       400,
       error.flatten().fieldErrors,
       "VALIDATION_ERROR"

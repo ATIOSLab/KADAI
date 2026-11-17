@@ -233,9 +233,33 @@ export default function RestockPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    // `parseFloat`/`parseInt` pada nilai kosong menghasilkan NaN, dan JSON
+    // mengubahnya menjadi null sehingga server hanya menjawab "Invalid input".
+    // Periksa di sisi formulir agar pesannya jelas dan field-nya disebut.
+    const quantity = Number.parseInt(String(formData.get("quantity") ?? ""), 10);
+    const parsedCost = parseInputNumber(costPrice);
+    const parsedSelling = parseInputNumber(sellingPrice);
+
+    if (!selectedProductId) {
+      toast.error("Pilih produk yang akan direstock");
+      return;
+    }
+    if (!Number.isFinite(quantity) || quantity < 1) {
+      toast.error("Jumlah unit minimal 1");
+      return;
+    }
+    if (parsedCost === null || parsedCost <= 0) {
+      toast.error("Harga modal per unit harus lebih dari 0");
+      return;
+    }
+    if (parsedSelling === null || parsedSelling <= 0) {
+      toast.error("Harga jual per unit harus lebih dari 0");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await apiFetch("/api/batches", {
@@ -243,9 +267,9 @@ export default function RestockPage() {
         body: {
           productId: selectedProductId,
           outletId: selectedOutletId || undefined,
-          quantity: parseInt(formData.get("quantity") as string),
-          costPrice: parseFloat(costPrice),
-          sellingPrice: parseFloat(sellingPrice),
+          quantity,
+          costPrice: parsedCost,
+          sellingPrice: parsedSelling,
           purchaseDate: (formData.get("purchaseDate") as string) || null,
           expiryDate: (formData.get("expiryDate") as string) || null,
           notes: (formData.get("notes") as string)?.trim() || null,

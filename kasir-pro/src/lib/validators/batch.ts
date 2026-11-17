@@ -11,7 +11,10 @@ export const createBatchSchema = z.object({
   costPrice: z.number().positive("Harga modal harus positif"),
   sellingPrice: z.number().positive("Harga jual harus positif"),
   supplierId: z.string().optional().nullable(),
-  purchaseDate: z.string().or(z.date()).optional(),
+  // Formulir Restock mengirim `null` (bukan menghilangkan field) saat kolom
+  // tanggal dikosongkan, sehingga `optional()` saja menolak restock tanpa
+  // tanggal pembelian dengan pesan "Invalid input".
+  purchaseDate: z.string().or(z.date()).optional().nullable(),
   expiryDate: z.string().or(z.date()).optional().nullable(),
   notes: z.string().max(500).optional().nullable(),
 });

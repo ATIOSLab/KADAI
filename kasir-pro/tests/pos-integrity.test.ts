@@ -289,8 +289,8 @@ test("filter tier pelanggan diproses di server", () => {
 
 test("pesan validasi Zod yang spesifik diteruskan ke pengguna", () => {
   const apiResponse = readFileSync(new URL("../src/lib/api-response.ts", import.meta.url), "utf8");
-  assert.match(apiResponse, /const firstIssue = error\.issues\[0\]\?\.message/);
-  assert.match(apiResponse, /firstIssue \|\| "Format data yang dikirim tidak valid"/);
+  assert.match(apiResponse, /describeZodIssue\(firstIssue\)/);
+  assert.match(apiResponse, /function describeZodIssue/);
 });
 
 // --- Stok wajib punya cabang & retry bentrok tulis ---------------------------------

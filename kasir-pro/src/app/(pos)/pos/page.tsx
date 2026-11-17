@@ -123,7 +123,7 @@ export default function PosPage() {
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left: Product Search */}
         <div className="flex-1 overflow-y-auto neo-scrollbar p-3 sm:p-4 pb-28 md:pb-6">
-          <ProductSearch />
+          <ProductSearch outletId={user?.outletId ?? null} />
         </div>
 
         {/* Mobile Floating Cart Summary (<768px Phones only) */}

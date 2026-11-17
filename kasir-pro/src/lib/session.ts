@@ -14,6 +14,7 @@ const sessionUserSchema = z.object({
   storeTier: z.string().optional(),
   storeName: z.string().optional(),
   storeId: z.string().optional(),
+  outletId: z.string().nullish(),
 });
 
 export type SessionUser = z.infer<typeof sessionUserSchema>;

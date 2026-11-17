@@ -20,6 +20,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const categoryId = searchParams.get("categoryId") || undefined;
+    // Kasir bekerja untuk satu cabang: stok & harga FIFO yang ditampilkan harus
+    // milik cabang itu. Tanpa filter ini layar kasir menampilkan stok/harga
+    // cabang lain, sehingga harga yang ditekan kasir bisa bukan harga cabangnya.
+    const outletIdParam = searchParams.get("outletId") || undefined;
     const page = Number(searchParams.get("page") || "1");
     const limit = Number(searchParams.get("limit") || "20");
     if (!Number.isSafeInteger(page) || page < 1 || page > 100000 ||
@@ -36,6 +40,21 @@ export async function GET(request: NextRequest) {
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
+    }
+
+    let outletFilter: string | null = null;
+    if (outletIdParam) {
+      const ownedOutlet = await prisma.outlet.findFirst({
+        where: { id: outletIdParam, storeId: scope.storeId },
+        select: { id: true },
+      });
+      if (!ownedOutlet) {
+        return NextResponse.json(
+          { error: "Cabang tidak ditemukan pada tenant Anda" },
+          { status: 404 }
+        );
+      }
+      outletFilter = ownedOutlet.id;
     }
 
     const where = {
@@ -57,7 +76,10 @@ export async function GET(request: NextRequest) {
         include: {
           category: true,
           batches: {
-            where: { remainingQty: { gt: 0 } },
+            where: {
+              remainingQty: { gt: 0 },
+              ...(outletFilter ? { outletId: outletFilter } : {}),
+            },
             orderBy: { purchaseDate: "asc" },
           },
         },

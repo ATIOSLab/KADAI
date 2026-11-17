@@ -20,6 +20,13 @@ export async function GET(request: NextRequest) {
     },
   });
 
+  // Cabang tempat pengguna bertugas: dipakai layar kasir untuk menampilkan
+  // stok & harga cabang tersebut, bukan gabungan semua cabang.
+  const dbUser = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: { outletId: true },
+  });
+
   // Deteksi vertikal adaptif berbasis akun demo/profil pengguna
   let activeBusinessType: string = store?.businessType ?? "FNB_CAFE";
   const emailLower = sessionUser.email.toLowerCase();
@@ -47,6 +54,7 @@ export async function GET(request: NextRequest) {
       storeTier: store?.tier ?? "PRO_BUSINESS",
       storeName: sessionUser.storeName ?? store?.name ?? "KADAI Store",
       storeId: sessionUser.storeId ?? store?.id,
+      outletId: dbUser?.outletId ?? null,
     },
   });
 }

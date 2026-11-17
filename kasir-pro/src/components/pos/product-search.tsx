@@ -14,7 +14,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { soundEffects } from "@/lib/audio-effects";
 import type { Category, ProductWithStock } from "@/types";
 
-export function ProductSearch() {
+export function ProductSearch({ outletId }: { outletId?: string | null }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -73,6 +73,10 @@ export function ProductSearch() {
           params.set("categoryId", activeCategory);
         }
 
+        if (outletId) {
+          params.set("outletId", outletId);
+        }
+
         const response = await apiFetch<{ data: ProductWithStock[] }>(
           `/api/products?${params.toString()}`
         );
@@ -101,7 +105,7 @@ export function ProductSearch() {
     return () => {
       cancelled = true;
     };
-  }, [activeCategory, catalogVersion, debouncedSearch]);
+  }, [activeCategory, catalogVersion, debouncedSearch, outletId]);
 
   const filteredProducts = useMemo(
     () =>

@@ -66,6 +66,7 @@ function sanitizeAmountInput(value: string) {
 export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const items = useCart((state) => state.items);
   const getGrandTotal = useCart((state) => state.getGrandTotal);
+  const getTotals = useCart((state) => state.getTotals);
   const clearCart = useCart((state) => state.clearCart);
   const bumpCatalogVersion = useCart((state) => state.bumpCatalogVersion);
 
@@ -112,6 +113,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   }, [customerSearch]);
 
   const grandTotal = getGrandTotal();
+  const totals = getTotals();
   const changeAmount =
     paymentType === "CASH" && cashAmount
       ? Number(cashAmount) - grandTotal
@@ -386,6 +388,19 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
             <p className="text-3xl font-black text-accent-primary">
               {formatCurrency(grandTotal)}
             </p>
+            {(totals.serviceCharge > 0 || totals.taxAmount > 0 || totals.roundingAmount !== 0) && (
+              <p className="text-[11px] text-text-muted mt-1">
+                {[
+                  totals.serviceCharge > 0 ? `Service ${formatCurrency(totals.serviceCharge)}` : null,
+                  totals.taxAmount > 0 ? `PB1 ${formatCurrency(totals.taxAmount)}` : null,
+                  totals.roundingAmount !== 0
+                    ? `Pembulatan ${formatCurrency(totals.roundingAmount)}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" • ")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem } from "@/types";
+import type { PricingRates } from "@/lib/pricing-rates";
+import {
+  DEFAULT_PRICING_RATES,
+  previewSaleTotals,
+  type PricingPreviewTotals,
+} from "@/lib/pricing-preview";
 import {
   getAvailablePricingBatchesForLine,
   getMaxQuantityForSelection,
@@ -13,6 +19,9 @@ interface CartStore {
   items: CartItem[];
   discountTotal: number;
   catalogVersion: number;
+  /** Tarif PB1 & service charge yang berlaku (diambil dari /api/pos/pricing). */
+  pricing: PricingRates;
+  setPricing: (rates: PricingRates) => void;
   setDiscountTotal: (amount: number) => void;
   addItem: (item: Omit<CartItem, "subtotal">) => void;
   removeItem: (lineId: string) => void;
@@ -23,6 +32,8 @@ interface CartStore {
   bumpCatalogVersion: () => void;
   getSubtotal: () => number;
   getGrandTotal: () => number;
+  /** Rincian total: service charge, PB1, pembulatan, dan jumlah yang ditagih. */
+  getTotals: () => PricingPreviewTotals;
   getItemCount: () => number;
   getAvailablePricingBatchesForLine: (lineId: string) => PricingBatch[];
 }
@@ -74,6 +85,7 @@ export const useCart = create<CartStore>()(
       items: [],
       discountTotal: 0,
       catalogVersion: 0,
+      pricing: DEFAULT_PRICING_RATES,
 
   setDiscountTotal: (amount) => set({ discountTotal: amount }),
 
@@ -159,6 +171,8 @@ export const useCart = create<CartStore>()(
 
   clearCart: () => set({ items: [], discountTotal: 0 }),
 
+  setPricing: (rates) => set({ pricing: rates }),
+
   bumpCatalogVersion: () =>
     set((state) => ({ catalogVersion: state.catalogVersion + 1 })),
 
@@ -167,9 +181,17 @@ export const useCart = create<CartStore>()(
   },
 
   getGrandTotal: () => {
-    const subtotal = get().getSubtotal();
-    return subtotal - get().discountTotal;
+    // "Grand total" = jumlah yang benar-benar ditagih (termasuk PB1 & service
+    // charge). Dipakai tombol uang pas dan validasi pembayaran tunai.
+    return get().getTotals().totalAmount;
   },
+
+  getTotals: () =>
+    previewSaleTotals({
+      subtotal: get().getSubtotal(),
+      discountAmount: get().discountTotal,
+      rates: get().pricing,
+    }),
 
   getItemCount: () => {
     return get().items.reduce((sum, item) => sum + item.quantity, 0);

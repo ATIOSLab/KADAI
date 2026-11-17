@@ -17,13 +17,46 @@ export function Cart({ onClose }: CartProps) {
   const clearCart = useCart((state) => state.clearCart);
   const getSubtotal = useCart((state) => state.getSubtotal);
   const getGrandTotal = useCart((state) => state.getGrandTotal);
+  const getTotals = useCart((state) => state.getTotals);
   const getItemCount = useCart((state) => state.getItemCount);
+  const setPricing = useCart((state) => state.setPricing);
   const discountTotal = useCart((state) => state.discountTotal);
   const [showCheckout, setShowCheckout] = useState(false);
 
   const subtotal = getSubtotal();
   const grandTotal = getGrandTotal();
+  const totals = getTotals();
   const itemCount = getItemCount();
+
+  // Tarif PB1 & service charge diambil dari server (tarif cabang bisa berbeda
+  // per cabang), supaya total di keranjang = total di struk.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPricing() {
+      try {
+        const response = await fetch("/api/pos/pricing", { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = await response.json();
+        const rates = payload?.data?.rates;
+        if (!cancelled && rates) {
+          setPricing({
+            taxRate: Number(rates.taxRate) || 0,
+            serviceChargeRate: Number(rates.serviceChargeRate) || 0,
+            taxInclusive: Boolean(rates.taxInclusive),
+            enableRounding: rates.enableRounding !== false,
+          });
+        }
+      } catch {
+        // Biarkan tarif terakhir yang diketahui; checkout tetap memakai tarif server.
+      }
+    }
+
+    loadPricing();
+    return () => {
+      cancelled = true;
+    };
+  }, [setPricing]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -111,6 +144,30 @@ export function Cart({ onClose }: CartProps) {
                 <span>Diskon</span>
                 <span className="font-bold tabular-nums">
                   -{formatCurrency(discountTotal)}
+                </span>
+              </div>
+            )}
+            {totals.serviceCharge > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Service Charge</span>
+                <span className="font-bold tabular-nums">
+                  {formatCurrency(totals.serviceCharge)}
+                </span>
+              </div>
+            )}
+            {totals.taxAmount > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">PB1</span>
+                <span className="font-bold tabular-nums">
+                  {formatCurrency(totals.taxAmount)}
+                </span>
+              </div>
+            )}
+            {totals.roundingAmount !== 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Pembulatan</span>
+                <span className="font-bold tabular-nums">
+                  {formatCurrency(totals.roundingAmount)}
                 </span>
               </div>
             )}

@@ -10,6 +10,12 @@ import {
 } from "@/lib/fifo";
 import { generateInvoiceNumber } from "@/lib/utils";
 import { ApiBusinessError } from "@/lib/api-response";
+import {
+  calculateSaleTotals,
+  resolvePricingRates,
+  type PricingRateSource,
+  type SaleTotals,
+} from "@/lib/pricing-rates";
 import { logActivity } from "@/lib/activity-logger";
 import {
   FINANCE_SYSTEM_CATEGORY_KEYS,
@@ -254,6 +260,7 @@ export async function POST(request: NextRequest) {
       prisma.$transaction(async (tx) => {
       // Resolve effective outlet, costing method, and kitchen workflow
       let effectiveOutletId = data.outletId || null;
+      let outletPricing: PricingRateSource | null = null;
       if (!effectiveOutletId) {
         const userRec = await tx.user.findUnique({
           where: { id: sessionUser.id },
@@ -280,11 +287,19 @@ export async function POST(request: NextRequest) {
       if (effectiveOutletId) {
         const targetOutlet = await tx.outlet.findUnique({
           where: { id: effectiveOutletId },
-          select: { costingMethod: true, kitchenWorkflow: true },
+          select: {
+            costingMethod: true,
+            kitchenWorkflow: true,
+            // Tarif per cabang: halaman Cabang adalah satu-satunya tempat
+            // PB1 & service charge bisa diatur, jadi cabang yang menang.
+            taxRate: true,
+            serviceChargeRate: true,
+          },
         });
         if (targetOutlet) {
           effectiveCostingMethod = targetOutlet.costingMethod as any;
           effectiveKitchenWorkflow = targetOutlet.kitchenWorkflow;
+          outletPricing = targetOutlet;
         }
       }
 
@@ -429,52 +444,36 @@ export async function POST(request: NextRequest) {
         timezone
       );
 
-      // 3. Store tax & service charge settings
-      const serviceRate = Number(store?.serviceChargeRate || 0);
-      const taxRate = Number(store?.taxRate || 0);
-      const taxInclusive = store?.taxInclusive ?? false;
-      const enableRounding = store?.enableRounding ?? true;
+      // 3. Tarif PB1 & service charge - satu implementasi bersama pratinjau
+      //    keranjang POS dan menu QR publik (src/lib/pricing-rates.ts)
+      const pricingRates = resolvePricingRates({ outlet: outletPricing, store });
 
       // 4. Calculate totals
       const transactionDiscount = new Decimal(data.discountAmount || 0);
       const discountAmount = itemDiscountTotal.add(transactionDiscount);
-      const netSubtotal = subtotal.sub(discountAmount);
-      if (netSubtotal.isNegative() || processedItems.some((item) => item.totalPrice.isNegative())) {
+
+      let totals: SaleTotals;
+      try {
+        totals = calculateSaleTotals({
+          subtotal,
+          discountAmount,
+          rates: pricingRates,
+        });
+      } catch {
+        // calculateSaleTotals menolak diskon yang melebihi nilai transaksi
         throw new ApiBusinessError(
           "Diskon melebihi nilai transaksi",
           400,
           "INVALID_DISCOUNT"
         );
       }
-
-      let serviceCharge = new Decimal(0);
-      if (serviceRate > 0) {
-        serviceCharge = netSubtotal.mul(serviceRate).div(100);
-      }
-
-      const taxableBase = netSubtotal.add(serviceCharge);
-      let taxAmount = new Decimal(0);
-      let preRoundingTotal = new Decimal(0);
-
-      if (taxInclusive) {
-        if (taxRate > 0) {
-          taxAmount = taxableBase.mul(taxRate).div(100 + taxRate);
-        }
-        preRoundingTotal = taxableBase;
-      } else {
-        if (taxRate > 0) {
-          taxAmount = taxableBase.mul(taxRate).div(100);
-        }
-        preRoundingTotal = taxableBase.add(taxAmount);
-      }
-
-      let roundingAmount = new Decimal(0);
-      let totalAmount = preRoundingTotal;
-
-      if (enableRounding) {
-        const rounded = Math.round(Number(preRoundingTotal) / 100) * 100;
-        roundingAmount = new Decimal(rounded).sub(preRoundingTotal);
-        totalAmount = new Decimal(rounded);
+      const { netSubtotal, serviceCharge, taxAmount, roundingAmount, totalAmount } = totals;
+      if (processedItems.some((item) => item.totalPrice.isNegative())) {
+        throw new ApiBusinessError(
+          "Diskon melebihi nilai transaksi",
+          400,
+          "INVALID_DISCOUNT"
+        );
       }
 
       // Laba kotor = pendapatan usaha dikurangi HPP. Service charge adalah

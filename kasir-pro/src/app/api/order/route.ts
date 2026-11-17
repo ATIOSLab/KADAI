@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolvePricingRates } from "@/lib/pricing-rates";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,7 +14,16 @@ export async function GET(req: NextRequest) {
     // Find table by QR token (sertakan store pemilik outlet meja untuk isolasi tenant)
     const table = await prisma.restaurantTable.findUnique({
       where: { qrToken: token },
-      include: { outlet: { select: { storeId: true } } },
+      include: {
+        outlet: {
+          select: {
+            storeId: true,
+            // Tarif cabang: dipakai menu QR supaya cocok dengan checkout POS
+            taxRate: true,
+            serviceChargeRate: true,
+          },
+        },
+      },
     });
 
     if (!table) {
@@ -25,6 +35,15 @@ export async function GET(req: NextRequest) {
     const store = storeId
       ? await prisma.store.findUnique({ where: { id: storeId } })
       : null;
+
+    // Tarif yang dipakai meja ini HARUS sama dengan tarif yang dipakai checkout:
+    // tarif cabang menang atas tarif toko (halaman Cabang yang mengaturnya).
+    // Sebelumnya menu QR memakai default 10/5 sehingga tamu melihat pajak &
+    // service charge yang tidak pernah muncul di struk.
+    const menuRates = resolvePricingRates({
+      outlet: table.outlet,
+      store,
+    });
 
     // Get available products (only finished goods & manufactured items with remaining batch stock or recipe)
     const products = await prisma.product.findMany({
@@ -81,10 +100,12 @@ export async function GET(req: NextRequest) {
       },
       store: {
         name: store?.name || "KADAI Indonesia",
-        taxType: store?.taxType || "PB1_10",
-        taxRate: Number(store?.taxRate || 10),
-        taxInclusive: store?.taxInclusive ?? false,
-        serviceChargeRate: Number(store?.serviceChargeRate || 5),
+        taxType: store?.taxType || "NONE",
+        // Angka yang sama dengan checkout: 0 berarti memang tanpa pajak,
+        // bukan alasan untuk menampilkan default 10%.
+        taxRate: menuRates.taxRate,
+        taxInclusive: menuRates.taxInclusive,
+        serviceChargeRate: menuRates.serviceChargeRate,
       },
       categories,
       products: formattedProducts,

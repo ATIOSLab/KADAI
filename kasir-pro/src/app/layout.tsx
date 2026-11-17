@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono, Saira } from "next/font/google";
 import { Toaster } from "sonner";
+import { ConfirmProvider } from "@/components/shared/confirm-dialog";
 import { cn } from "@/lib/utils";
 import { PwaRegister } from "@/components/shared/pwa-register";
 
@@ -240,7 +241,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased bg-slate-50 text-slate-900 selection:bg-primary/20">
         <PwaRegister />
         <ReferralTracker />
-        {children}
+        <ConfirmProvider>{children}</ConfirmProvider>
         <Toaster
           position="top-right"
           richColors

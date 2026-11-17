@@ -12,6 +12,7 @@ import {
   Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -41,6 +42,7 @@ interface TableItem {
 }
 
 export default function TablesPage() {
+  const confirmAction = useConfirm();
   const [tables, setTables] = useState<TableItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -108,7 +110,14 @@ export default function TablesPage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus ${name}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (
+      !(await confirmAction(`Hapus ${name}? Tindakan ini tidak dapat dibatalkan.`, {
+        title: "Hapus Meja",
+        confirmLabel: "Ya, Hapus",
+        variant: "danger",
+      }))
+    )
+      return;
     try {
       const res = await fetch(`/api/tables?id=${id}`, { method: "DELETE" });
       if (res.ok) {

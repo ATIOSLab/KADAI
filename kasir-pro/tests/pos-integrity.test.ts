@@ -237,3 +237,22 @@ test("transaksi batal tidak menampilkan laba", () => {
   assert.match(saleDetailPage, /const netRevenue = totalAmount - taxAmount/);
   assert.match(saleDetailPage, /!sale\.isVoided && netRevenue > 0 \? \(\(grossProfit \/ netRevenue\) \* 100\)/);
 });
+
+// --- Konfirmasi: jangan pakai dialog bawaan browser ---------------------------
+
+test("konfirmasi memakai dialog aplikasi, bukan window.confirm", () => {
+  const files: [string, string][] = [
+    ["app/layout.tsx", readFileSync(new URL("../src/app/layout.tsx", import.meta.url), "utf8")],
+    ["shared/confirm-dialog.tsx", readFileSync(new URL("../src/components/shared/confirm-dialog.tsx", import.meta.url), "utf8")],
+    ["inventory/transfers", readFileSync(new URL("../src/app/(dashboard)/inventory/transfers/page.tsx", import.meta.url), "utf8")],
+    ["tables", readFileSync(new URL("../src/app/(dashboard)/tables/page.tsx", import.meta.url), "utf8")],
+    ["finance", readFileSync(new URL("../src/app/(dashboard)/finance/page.tsx", import.meta.url), "utf8")],
+  ];
+  const layout = files[0][1];
+  assert.match(layout, /<ConfirmProvider>/);
+  assert.match(files[1][1], /export function useConfirm/);
+  for (const [name, source] of files.slice(2)) {
+    assert.match(source, /useConfirm\(\)/, `${name}: memakai useConfirm`);
+    assert.doesNotMatch(source, /[^A-Za-z]window\.confirm\(/, `${name}: window.confirm sudah tidak dipakai`);
+  }
+});

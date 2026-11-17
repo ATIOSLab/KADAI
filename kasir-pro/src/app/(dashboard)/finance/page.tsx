@@ -29,6 +29,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SearchableSelect } from "@/components/shared/searchable-select";
 import { TablePagination } from "@/components/shared/table-pagination";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -261,6 +262,7 @@ function getCategoryFormDefaults() {
 }
 
 export default function FinancePage() {
+  const confirmAction = useConfirm();
   const defaultRange = getCurrentMonthRange();
   const { user, loading: loadingUser } = useSessionUser();
   const canAccessFinance =
@@ -520,7 +522,12 @@ export default function FinancePage() {
   };
 
   const handleArchiveEntry = async (entry: FinanceEntryRecord) => {
-    if (!window.confirm(`Arsipkan transaksi "${entry.title}"?`)) {
+    if (
+      !(await confirmAction(`Arsipkan transaksi "${entry.title}"?`, {
+        title: "Arsipkan Transaksi",
+        confirmLabel: "Ya, Arsipkan",
+      }))
+    ) {
       return;
     }
 
@@ -569,7 +576,13 @@ export default function FinancePage() {
   };
 
   const handleDeactivateCategory = async (category: FinanceCategoryRecord) => {
-    if (!window.confirm(`Nonaktifkan kategori "${category.name}"?`)) {
+    if (
+      !(await confirmAction(`Nonaktifkan kategori "${category.name}"?`, {
+        title: "Nonaktifkan Kategori",
+        confirmLabel: "Ya, Nonaktifkan",
+        variant: "danger",
+      }))
+    ) {
       return;
     }
 

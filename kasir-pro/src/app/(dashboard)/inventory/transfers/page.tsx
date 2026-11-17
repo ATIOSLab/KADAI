@@ -39,6 +39,7 @@ import { formatCurrency } from "@/lib/utils";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatCard } from "@/components/shared/stat-card";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 
 interface TransferItem {
   id: string;
@@ -80,6 +81,7 @@ interface StockTransfer {
 }
 
 export default function StockTransfersPage() {
+  const confirmAction = useConfirm();
   const [transfers, setTransfers] = useState<StockTransfer[]>([]);
   const [outlets, setOutlets] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -236,9 +238,14 @@ export default function StockTransfersPage() {
   const handleAction = async (id: string, action: "RECEIVE" | "CANCEL") => {
     const actionLabel = action === "RECEIVE" ? "menerima" : "membatalkan";
     if (
-      !confirm(
-        `Apakah Anda yakin ingin ${actionLabel} pengiriman transfer stok ini?`
-      )
+      !(await confirmAction(
+        `Apakah Anda yakin ingin ${actionLabel} pengiriman transfer stok ini?`,
+        {
+          title: action === "RECEIVE" ? "Terima Barang" : "Batalkan Transfer",
+          confirmLabel: action === "RECEIVE" ? "Ya, Terima" : "Ya, Batalkan",
+          variant: action === "RECEIVE" ? "default" : "danger",
+        }
+      ))
     ) {
       return;
     }

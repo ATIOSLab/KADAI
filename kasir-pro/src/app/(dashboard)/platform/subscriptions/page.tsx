@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StatCard } from "@/components/shared/stat-card";
 import { PageHeader } from "@/components/shared/page-header";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { StatusBadge, type StatusTone } from "@/components/shared/status-badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogBody } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -83,6 +84,7 @@ const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 export default function PlatformSubscriptionsPage() {
+  const confirmAction = useConfirm();
   const [rows, setRows] = useState<SubscriptionRow[]>([]);
   const [invoices, setInvoices] = useState<InvoiceItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -382,8 +384,16 @@ export default function PlatformSubscriptionsPage() {
                   variant="destructive"
                   size="sm"
                   disabled={savingManage}
-                  onClick={() => {
-                    if (confirm(`Suspend tenant "${manageTarget?.storeName}"? Akses owner akan dicabut.`)) {
+                  onClick={async () => {
+                    const proceed = await confirmAction(
+                      `Suspend tenant "${manageTarget?.storeName}"? Akses owner akan dicabut.`,
+                      {
+                        title: "Suspend Tenant",
+                        confirmLabel: "Ya, Suspend",
+                        variant: "danger",
+                      }
+                    );
+                    if (proceed) {
                       manageAction("SUSPEND_TENANT", { suspendOwners: true });
                     }
                   }}

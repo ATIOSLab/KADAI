@@ -173,10 +173,12 @@ function isRetryableWriteConflict(error: unknown): boolean {
   return /write conflict|deadlock/i.test(String(error.message ?? ""));
 }
 
-async function createSaleWithRetry<T>(run: () => Promise<T>): Promise<T> {
+async function createSaleWithRetry<T>(
+  run: (attempt: number) => Promise<T>
+): Promise<T> {
   for (let attempt = 1; ; attempt += 1) {
     try {
-      return await run();
+      return await run(attempt - 1);
     } catch (error) {
       const isInvoiceCollision =
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -262,7 +264,7 @@ export async function POST(request: NextRequest) {
     // Process sale in a transaction.
     // Nomor invoice unik PER TENANT (storeId + invoiceNumber); retry menutup balapan
     // dua kasir yang checkout pada detik yang sama (Serializable + P2002).
-    const result = await createSaleWithRetry(() =>
+    const result = await createSaleWithRetry((attemptOffset) =>
       prisma.$transaction(async (tx) => {
       // Resolve effective outlet, costing method, and kitchen workflow
       let effectiveOutletId = data.outletId || null;
@@ -445,7 +447,7 @@ export async function POST(request: NextRequest) {
         },
       });
       const invoiceNumber = generateInvoiceNumber(
-        todaySalesCount + 1,
+        todaySalesCount + 1 + attemptOffset,
         new Date(),
         timezone
       );

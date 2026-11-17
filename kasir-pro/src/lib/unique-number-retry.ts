@@ -11,14 +11,18 @@ import { Prisma } from "@prisma/client";
  * hasilnya akan sama dan pengguna justru butuh pesan aslinya.
  */
 export async function withUniqueNumberRetry<T>(
-  run: () => Promise<T>,
+  // `attempt` (0,1,2,...) dipakai pemanggil untuk MENGESER nomor dokumen.
+  // Tanpa itu hitungan ulang menghasilkan nomor yang sama persis, sehingga
+  // lima percobaan menabrak nomor yang sama dan pengguna menerima 409 padahal
+  // tidak ada yang bersamaan (nomor lama bolong karena batch dihapus).
+  run: (attempt: number) => Promise<T>,
   options: { attempts?: number; uniqueFields?: string[]; onExhausted?: () => Error } = {}
 ): Promise<T> {
   const attempts = options.attempts ?? 5;
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
-      return await run();
+      return await run(attempt);
     } catch (error) {
       const retryable = isRetryableUniqueViolation(error, options.uniqueFields);
       if (!retryable) {

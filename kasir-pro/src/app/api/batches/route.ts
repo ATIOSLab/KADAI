@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // dua staff yang menyimpan restock pada saat yang sama bisa menghitung nomor
     // yang sama dan satu di antaranya gagal (500) padahal stok fisik sudah masuk.
     const batch = await withUniqueNumberRetry(
-      () =>
+      (attempt) =>
         prisma.$transaction(async (tx) => {
       // `batchNumber` = BATCH-<SKU>-<TANGGAL>-<urut> dan indeksnya unik GLOBAL,
       // sementara SKU hanya unik per tenant. Karena itu urutan dihitung global:
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       });
       const batchNumber = generateBatchNumber(
         product.sku,
-        todayBatchCount + 1,
+        todayBatchCount + 1 + attempt,
         new Date(),
         timezone
       );

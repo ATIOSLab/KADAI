@@ -323,7 +323,11 @@ test("nomor dokumen (invoice/batch) memakai tanggal zona bisnis", () => {
 
   const sales = route("sales");
   assert.match(sales, /gte: getBusinessDayStart\(new Date\(\), timezone\)/);
-  assert.match(sales, /generateInvoiceNumber\(\s*todaySalesCount \+ 1,\s*new Date\(\),\s*timezone\s*\)/);
+  // Hitungan per tenant + pergeseran nomor percobaan saat nomor bentrok.
+  assert.match(
+    sales,
+    /generateInvoiceNumber\(\s*todaySalesCount \+ 1 \+ attemptOffset,\s*new Date\(\),\s*timezone\s*\)/
+  );
 
   const batches = route("batches");
   assert.match(batches, /gte: getBusinessDayStart\(new Date\(\), timezone\)/);

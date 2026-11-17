@@ -82,7 +82,9 @@ export async function GET(request: NextRequest) {
  * bisa menghitung nomor yang sama dan menabrak constraint (P2002) - ulangi dengan
  * nomor segar; hitungan ulang otomatis memakai nomor berikutnya.
  */
-function createTransferWithRetry<T>(run: () => Promise<T>): Promise<T> {
+function createTransferWithRetry<T>(
+  run: (attempt: number) => Promise<T>
+): Promise<T> {
   return withUniqueNumberRetry(run, { uniqueFields: ["transferNumber"] });
 }
 
@@ -137,11 +139,14 @@ export async function POST(request: NextRequest) {
     const timezone = await resolveBusinessTimezone();
     const dateStr = formatInTimeZone(new Date(), timezone, "yyyyMMdd");
 
-    const newTransfer = await createTransferWithRetry(async () => {
+    const newTransfer = await createTransferWithRetry(async (attempt) => {
       const count = await prisma.stockTransfer.count({
         where: { transferNumber: { startsWith: `TRF-${dateStr}` } },
       });
-      const transferNumber = `TRF-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+      // `+ attempt`: bila nomor hasil hitungan sudah terpakai (transfer lama
+      // dihapus), percobaan berikutnya memakai nomor setelahnya, bukan nomor
+      // yang sama berulang kali.
+      const transferNumber = `TRF-${dateStr}-${String(count + 1 + attempt).padStart(4, "0")}`;
 
       return prisma.$transaction(async (tx) => {
         const transfer = await tx.stockTransfer.create({

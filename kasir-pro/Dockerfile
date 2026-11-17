@@ -8,6 +8,13 @@ COPY prisma ./prisma
 RUN npm ci
 
 FROM base AS builder
+# VPS build (16 GB, tanpa swap) sempat membunuh proses `next build` di tengah
+# "Creating an optimized production build" tanpa satu pun pesan galat. Batas
+# heap membuat V8 melakukan GC lebih awal, bukan meminta memori sampai kernel
+# menghentikan prosesnya. Telemetri dimatikan karena build tidak boleh
+# bergantung pada jaringan keluar.
+ENV NODE_OPTIONS="--max-old-space-size=3072"
+ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

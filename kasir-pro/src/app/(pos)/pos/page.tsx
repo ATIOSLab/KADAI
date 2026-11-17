@@ -16,7 +16,7 @@ import { formatCurrency, cn } from "@/lib/utils";
 import { thermalPrinter, type PrinterConfig } from "@/lib/escpos/driver";
 
 export default function PosPage() {
-  const { user } = useSessionUser();
+  const { user, loading: userLoading } = useSessionUser();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isShiftOpen, setIsShiftOpen] = useState(false);
   const [isPrinterOpen, setIsPrinterOpen] = useState(false);
@@ -123,7 +123,7 @@ export default function PosPage() {
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left: Product Search */}
         <div className="flex-1 overflow-y-auto neo-scrollbar p-3 sm:p-4 pb-28 md:pb-6">
-          <ProductSearch outletId={user?.outletId ?? null} />
+          <ProductSearch outletId={user?.outletId ?? null} outletResolved={!userLoading} />
         </div>
 
         {/* Mobile Floating Cart Summary (<768px Phones only) */}

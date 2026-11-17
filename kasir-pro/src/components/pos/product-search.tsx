@@ -14,7 +14,14 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { soundEffects } from "@/lib/audio-effects";
 import type { Category, ProductWithStock } from "@/types";
 
-export function ProductSearch({ outletId }: { outletId?: string | null }) {
+export function ProductSearch({
+  outletId,
+  outletResolved = true,
+}: {
+  outletId?: string | null;
+  /** Sesudah sesi terbaca: sebelum itu cabang belum diketahui. */
+  outletResolved?: boolean;
+}) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -58,6 +65,12 @@ export function ProductSearch({ outletId }: { outletId?: string | null }) {
     let cancelled = false;
 
     async function loadProducts() {
+      // Tunggu cabang kasir terbaca: kalau tidak, katalog dimuat dua kali -
+      // sekali tanpa cabang (stok semua cabang) lalu sekali dengan cabang.
+      if (!outletResolved) {
+        return;
+      }
+
       setLoading(true);
 
       try {
@@ -105,7 +118,7 @@ export function ProductSearch({ outletId }: { outletId?: string | null }) {
     return () => {
       cancelled = true;
     };
-  }, [activeCategory, catalogVersion, debouncedSearch, outletId]);
+  }, [activeCategory, catalogVersion, debouncedSearch, outletId, outletResolved]);
 
   const filteredProducts = useMemo(
     () =>

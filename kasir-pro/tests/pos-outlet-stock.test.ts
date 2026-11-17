@@ -30,7 +30,12 @@ test("sesi menyertakan cabang pengguna untuk layar kasir", () => {
 });
 
 test("layar kasir meneruskan cabang pengguna ke daftar produk", () => {
-  assert.match(posPage, /<ProductSearch outletId=\{user\?\.outletId \?\? null\} \/>/);
+  assert.match(
+    posPage,
+    /<ProductSearch outletId=\{user\?\.outletId \?\? null\} outletResolved=\{!userLoading\} \/>/
+  );
+  assert.match(posPage, /const \{ user, loading: userLoading \} = useSessionUser\(\)/);
   assert.match(search, /params\.set\("outletId", outletId\)/);
-  assert.match(search, /debouncedSearch, outletId\]/);
+  assert.match(search, /debouncedSearch, outletId, outletResolved\]/);
+  assert.match(search, /if \(!outletResolved\) \{\s*return;/);
 });

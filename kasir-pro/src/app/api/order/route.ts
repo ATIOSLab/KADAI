@@ -55,7 +55,14 @@ export async function GET(req: NextRequest) {
       include: {
         category: true,
         batches: {
-          where: { remainingQty: { gt: 0 } },
+          // Batch yang dijual dari cabang meja ini (plus stok lama tanpa
+          // cabang), urut FIFO - batch pertama inilah yang benar-benar
+          // dipotong kasir, jadi harganya yang harus tampil di menu.
+          where: {
+            remainingQty: { gt: 0 },
+            OR: [{ outletId: table.outletId }, { outletId: null }],
+          },
+          orderBy: [{ purchaseDate: "asc" }, { createdAt: "asc" }],
           select: {
             id: true,
             batchNumber: true,
@@ -68,10 +75,23 @@ export async function GET(req: NextRequest) {
     });
 
     // Format products with available price
-    const formattedProducts = products.map((p: any) => {
-      const activeBatch = p.batches[0];
-      const price = activeBatch ? Number(activeBatch.sellingPrice) : 0;
-      const totalStock = p.batches.reduce((sum: number, b: any) => sum + b.remainingQty, 0);
+    const formattedProducts = products
+      .map((p: any) => {
+        // Tanpa orderBy, batches[0] bisa batch mana saja: menu sempat menampilkan
+        // Rp 7.000 sementara kasir menagih Rp 12.000 untuk produk yang sama.
+        const activeBatch = p.batches[0];
+        const price = activeBatch ? Number(activeBatch.sellingPrice) : 0;
+        const totalStock = p.batches.reduce((sum: number, b: any) => sum + b.remainingQty, 0);
+
+        return {
+          product: p,
+          price,
+          totalStock,
+        };
+      })
+      // Produk tanpa harga tidak boleh tampil "Rp 0" dan bisa dipesan gratis.
+      .filter((row: any) => row.price > 0)
+      .map(({ product: p, price, totalStock }: any) => {
 
       return {
         id: p.id,
@@ -109,6 +129,10 @@ export async function GET(req: NextRequest) {
       },
       categories,
       products: formattedProducts,
+      // POST masih ditutup (token QR publik tidak boleh menulis stok/menagih).
+      // UI wajib membaca flag ini supaya tamu tidak menyusun keranjang yang
+      // akhirnya ditolak 403.
+      selfOrderEnabled: false,
     });
   } catch (error) {
     console.error("GET /api/order error:", error);

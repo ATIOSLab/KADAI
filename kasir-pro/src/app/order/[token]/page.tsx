@@ -72,6 +72,10 @@ export default function TableOrderPage({
   // Cart State
   const [cart, setCart] = useState<Map<string, CartLine>>(new Map());
   const [isCartOpen, setIsCartOpen] = useState(false);
+  // POST /api/order masih 403: token QR publik tidak boleh menulis stok.
+  // Menu tetap tampil sebagai katalog, tapi tamu tidak boleh menyusun pesanan
+  // yang pasti ditolak di langkah terakhir.
+  const [selfOrderEnabled, setSelfOrderEnabled] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [generalNotes, setGeneralNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -95,6 +99,7 @@ export default function TableOrderPage({
         setStoreData(data.store);
         setCategories(["Semua", ...(data.categories || [])]);
         setProducts(data.products || []);
+        setSelfOrderEnabled(data.selfOrderEnabled === true);
       } catch {
         setError("Gagal terhubung ke server");
       } finally {
@@ -244,14 +249,24 @@ export default function TableOrderPage({
               </p>
             </div>
           </div>
-          <Badge className="font-bold neo-border bg-accent-success text-white">
-            Self-Order
+          <Badge
+            className={`font-bold neo-border text-white ${
+              selfOrderEnabled ? "bg-accent-success" : "bg-muted-foreground"
+            }`}
+          >
+            {selfOrderEnabled ? "Self-Order" : "Katalog Menu"}
           </Badge>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-xl mx-auto px-4 pt-4 space-y-4">
+        {!selfOrderEnabled && (
+          <div className="rounded-xl neo-border bg-muted px-4 py-3 text-xs font-semibold text-muted-foreground">
+            Pemesanan mandiri belum aktif. Silakan pesan langsung ke pelayan atau
+            kasir — daftar di bawah adalah katalog menu dan harga.
+          </div>
+        )}
         {/* Success Modal */}
         {orderSuccess && (
           <Card className="neo-border neo-shadow bg-accent-success/10 border-accent-success p-6 text-center">
@@ -357,10 +372,15 @@ export default function TableOrderPage({
                             <Plus className="size-3.5" />
                           </button>
                         </div>
+                      ) : p.isAvailable === false ? (
+                        <span className="text-[11px] font-bold text-muted-foreground">
+                          Habis
+                        </span>
                       ) : (
                         <Button
                           size="sm"
                           onClick={() => addToCart(p)}
+                          disabled={!selfOrderEnabled}
                           className="neo-border font-bold text-xs bg-primary text-primary-foreground"
                         >
                           <Plus className="size-3.5 mr-1" /> Tambah

@@ -293,7 +293,7 @@ export default function NewProductPage() {
                       })),
                       {
                         value: OTHER_CATEGORY_VALUE,
-                        label: "Lainnya...",
+                        label: "+ Kategori baru...",
                         searchText: "lainnya other custom",
                       },
                     ]}
@@ -344,7 +344,7 @@ export default function NewProductPage() {
                       })),
                       {
                         value: OTHER_UNIT_VALUE,
-                        label: "Lainnya...",
+                        label: "+ Satuan baru...",
                         searchText: "lainnya other custom",
                       },
                     ]}

@@ -11,6 +11,15 @@ const transfers = route("inventory/transfers");
 const reporting = lib("reporting.ts");
 const hpp = lib("hpp.ts");
 const reportsPage = readFileSync(new URL("../src/app/(dashboard)/reports/page.tsx", import.meta.url), "utf8");
+const fifo = lib("fifo.ts");
+const adjustmentRoute = route("inventory/adjustment");
+const produceRoute = route("products/[id]/produce");
+const pricingRates = lib("pricing-rates.ts");
+const pricingPreview = lib("pricing-preview.ts");
+const posPricingRoute = route("pos/pricing");
+const cartHook = readFileSync(new URL("../src/hooks/use-cart.ts", import.meta.url), "utf8");
+const cartComponent = readFileSync(new URL("../src/components/pos/cart.tsx", import.meta.url), "utf8");
+const orderRoute = route("order");
 
 // --- Checkout: tabrakan tulis PostgreSQL (P2034) bukan kegagalan server -------
 
@@ -139,4 +148,65 @@ test("halaman laporan menampilkan pajak, service charge, dan omzet neto", () => 
   assert.match(reportsPage, /Service Charge/);
   assert.match(reportsPage, /report\.kpi\.taxCollected/);
   assert.match(reportsPage, /report\.kpi\.netRevenue/);
+});
+
+// --- Stok: pemotongan batch harus "klaim bersyarat", bukan decrement buta -----
+
+test("pemotongan batch tidak pernah membuat stok minus", () => {
+  // fifo.ts (dipakai checkout) memakai updateMany bersyarat
+  assert.match(fifo, /remainingQty: \{ gte: allocation\.quantity \}/);
+  assert.match(fifo, /claim\.count !== 1/);
+  assert.match(fifo, /"STOCK_ALREADY_TAKEN"/);
+  // Bagian pemotongan tidak boleh lagi memakai update() buta (bagian pemulihan
+  // void tetap memakai increment, itu memang disengaja).
+  const deductionBlock = fifo.slice(fifo.indexOf("export async function applyFIFODeductions"), fifo.indexOf("Restore FIFO deductions"));
+  assert.doesNotMatch(deductionBlock, /productBatch\.update\(\{/);
+
+  // Penyesuaian stok (opname) dan produksi bahan baku memakai pola yang sama
+  for (const [name, source] of [
+    ["inventory/adjustment", adjustmentRoute],
+    ["products/[id]/produce", produceRoute],
+    ["inventory/transfers", transfers],
+  ] as const) {
+    assert.match(source, /remainingQty: \{ gte: (take|takeQty|deduct) /, `${name}: klaim batch bersyarat`);
+    assert.match(source, /claim\.count !== 1/, `${name}: menolak kalau batch sudah terpakai`);
+  }
+});
+
+test("transaksi yang memotong stok berjalan Serializable", () => {
+  assert.match(sales, /isolationLevel: Prisma\.TransactionIsolationLevel\.Serializable/);
+  assert.match(transfers, /isolationLevel: Prisma\.TransactionIsolationLevel\.Serializable/);
+  assert.match(adjustmentRoute, /isolationLevel: Prisma\.TransactionIsolationLevel\.Serializable/);
+  assert.match(produceRoute, /isolationLevel: Prisma\.TransactionIsolationLevel\.Serializable/);
+});
+
+// --- Tarif PB1 & service charge: satu sumber untuk kasir, menu QR, dan struk --
+
+test("kasir dan struk memakai tarif yang sama", () => {
+  // Checkout memakai resolver bersama, tidak lagi membaca tarif store langsung
+  assert.match(sales, /resolvePricingRates\(\{ outlet: outletPricing, store \}\)/);
+  assert.match(sales, /calculateSaleTotals\(\{/);
+  assert.doesNotMatch(sales, /const serviceRate = Number\(store\?\.serviceChargeRate/);
+
+  // Resolver: tarif cabang menang, angka 0 tetap dihormati
+  assert.match(pricingRates, /taxRate: toRate\(outlet\?\.taxRate\) \?\? toRate\(store\?\.taxRate\) \?\? 0/);
+
+  // Menu QR publik tidak lagi memakai default 10/5
+  assert.match(orderRoute, /resolvePricingRates\(\{/);
+  assert.doesNotMatch(orderRoute, /Number\(store\?\.taxRate \|\| 10\)/);
+
+  // Keranjang menampilkan rincian dan memakai total yang benar-benar ditagih
+  assert.match(cartHook, /getTotals: \(\) =>/);
+  assert.match(cartHook, /previewSaleTotals\(\{/);
+  assert.match(cartComponent, /totals\.serviceCharge > 0/);
+  assert.match(cartComponent, /totals\.taxAmount > 0/);
+  assert.match(posPricingRoute, /resolvePricingRates\(\{ outlet, store \}\)/);
+
+  // Pratinjau kasir tidak boleh menarik runtime Prisma ke bundel browser
+  assert.match(pricingPreview, /import type \{ PricingRates \}/);
+  assert.doesNotMatch(pricingPreview, /runtime\/library/);
+});
+
+test("keranjang memakai total bertagih untuk tombol uang pas", () => {
+  assert.match(cartHook, /return get\(\)\.getTotals\(\)\.totalAmount;/);
 });

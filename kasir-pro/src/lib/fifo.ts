@@ -217,20 +217,36 @@ export async function getTotalStock(productId: string): Promise<number> {
 
 /**
  * Apply FIFO deductions to database (update batch remaining quantities)
+ *
+ * Tiap batch dipotong dengan "klaim" bersyarat (`remainingQty >= jumlah`),
+ * bukan decrement buta. Kalau stok batch ternyata sudah berkurang di transaksi
+ * lain, potongan tidak jadi dan seluruh transaksi dibatalkan dengan 409 -
+ * lebih baik gagal daripada menyisakan stok minus di kartu stok.
  */
 export async function applyFIFODeductions(
   db: PrismaExecutor,
   allocations: FIFOAllocation[]
 ): Promise<void> {
   for (const allocation of allocations) {
-    await db.productBatch.update({
-      where: { id: allocation.batchId },
+    const claim = await db.productBatch.updateMany({
+      where: {
+        id: allocation.batchId,
+        remainingQty: { gte: allocation.quantity },
+      },
       data: {
         remainingQty: {
           decrement: allocation.quantity,
         },
       },
     });
+
+    if (claim.count !== 1) {
+      throw new ApiBusinessError(
+        "Stok berubah saat transaksi sedang diproses. Silakan ulangi transaksi.",
+        409,
+        "STOCK_ALREADY_TAKEN"
+      );
+    }
   }
 }
 

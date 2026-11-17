@@ -285,10 +285,19 @@ export async function PUT(request: NextRequest) {
           for (const batch of sourceBatches) {
             if (remainingToDeduct <= 0) break;
             const takeQty = Math.min(remainingToDeduct, batch.remainingQty);
-            await tx.productBatch.update({
-              where: { id: batch.id },
+            // Klaim bersyarat: kalau batch sudah terpakai transaksi lain, gagalkan
+            // seluruh penerimaan - jangan sampai stok sumber jadi minus.
+            const claim = await tx.productBatch.updateMany({
+              where: { id: batch.id, remainingQty: { gte: takeQty } },
               data: { remainingQty: { decrement: takeQty } },
             });
+            if (claim.count !== 1) {
+              throw new ApiBusinessError(
+                `Stok ${item.product.name} di cabang asal berubah saat penerimaan diproses. Silakan ulangi.`,
+                409,
+                "STOCK_ALREADY_TAKEN"
+              );
+            }
             costValue = costValue.add(new Decimal(batch.costPrice).mul(takeQty));
             priceValue = priceValue.add(new Decimal(batch.sellingPrice).mul(takeQty));
             remainingToDeduct -= takeQty;

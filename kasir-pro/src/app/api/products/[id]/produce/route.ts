@@ -11,6 +11,7 @@ import {
 } from "@/lib/api-response";
 import { formatInTimeZone } from "date-fns-tz";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
+import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 
@@ -151,10 +152,19 @@ export async function POST(
           if (remainingToDeduct <= 0) break;
           const take = Math.min(remainingToDeduct, batch.remainingQty);
 
-          await tx.productBatch.update({
-            where: { id: batch.id },
+          // Klaim bersyarat: dua produksi bersamaan tidak boleh menarik bahan
+          // yang sama dua kali (stok bahan jadi minus).
+          const claim = await tx.productBatch.updateMany({
+            where: { id: batch.id, remainingQty: { gte: take } },
             data: { remainingQty: { decrement: take } },
           });
+          if (claim.count !== 1) {
+            throw new ApiBusinessError(
+              `Stok bahan baku "${recipe.ingredient.name}" berubah saat produksi diproses. Silakan ulangi.`,
+              409,
+              "STOCK_ALREADY_TAKEN"
+            );
+          }
 
           const costContribution = batch.costPrice.mul(take);
           totalBatchCost = totalBatchCost.add(costContribution);
@@ -224,7 +234,9 @@ export async function POST(
         totalCost: totalBatchCost.toNumber(),
         unitCost: unitCost.toNumber(),
       };
-    });
+      // Serializable: dua produksi bersamaan tidak boleh menarik bahan yang sama
+      // (klaim batch di dalamnya akan menolak dengan 409 kalau stok berubah).
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
     return jsonOk(
       result,

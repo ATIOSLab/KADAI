@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { logActivity } from "@/lib/activity-logger";
@@ -48,6 +49,8 @@ export async function POST(request: NextRequest) {
 
     // Catatan penyesuaian dan pemotongan batch harus satu transaksi: kalau
     // pemotongan gagal, catatan -N tanpa stok yang keluar akan menyesatkan opname.
+    // Serializable + klaim batch: dua opname bersamaan tidak boleh memotong batch
+    // yang sama sampai minus.
     const adjustment = await prisma.$transaction(async (tx) => {
       const created = await tx.stockAdjustment.create({
         data: {
@@ -72,10 +75,17 @@ export async function POST(request: NextRequest) {
         for (const batch of batches) {
           if (remaining <= 0) break;
           const deduct = Math.min(remaining, batch.remainingQty);
-          await tx.productBatch.update({
-            where: { id: batch.id },
+          const claim = await tx.productBatch.updateMany({
+            where: { id: batch.id, remainingQty: { gte: deduct } },
             data: { remainingQty: { decrement: deduct } },
           });
+          if (claim.count !== 1) {
+            throw new ApiBusinessError(
+              "Stok berubah saat penyesuaian diproses. Silakan ulangi.",
+              409,
+              "STOCK_ALREADY_TAKEN"
+            );
+          }
           remaining -= deduct;
         }
 
@@ -91,7 +101,7 @@ export async function POST(request: NextRequest) {
       }
 
       return created;
-    });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
     await logActivity({
       userId: sessionUser.id,

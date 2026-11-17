@@ -64,6 +64,8 @@ interface SaleDetail {
   taxAmount: number;
   roundingAmount: number;
   totalAmount: number;
+  paidAmount: number | string | null;
+  changeAmount: number | string | null;
   totalCost: number;
   grossProfit: number;
   paymentType: string;
@@ -274,6 +276,8 @@ export default function SaleDetailPage({
           totalAmount: Number(sale.totalAmount),
           paymentType: sale.paymentType,
           paymentRef: sale.paymentRef,
+          cashReceived: sale.paidAmount ? Number(sale.paidAmount) : null,
+          changeAmount: sale.changeAmount ? Number(sale.changeAmount) : null,
         });
         toast.success(`Struk berhasil dicetak ke ${thermalPrinter.config.deviceName || "Printer"}`, { id: "print-sale" });
         return;
@@ -568,6 +572,8 @@ export default function SaleDetailPage({
               totalAmount={Number(sale.totalAmount)}
               paymentType={sale.paymentType}
               paymentRef={sale.paymentRef}
+              cashReceived={sale.paidAmount ? Number(sale.paidAmount) : null}
+              changeAmount={sale.changeAmount ? Number(sale.changeAmount) : null}
               preview={true}
             />
           </div>
@@ -613,6 +619,8 @@ export default function SaleDetailPage({
         totalAmount={Number(sale.totalAmount)}
         paymentType={sale.paymentType}
         paymentRef={sale.paymentRef}
+        cashReceived={sale.paidAmount ? Number(sale.paidAmount) : null}
+        changeAmount={sale.changeAmount ? Number(sale.changeAmount) : null}
       />
     </div>
   );

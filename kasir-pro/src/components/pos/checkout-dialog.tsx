@@ -149,6 +149,9 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           tableId: orderType === "DINE_IN" && tableId ? tableId : null,
           paymentType,
           paymentRef: paymentRef || null,
+          // Uang yang benar-benar dipegang kasir ikut dikirim supaya tersimpan
+          // di transaksinya; struk cetak ulang tidak boleh kehilangan angka ini.
+          paidAmount: paymentType === "CASH" && cashAmount ? Number(cashAmount) : null,
           customerName: customerName || null,
           customerId: customerId || null,
           discountAmount: 0,
@@ -247,8 +250,16 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           taxAmount: Number(completedSale.taxAmount || 0),
           roundingAmount: Number(completedSale.roundingAmount || 0),
           totalAmount: Number(completedSale.totalAmount),
-          cashReceived: cashAmount ? Number(cashAmount) : null,
-          changeAmount: changeAmount > 0 ? changeAmount : null,
+          cashReceived: completedSale.paidAmount
+            ? Number(completedSale.paidAmount)
+            : cashAmount
+              ? Number(cashAmount)
+              : null,
+          changeAmount: completedSale.changeAmount
+            ? Number(completedSale.changeAmount)
+            : changeAmount > 0
+              ? changeAmount
+              : null,
         });
         toast.success(`Struk berhasil dicetak ke ${thermalPrinter.config.deviceName || "Printer"}`, { id: "print-thermal" });
         return;
@@ -354,8 +365,20 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                   taxAmount={Number(completedSale.taxAmount || 0)}
                   roundingAmount={Number(completedSale.roundingAmount || 0)}
                   totalAmount={Number(completedSale.totalAmount)}
-                  cashReceived={cashAmount ? Number(cashAmount) : null}
-                  changeAmount={changeAmount > 0 ? changeAmount : null}
+                  cashReceived={
+                    completedSale.paidAmount
+                      ? Number(completedSale.paidAmount)
+                      : cashAmount
+                        ? Number(cashAmount)
+                        : null
+                  }
+                  changeAmount={
+                    completedSale.changeAmount
+                      ? Number(completedSale.changeAmount)
+                      : changeAmount > 0
+                        ? changeAmount
+                        : null
+                  }
                   preview={true}
                 />
               </div>
@@ -390,8 +413,20 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 taxAmount={Number(completedSale.taxAmount || 0)}
                 roundingAmount={Number(completedSale.roundingAmount || 0)}
                 totalAmount={Number(completedSale.totalAmount)}
-                cashReceived={cashAmount ? Number(cashAmount) : null}
-                changeAmount={changeAmount > 0 ? changeAmount : null}
+                cashReceived={
+                    completedSale.paidAmount
+                      ? Number(completedSale.paidAmount)
+                      : cashAmount
+                        ? Number(cashAmount)
+                        : null
+                  }
+                changeAmount={
+                    completedSale.changeAmount
+                      ? Number(completedSale.changeAmount)
+                      : changeAmount > 0
+                        ? changeAmount
+                        : null
+                  }
               />
             </div>
           )}

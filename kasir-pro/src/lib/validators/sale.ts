@@ -26,6 +26,14 @@ export const checkoutSchema = z.object({
   customerName: z.string().optional().nullable(),
   customerId: z.string().optional().nullable(),
   discountAmount: z.number().min(0).default(0),
+  /// Uang tunai yang diserahkan tamu. Diisi kasir untuk pembayaran CASH;
+  /// server menolak nilai yang kurang dari total tagihan.
+  paidAmount: z
+    .number("Uang diterima harus berupa angka")
+    .min(0, "Uang diterima tidak boleh negatif")
+    .max(1e12, "Batas transaksi terlampaui")
+    .optional()
+    .nullable(),
   notes: z.string().max(500).optional().nullable(),
   idempotencyKey: z.string().max(128).optional().nullable(),
 });

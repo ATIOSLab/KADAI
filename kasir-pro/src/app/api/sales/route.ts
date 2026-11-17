@@ -515,6 +515,30 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Uang yang dipegang kasir. Divalidasi terhadap total yang SUDAH dihitung
+      // server, bukan terhadap angka kiriman klien, supaya tidak ada jalan
+      // mencatat "kembalian" dari total yang dipalsukan.
+      let paidAmount: Decimal | null = null;
+      let changeAmount: Decimal | null = null;
+      if (data.paidAmount !== undefined && data.paidAmount !== null) {
+        if (data.paymentType !== "CASH") {
+          throw new ApiBusinessError(
+            "Uang diterima hanya dicatat untuk pembayaran tunai",
+            400,
+            "PAID_AMOUNT_NOT_CASH"
+          );
+        }
+        paidAmount = new Decimal(data.paidAmount).toDecimalPlaces(2);
+        if (paidAmount.lessThan(totalAmount)) {
+          throw new ApiBusinessError(
+            "Uang diterima kurang dari total tagihan",
+            400,
+            "PAID_LESS_THAN_TOTAL"
+          );
+        }
+        changeAmount = paidAmount.sub(totalAmount).toDecimalPlaces(2);
+      }
+
       // Laba kotor = pendapatan usaha dikurangi HPP. Service charge adalah
       // pendapatan jasa milik usaha, jadi ikut dihitung; PB1 tidak, karena
       // uang itu titipan negara dan hanya lewat di kas.
@@ -541,6 +565,8 @@ export async function POST(request: NextRequest) {
           taxAmount,
           roundingAmount,
           totalAmount,
+          paidAmount,
+          changeAmount,
           totalCost,
           grossProfit,
           paymentType: data.paymentType,

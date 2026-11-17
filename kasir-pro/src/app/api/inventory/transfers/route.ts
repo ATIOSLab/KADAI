@@ -11,6 +11,7 @@ import {
 } from "@/lib/api-response";
 import { Decimal } from "@prisma/client/runtime/library";
 import { Prisma } from "@prisma/client";
+import { withUniqueNumberRetry } from "@/lib/unique-number-retry";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { checkFeature } from "@/lib/plan-limits";
 import { formatInTimeZone } from "date-fns-tz";
@@ -80,20 +81,8 @@ export async function GET(request: NextRequest) {
  * bisa menghitung nomor yang sama dan menabrak constraint (P2002) - ulangi dengan
  * nomor segar; hitungan ulang otomatis memakai nomor berikutnya.
  */
-async function createTransferWithRetry<T>(run: () => Promise<T>): Promise<T> {
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    try {
-      return await run();
-    } catch (error) {
-      const isNumberCollision =
-        error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
-      if (!isNumberCollision || attempt === 4) {
-        throw error;
-      }
-    }
-  }
-
-  throw new Error("Gagal membuat nomor transfer unik");
+function createTransferWithRetry<T>(run: () => Promise<T>): Promise<T> {
+  return withUniqueNumberRetry(run, { uniqueFields: ["transferNumber"] });
 }
 
 // POST /api/inventory/transfers

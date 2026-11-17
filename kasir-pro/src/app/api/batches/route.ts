@@ -13,6 +13,8 @@ import {
   getSystemFinanceCategoryId,
 } from "@/lib/finance";
 import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { ApiBusinessError } from "@/lib/api-response";
+import { withUniqueNumberRetry } from "@/lib/unique-number-retry";
 import { ZodError } from "zod";
 
 // POST /api/batches — Create new batch (restock)
@@ -51,7 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
     }
 
-    const batch = await prisma.$transaction(async (tx) => {
+    // Restock bersamaan: nomor batch dihitung dari jumlah batch hari ini, jadi
+    // dua staff yang menyimpan restock pada saat yang sama bisa menghitung nomor
+    // yang sama dan satu di antaranya gagal (500) padahal stok fisik sudah masuk.
+    const batch = await withUniqueNumberRetry(
+      () =>
+        prisma.$transaction(async (tx) => {
       // `batchNumber` = BATCH-<SKU>-<TANGGAL>-<urut> dan indeksnya unik GLOBAL,
       // sementara SKU hanya unik per tenant. Karena itu urutan dihitung global:
       // dua tenant dengan SKU sama tidak lagi saling menabrak (P2002).
@@ -105,7 +112,17 @@ export async function POST(request: NextRequest) {
       });
 
       return createdBatch;
-    });
+        }),
+      {
+        uniqueFields: ["batchNumber"],
+        onExhausted: () =>
+          new ApiBusinessError(
+            "Restock lain sedang disimpan bersamaan. Silakan simpan ulang sebentar lagi.",
+            409,
+            "BATCH_NUMBER_CONFLICT"
+          ),
+      }
+    );
 
     await logActivity({
       userId: sessionUser.id,
@@ -128,6 +145,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: error.issues[0]?.message ?? "Data batch tidak valid" },
         { status: 400 }
+      );
+    }
+    if (error instanceof ApiBusinessError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.status }
       );
     }
     return NextResponse.json({ error: "Gagal membuat batch baru" }, { status: 500 });

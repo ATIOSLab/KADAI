@@ -9,10 +9,17 @@ export const cartItemSchema = z.object({
   selectedBatchId: z.string().optional().nullable(),
 });
 
+export const PAYMENT_TYPES = ["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"] as const;
+export const ORDER_TYPES = ["DINE_IN", "TAKEAWAY", "DELIVERY"] as const;
+
 export const checkoutSchema = z.object({
   items: z.array(cartItemSchema).min(1, "Keranjang tidak boleh kosong"),
-  paymentType: z.enum(["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"]),
-  orderType: z.enum(["DINE_IN", "TAKEAWAY", "DELIVERY"]).default("DINE_IN"),
+  paymentType: z.enum(PAYMENT_TYPES, {
+    message: "Metode pembayaran tidak dikenal (CASH, BANK_TRANSFER, QRIS, E_WALLET, TEMPO)",
+  }),
+  orderType: z
+    .enum(ORDER_TYPES, { message: "Jenis pesanan tidak dikenal (DINE_IN, TAKEAWAY, DELIVERY)" })
+    .default("DINE_IN"),
   outletId: z.string().optional().nullable(),
   tableId: z.string().optional().nullable(),
   paymentRef: z.string().optional().nullable(),
@@ -27,7 +34,9 @@ export const saleFilterSchema = z.object({
   search: z.string().optional(),
   cashierId: z.string().optional(),
   outletId: z.string().optional(),
-  paymentType: z.enum(["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"]).optional(),
+  paymentType: z
+    .enum(PAYMENT_TYPES, { message: "Metode pembayaran tidak dikenal" })
+    .optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   isVoided: z.boolean().optional(),

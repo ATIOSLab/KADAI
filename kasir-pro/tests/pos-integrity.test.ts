@@ -79,6 +79,17 @@ test("status transfer tidak lagi diubah non-atomik di akhir transaksi", () => {
   );
 });
 
+// --- Restock bersamaan: nomor batch juga unik global -------------------------
+
+test("restock memakai nomor batch dengan percobaan ulang, bukan 500", () => {
+  const batches = route("batches");
+  assert.match(batches, /withUniqueNumberRetry\(/);
+  assert.match(batches, /uniqueFields: \["batchNumber"\]/);
+  assert.match(batches, /"BATCH_NUMBER_CONFLICT"/);
+  // Galat bisnis harus dijawab dengan statusnya sendiri, bukan 500 generik
+  assert.match(batches, /if \(error instanceof ApiBusinessError\)/);
+});
+
 // --- Akuntansi: PB1 titipan negara, service charge pendapatan jasa ------------
 
 test("laba kotor menyertakan service charge tetapi tidak PB1", () => {

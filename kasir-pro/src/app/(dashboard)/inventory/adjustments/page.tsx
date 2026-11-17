@@ -164,6 +164,10 @@ export default function AdjustmentsPage() {
       toast.error("Jumlah perubahan tidak boleh 0");
       return;
     }
+    if (outlets.length > 1 && !selectedOutletId) {
+      toast.error("Pilih cabang tempat barang hilang, rusak, atau kedaluwarsa");
+      return;
+    }
 
     setSubmitting(true);
     try {

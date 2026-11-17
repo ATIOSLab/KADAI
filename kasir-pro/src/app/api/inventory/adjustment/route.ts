@@ -71,6 +71,20 @@ export async function POST(request: NextRequest) {
       });
       effectiveOutletId = userRec?.outletId ?? null;
       if (!effectiveOutletId) {
+        // Tenant multi-cabang: jangan menebak. Dulu permintaan tanpa cabang
+        // otomatis jatuh ke cabang utama, sehingga kerugian cabang PIK tercatat
+        // menggerus stok Menteng tanpa satu pun pesan di layar.
+        const activeOutlets = await prisma.outlet.count({
+          where: { isActive: true, storeId: scope.storeId },
+        });
+        if (activeOutlets > 1) {
+          throw new ApiBusinessError(
+            "Pilih cabang terlebih dahulu: penyesuaian stok harus jelas cabangnya",
+            400,
+            "OUTLET_REQUIRED"
+          );
+        }
+
         const mainOutlet = await prisma.outlet.findFirst({
           where: { isMain: true, isActive: true, storeId: scope.storeId },
           select: { id: true },

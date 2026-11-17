@@ -135,21 +135,35 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// In-memory Idempotency Cache (TTL 60 detik) untuk mencegah double-deduction transaksi kasir
-interface SaleIdempotencyRecord {
-  timestamp: number;
-  response: unknown;
-}
-const salesIdempotencyMap = new Map<string, SaleIdempotencyRecord>();
-const IDEMPOTENCY_TTL_MS = 60 * 1000;
+/**
+ * Bentuk data penjualan yang dikembalikan ke klien, dipakai baik saat transaksi
+ * baru dibuat maupun saat permintaan yang sama dikirim ulang (replay).
+ */
+const SALE_RESPONSE_INCLUDE = {
+  items: {
+    include: {
+      product: { select: { id: true, name: true, sku: true, unit: true, station: true } },
+      batchAllocations: true,
+    },
+  },
+  cashier: { select: { id: true, name: true } },
+  table: true,
+} as const;
 
-function pruneSalesIdempotency() {
-  const now = Date.now();
-  for (const [key, val] of salesIdempotencyMap.entries()) {
-    if (now - val.timestamp > IDEMPOTENCY_TTL_MS) {
-      salesIdempotencyMap.delete(key);
-    }
-  }
+/**
+ * Kunci idempotensi pernah disimpan hanya di memori proses (TTL 60 detik).
+ * Itu tidak menolong pada dua keadaan yang justru paling berbahaya: proses
+ * server sempat mati/hidup ulang, atau jawaban hilang di jalan sehingga kasir
+ * mengirim ulang pembayaran yang sebenarnya sudah tersimpan. Sekarang kuncinya
+ * tersimpan pada baris penjualannya (unik), jadi pengiriman ulang selalu
+ * mengembalikan transaksi yang sama - bukan transaksi kedua.
+ */
+function isIdempotencyKeyCollision(error: unknown): boolean {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+  if (error.code !== "P2002") return false;
+  const target = (error.meta?.target as string[] | string | undefined) ?? [];
+  const fields = Array.isArray(target) ? target : [target];
+  return fields.some((field) => String(field).includes("idempotencyKey"));
 }
 
 // POST /api/sales — Create sale with FIFO deduction
@@ -186,6 +200,7 @@ async function createSaleWithRetry<T>(
       const isInvoiceCollision =
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002" &&
+        !isIdempotencyKeyCollision(error) &&
         (((error.meta?.target as string[]) ?? []).includes("invoiceNumber") ||
           ((error.meta?.target as string[]) ?? []).includes("storeId_invoiceNumber"));
       const retryable = isInvoiceCollision || isRetryableWriteConflict(error);
@@ -253,13 +268,17 @@ export async function POST(request: NextRequest) {
       null;
 
     if (idempotencyKey) {
-      pruneSalesIdempotency();
-      const existing = salesIdempotencyMap.get(idempotencyKey);
-      if (existing && Date.now() - existing.timestamp <= IDEMPOTENCY_TTL_MS) {
-        return NextResponse.json(existing.response, {
-          status: 201,
-          headers: { "X-Idempotent-Replay": "true" },
-        });
+      // Dibatasi tenant pemanggil: kunci milik tenant lain tidak boleh
+      // membocorkan transaksi, dan pencariannya pun tidak boleh menebak-nebak.
+      const sudahTersimpan = await prisma.sale.findFirst({
+        where: { idempotencyKey, storeId: scope.storeId },
+        include: SALE_RESPONSE_INCLUDE,
+      });
+      if (sudahTersimpan) {
+        return NextResponse.json(
+          { success: true, data: redactCosts(sudahTersimpan, sessionUser.role) },
+          { status: 201, headers: { "X-Idempotent-Replay": "true" } }
+        );
       }
     }
 
@@ -271,7 +290,12 @@ export async function POST(request: NextRequest) {
     // Process sale in a transaction.
     // Nomor invoice unik PER TENANT (storeId + invoiceNumber); retry menutup balapan
     // dua kasir yang checkout pada detik yang sama (Serializable + P2002).
-    const result = await createSaleWithRetry((attemptOffset) =>
+    type SaleWithRelations = Prisma.SaleGetPayload<{
+      include: typeof SALE_RESPONSE_INCLUDE;
+    }>;
+    let result: SaleWithRelations;
+    try {
+      result = await createSaleWithRetry((attemptOffset) =>
       prisma.$transaction(async (tx) => {
       // Resolve effective outlet, costing method, and kitchen workflow
       let effectiveOutletId = data.outletId || null;
@@ -506,6 +530,7 @@ export async function POST(request: NextRequest) {
       const sale = await tx.sale.create({
         data: {
           invoiceNumber,
+          idempotencyKey: idempotencyKey ?? null,
           storeId: scope.storeId,
           orderType: data.orderType || "DINE_IN",
           outletId: effectiveOutletId,
@@ -543,16 +568,7 @@ export async function POST(request: NextRequest) {
             })),
           },
         },
-        include: {
-          items: {
-            include: {
-              product: { select: { id: true, name: true, sku: true, unit: true, station: true } },
-              batchAllocations: true,
-            },
-          },
-          cashier: { select: { id: true, name: true } },
-          table: true,
-        },
+        include: SALE_RESPONSE_INCLUDE,
       });
 
       // 6. Update table occupancy if dine-in
@@ -672,7 +688,26 @@ export async function POST(request: NextRequest) {
     }, {
       isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     })
-    );
+      );
+    } catch (error) {
+      if (!idempotencyKey || !isIdempotencyKeyCollision(error)) {
+        throw error;
+      }
+      // Dua permintaan identik masuk hampir bersamaan (kasir menekan Bayar dua
+      // kali, atau pengiriman ulang otomatis). Yang kalah menabrak indeks unik:
+      // jawabannya bukan "gagal", melainkan transaksi yang sudah dibuat kembarnya.
+      const kembar = await prisma.sale.findFirst({
+        where: { idempotencyKey, storeId: scope.storeId },
+        include: SALE_RESPONSE_INCLUDE,
+      });
+      if (!kembar) {
+        throw error;
+      }
+      return NextResponse.json(
+        { success: true, data: redactCosts(kembar, sessionUser.role) },
+        { status: 201, headers: { "X-Idempotent-Replay": "true" } }
+      );
+    }
 
     await logActivity({
       userId: sessionUser.id,
@@ -687,12 +722,6 @@ export async function POST(request: NextRequest) {
     });
 
     const finalPayload = { success: true, data: redactCosts(result, sessionUser.role) };
-    if (idempotencyKey) {
-      salesIdempotencyMap.set(idempotencyKey, {
-        timestamp: Date.now(),
-        response: finalPayload,
-      });
-    }
 
     return NextResponse.json(finalPayload, { status: 201 });
   } catch (error) {

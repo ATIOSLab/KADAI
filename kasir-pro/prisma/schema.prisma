@@ -610,6 +610,10 @@ model RestaurantTable {
 model Sale {
   id             String           @id @default(cuid())
   invoiceNumber  String
+  /// Kunci idempotensi checkout: satu kunci = satu transaksi. Disimpan pada
+  /// barisnya (bukan di memori proses) supaya pengiriman ulang setelah proses
+  /// hidup ulang atau jawaban hilang tetap mengembalikan transaksi yang sama.
+  idempotencyKey String?          @unique
   orderType      OrderType        @default(DINE_IN)
   outletId       String?
   outlet         Outlet?          @relation(fields: [outletId], references: [id])

@@ -255,6 +255,27 @@ export async function PUT(request: NextRequest) {
 
     if (validated.action === "RECEIVE") {
       await prisma.$transaction(async (tx) => {
+        // Klaim atomik: hanya SATU permintaan yang boleh mengubah IN_TRANSIT →
+        // RECEIVED. Sebelumnya dua klik "Terima" bersamaan sama-sama lolos
+        // pemeriksaan status di luar transaksi, dan satu-satunya pengaman adalah
+        // unique batchNumber — pengguna melihat 409 "batchNumber tersebut sudah
+        // digunakan", bukan penjelasan bahwa transfernya sudah diterima.
+        const claim = await tx.stockTransfer.updateMany({
+          where: { id: validated.id, status: { in: ["IN_TRANSIT", "DRAFT"] } },
+          data: {
+            status: "RECEIVED",
+            receivedAt: new Date(),
+            receivedById: sessionUser.id,
+          },
+        });
+        if (claim.count !== 1) {
+          throw new ApiBusinessError(
+            `Transfer ${transfer.transferNumber} sudah diterima sebelumnya`,
+            409,
+            "TRANSFER_ALREADY_RECEIVED"
+          );
+        }
+
         for (const item of transfer.items) {
           const sourceBatches = await tx.productBatch.findMany({
             where: {
@@ -350,15 +371,6 @@ export async function PUT(request: NextRequest) {
           });
         }
 
-        await tx.stockTransfer.update({
-          where: { id: validated.id },
-          data: {
-            status: "RECEIVED",
-            receivedAt: new Date(),
-            receivedById: sessionUser.id,
-          },
-        });
-
         await tx.activityLog.create({
           data: {
             action: "STOCK_TRANSFERRED",
@@ -372,7 +384,7 @@ export async function PUT(request: NextRequest) {
             },
           },
         });
-      });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
       return jsonOk(
         null,

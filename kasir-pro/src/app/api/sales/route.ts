@@ -152,6 +152,18 @@ function pruneSalesIdempotency() {
 // (hitungan di dalam transaksi ikut maju, jadi percobaan kedua pasti mendapat nomor baru).
 const MAX_INVOICE_ATTEMPTS = 3;
 
+/**
+ * Transaksi Serializable yang bertabrakan ditolak PostgreSQL dengan P2034
+ * ("write conflict or deadlock"). Itu bukan kegagalan server: transaksi kedua
+ * hanya perlu diulang dengan jeda. Tanpa deteksi ini, dua kasir yang checkout
+ * pada detik yang sama menerima 500 "Gagal membuat transaksi".
+ */
+function isRetryableWriteConflict(error: unknown): boolean {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+  if (error.code === "P2034") return true;
+  return /write conflict|deadlock/i.test(String(error.message ?? ""));
+}
+
 async function createSaleWithRetry<T>(run: () => Promise<T>): Promise<T> {
   for (let attempt = 1; ; attempt += 1) {
     try {
@@ -162,9 +174,15 @@ async function createSaleWithRetry<T>(run: () => Promise<T>): Promise<T> {
         error.code === "P2002" &&
         (((error.meta?.target as string[]) ?? []).includes("invoiceNumber") ||
           ((error.meta?.target as string[]) ?? []).includes("storeId_invoiceNumber"));
-      if (!isInvoiceCollision || attempt >= MAX_INVOICE_ATTEMPTS) {
+      const retryable = isInvoiceCollision || isRetryableWriteConflict(error);
+      if (!retryable || attempt >= MAX_INVOICE_ATTEMPTS) {
         throw error;
       }
+      // Jeda pendek berjitter: dua transaksi yang bentrok tidak boleh mengulang
+      // pada milidetik yang sama lalu bentrok lagi.
+      await new Promise((resolve) =>
+        setTimeout(resolve, 15 * attempt + Math.floor(Math.random() * 25))
+      );
     }
   }
 }
@@ -669,6 +687,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: error.message, code: error.code },
         { status: error.status }
+      );
+    }
+
+    // Tabrakan tulis yang tetap gagal walau sudah diulang: kasir harus tahu
+    // untuk mengulang, bukan melihat 500 yang tampak seperti server rusak.
+    if (isRetryableWriteConflict(error)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Transaksi lain sedang diproses bersamaan. Silakan ulangi sebentar lagi.",
+          code: "TRANSACTION_CONFLICT",
+        },
+        { status: 409 }
       );
     }
 

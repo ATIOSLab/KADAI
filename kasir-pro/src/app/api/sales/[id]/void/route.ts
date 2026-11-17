@@ -157,6 +157,17 @@ export async function POST(
       );
 
       await restoreFIFODeductions(tx, allocations);
+
+      // Tiket dapur milik transaksi batal wajib ikut dibatalkan. Tanpa ini
+      // layar KDS tetap menampilkan pesanan yang uangnya sudah dikembalikan,
+      // sehingga dapur memasak hidangan yang tidak akan pernah dibayar.
+      await tx.kDSOrder.updateMany({
+        where: {
+          saleId: id,
+          status: { in: ["QUEUED", "COOKING", "READY"] },
+        },
+        data: { status: "CANCELED" },
+      });
     });
 
     await logActivity({

@@ -37,8 +37,10 @@ export async function GET(req: NextRequest) {
 
     const whereClause: Prisma.KDSOrderWhereInput = {
       status: { in: ["QUEUED", "COOKING", "READY"] },
-      // Isolasi tenant: hanya tiket dari outlet milik tenant pemanggil
-      sale: { outlet: { storeId: scope.storeId } },
+      // Isolasi tenant: hanya tiket dari outlet milik tenant pemanggil.
+      // Transaksi yang sudah di-void tidak boleh lagi tampil di dapur, walau
+      // tiketnya belum sempat ditandai CANCELED (data lama / balapan).
+      sale: { outlet: { storeId: scope.storeId }, isVoided: false },
     };
 
     if (station && station !== "ALL") {
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (outletId && outletId !== "ALL") {
-      whereClause.sale = { outletId, outlet: { storeId: scope.storeId } };
+      whereClause.sale = { outletId, outlet: { storeId: scope.storeId }, isVoided: false };
     }
 
     const orders = await prisma.kDSOrder.findMany({

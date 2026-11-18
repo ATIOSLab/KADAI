@@ -33,8 +33,9 @@ test("kembalian dihitung dari total server, bukan dari angka kiriman klien", () 
   // Kalau kembalian dihitung dari total yang dikirim klien, kasir bisa mengaku
   // menerima Rp 100.000 untuk tagihan Rp 500.000 dan "kembalian" negatifnya
   // lolos. Total tagihan dipakai dari hasil calculateSaleTotals di transaksi.
-  assert.match(route, /paidAmount = new Decimal\(data\.paidAmount\)\.toDecimalPlaces\(2\);/);
-  assert.match(route, /if \(paidAmount\.lessThan\(totalAmount\)\)/);
+  assert.match(route, /new Decimal\(data\.paidAmount\)/);
+  assert.match(route, /paidAmount = uangDiterima\.toDecimalPlaces\(2\);/);
+  assert.match(route, /uangDiterima\.lessThan\(totalAmount\)/);
   assert.match(route, /"PAID_LESS_THAN_TOTAL"/);
   assert.match(route, /changeAmount = paidAmount\.sub\(totalAmount\)\.toDecimalPlaces\(2\);/);
   assert.match(route, /"PAID_AMOUNT_NOT_CASH"/);

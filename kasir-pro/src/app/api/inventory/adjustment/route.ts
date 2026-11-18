@@ -14,7 +14,11 @@ const adjustmentSchema = z.object({
   // Cabang tempat barang hilang/rusak. Tanpa ini potongan FIFO menyapu batch
   // seluruh cabang sehingga kerugian satu cabang menggerus stok cabang lain.
   outletId: z.string().optional().nullable(),
-  quantityChange: z.number().int(),
+  // Penyesuaian tanpa perubahan jumlah hanya menambah baris di buku stok tanpa
+  // mengubah apa pun; itu menyulitkan audit karena tidak ada kejadian nyata.
+  quantityChange: z.number().int().refine((v) => v !== 0, {
+    message: "Jumlah penyesuaian tidak boleh 0 — tidak ada stok yang berubah",
+  }),
   reason: z.enum(["DAMAGED", "LOST", "EXPIRED", "STOCK_OPNAME", "OTHER"]),
   notes: z.string().optional(),
 });

@@ -591,9 +591,17 @@ export async function POST(request: NextRequest) {
       // Uang yang dipegang kasir. Divalidasi terhadap total yang SUDAH dihitung
       // server, bukan terhadap angka kiriman klien, supaya tidak ada jalan
       // mencatat "kembalian" dari total yang dipalsukan.
+      //
+      // `paidAmount: 0` diperlakukan sama dengan tidak dikirim: bagi pembayaran
+      // non-tunai (termasuk tempo) nilai 0 hanya berarti "belum ada uang diterima",
+      // dan klien yang selalu menyertakan kolomnya tidak boleh ditolak.
       let paidAmount: Decimal | null = null;
       let changeAmount: Decimal | null = null;
-      if (data.paidAmount !== undefined && data.paidAmount !== null) {
+      const uangDiterima =
+        data.paidAmount !== undefined && data.paidAmount !== null
+          ? new Decimal(data.paidAmount)
+          : null;
+      if (uangDiterima !== null && uangDiterima.greaterThan(0)) {
         if (data.paymentType !== "CASH") {
           throw new ApiBusinessError(
             "Uang diterima hanya dicatat untuk pembayaran tunai",
@@ -601,15 +609,22 @@ export async function POST(request: NextRequest) {
             "PAID_AMOUNT_NOT_CASH"
           );
         }
-        paidAmount = new Decimal(data.paidAmount).toDecimalPlaces(2);
-        if (paidAmount.lessThan(totalAmount)) {
+        if (uangDiterima.lessThan(totalAmount)) {
           throw new ApiBusinessError(
             "Uang diterima kurang dari total tagihan",
             400,
             "PAID_LESS_THAN_TOTAL"
           );
         }
+        paidAmount = uangDiterima.toDecimalPlaces(2);
         changeAmount = paidAmount.sub(totalAmount).toDecimalPlaces(2);
+      } else if (uangDiterima !== null && data.paymentType === "CASH" && totalAmount.greaterThan(0)) {
+        // Tunai untuk tagihan bernilai: uang diterima tidak boleh nol.
+        throw new ApiBusinessError(
+          "Uang diterima kurang dari total tagihan",
+          400,
+          "PAID_LESS_THAN_TOTAL"
+        );
       }
 
       // Bukti bayar: piutang harus punya penanggung utang, dan pembayaran

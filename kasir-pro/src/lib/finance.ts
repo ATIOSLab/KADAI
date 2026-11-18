@@ -13,6 +13,8 @@ export const FINANCE_SYSTEM_CATEGORY_KEYS = {
   SALE_INCOME: "SALE_INCOME",
   SALE_VOID_OUTFLOW: "SALE_VOID_OUTFLOW",
   RESTOCK_EXPENSE: "RESTOCK_EXPENSE",
+  SHIFT_VARIANCE_SHORT: "SHIFT_VARIANCE_SHORT",
+  SHIFT_VARIANCE_OVER: "SHIFT_VARIANCE_OVER",
 } as const;
 
 export const FINANCE_SOURCE_LABELS: Record<FinanceSource, string> = {
@@ -20,6 +22,7 @@ export const FINANCE_SOURCE_LABELS: Record<FinanceSource, string> = {
   SALE: "Penjualan",
   SALE_VOID: "Pembatalan Penjualan",
   RESTOCK: "Restock",
+  SHIFT_VARIANCE: "Selisih Kas (Z-Report)",
 };
 
 export const FINANCE_DIRECTION_LABELS: Record<FinanceDirection, string> = {
@@ -45,6 +48,18 @@ const financeSeedCategories = [
     direction: FinanceDirection.OUT,
     isSystem: true,
     systemKey: FINANCE_SYSTEM_CATEGORY_KEYS.RESTOCK_EXPENSE,
+  },
+  {
+    name: "Selisih Kas Kurang",
+    direction: FinanceDirection.OUT,
+    isSystem: true,
+    systemKey: FINANCE_SYSTEM_CATEGORY_KEYS.SHIFT_VARIANCE_SHORT,
+  },
+  {
+    name: "Selisih Kas Lebih",
+    direction: FinanceDirection.IN,
+    isSystem: true,
+    systemKey: FINANCE_SYSTEM_CATEGORY_KEYS.SHIFT_VARIANCE_OVER,
   },
   {
     name: "Modal Masuk",

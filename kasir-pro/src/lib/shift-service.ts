@@ -1,10 +1,15 @@
-import type { CashShift } from "@prisma/client";
+import type { CashShift, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/activity-logger";
 import { ApiBusinessError } from "@/lib/api-response";
 import { getBusinessDayStart } from "@/lib/business-day";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { generateShiftNumber } from "@/lib/utils";
+import { ensureFinanceCategories } from "@/lib/finance";
+import {
+  resolveShiftVarianceLedgerEntry,
+  shiftVarianceLedgerTitle,
+} from "@/lib/shift-ledger";
 import {
   buildShiftReport,
   loadPriorShiftCashRefunds,
@@ -53,6 +58,65 @@ async function buildShiftNumberCandidate(
 export interface CloseShiftResult {
   report: ShiftReport;
   status: ReturnType<typeof varianceStatus>;
+  /** Entri Buku Kas penampung selisih kas; null bila kas pas. */
+  ledgerEntryId: string | null;
+}
+
+/**
+ * Mencatat selisih kas ke Buku Kas sebagai entri tersendiri.
+ *
+ * Satu entri per shift (`FinanceEntry.cashShiftId` unik), arah mengikuti tanda
+ * selisih: kurang = uang keluar, lebih = uang masuk. Shift yang pas tidak
+ * menghasilkan entri apa pun.
+ */
+async function recordShiftVarianceEntry(
+  tx: Prisma.TransactionClient,
+  input: {
+    shift: CashShift;
+    report: ShiftReport;
+    actorUserId: string;
+  }
+) {
+  const entry = resolveShiftVarianceLedgerEntry(input.report.shift.variance);
+  if (!entry) return null;
+
+  const category = await tx.financeCategory.findUnique({
+    where: { systemKey: entry.systemKey },
+    select: { id: true },
+  });
+
+  if (!category) {
+    // Kategori sistem wajib ada; lebih baik tutup shift digagalkan daripada
+    // selisih kas hilang dari pembukuan tanpa jejak.
+    throw new ApiBusinessError(
+      `Kategori Buku Kas "${entry.systemKey}" tidak ditemukan`,
+      500,
+      "FINANCE_CATEGORY_MISSING"
+    );
+  }
+
+  const kasir = input.report.cashier?.name ?? null;
+  return tx.financeEntry.create({
+    data: {
+      amount: entry.amount,
+      direction: entry.direction,
+      source: "SHIFT_VARIANCE",
+      title: shiftVarianceLedgerTitle({
+        shiftNumber: input.report.shift.number,
+        cashierName: kasir,
+        variance: input.report.shift.variance ?? 0,
+      }),
+      notes: `Kas fisik ${input.report.shift.closingCash ?? 0} vs kas diharapkan ${input.report.expectedCash}`,
+      entryDate: input.report.shift.closedAt
+        ? new Date(input.report.shift.closedAt)
+        : new Date(),
+      storeId: input.shift.storeId,
+      categoryId: category.id,
+      createdByUserId: input.actorUserId,
+      cashShiftId: input.shift.id,
+    },
+    select: { id: true, direction: true, amount: true },
+  });
 }
 
 /**
@@ -91,8 +155,14 @@ export async function closeCashShift(
 
   const timezone = await resolveBusinessTimezone();
 
+  // Kategori Buku Kas untuk selisih kas harus ada SEBELUM transaksi penutupan;
+  // memanggil ensure di dalam transaksi akan mengulang upsert 9 kategori pada
+  // setiap penutupan laci.
+  await ensureFinanceCategories(prisma);
+
   let report: ShiftReport | null = null;
   let claimed = 0;
+  let ledgerEntryId: string | null = null;
 
   // Nomor Z-Report dialokasikan bersamaan dengan klaim laci: bila dua kasir
   // menutup laci pada detik yang sama, indeks unik store+nomor menolak nomor
@@ -124,31 +194,46 @@ export async function closeCashShift(
     });
 
     try {
-      // Klaim atomik: dua perangkat yang menekan "Tutup Shift" bersamaan tidak
-      // boleh menghasilkan dua Z-Report dengan angka berbeda.
-      const claim = await prisma.cashShift.updateMany({
-        where: { id: shift.id, status: "OPEN" },
-        data: {
-          status: "CLOSED",
-          shiftNumber,
-          closedAt,
-          closingCash: input.actualCash,
-          closingNotes: notes,
-          expectedCash: candidate.expectedCash,
-          variance: candidate.shift.variance,
-          totalSales: candidate.totalTransactions,
-          totalVoided: candidate.totalVoided,
-          totalRevenue: candidate.totalRevenue,
-          totalCashSales: candidate.totalCashSales,
-          totalRefunds: candidate.totalCashRefunds,
-          totalTax: candidate.totalTax,
-          totalDiscount: candidate.totalDiscount,
-          reportJson: candidate as unknown as object,
-        },
+      // Klaim atomik + entri Buku Kas dalam SATU transaksi: kalau pencatatan
+      // selisih gagal, penutupan shift ikut dibatalkan sehingga laci tertutup
+      // tidak pernah kehilangan jejak uangnya.
+      const claim = await prisma.$transaction(async (tx) => {
+        const result = await tx.cashShift.updateMany({
+          where: { id: shift.id, status: "OPEN" },
+          data: {
+            status: "CLOSED",
+            shiftNumber,
+            closedAt,
+            closingCash: input.actualCash,
+            closingNotes: notes,
+            expectedCash: candidate.expectedCash,
+            variance: candidate.shift.variance,
+            totalSales: candidate.totalTransactions,
+            totalVoided: candidate.totalVoided,
+            totalRevenue: candidate.totalRevenue,
+            totalCashSales: candidate.totalCashSales,
+            totalRefunds: candidate.totalCashRefunds,
+            totalTax: candidate.totalTax,
+            totalDiscount: candidate.totalDiscount,
+            reportJson: candidate as unknown as object,
+          },
+        });
+
+        if (result.count === 1) {
+          const ledger = await recordShiftVarianceEntry(tx, {
+            shift,
+            report: candidate,
+            actorUserId: input.actorUserId,
+          });
+          return { count: result.count, ledgerId: ledger?.id ?? null };
+        }
+
+        return { count: result.count, ledgerId: null };
       });
 
       report = candidate;
       claimed = claim.count;
+      ledgerEntryId = claim.ledgerId;
     } catch (error) {
       if (!isUniqueViolation(error)) throw error;
       // Nomor baru saja dipakai kasir lain — ulangi dengan nomor berikutnya.
@@ -175,6 +260,7 @@ export async function closeCashShift(
     entityId: shift.id,
     details: {
       shiftNumber: report.shift.number,
+      ledgerEntryId,
       cashierId: shift.cashierId,
       openingCash: report.shift.openingCash,
       closingCash: report.shift.closingCash,
@@ -187,7 +273,7 @@ export async function closeCashShift(
     },
   });
 
-  return { report, status };
+  return { report, status, ledgerEntryId };
 }
 
 /** Rekap hidup satu laci (dipakai GET /api/pos/shifts). */

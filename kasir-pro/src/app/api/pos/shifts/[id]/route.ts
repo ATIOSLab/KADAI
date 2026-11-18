@@ -16,9 +16,6 @@ const closeShiftSchema = z.object({
   notes: z.string().max(500, "Catatan terlalu panjang").optional().nullable(),
 });
 
-const STORE_SELECT = { name: true, address: true, phone: true } as const;
-const CASHIER_SELECT = { id: true, name: true, role: true } as const;
-
 // GET /api/pos/shifts/[id] — Z-Report tersimpan (bisa dicetak ulang kapan pun)
 export async function GET(
   request: NextRequest,
@@ -101,17 +98,23 @@ export async function POST(
       );
     }
 
-    const { report, status } = await closeCashShift(shift, {
+    const { report, status, ledgerEntryId } = await closeCashShift(shift, {
       actualCash: data.actualCash,
       notes: data.notes,
       actorUserId: sessionUser.id,
     });
 
+    // Selisih kas tidak berhenti sebagai angka di kertas Z-Report: kalau ada
+    // selisih, entri Buku Kas ikut dibuat dan itu harus terlihat oleh kasir.
+    const pesanSelisih = `Rp ${Math.abs(report.shift.variance ?? 0).toLocaleString("id-ID")}`;
+
     return jsonOk(
-      { ...report, varianceStatus: status },
+      { ...report, varianceStatus: status, ledgerEntryId },
       status === "BALANCED"
         ? "Shift ditutup, kas sesuai"
-        : `Shift ditutup dengan selisih Rp ${Math.abs(report.shift.variance ?? 0).toLocaleString("id-ID")}`
+        : `Shift ditutup dengan selisih ${pesanSelisih}${
+            ledgerEntryId ? " — tercatat di Buku Kas" : ""
+          }`
     );
   } catch (error) {
     return handleApiError(error, "POST /api/pos/shifts/[id]", "Gagal menutup shift kasir");

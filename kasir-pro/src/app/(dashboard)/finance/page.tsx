@@ -64,7 +64,7 @@ import type {
 } from "@/types";
 
 type FinanceDirection = "IN" | "OUT";
-type FinanceSource = "MANUAL" | "SALE" | "SALE_VOID" | "RESTOCK";
+type FinanceSource = "MANUAL" | "SALE" | "SALE_VOID" | "RESTOCK" | "SHIFT_VARIANCE";
 type BreakdownChartDatum = {
   id: string;
   label: string;
@@ -79,6 +79,7 @@ const SOURCE_LABELS: Record<FinanceSource, string> = {
   SALE: "Penjualan",
   SALE_VOID: "Pembatalan Penjualan",
   RESTOCK: "Restock",
+  SHIFT_VARIANCE: "Selisih Kas (Z-Report)",
 };
 
 const DIRECTION_LABELS: Record<FinanceDirection, string> = {
@@ -790,6 +791,7 @@ export default function FinancePage() {
                   { value: "SALE", label: "Penjualan" },
                   { value: "SALE_VOID", label: "Pembatalan Penjualan" },
                   { value: "RESTOCK", label: "Restock" },
+                  { value: "SHIFT_VARIANCE", label: "Selisih Kas (Z-Report)" },
                 ]}
               />
           </div>

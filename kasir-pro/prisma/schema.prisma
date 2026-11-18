@@ -228,6 +228,8 @@ enum FinanceSource {
   SALE
   SALE_VOID
   RESTOCK
+  /// Selisih kas saat laci ditutup (Z-Report): kurang = OUT, lebih = IN.
+  SHIFT_VARIANCE
 }
 
 enum BotBusinessDayMode {
@@ -766,6 +768,7 @@ model CashShift {
   cashierId String
   cashier   User   @relation("CashierShifts", fields: [cashierId], references: [id])
   sales     Sale[]
+  financeEntries FinanceEntry[]
 
   @@index([storeId, status])
   @@unique([storeId, shiftNumber])
@@ -961,6 +964,9 @@ model FinanceEntry {
   sale            Sale?           @relation(fields: [saleId], references: [id])
   productBatchId  String?
   productBatch    ProductBatch?   @relation(fields: [productBatchId], references: [id])
+  /// Satu entri selisih kas per shift; null untuk entri lain.
+  cashShiftId     String?         @unique
+  cashShift       CashShift?      @relation(fields: [cashShiftId], references: [id], onDelete: SetNull)
 
   @@index([entryDate])
   @@index([direction, entryDate])

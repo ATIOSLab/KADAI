@@ -32,6 +32,18 @@ const DEFAULT_FINANCE_CATEGORIES = [
     systemKey: "RESTOCK_EXPENSE",
   },
   {
+    name: "Selisih Kas Kurang",
+    direction: FinanceDirection.OUT,
+    isSystem: true,
+    systemKey: "SHIFT_VARIANCE_SHORT",
+  },
+  {
+    name: "Selisih Kas Lebih",
+    direction: FinanceDirection.IN,
+    isSystem: true,
+    systemKey: "SHIFT_VARIANCE_OVER",
+  },
+  {
     name: "Modal Masuk",
     direction: FinanceDirection.IN,
     isSystem: false,

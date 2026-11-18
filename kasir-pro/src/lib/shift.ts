@@ -215,6 +215,8 @@ export interface ShiftReport {
     /** Jumlah transaksi di laci ini yang dibatalkan SETELAH laporan ditutup. */
     lateVoidCount: number;
     lastLateVoidAt: string | null;
+    /** Berapa kali laporan ini dibuka/dicetak ulang setelah ditutup. */
+    reprintCount: number;
   };
   store: { name: string; address: string | null; phone: string | null };
   cashier: { id: string; name: string; role: string } | null;
@@ -246,6 +248,7 @@ export interface ShiftReportInput {
     notes?: string | null;
     lateVoidCount?: number;
     lastLateVoidAt?: Date | null;
+    reprintCount?: number;
   };
   store: { name: string; address: string | null; phone: string | null } | null;
   cashier: { id: string; name: string; role: string } | null;
@@ -280,6 +283,7 @@ export function buildShiftReport(input: ShiftReportInput): ShiftReport {
       lastLateVoidAt: input.shift.lastLateVoidAt
         ? input.shift.lastLateVoidAt.toISOString()
         : null,
+      reprintCount: input.shift.reprintCount ?? 0,
     },
     store: input.store ?? { name: "KADAI POS", address: null, phone: null },
     cashier: input.cashier,

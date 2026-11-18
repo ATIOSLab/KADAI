@@ -188,6 +188,7 @@ export async function closeCashShift(
         notes: notes ?? shift.closingNotes,
         lateVoidCount: shift.lateVoidCount,
         lastLateVoidAt: shift.lastLateVoidAt,
+        reprintCount: shift.reprintCount,
       },
       store,
       cashier,

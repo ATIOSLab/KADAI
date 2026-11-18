@@ -168,3 +168,21 @@ test("riwayat shift dan cetak ulang Z-Report menampilkan koreksi susulan", () =>
   assert.match(page, /koreksi susulan/i);
   assert.match(page, /Koreksi susulan/);
 });
+
+test("cetak ulang Z-Report tertutup tercatat (siapa, kapan, ke berapa)", () => {
+  const route = readFileSync(
+    path.join(repoRoot, "src/app/api/pos/shifts/[id]/route.ts"),
+    "utf8"
+  );
+  const schema = readFileSync(path.join(repoRoot, "prisma/schema.prisma"), "utf8");
+  const migrasi = path.join(
+    repoRoot,
+    "prisma/migrations/20261118190000_cash_shift_reprint_count/migration.sql"
+  );
+
+  assert.match(route, /action: "SHIFT_REPORT_REPRINTED"/);
+  assert.match(route, /reprintCount: \{ increment: 1 \}/);
+  assert.match(schema, /reprintCount\s+Int\s+@default\(0\)/);
+  assert.match(schema, /SHIFT_REPORT_REPRINTED/);
+  assert.ok(existsSync(migrasi), "migrasi penghitung cetak ulang wajib ada");
+});

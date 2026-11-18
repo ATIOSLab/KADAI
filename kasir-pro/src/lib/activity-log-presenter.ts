@@ -29,6 +29,7 @@ export const ACTIVITY_ACTION_LABELS: Record<string, string> = {
   SALE_CREATED: "Transaksi Dibuat",
   SALE_VOIDED: "Transaksi Dibatalkan",
   SHIFT_CLOSED: "Shift Kasir Ditutup",
+  SHIFT_REPORT_REPRINTED: "Z-Report Dicetak Ulang",
   PRODUCT_CREATED: "Produk Ditambahkan",
   PRODUCT_UPDATED: "Produk Diperbarui",
   PRODUCT_DELETED: "Produk Dihapus",

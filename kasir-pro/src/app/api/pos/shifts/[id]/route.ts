@@ -6,6 +6,7 @@ import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_MANAGER_ROLES, POS_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { ApiBusinessError, handleApiError, jsonError, jsonOk } from "@/lib/api-response";
 import { buildLiveShiftReport, closeCashShift } from "@/lib/shift-service";
+import { logActivity } from "@/lib/activity-logger";
 import type { ShiftReport } from "@/lib/shift";
 
 const closeShiftSchema = z.object({
@@ -53,12 +54,42 @@ export async function GET(
     // lama padahal sudah ada transaksi yang dibatalkan setelahnya.
     if (shift.status === "CLOSED" && shift.reportJson) {
       const snapshot = shift.reportJson as unknown as ShiftReport;
+
+      // Membuka laporan laci tertutup = mencetak ulang kertas. Setiap kali
+      // kertas keluar, itu dicatat — termasuk kalau isinya sudah berubah karena
+      // koreksi susulan. Kegagalan pencatatan tidak boleh menggagalkan cetak,
+      // tetapi angkanya tidak boleh muncul kalau memang tidak tercatat.
+      let reprintCount = shift.reprintCount;
+      try {
+        const diperbarui = await prisma.cashShift.update({
+          where: { id: shift.id },
+          data: { reprintCount: { increment: 1 } },
+          select: { reprintCount: true },
+        });
+        reprintCount = diperbarui.reprintCount;
+        await logActivity({
+          userId: sessionUser.id,
+          action: "SHIFT_REPORT_REPRINTED",
+          entity: "CashShift",
+          entityId: shift.id,
+          details: {
+            shiftNumber: shift.shiftNumber,
+            reprintCount,
+            lateVoidCount: shift.lateVoidCount,
+            cashierId: shift.cashierId,
+          },
+        });
+      } catch (error) {
+        console.warn("Gagal mencatat cetak ulang Z-Report:", error);
+      }
+
       return jsonOk({
         ...snapshot,
         shift: {
           ...snapshot.shift,
           lateVoidCount: shift.lateVoidCount,
           lastLateVoidAt: shift.lastLateVoidAt ? shift.lastLateVoidAt.toISOString() : null,
+          reprintCount,
         },
       });
     }

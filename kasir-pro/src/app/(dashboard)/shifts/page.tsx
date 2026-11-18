@@ -18,6 +18,7 @@ interface ShiftRow {
   number: string | null;
   lateVoidCount: number;
   lastLateVoidAt: string | null;
+  reprintCount: number;
   cashier: { id: string; name: string } | null;
   openedAt: string;
   closedAt: string | null;
@@ -128,7 +129,7 @@ export default function ShiftHistoryPage() {
       const report = res.data as {
         store?: { name?: string };
         cashier?: { name?: string };
-        shift?: { openedAt?: string; closedAt?: string; number?: string | null; openingCash?: number; closingCash?: number; variance?: number; lateVoidCount?: number; lastLateVoidAt?: string | null };
+        shift?: { openedAt?: string; closedAt?: string; number?: string | null; openingCash?: number; closingCash?: number; variance?: number; lateVoidCount?: number; lastLateVoidAt?: string | null; reprintCount?: number };
         expectedCash?: number;
         totalTransactions?: number;
         totalVoided?: number;
@@ -169,6 +170,11 @@ export default function ShiftHistoryPage() {
                 "Koreksi susulan",
                 `${report.shift?.lateVoidCount} transaksi dibatalkan setelah laporan ditutup`
               ) + line("Koreksi terakhir", formatDateTime(report.shift?.lastLateVoidAt ?? null))
+            : ""
+        }
+        ${
+          (report.shift?.reprintCount ?? 0) > 0
+            ? line("Cetak ulang ke", String(report.shift?.reprintCount))
             : ""
         }
         ${line("Diskon", formatCurrency(Number(report.totalDiscount ?? 0)))}
@@ -322,6 +328,15 @@ export default function ShiftHistoryPage() {
                       >
                         <AlertTriangle className="h-3 w-3" />
                         {row.lateVoidCount} koreksi susulan
+                      </span>
+                    )}
+                    {row.reprintCount > 0 && (
+                      <span
+                        className="ml-2 inline-flex items-center gap-1 rounded-full bg-slate-500/15 px-1.5 py-0.5 text-[10px] font-medium text-slate-600"
+                        title={`Laporan laci ini sudah dibuka/dicetak ulang ${row.reprintCount} kali`}
+                      >
+                        <Printer className="h-3 w-3" />
+                        {row.reprintCount}×
                       </span>
                     )}
                   </td>

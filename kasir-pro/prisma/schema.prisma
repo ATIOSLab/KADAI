@@ -169,6 +169,7 @@ enum ActionType {
   // Shift / cash drawer
   SHIFT_OPENED
   SHIFT_CLOSED
+  SHIFT_REPORT_REPRINTED
   /// Diskon manual diberikan pada sebuah transaksi (siapa, berapa, alasannya).
   SALE_DISCOUNTED
   // Product actions
@@ -765,6 +766,9 @@ model CashShift {
   /// yang membuat selisihnya terlihat.
   lateVoidCount  Int         @default(0)
   lastLateVoidAt DateTime?
+  /// Berapa kali laporan laci ini dibuka/dicetak ulang setelah ditutup. Kertas
+  /// Z-Report yang beredar bisa berbeda isinya, jadi jumlah cetak harus terlihat.
+  reprintCount   Int         @default(0)
   openedAt       DateTime    @default(now())
   closedAt       DateTime?
 

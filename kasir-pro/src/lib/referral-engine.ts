@@ -55,6 +55,18 @@ export async function attributeInvoiceToReferral(
   });
 }
 
+/**
+ * Hitung nilai payout periode ini setelah tambahan komisi baru.
+ *
+ * Payout bulanan bersifat akumulatif: komisi mitra yang sudah menunggu dibayar
+ * tidak boleh hilang hanya karena ada komisi baru di periode yang sama. Nilai
+ * lama dipakai kembali, bukan ditimpa.
+ */
+export function akumulasiPayout(amountSebelumnya: number | null | undefined, tambahan: number): number {
+  const lama = Number(amountSebelumnya ?? 0);
+  return Math.round((Math.max(0, lama) + Math.max(0, tambahan)) * 100) / 100;
+}
+
 /** Buat batch payout bulanan per mitra aktif — idempotent (unik partner+period). */
 export async function generatePayoutBatch(period: string = monthlyPeriod()): Promise<{
   generated: number;
@@ -91,10 +103,14 @@ export async function generatePayoutBatch(period: string = monthlyPeriod()): Pro
     });
     if (existing && existing.status !== "PENDING") continue; // payout periode tsb sudah final
 
+    // Payout periode ini akumulatif: tambahan komisi baru menambah nilai yang
+    // masih menunggu dibayar, bukan menggantikannya.
+    const nilaiPeriode = akumulasiPayout(existing?.amount ? Number(existing.amount) : 0, group.pending);
+
     await prisma.referralPayout.upsert({
       where: { partnerId_period: { partnerId, period } },
-      create: { partnerId, amount: group.pending, period, status: "PENDING" },
-      update: { amount: group.pending, status: "PENDING" },
+      create: { partnerId, amount: nilaiPeriode, period, status: "PENDING" },
+      update: { amount: nilaiPeriode, status: "PENDING" },
     });
 
     // Tandai komisi periode ini sebagai "sudah masuk payout" (anti double-pay)

@@ -51,21 +51,42 @@ for tok, siapa in ((TOK_MGR, "manager"), (TOK_KSR, "kasir")):
 st, out = req("GET", "/api/outlets")
 o = (out if isinstance(out, list) else out.get("data") or out.get("outlets") or [])[0]
 OUT = o["id"]
-GERINDA = "cmwm2f2fq0018s9mgpugnakqm"  # 385.000, stok tersedia
-MGR_SALE_PID = "cmwm2f2ge001gs9mgvlvfnu70"  # 52.000
+
+
+def pilih_produk(tok, outlet, butuh=1):
+    st, r = req("GET", f"/api/products?limit=100&outletId={outlet}", tok=tok)
+    items = (r.get("data") or [])
+    if not items:
+        raise SystemExit("tidak ada produk di tenant")
+    return items
+
+
+def produk_termahal(items, butuh):
+    for p in sorted(items, key=lambda x: float(x.get("currentSellingPrice") or 0), reverse=True):
+        if float(p.get("totalStock") or 0) >= butuh:
+            return p["id"], p["name"], float(p["currentSellingPrice"])
+    raise SystemExit("tidak ada produk berharga cukup & berstok cukup")
+
+
+ITEMS = pilih_produk(TOK_MGR, OUT)
+GERINDA, GERINDA_NAMA, GERINDA_HARGA = produk_termahal(ITEMS, 1)
+# ambang bukti bayar: total belanja harus >= 250.000 sesuai harga jual server
+GERINDA_QTY = max(1, int(250001 / GERINDA_HARGA) + (0 if 250001 % GERINDA_HARGA == 0 else 1))
+MGR_SALE_PID = ITEMS[0]["id"]
+MGR_SALE_NAMA = ITEMS[0]["name"]
 MODAL = 200000
 
 # ============ A. aturan bukti bayar non-tunai >= 250.000 ============
 st, a1 = req("POST", "/api/sales", {
     "outletId": OUT, "paymentType": "QRIS", "paidAmount": 0, "idempotencyKey": f"v3-a1-{time.time()}",
-    "items": [{"productId": GERINDA, "productName": "Uji Gerinda", "quantity": 1, "unitPrice": 385000}],
+    "items": [{"productId": GERINDA, "productName": GERINDA_NAMA, "quantity": GERINDA_QTY, "unitPrice": GERINDA_HARGA}],
 })
 catat("non-tunai >= 250rb tanpa referensi ditolak", st == 400 and a1.get("code") == "NON_CASH_REFERENCE_REQUIRED", f"HTTP {st} {a1.get('code') or a1.get('error')}")
 
 st, a2 = req("POST", "/api/sales", {
     "outletId": OUT, "paymentType": "QRIS", "paidAmount": 0, "paymentRef": "QR-2026-000777",
     "idempotencyKey": f"v3-a2-{time.time()}",
-    "items": [{"productId": GERINDA, "productName": "Uji Gerinda", "quantity": 1, "unitPrice": 385000}],
+    "items": [{"productId": GERINDA, "productName": GERINDA_NAMA, "quantity": GERINDA_QTY, "unitPrice": GERINDA_HARGA}],
 })
 A2 = a2.get("data", {})
 catat("non-tunai >= 250rb dengan referensi diterima", st in (200, 201) and float(A2.get("totalAmount") or 0) >= 250000,
@@ -74,7 +95,7 @@ catat("non-tunai >= 250rb dengan referensi diterima", st in (200, 201) and float
 # tunai besar tanpa referensi harus tetap boleh
 st, a3 = req("POST", "/api/sales", {
     "outletId": OUT, "paymentType": "CASH", "paidAmount": 1000000, "idempotencyKey": f"v3-a3-{time.time()}",
-    "items": [{"productId": GERINDA, "productName": "Uji Gerinda", "quantity": 1, "unitPrice": 385000}],
+    "items": [{"productId": GERINDA, "productName": GERINDA_NAMA, "quantity": GERINDA_QTY, "unitPrice": GERINDA_HARGA}],
 })
 catat("tunai besar tidak wajib referensi", st in (200, 201), f"HTTP {st}")
 
@@ -85,7 +106,7 @@ catat("kasir buka laci", bool(SH_K), f"HTTP {st}")
 
 st, s = req("POST", "/api/sales", {
     "outletId": OUT, "paymentType": "CASH", "paidAmount": 1000000, "idempotencyKey": f"v3-b-{time.time()}",
-    "items": [{"productId": MGR_SALE_PID, "productName": "Uji Kasir", "quantity": 1, "unitPrice": 10000}],
+    "items": [{"productId": MGR_SALE_PID, "productName": MGR_SALE_NAMA, "quantity": 1, "unitPrice": 10000}],
 }, TOK_KSR)
 SB = s.get("data", {})
 SALE_K = SB.get("id")
@@ -117,14 +138,14 @@ print("  kunci laporan laci kasir:", [k for k in ZK.keys() if k not in ("shift",
 # ============ D. koreksi tanpa PIN oleh manager: apakah PIN diwajibkan? ============
 st, s2 = req("POST", "/api/sales", {
     "outletId": OUT, "paymentType": "CASH", "paidAmount": 1000000, "idempotencyKey": f"v3-d-{time.time()}",
-    "items": [{"productId": MGR_SALE_PID, "productName": "Uji PIN", "quantity": 1, "unitPrice": 10000}],
+    "items": [{"productId": MGR_SALE_PID, "productName": MGR_SALE_NAMA, "quantity": 1, "unitPrice": 10000}],
 })
 S2 = s2.get("data", {})
 st, sh2 = req("POST", "/api/pos/shifts", {"openingCash": MODAL})
 SH2 = ((sh2.get("data") or {}).get("shift") or {}).get("id")
 st, c2 = req("POST", f"/api/pos/shifts/{SH2}", {"actualCash": MODAL + float(S2.get("totalAmount") or 0)})
 st, vpn = req("POST", f"/api/sales/{S2.get('id')}/void", {"reason": "koreksi tanpa pin oleh kepala toko"})
-catat("koreksi susulan oleh manager tercatat", st in (200, 201), f"HTTP {st}")
+catat("koreksi susulan oleh manager tercatat", vpn is not None and st in (200, 201), f"HTTP {st}")
 
 bersihkan(TOK_MGR, "manager")
 bersihkan(TOK_KSR, "kasir")

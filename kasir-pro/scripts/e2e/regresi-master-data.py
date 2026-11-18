@@ -27,6 +27,14 @@ BASE = os.environ.get("KADAI_BASE", "http://127.0.0.1:3110")
 TOK_MGR = os.environ.get("KADAI_TOKEN_MANAGER", "")
 TOK_KASIR = os.environ.get("KADAI_TOKEN_KASIR", "")
 
+# Produksi berada di belakang Cloudflare: UA bawaan urllib diblokir (error 1010),
+# jadi semua permintaan menyamar sebagai browser Chrome.
+UA = os.environ.get(
+    "KADAI_UA",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+)
+
 lulus = 0
 gagal = 0
 
@@ -37,6 +45,7 @@ def req(method: str, path: str, token: str, body: Any = None) -> tuple[int, Any]
     r = urllib.request.Request(url, data=data, method=method)
     r.add_header("Cookie", f"session={token}")
     r.add_header("Origin", BASE)
+    r.add_header("User-Agent", UA)
     if data is not None:
         r.add_header("Content-Type", "application/json")
     try:

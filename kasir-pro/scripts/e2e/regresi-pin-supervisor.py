@@ -11,6 +11,8 @@ TOK_KSR = os.environ["KADAI_TOKEN_KASIR"]
 TOK_MGR = os.environ["KADAI_TOKEN_MANAGER"]
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 MODAL = 200000
+PIN_BENAR = os.environ.get("KADAI_PIN", "888222")  # PIN supervisor (manager/ADMIN) tenant
+PIN_SALAH = "111111"
 
 
 def req(method, path, body=None, tok=TOK_KSR):
@@ -31,12 +33,14 @@ def req(method, path, body=None, tok=TOK_KSR):
 def siklus(label):
     st, out = req("GET", "/api/outlets", tok=TOK_MGR)
     o = (out if isinstance(out, list) else out.get("data") or out.get("outlets") or [])[0]
+    st, ps = req("GET", f"/api/products?limit=100&outletId={o['id']}", tok=TOK_MGR)
+    p = (ps.get("data") or [])[0]
     st, sh = req("POST", "/api/pos/shifts", {"openingCash": MODAL})
     sid = ((sh.get("data") or {}).get("shift") or {}).get("id")
     st, s = req("POST", "/api/sales", {
         "outletId": o["id"], "paymentType": "CASH", "paidAmount": 1000000,
         "idempotencyKey": f"v4-{label}-{time.time()}",
-        "items": [{"productId": "cmwm2f2ge001gs9mgvlvfnu70", "productName": "Uji PIN", "quantity": 1, "unitPrice": 10000}],
+        "items": [{"productId": p["id"], "productName": p["name"], "quantity": 1, "unitPrice": float(p.get("currentSellingPrice") or 0)}],
     })
     S = s.get("data", {})
     total = float(S.get("totalAmount") or 0)

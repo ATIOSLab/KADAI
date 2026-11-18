@@ -82,7 +82,16 @@ st, out = req("GET", "/api/outlets")
 o = (out if isinstance(out, list) else out.get("data") or out.get("outlets") or [])[0]
 PID, OUT = p["id"], o["id"]
 MODAL = 200000
-GERINDA = "cmwm2f2fq0018s9mgpugnakqm"  # harga 385.000, dipakai untuk uji ambang bukti bayar
+
+st, ps = req("GET", f"/api/products?limit=100&outletId={OUT}")
+ps = (ps.get("data") or [])
+if not ps:
+    raise SystemExit("tidak ada produk di tenant")
+MAHAL = sorted(ps, key=lambda x: float(x.get("currentSellingPrice") or 0), reverse=True)[0]
+GERINDA = MAHAL["id"]
+GERINDA_HARGA = float(MAHAL.get("currentSellingPrice") or 0)
+GERINDA_QTY = max(1, int(250001 / GERINDA_HARGA) + (0 if 250001 % GERINDA_HARGA == 0 else 1))
+CRON = os.environ.get("KADAI_CRON_SECRET", "uji-cron-9f3a71")
 
 # tutup laci yang masih terbuka
 for tok, siapa in ((TOK_MGR, "manager"), (TOK_KSR, "kasir")):
@@ -172,9 +181,9 @@ st, t1 = jual(TOK_MGR, "TEMPO", bayar=0, nama="")
 catat("tempo wajib pelanggan", st == 400 and t1.get("code") == "TEMPO_REQUIRES_CUSTOMER", f"HTTP {st} {t1.get('code')}")
 st, t2 = jual(TOK_MGR, "TEMPO", bayar=0, nama="Budi Santoso")
 catat("tempo dengan pelanggan diterima", st in (200, 201), f"HTTP {st}")
-st, t3 = jual(TOK_MGR, "QRIS", bayar=0, jumlah=1, produk=GERINDA)
+st, t3 = jual(TOK_MGR, "QRIS", bayar=0, jumlah=GERINDA_QTY, produk=GERINDA)
 catat("non-tunai >= 250rb wajib referensi", st == 400 and t3.get("code") == "NON_CASH_REFERENCE_REQUIRED", f"HTTP {st} {t3.get('code') or t3.get('error')}")
-st, t4 = jual(TOK_MGR, "QRIS", bayar=0, ref="QR-123456", jumlah=1, produk=GERINDA)
+st, t4 = jual(TOK_MGR, "QRIS", bayar=0, ref="QR-123456", jumlah=GERINDA_QTY, produk=GERINDA)
 catat("non-tunai >= 250rb dengan referensi diterima", st in (200, 201), f"HTTP {st}")
 st, a1 = req("POST", "/api/inventory/adjustment", {"productId": PID, "quantityChange": 0, "reason": "OTHER"})
 catat("penyesuaian stok 0 ditolak", st == 400, f"HTTP {st}")
@@ -182,7 +191,7 @@ st, _ = req("POST", "/api/cron/billing-referral", {"task": "renewals"}, extra={"
 catat("cron menolak rahasia cadangan lama", st == 403, f"HTTP {st}")
 st, _ = req("POST", "/api/cron/billing-referral?secret=uji-cron-9f3a71", {"task": "renewals"})
 catat("cron menolak rahasia dari query string", st == 403, f"HTTP {st}")
-st, _ = req("POST", "/api/cron/daily-summary", {}, extra={"x-cron-secret": "uji-cron-9f3a71"})
+st, _ = req("POST", "/api/cron/daily-summary", {}, extra={"x-cron-secret": CRON})
 catat("cron menerima rahasia benar", st == 200, f"HTTP {st}")
 
 # tutup laci manager bila masih terbuka

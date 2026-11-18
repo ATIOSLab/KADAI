@@ -40,23 +40,42 @@ export async function createInvoice(opts: {
   const issued = await prisma.paymentInvoice.count({
     where: { invoiceNumber: { startsWith: `INV-${stamp}` } },
   });
-  const invoiceNumber = `INV-${stamp}-${String(issued + 1).padStart(4, "0")}`;
 
-  return prisma.paymentInvoice.create({
-    data: {
-      storeId: store.id,
-      subscriptionId: opts.subscriptionId ?? null,
-      invoiceNumber,
-      description:
-        opts.description ??
-        `Langganan ${TIER_LABELS[opts.tier]} ${opts.cycle.toLowerCase()} — ${store.name}`,
-      tier: opts.tier,
-      cycle: opts.cycle,
-      amount,
-      provider: opts.provider ?? "MANUAL",
-      status: "PENDING",
-    },
-  });
+  // Nomor tagihan dihitung per bulan. Dua penerbitan yang berbarengan (cron
+  // perpanjangan dan tagihan manual) bisa menabrak nomor yang sama; nomor
+  // tagihan wajib unik, jadi penomoran dicoba ulang dengan nomor berikutnya
+  // alih-alih menggagalkan seluruh proses billing.
+  const data = {
+    storeId: store.id,
+    subscriptionId: opts.subscriptionId ?? null,
+    description:
+      opts.description ??
+      `Langganan ${TIER_LABELS[opts.tier]} ${opts.cycle.toLowerCase()} — ${store.name}`,
+    tier: opts.tier,
+    cycle: opts.cycle,
+    amount,
+    provider: opts.provider ?? "MANUAL",
+    status: "PENDING" as const,
+  };
+
+  let upayaTerakhir: unknown = null;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const invoiceNumber = `INV-${stamp}-${String(issued + 1 + attempt).padStart(4, "0")}`;
+    try {
+      return await prisma.paymentInvoice.create({ data: { ...data, invoiceNumber } });
+    } catch (error) {
+      const kode = (error as { code?: string }).code;
+      if (kode !== "P2002") throw error; // bukan bentrok nomor: teruskan apa adanya
+      upayaTerakhir = error;
+      logger.warn("Nomor tagihan bentrok, mencoba nomor berikutnya", "billing", {
+        invoiceNumber,
+        attempt: attempt + 1,
+      });
+    }
+  }
+  throw upayaTerakhir instanceof Error
+    ? upayaTerakhir
+    : new Error("Gagal menerbitkan nomor tagihan yang unik");
 }
 
 export async function settleInvoice(opts: {

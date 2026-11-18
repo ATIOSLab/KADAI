@@ -33,6 +33,7 @@ import {
 } from "@/lib/discount-policy";
 import { getBusinessDayStart } from "@/lib/business-day";
 import { resolveDefaultOutletId } from "@/lib/outlet-resolution";
+import { evaluatePaymentPolicy } from "@/lib/payment-policy";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { fromZonedTime } from "date-fns-tz";
 import { ZodError } from "zod";
@@ -609,6 +610,24 @@ export async function POST(request: NextRequest) {
           );
         }
         changeAmount = paidAmount.sub(totalAmount).toDecimalPlaces(2);
+      }
+
+      // Bukti bayar: piutang harus punya penanggung utang, dan pembayaran
+      // non-tunai bernilai besar harus punya nomor referensi yang bisa
+      // dicocokkan dengan mutasi bank/EDC.
+      const paymentPolicy = evaluatePaymentPolicy({
+        paymentType: data.paymentType,
+        totalAmount: Number(totalAmount),
+        paymentRef: data.paymentRef,
+        customerId: data.customerId,
+        customerName: data.customerName,
+      });
+      if (!paymentPolicy.ok) {
+        throw new ApiBusinessError(
+          paymentPolicy.message ?? "Bukti bayar belum lengkap",
+          400,
+          paymentPolicy.code
+        );
       }
 
       // Laba kotor = pendapatan usaha dikurangi HPP. Service charge adalah

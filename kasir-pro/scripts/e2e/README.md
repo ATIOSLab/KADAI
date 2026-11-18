@@ -26,7 +26,10 @@ berikutnya).
    export KADAI_TOKEN_KASIR="<token sesi kasir>"
    ```
 
-   PIN supervisor yang dipakai uji PIN adalah `999222` (PIN akun demo).
+   PIN supervisor yang dipakai uji PIN diambil dari `KADAI_PIN` (default
+   `888222`, PIN manager tenant demo Resto). Rahasia cron untuk uji
+   `x-cron-secret` diambil dari `KADAI_CRON_SECRET`; tanpa itu uji cron hanya
+   lulus di server lokal.
 
 ## Menjalankan
 
@@ -67,3 +70,14 @@ berulang pada database uji.
   satuan yang masih dipakai tidak bisa dihapus (`409 UNIT_IN_USE`).
 
 Skrip membuat nama/telepon bersufiks acak, jadi aman diulang tanpa bentrok.
+
+## Menjalankan di produksi (di belakang Cloudflare)
+
+Produksi menolak User-Agent bawaan `urllib` (Cloudflare error 1010), jadi semua
+skrip mengirim UA browser Chrome. Selalu ekspor `KADAI_BASE=https://kadai.asia`.
+
+Rate limit PIN supervisor bersifat per IP (10 percobaan / 10 menit, kunci 30
+menit). Karena trafik produksi masuk lewat edge Cloudflare, banyak penguji
+berbagi satu IP: setelah beberapa putaran, uji PIN benar akan berhenti dengan
+"Terlalu banyak percobaan PIN". Itu perilaku keamanan yang benar — skrip
+menandainya `SKIP`, bukan gagal. Tunggu 30 menit atau jalankan lewat IP lain.

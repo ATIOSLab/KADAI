@@ -76,21 +76,34 @@ def jual(tok, tipe, bayar=None, nama=None, ref=None, jumlah=1, key=None, produk=
 
 
 # --- persiapan ---
-st, prod = req("GET", "/api/products?limit=1")
-p = (prod.get("data") or prod.get("products") or prod.get("items") or [])[0]
 st, out = req("GET", "/api/outlets")
 o = (out if isinstance(out, list) else out.get("data") or out.get("outlets") or [])[0]
-PID, OUT = p["id"], o["id"]
+OUT = o["id"]
 MODAL = 200000
 
 st, ps = req("GET", f"/api/products?limit=100&outletId={OUT}")
 ps = (ps.get("data") or [])
 if not ps:
     raise SystemExit("tidak ada produk di tenant")
-MAHAL = sorted(ps, key=lambda x: float(x.get("currentSellingPrice") or 0), reverse=True)[0]
-GERINDA = MAHAL["id"]
-GERINDA_HARGA = float(MAHAL.get("currentSellingPrice") or 0)
-GERINDA_QTY = max(1, int(250001 / GERINDA_HARGA) + (0 if 250001 % GERINDA_HARGA == 0 else 1))
+LAYAK = [x for x in ps if float(x.get("currentSellingPrice") or 0) > 0]
+if not LAYAK:
+    raise SystemExit("tidak ada produk berharga di cabang ini")
+
+# produk penjualan: yang benar-benar punya stok di cabang ini
+PID = next((x["id"] for x in LAYAK if float(x.get("totalStock") or 0) >= 1), None)
+if not PID:
+    raise SystemExit("tidak ada produk berstok di cabang ini")
+
+# produk uji ambang: cari yang stoknya cukup untuk qty yang dibutuhkan
+GERINDA = GERINDA_HARGA = GERINDA_QTY = None
+for x in sorted(LAYAK, key=lambda y: float(y.get("currentSellingPrice") or 0), reverse=True):
+    harga = float(x.get("currentSellingPrice") or 0)
+    qty = max(1, int(250001 / harga) + (0 if 250001 % harga == 0 else 1))
+    if float(x.get("totalStock") or 0) >= qty:
+        GERINDA, GERINDA_HARGA, GERINDA_QTY = x["id"], harga, qty
+        break
+if not GERINDA:
+    raise SystemExit("tidak ada produk berstok cukup untuk uji ambang 250rb")
 CRON = os.environ.get("KADAI_CRON_SECRET", "uji-cron-9f3a71")
 
 # tutup laci yang masih terbuka

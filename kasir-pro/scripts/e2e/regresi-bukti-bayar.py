@@ -61,19 +61,28 @@ def pilih_produk(tok, outlet, butuh=1):
     return items
 
 
-def produk_termahal(items, butuh):
+def produk_ambang(items):
+    # total belanja harus >= 250.000 sesuai harga jual server (bukan harga kirim)
     for p in sorted(items, key=lambda x: float(x.get("currentSellingPrice") or 0), reverse=True):
-        if float(p.get("totalStock") or 0) >= butuh:
-            return p["id"], p["name"], float(p["currentSellingPrice"])
-    raise SystemExit("tidak ada produk berharga cukup & berstok cukup")
+        h = float(p.get("currentSellingPrice") or 0)
+        if h <= 0:
+            continue
+        q = max(1, int(250001 / h) + (0 if 250001 % h == 0 else 1))
+        if float(p.get("totalStock") or 0) >= q:
+            return p["id"], p["name"], h, q
+    raise SystemExit("tidak ada produk berharga cukup & berstok cukup untuk uji ambang")
+
+
+def produk_murah(items):
+    for p in items:
+        if float(p.get("currentSellingPrice") or 0) > 0 and float(p.get("totalStock") or 0) >= 1:
+            return p["id"], p["name"]
+    raise SystemExit("tidak ada produk berstok untuk uji penjualan")
 
 
 ITEMS = pilih_produk(TOK_MGR, OUT)
-GERINDA, GERINDA_NAMA, GERINDA_HARGA = produk_termahal(ITEMS, 1)
-# ambang bukti bayar: total belanja harus >= 250.000 sesuai harga jual server
-GERINDA_QTY = max(1, int(250001 / GERINDA_HARGA) + (0 if 250001 % GERINDA_HARGA == 0 else 1))
-MGR_SALE_PID = ITEMS[0]["id"]
-MGR_SALE_NAMA = ITEMS[0]["name"]
+GERINDA, GERINDA_NAMA, GERINDA_HARGA, GERINDA_QTY = produk_ambang(ITEMS)
+MGR_SALE_PID, MGR_SALE_NAMA = produk_murah(ITEMS)
 MODAL = 200000
 
 # ============ A. aturan bukti bayar non-tunai >= 250.000 ============

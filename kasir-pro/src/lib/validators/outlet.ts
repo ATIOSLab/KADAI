@@ -16,6 +16,9 @@ export const createOutletSchema = z.object({
 
 export const updateOutletSchema = createOutletSchema.partial().extend({
   id: z.string().min(1, "ID cabang wajib disertakan"),
+  // Status aktif bisa diubah dari formulir ubah cabang; penjagaannya sama
+  // dengan DELETE lewat outletDeactivationBlocker().
+  isActive: z.boolean().optional(),
 });
 
 export type CreateOutletInput = z.infer<typeof createOutletSchema>;

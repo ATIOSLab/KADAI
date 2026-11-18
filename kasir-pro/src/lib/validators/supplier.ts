@@ -9,6 +9,11 @@ export const createSupplierSchema = z.object({
 
 export const updateSupplierSchema = createSupplierSchema.partial().extend({
   id: z.string().min(1, "ID pemasok wajib disertakan"),
+  // Status aktif ikut bisa diubah di sini karena halaman Pemasok memakai satu
+  // formulir untuk menyunting data dan menonaktifkan vendor. Sebelumnya nilai
+  // ini dibuang diam-diam oleh zod: tombol melaporkan "berhasil" tetapi status
+  // pemasok tidak berubah sama sekali.
+  isActive: z.boolean().optional(),
 });
 
 export type CreateSupplierInput = z.infer<typeof createSupplierSchema>;

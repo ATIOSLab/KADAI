@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
-import { POS_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { POS_ROLES, ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { MEMBER_TIERS, createCustomerSchema, updateCustomerSchema } from "@/lib/validators/customer";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { logActivity } from "@/lib/activity-logger";
 
 // GET /api/customers
 export async function GET(req: NextRequest) {
@@ -29,6 +30,9 @@ export async function GET(req: NextRequest) {
     const customers = await prisma.customer.findMany({
       where: {
         storeId: scope.storeId,
+        // Pelanggan nonaktif tidak muncul lagi di pemilih kasir; ?includeInactive=1
+        // dipakai halaman Pelanggan untuk menampilkan arsip.
+        ...(searchParams.get("includeInactive") === "1" ? {} : { isActive: true }),
         ...(tier && { memberTier: tier }),
         ...(search && {
           OR: [
@@ -101,7 +105,7 @@ export async function PUT(req: NextRequest) {
 
     const owned = await prisma.customer.findFirst({
       where: { id: validated.id, storeId: scope.storeId },
-      select: { id: true },
+      select: { id: true, isActive: true },
     });
     if (!owned) {
       return jsonError("Data tidak ditemukan pada tenant Anda", 404);
@@ -120,11 +124,85 @@ export async function PUT(req: NextRequest) {
         ...(validated.notes !== undefined && { notes: validated.notes || null }),
         ...(validated.memberTier && { memberTier: validated.memberTier }),
         ...(validated.loyaltyPoints !== undefined && { loyaltyPoints: validated.loyaltyPoints }),
+        ...(validated.isActive !== undefined && { isActive: validated.isActive }),
       },
     });
 
-    return jsonOk(customer, "Data pelanggan berhasil diperbarui");
+    if (validated.isActive !== undefined && validated.isActive !== owned.isActive) {
+      await logActivity({
+        userId: sessionUser.id,
+        action: validated.isActive ? "CUSTOMER_ACTIVATED" : "CUSTOMER_DEACTIVATED",
+        entity: "customer",
+        entityId: customer.id,
+        details: { name: customer.name, cara: "PUT" },
+      });
+    }
+
+    return jsonOk(
+      customer,
+      validated.isActive !== undefined && validated.isActive !== owned.isActive
+        ? `Pelanggan "${customer.name}" ${validated.isActive ? "diaktifkan" : "dinonaktifkan"}`
+        : "Data pelanggan berhasil diperbarui"
+    );
   } catch (error) {
     return handleApiError(error, "PUT /api/customers", "Gagal memperbarui data pelanggan");
+  }
+}
+
+/**
+ * DELETE /api/customers?id=...
+ *
+ * Menonaktifkan pelanggan (soft delete), bukan menghapus barisnya: riwayat
+ * transaksi dan nama penanggung utang pada nota lama harus tetap terbaca.
+ * Hanya ADMIN/MANAGER yang boleh; kasir cukup memilih pelanggan.
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const sessionUser = await getServerSessionUser();
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+      return jsonError("Forbidden", 403);
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id")?.trim() || "";
+    if (!id) {
+      return jsonError("ID pelanggan wajib disertakan", 400);
+    }
+
+    const customer = await prisma.customer.findFirst({
+      where: { id, storeId: scope.storeId },
+      select: { id: true, name: true, isActive: true },
+    });
+    if (!customer) {
+      return jsonError("Data tidak ditemukan pada tenant Anda", 404);
+    }
+    if (!customer.isActive) {
+      return jsonOk({ id: customer.id, isActive: false }, `Pelanggan "${customer.name}" sudah nonaktif`);
+    }
+
+    // Piutang tempo yang belum lunas TIDAK dihitung di sini: aplikasi belum
+    // menyimpan pembayaran bertahap per nota, jadi menonaktifkan pelanggan tidak
+    // menghilangkan catatan apa pun - nota tempo lama tetap menyimpan namanya.
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: { isActive: false },
+    });
+
+    await logActivity({
+      userId: sessionUser.id,
+      action: "CUSTOMER_DEACTIVATED",
+      entity: "customer",
+      entityId: customer.id,
+      details: { name: customer.name },
+    });
+
+    return jsonOk({ id: customer.id, isActive: false }, `Pelanggan "${customer.name}" dinonaktifkan`);
+  } catch (error) {
+    return handleApiError(error, "DELETE /api/customers", "Gagal menonaktifkan pelanggan");
   }
 }

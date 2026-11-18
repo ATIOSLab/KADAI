@@ -13,6 +13,7 @@ import {
     ChefHat,
   QrCode,
   Scale,
+  Ruler,
   Truck,
   Users,
   Building,
@@ -103,6 +104,14 @@ export const navigationSections: NavigationSection[] = [
         shortLabel: "Produk",
         description: "Katalog produk, SKU, varian, dan Bill of Materials.",
         icon: Package,
+        roles: ["ADMIN", "MANAGER", "INVENTORY"],
+      },
+      {
+        href: "/units",
+        label: "Satuan & Kemasan",
+        shortLabel: "Satuan",
+        description: "Daftar satuan produk: ganti nama, lihat pemakaian, dan hapus satuan yang tidak terpakai.",
+        icon: Ruler,
         roles: ["ADMIN", "MANAGER", "INVENTORY"],
       },
       {

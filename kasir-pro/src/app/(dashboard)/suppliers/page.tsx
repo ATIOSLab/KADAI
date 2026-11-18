@@ -57,7 +57,11 @@ export default function SuppliersPage() {
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/suppliers?search=${encodeURIComponent(search)}`);
+      // includeInactive=1: pemasok nonaktif tetap tampil (dengan badge) supaya
+      // bisa diaktifkan kembali; tanpa ini barisnya hilang dari layar selamanya.
+      const res = await fetch(
+        `/api/suppliers?search=${encodeURIComponent(search)}&includeInactive=1`
+      );
       const data = await res.json();
       if (res.ok) {
         setSuppliers(data.data || []);

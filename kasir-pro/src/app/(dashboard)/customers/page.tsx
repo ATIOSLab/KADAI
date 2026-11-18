@@ -6,6 +6,8 @@ import {
   Plus,
   Search,
   Edit2,
+  UserMinus,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { formatCurrency } from "@/lib/utils";
 
 interface CustomerItem {
@@ -66,7 +69,8 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      let url = `/api/customers?search=${encodeURIComponent(search)}`;
+      // includeInactive=1: pelanggan nonaktif tetap tampil agar bisa diaktifkan lagi.
+      let url = `/api/customers?search=${encodeURIComponent(search)}&includeInactive=1`;
       if (tierFilter !== "ALL") {
         url += `&tier=${tierFilter}`;
       }
@@ -97,6 +101,53 @@ export default function CustomersPage() {
       notes: "",
     });
     setIsDialogOpen(true);
+  };
+
+  const confirm = useConfirm();
+
+  /**
+   * Menonaktifkan pelanggan. Barisnya tidak dihapus karena nota tempo lama
+   * menyimpan nama penanggung utang; yang berhenti hanyalah kemunculannya di
+   * pemilih kasir.
+   */
+  const handleActivate = async (cust: CustomerItem) => {
+    try {
+      const res = await fetch("/api/customers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: cust.id, isActive: true }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error || "Gagal mengaktifkan pelanggan");
+        return;
+      }
+      toast.success(data.message || "Pelanggan diaktifkan kembali");
+      fetchCustomers();
+    } catch {
+      toast.error("Gagal mengaktifkan pelanggan");
+    }
+  };
+
+  const handleDeactivate = async (cust: CustomerItem) => {
+    const setuju = await confirm(
+      `Pelanggan "${cust.name}" akan dinonaktifkan dan tidak lagi muncul di pemilih kasir. Riwayat transaksinya tetap tersimpan.`,
+      { title: "Nonaktifkan pelanggan?", confirmLabel: "Ya, nonaktifkan", variant: "danger" }
+    );
+    if (!setuju) return;
+
+    try {
+      const res = await fetch(`/api/customers?id=${encodeURIComponent(cust.id)}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error || "Gagal menonaktifkan pelanggan");
+        return;
+      }
+      toast.success(data.message || "Pelanggan dinonaktifkan");
+      fetchCustomers();
+    } catch {
+      toast.error("Gagal menonaktifkan pelanggan");
+    }
   };
 
   const handleOpenEdit = (cust: CustomerItem) => {
@@ -252,7 +303,16 @@ export default function CustomersPage() {
                       <div>{cust.phone || "-"}</div>
                       {cust.email && <div className="text-[11px] text-muted-foreground">{cust.email}</div>}
                     </td>
-                    <td className="py-3 px-4 text-center">{getTierBadge(cust.memberTier)}</td>
+                    <td className="py-3 px-4 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        {getTierBadge(cust.memberTier)}
+                        {!cust.isActive && (
+                          <Badge variant="secondary" className="text-[10px]">
+                            Nonaktif
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
                     <td className="py-3 px-4 text-right font-mono font-bold text-amber-600">
                       {cust.loyaltyPoints.toLocaleString("id-ID")} Pts
                     </td>
@@ -263,14 +323,35 @@ export default function CustomersPage() {
                       {cust.visitCount}x
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-7"
-                        onClick={() => handleOpenEdit(cust)}
-                      >
-                        <Edit2 className="size-3.5 mr-1" /> Ubah
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => handleOpenEdit(cust)}
+                        >
+                          <Edit2 className="size-3.5 mr-1" /> Ubah
+                        </Button>
+                        {cust.isActive ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-7 text-rose-600 hover:text-rose-700"
+                            onClick={() => handleDeactivate(cust)}
+                          >
+                            <UserMinus className="size-3.5 mr-1" /> Nonaktifkan
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-7 text-emerald-600 hover:text-emerald-700"
+                            onClick={() => handleActivate(cust)}
+                          >
+                            <UserCheck className="size-3.5 mr-1" /> Aktifkan
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

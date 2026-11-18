@@ -51,6 +51,8 @@ export const createCustomerSchema = z.object({
 
 export const updateCustomerSchema = createCustomerSchema.partial().extend({
   id: z.string().min(1, "ID pelanggan wajib disertakan"),
+  // Menonaktifkan pelanggan lewat formulir ubah (sama seperti tombol hapus).
+  isActive: z.boolean().optional(),
 });
 
 export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;

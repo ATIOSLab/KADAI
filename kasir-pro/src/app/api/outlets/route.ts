@@ -5,6 +5,8 @@ import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { createOutletSchema, updateOutletSchema } from "@/lib/validators/outlet";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { logActivity } from "@/lib/activity-logger";
+import { outletDeactivationBlocker } from "@/lib/outlet-lifecycle";
 import { checkFeature, checkOutletLimit } from "@/lib/plan-limits";
 
 // GET /api/outlets — daftar cabang milik tenant pemanggil
@@ -121,10 +123,19 @@ export async function PUT(req: NextRequest) {
 
     const owned = await prisma.outlet.findFirst({
       where: { id: validated.id, storeId: scope.storeId },
-      select: { id: true },
+      select: { id: true, name: true, isMain: true, isActive: true },
     });
     if (!owned) {
       return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
+    }
+
+    // Menonaktifkan lewat formulir ubah harus melewati penjagaan yang sama
+    // dengan tombol hapus; kalau tidak, aturan cabang utama bisa dilewati.
+    if (validated.isActive === false) {
+      const penolakan = await outletDeactivationBlocker(prisma, scope.storeId, owned);
+      if (penolakan) {
+        return jsonError(penolakan.message, 409, undefined, penolakan.code);
+      }
     }
 
     if (validated.isMain) {
@@ -148,11 +159,92 @@ export async function PUT(req: NextRequest) {
         ...(validated.outletType && { outletType: validated.outletType }),
         ...(validated.kitchenWorkflow && { kitchenWorkflow: validated.kitchenWorkflow }),
         ...(validated.costingMethod && { costingMethod: validated.costingMethod }),
+        ...(validated.isActive !== undefined && { isActive: validated.isActive }),
       },
     });
 
-    return jsonOk(updated, "Cabang berhasil diperbarui");
+    if (validated.isActive !== undefined && validated.isActive !== owned.isActive) {
+      await logActivity({
+        userId: sessionUser.id,
+        action: validated.isActive ? "OUTLET_ACTIVATED" : "OUTLET_DEACTIVATED",
+        entity: "outlet",
+        entityId: updated.id,
+        details: { name: updated.name, cara: "PUT" },
+      });
+    }
+
+    return jsonOk(
+      updated,
+      validated.isActive !== undefined && validated.isActive !== owned.isActive
+        ? `Cabang "${updated.name}" ${validated.isActive ? "diaktifkan" : "dinonaktifkan"}`
+        : "Cabang berhasil diperbarui"
+    );
   } catch (error) {
     return handleApiError(error, "PUT /api/outlets", "Gagal memperbarui data cabang");
+  }
+}
+
+/**
+ * DELETE /api/outlets?id=...
+ *
+ * Menonaktifkan cabang (soft delete). Tiga penjagaan yang mencegah data
+ * operasional jadi menggantung:
+ *  1. cabang utama tidak bisa dinonaktifkan (kasir tanpa cabang kehilangan
+ *     default laci),
+ *  2. cabang terakhir yang aktif tidak bisa dinonaktifkan (toko jadi tanpa
+ *     tempat berjualan),
+ *  3. cabang dengan laci kasir masih terbuka tidak bisa dinonaktifkan (uang
+ *     tunai yang belum dihitung akan hilang dari rekonsiliasi).
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const sessionUser = await getServerSessionUser();
+    if (!sessionUser || !hasRequiredRole(sessionUser.role, ADMIN_MANAGER_ROLES)) {
+      return jsonError("Forbidden", 403);
+    }
+
+    const scope = await resolveTenantScope(sessionUser);
+    if (!scope.ok) {
+      return jsonError(scope.message, scope.status);
+    }
+
+    const { searchParams } = new URL(req.url);
+    let id = searchParams.get("id")?.trim() || "";
+    if (!id) {
+      const body = await req.json().catch(() => ({}));
+      id = typeof body?.id === "string" ? body.id.trim() : "";
+    }
+    if (!id) {
+      return jsonError("ID cabang wajib disertakan", 400);
+    }
+
+    const outlet = await prisma.outlet.findFirst({
+      where: { id, storeId: scope.storeId },
+      select: { id: true, name: true, isMain: true, isActive: true },
+    });
+    if (!outlet) {
+      return jsonError("Data tidak ditemukan pada tenant Anda", 404);
+    }
+    if (!outlet.isActive) {
+      return jsonOk({ id: outlet.id, isActive: false }, `Cabang "${outlet.name}" sudah nonaktif`);
+    }
+    const penolakan = await outletDeactivationBlocker(prisma, scope.storeId, outlet);
+    if (penolakan) {
+      return jsonError(penolakan.message, 409, undefined, penolakan.code);
+    }
+
+    await prisma.outlet.update({ where: { id: outlet.id }, data: { isActive: false } });
+
+    await logActivity({
+      userId: sessionUser.id,
+      action: "OUTLET_DEACTIVATED",
+      entity: "outlet",
+      entityId: outlet.id,
+      details: { name: outlet.name },
+    });
+
+    return jsonOk({ id: outlet.id, isActive: false }, `Cabang "${outlet.name}" dinonaktifkan`);
+  } catch (error) {
+    return handleApiError(error, "DELETE /api/outlets", "Gagal menonaktifkan cabang");
   }
 }

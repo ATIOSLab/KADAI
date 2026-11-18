@@ -34,6 +34,7 @@ berikutnya).
 python scripts/e2e/regresi-siklus-kas.py      # laci A/B, refund, cetak ulang Z-Report
 python scripts/e2e/regresi-bukti-bayar.py     # tempo, non-tunai >= Rp250rb, kasir vs manager
 python scripts/e2e/regresi-pin-supervisor.py  # PIN salah ditolak, PIN benar diterima
+python scripts/e2e/regresi-master-data.py     # CRUD pemasok, pelanggan, cabang, satuan
 ```
 
 Setiap skrip mencetak `LULUS`/`GAGAL` per butir dan ringkasan di akhir. Skrip
@@ -50,3 +51,19 @@ berulang pada database uji.
   supervisor; manager/admin tidak perlu PIN.
 - Restock produk habis dipakai uji: bila stok uji habis, jalankan ulang seed
   demo sebelum mengulang skrip.
+
+## Uji data induk (CRUD)
+
+`regresi-master-data.py` membuktikan kelengkapan CRUD yang sebelumnya bolong:
+
+- pemasok & pelanggan bisa dinonaktifkan, hilang dari daftar default, tetap
+  terlihat dengan `?includeInactive=1`, dan bisa diaktifkan kembali lewat
+  `PUT { isActive: true }` (dulu tombol "Nonaktifkan" tidak berefek apa pun
+  karena validator membuang `isActive` tanpa pesan);
+- pelanggan hanya bisa dinonaktifkan oleh manager/admin - kasir ditolak 403;
+- cabang utama tidak bisa dinonaktifkan (`409 MAIN_OUTLET_PROTECTED`), begitu
+  pula cabang aktif terakhir dan cabang yang lacinya masih terbuka;
+- satuan bisa diganti nama dan namanya **ikut berubah di semua produk**;
+  satuan yang masih dipakai tidak bisa dihapus (`409 UNIT_IN_USE`).
+
+Skrip membuat nama/telepon bersufiks acak, jadi aman diulang tanpa bentrok.

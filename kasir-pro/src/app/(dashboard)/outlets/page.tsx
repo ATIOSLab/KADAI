@@ -12,6 +12,8 @@ import {
   Edit2,
   CheckCircle2,
   Star,
+  PowerOff,
+  Power,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/shared/confirm-dialog";
 import { CardGridSkeleton } from "@/components/shared/loading-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
 
@@ -108,6 +111,45 @@ export default function OutletsPage() {
       costingMethod: "FIFO",
     });
     setIsDialogOpen(true);
+  };
+
+  const confirm = useConfirm();
+
+  /**
+   * Mengaktifkan / menonaktifkan cabang. Server tetap memegang aturan: cabang
+   * utama, cabang aktif terakhir, dan cabang yang lacinya masih terbuka akan
+   * ditolak dengan pesan yang menjelaskan sebabnya.
+   */
+  const handleToggleOutlet = async (outlet: OutletItem) => {
+    const akanNonaktif = outlet.isActive;
+    const setuju = await confirm(
+      akanNonaktif
+        ? `Cabang "${outlet.name}" akan dinonaktifkan dan tidak lagi muncul di pemilih cabang. Transaksi lama tetap tersimpan.`
+        : `Aktifkan kembali cabang "${outlet.name}"?`,
+      akanNonaktif
+        ? { title: "Nonaktifkan cabang?", confirmLabel: "Ya, nonaktifkan", variant: "danger" }
+        : { title: "Aktifkan cabang?", confirmLabel: "Ya, aktifkan" }
+    );
+    if (!setuju) return;
+
+    try {
+      const res = akanNonaktif
+        ? await fetch(`/api/outlets?id=${encodeURIComponent(outlet.id)}`, { method: "DELETE" })
+        : await fetch("/api/outlets", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: outlet.id, isActive: true }),
+          });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error || "Gagal mengubah status cabang");
+        return;
+      }
+      toast.success(data.message || "Status cabang diperbarui");
+      fetchOutlets();
+    } catch {
+      toast.error("Gagal mengubah status cabang");
+    }
   };
 
   const handleOpenEdit = (outlet: OutletItem) => {
@@ -252,7 +294,23 @@ export default function OutletsPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border flex items-center justify-end">
+                <div className="pt-2 border-t border-border flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`text-xs h-8 ${outlet.isActive ? "text-rose-600 hover:text-rose-700" : "text-emerald-600 hover:text-emerald-700"}`}
+                    onClick={() => handleToggleOutlet(outlet)}
+                  >
+                    {outlet.isActive ? (
+                      <>
+                        <PowerOff className="size-3.5 mr-1" /> Nonaktifkan
+                      </>
+                    ) : (
+                      <>
+                        <Power className="size-3.5 mr-1" /> Aktifkan
+                      </>
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

@@ -77,8 +77,28 @@ Uji: `tests/cron-and-payment-settlement.test.ts`,
 | Ringkasan pajak hanya menghitung penjualan yang tidak dibatalkan | `api/finance/tax-summary/route.ts` (uji: `tests/tax-summary.test.ts`) |
 | Data satu toko tidak bisa dibaca toko lain (isolasi tenant) | `src/lib/tenant-scope.ts` (uji: `tests/tenant-isolation.test.ts`) |
 
----
+## 6. Data induk (pemasok, pelanggan, cabang, satuan)
 
+Data induk **tidak dihapus permanen** kalau masih dirujuk riwayat: batch stok,
+nota tempo, dan transaksi lama menyimpan nama/id-nya. Yang berubah hanya status
+aktif. Satuan adalah pengecualian karena hanya kamus teks tanpa relasi.
+
+| Aturan | Kode penolakan | Penegak |
+| --- | --- | --- |
+| Pemasok & pelanggan bisa dinonaktifkan (`DELETE`) dan diaktifkan lagi (`PUT isActive`); nonaktif tidak muncul di pemilih transaksi tapi tetap terlihat dengan `?includeInactive=1` | - | `api/suppliers/route.ts`, `api/customers/route.ts`, `src/lib/validators/{supplier,customer}.ts` |
+| Pelanggan hanya bisa dinonaktifkan oleh **manager/admin** | 403 | `api/customers/route.ts` (`ADMIN_MANAGER_ROLES`) |
+| Cabang utama tidak bisa dinonaktifkan | `MAIN_OUTLET_PROTECTED` | `src/lib/outlet-lifecycle.ts` (`outletDeactivationBlocker`) |
+| Cabang aktif terakhir tidak bisa dinonaktifkan (kasir jadi kehilangan tempat berjualan) | `LAST_OUTLET_PROTECTED` | `src/lib/outlet-lifecycle.ts` |
+| Cabang yang lacinya masih terbuka tidak bisa dinonaktifkan | `OUTLET_HAS_OPEN_SHIFT` | `src/lib/outlet-lifecycle.ts` |
+| Penjagaan yang sama berlaku untuk `DELETE` **dan** `PUT isActive: false` - satu helper, bukan dua salinan | `MAIN_OUTLET_PROTECTED`/`LAST_OUTLET_PROTECTED`/`OUTLET_HAS_OPEN_SHIFT` | `api/outlets/route.ts` (dua pemanggilan `outletDeactivationBlocker`) |
+| Ganti nama satuan ikut mengubah `Product.unit` semua produk yang memakainya | - | `api/units/route.ts` (`tx.product.updateMany`) |
+| Satuan yang masih dipakai produk tidak bisa dihapus | `UNIT_IN_USE` | `api/units/route.ts` |
+| Satuan bawaan platform (`storeId` NULL) tidak bisa diubah/dihapus tenant | 404 | `api/units/route.ts` (filter `storeId: scope.storeId`) |
+| Setiap aktivasi/nonaktif/rename satuan tercatat di log aktivitas | - | enum `ActionType` (`SUPPLIER_*`, `CUSTOMER_*`, `OUTLET_*`, `UNIT_*`) |
+
+Uji: `tests/crud-completeness.test.ts`, `scripts/e2e/regresi-master-data.py`.
+
+---
 ## Cara memverifikasi sendiri
 
 ```bash

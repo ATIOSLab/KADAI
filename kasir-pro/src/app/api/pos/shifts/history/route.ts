@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
           totalCashSales: true,
           totalRefunds: true,
           totalDiscount: true,
+          shiftNumber: true,
           cashier: { select: { id: true, name: true } },
         },
       }),
@@ -129,6 +130,7 @@ export async function GET(request: NextRequest) {
       const variance = row.variance === null ? null : Number(row.variance);
       return {
         id: row.id,
+        number: row.shiftNumber,
         cashier: row.cashier,
         openedAt: row.openedAt,
         closedAt: row.closedAt,

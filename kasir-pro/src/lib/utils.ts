@@ -57,6 +57,18 @@ export function generateBatchNumber(
   )}`;
 }
 
+/**
+ * Nomor Z-Report (penutupan laci kasir). Berurutan per tenant per hari bisnis,
+ * supaya pemilik bisa merujuk "Z-20261118-003" saat memeriksa selisih kas.
+ */
+export function generateShiftNumber(
+  sequence: number,
+  date = new Date(),
+  timezone = DEFAULT_BUSINESS_TIMEZONE
+) {
+  return `Z-${formatDateSegment(date, timezone)}-${padSequence(sequence, 3)}`;
+}
+
 function sanitizeSkuSegment(value: string) {
   return value.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
 }

@@ -205,6 +205,8 @@ export interface ShiftReport {
     outletId: string | null;
     openedAt: string;
     closedAt: string | null;
+    /** Nomor Z-Report; null selama laci masih terbuka. */
+    number: string | null;
     openingCash: number;
     closingCash: number | null;
     expectedCash: number;
@@ -235,6 +237,7 @@ export interface ShiftReportInput {
     outletId: string | null;
     openedAt: Date;
     closedAt?: Date | null;
+    number?: string | null;
     openingCash: number;
     closingCash?: number | null;
     notes?: string | null;
@@ -262,6 +265,7 @@ export function buildShiftReport(input: ShiftReportInput): ShiftReport {
       outletId: input.shift.outletId,
       openedAt: input.shift.openedAt.toISOString(),
       closedAt: input.shift.closedAt ? input.shift.closedAt.toISOString() : null,
+      number: input.shift.number ?? null,
       openingCash: round2(input.shift.openingCash),
       closingCash: closingCash === null ? null : round2(closingCash),
       expectedCash: numbers.expectedCash,

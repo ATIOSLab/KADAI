@@ -32,6 +32,7 @@ interface ShiftSummaryData {
     status: "OPEN" | "CLOSED";
     openedAt: string;
     closedAt: string | null;
+    number?: string | null;
     openingCash: number;
     closingCash: number | null;
     expectedCash: number;
@@ -327,6 +328,14 @@ export function ShiftDialog({
               {/* Z-Report Shift Closing Form */}
               {activeTab === "z-report" && (
                 <div className="p-3.5 rounded-xl border-2 border-primary/40 bg-card space-y-3 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                      Nomor Z-Report
+                    </span>
+                    <span className="font-mono text-[11px] font-black">
+                      {data.shift?.number ?? "diberikan saat tutup"}
+                    </span>
+                  </div>
                   <div className="space-y-1">
                     <Label htmlFor="actualCash" className="font-bold text-slate-900">
                       Hitung Fisik Uang di Laci Kasir (Cash Count):

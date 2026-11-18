@@ -72,6 +72,27 @@ test("laporan shift menghitung selisih laci terhadap kas diharapkan", () => {
   assert.equal(report.totalTransactions, 2);
   assert.equal(report.totalCashRefunds, 10_000);
   assert.equal(report.shift.notes, "tutup pagi");
+  assert.equal(report.shift.number, null);
+});
+
+test("nomor Z-Report ikut tercatat di laporan shift", () => {
+  const report = buildShiftReport({
+    shift: {
+      id: "shift-9",
+      status: "CLOSED",
+      outletId: null,
+      openedAt: new Date("2026-11-18T01:00:00.000Z"),
+      closedAt: new Date("2026-11-18T10:00:00.000Z"),
+      number: "Z-20261118-003",
+      openingCash: 0,
+      closingCash: 100_000,
+    },
+    store,
+    cashier,
+    sales: [sale()],
+  });
+
+  assert.equal(report.shift.number, "Z-20261118-003");
 });
 
 test("shift yang masih terbuka belum punya selisih", () => {

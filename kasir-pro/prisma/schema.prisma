@@ -739,6 +739,9 @@ model SaleItemBatch {
 model CashShift {
   id             String      @id @default(cuid())
   status         ShiftStatus @default(OPEN)
+  /// Nomor Z-Report berurutan per tenant ("Z-20261118-003"); null selama laci
+  /// belum ditutup karena nomor baru sah saat laporan ditutup.
+  shiftNumber    String?
   /// Cabang tempat laci ini dipakai; null = kasir tanpa cabang (tenant tunggal).
   outletId       String?
   openingCash    Decimal     @default(0) @db.Decimal(15, 2)
@@ -765,6 +768,7 @@ model CashShift {
   sales     Sale[]
 
   @@index([storeId, status])
+  @@unique([storeId, shiftNumber])
   @@index([cashierId, openedAt])
   @@map("cash_shifts")
 }

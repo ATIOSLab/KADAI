@@ -15,6 +15,7 @@ import { Printer, RefreshCw, Wallet } from "lucide-react";
 
 interface ShiftRow {
   id: string;
+  number: string | null;
   cashier: { id: string; name: string } | null;
   openedAt: string;
   closedAt: string | null;
@@ -125,7 +126,7 @@ export default function ShiftHistoryPage() {
       const report = res.data as {
         store?: { name?: string };
         cashier?: { name?: string };
-        shift?: { openedAt?: string; closedAt?: string; openingCash?: number; closingCash?: number; variance?: number };
+        shift?: { openedAt?: string; closedAt?: string; number?: string | null; openingCash?: number; closingCash?: number; variance?: number };
         expectedCash?: number;
         totalTransactions?: number;
         totalVoided?: number;
@@ -153,8 +154,8 @@ export default function ShiftHistoryPage() {
           .sep{border-top:1px dashed #999;margin:8px 0}
           .total{font-weight:700}
         </style></head><body>
-        <h1>Z-REPORT — ${report.store?.name ?? "KADAI"}</h1>
-        <div class="sub">${report.cashier?.name ?? "-"} · ${formatDateTime(report.shift?.closedAt ?? null)}</div>
+        <h1>Z-REPORT ${report.shift?.number ? `— ${report.shift.number}` : ""}</h1>
+        <div class="sub">${report.store?.name ?? "KADAI"} · ${report.cashier?.name ?? "-"}</div>
         ${line("Buka shift", formatDateTime(report.shift?.openedAt ?? null))}
         ${line("Tutup shift", formatDateTime(report.shift?.closedAt ?? null))}
         <div class="sep"></div>
@@ -269,6 +270,7 @@ export default function ShiftHistoryPage() {
           <table className="w-full text-xs">
             <thead className="bg-slate-50 text-left text-[11px] uppercase tracking-wide text-slate-500">
               <tr>
+                <th className="px-3 py-2 font-bold">No. Z</th>
                 <th className="px-3 py-2 font-bold">Kasir</th>
                 <th className="px-3 py-2 font-bold">Buka</th>
                 <th className="px-3 py-2 font-bold">Tutup</th>
@@ -284,14 +286,14 @@ export default function ShiftHistoryPage() {
             <tbody>
               {loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-6">
+                  <td colSpan={11} className="px-3 py-6">
                     <Skeleton className="h-6 w-full" />
                   </td>
                 </tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-10 text-center text-muted-foreground">
+                  <td colSpan={11} className="px-3 py-10 text-center text-muted-foreground">
                     <Wallet className="mx-auto mb-2 size-6 opacity-40" />
                     Belum ada shift tertutup pada rentang ini.
                   </td>
@@ -299,6 +301,9 @@ export default function ShiftHistoryPage() {
               )}
               {rows.map((row) => (
                 <tr key={row.id} className="border-t border-slate-100">
+                  <td className="px-3 py-2 font-mono text-[11px] whitespace-nowrap">
+                    {row.number ?? "—"}
+                  </td>
                   <td className="px-3 py-2 font-semibold">{row.cashier?.name ?? "—"}</td>
                   <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
                     {formatDateTime(row.openedAt)}

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { CYCLE_MONTHS, TIER_LABELS } from "@/lib/pricing";
 import { cyclePrice } from "@/lib/plan-catalog";
 import { attributeInvoiceToReferral } from "@/lib/referral-engine";
+import { logger } from "@/lib/logger";
 import type { BillingCycle, PaymentProvider, SubscriptionTier } from "@prisma/client";
 
 /**
@@ -64,6 +65,12 @@ export async function settleInvoice(opts: {
   paymentProof?: string | null;
   notes?: string | null;
   providerRef?: string | null;
+  /**
+   * Nominal yang benar-benar diterima penyedia pembayaran. Bila diisi dan kurang
+   * dari nilai tagihan, tagihan TIDAK dilunasi: menerima pembayaran kurang lalu
+   * menandai lunas sama dengan menghibahkan selisihnya tanpa jejak.
+   */
+  paidAmount?: number | null;
 }) {
   const invoice = await prisma.paymentInvoice.findUnique({
     where: { id: opts.invoiceId },
@@ -72,6 +79,24 @@ export async function settleInvoice(opts: {
   if (!invoice) throw new Error("Invoice tidak ditemukan");
   if (invoice.status === "SETTLED") {
     return { invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber, alreadySettled: true };
+  }
+
+  const tagihan = Number(invoice.amount);
+  const dibayar = opts.paidAmount == null ? null : Number(opts.paidAmount);
+  if (dibayar != null && Number.isFinite(dibayar) && dibayar + 0.01 < tagihan) {
+    logger.warn("Pembayaran kurang dari nilai tagihan — tagihan tidak dilunasi", "billing", {
+      invoiceNumber: invoice.invoiceNumber,
+      tagihan,
+      dibayar,
+      providerRef: opts.providerRef ?? null,
+    });
+    return {
+      invoiceId: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      underpaid: true,
+      expected: tagihan,
+      received: dibayar,
+    };
   }
 
   const result = await prisma.$transaction(async (tx) => {

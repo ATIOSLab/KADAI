@@ -39,12 +39,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: "Invoice tidak ditemukan (diabaikan)" });
     }
 
-    await settleInvoice({
+    const hasil = await settleInvoice({
       invoiceId: invoice.id,
       paidBy: "Xendit Webhook",
       providerRef: body.id,
+      paidAmount: body.paid_amount,
       notes: `Xendit PAID ${body.paid_amount ?? ""}`,
     });
+
+    if ("underpaid" in hasil && hasil.underpaid) {
+      return NextResponse.json({
+        success: false,
+        message: `Nominal tidak mencukupi: tagihan Rp ${hasil.expected}, diterima Rp ${hasil.received}`,
+      });
+    }
 
     return NextResponse.json({ success: true, message: "Tagihan lunas via Xendit" });
   } catch (error) {

@@ -3,30 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { ensureBotSettings } from "@/lib/bot/settings";
 import { buildDailyExecutiveSummary } from "@/lib/bot/summary";
 import { sendTelegramMessage } from "@/lib/bot/telegram";
+import { verifyCronSecret } from "@/lib/cron-auth";
 import { logger } from "@/lib/logger";
 
 /**
  * Daily Executive & Z-Report Summary Cron
- * Protected by header `x-cron-secret` (matches CRON_SECRET)
+ * Dilindungi header `x-cron-secret` (atau `Authorization: Bearer`) yang harus
+ * sama dengan CRON_SECRET di server. Tidak ada nilai cadangan di kode.
  */
 export async function POST(request: NextRequest) {
   try {
-    const expectedSecret = process.env.CRON_SECRET || process.env.BETTER_AUTH_SECRET || "kadai-internal-cron-token";
-    const authHeader = request.headers.get("authorization");
-    const bearer = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const headerSecret = request.headers.get("x-cron-secret");
-    const querySecret = request.nextUrl.searchParams.get("secret");
-
-    const provided = headerSecret || bearer || querySecret;
-
-    const validSecrets = [
-      process.env.CRON_SECRET,
-      process.env.BETTER_AUTH_SECRET,
-      "kadai-internal-cron-token",
-    ].filter(Boolean);
-
-    if (!provided || !validSecrets.includes(provided)) {
-      return NextResponse.json({ error: "Forbidden: Invalid cron secret" }, { status: 403 });
+    const auth = verifyCronSecret(request);
+    if (!auth.ok) {
+      logger.warn("Cron daily-summary ditolak", "cron", { reason: auth.message });
+      return NextResponse.json({ error: auth.message }, { status: auth.status });
     }
 
     const settings = await ensureBotSettings();

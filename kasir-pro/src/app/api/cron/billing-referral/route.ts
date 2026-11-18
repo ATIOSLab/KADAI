@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { renewDueSubscriptions } from "@/lib/billing-service";
 import { generatePayoutBatch, monthlyPeriod } from "@/lib/referral-engine";
+import { verifyCronSecret } from "@/lib/cron-auth";
 import { logger } from "@/lib/logger";
 
 /**
  * Cron otomatisasi billing & komisi referral.
- * Dilindungi header `x-cron-secret` (CRON_SECRET di environment server).
+ * Dilindungi header `x-cron-secret` (atau `Authorization: Bearer`) yang harus
+ * sama dengan CRON_SECRET di environment server. Karena endpoint ini menerbitkan
+ * tagihan dan mencairkan komisi, rahasianya tidak punya nilai cadangan di kode
+ * dan tidak diterima lewat query string.
  *
  * Task:
  *  - renewals : terbitkan tagihan perpanjangan langganan yang jatuh tempo
@@ -20,21 +24,10 @@ const taskSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization");
-    const bearer = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const headerSecret = request.headers.get("x-cron-secret");
-    const querySecret = request.nextUrl.searchParams.get("secret");
-
-    const provided = headerSecret || bearer || querySecret;
-
-    const validSecrets = [
-      process.env.CRON_SECRET,
-      process.env.BETTER_AUTH_SECRET,
-      "kadai-internal-cron-token",
-    ].filter(Boolean);
-
-    if (!provided || !validSecrets.includes(provided)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const auth = verifyCronSecret(request);
+    if (!auth.ok) {
+      logger.warn("Cron billing-referral ditolak", "cron", { reason: auth.message });
+      return NextResponse.json({ error: auth.message }, { status: auth.status });
     }
 
     const { task, period } = taskSchema.parse(await request.json());

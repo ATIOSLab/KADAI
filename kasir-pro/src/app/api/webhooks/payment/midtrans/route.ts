@@ -50,12 +50,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: "Invoice tidak ditemukan (diabaikan)" });
     }
 
-    await settleInvoice({
+    const hasil = await settleInvoice({
       invoiceId: invoice.id,
       paidBy: "Midtrans Webhook",
       providerRef: body.transaction_id,
+      paidAmount: Number(body.gross_amount ?? 0),
       notes: `Midtrans ${body.transaction_status}`,
     });
+
+    if ("underpaid" in hasil && hasil.underpaid) {
+      return NextResponse.json({
+        success: false,
+        message: `Nominal tidak mencukupi: tagihan Rp ${hasil.expected}, diterima Rp ${hasil.received}`,
+      });
+    }
 
     return NextResponse.json({ success: true, message: "Tagihan lunas via Midtrans" });
   } catch (error) {

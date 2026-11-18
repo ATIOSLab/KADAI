@@ -760,6 +760,11 @@ model CashShift {
   openingNotes   String?
   closingNotes   String?
   reportJson     Json?
+  /// Koreksi susulan: jumlah transaksi di laci ini yang dibatalkan SETELAH
+  /// laporan ditutup. Laporan tercetak tidak bisa berubah lagi, jadi angka ini
+  /// yang membuat selisihnya terlihat.
+  lateVoidCount  Int         @default(0)
+  lastLateVoidAt DateTime?
   openedAt       DateTime    @default(now())
   closedAt       DateTime?
 

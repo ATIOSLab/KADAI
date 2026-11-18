@@ -11,11 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiFetch } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
-import { Printer, RefreshCw, Wallet } from "lucide-react";
+import { AlertTriangle, Printer, RefreshCw, Wallet } from "lucide-react";
 
 interface ShiftRow {
   id: string;
   number: string | null;
+  lateVoidCount: number;
+  lastLateVoidAt: string | null;
   cashier: { id: string; name: string } | null;
   openedAt: string;
   closedAt: string | null;
@@ -126,7 +128,7 @@ export default function ShiftHistoryPage() {
       const report = res.data as {
         store?: { name?: string };
         cashier?: { name?: string };
-        shift?: { openedAt?: string; closedAt?: string; number?: string | null; openingCash?: number; closingCash?: number; variance?: number };
+        shift?: { openedAt?: string; closedAt?: string; number?: string | null; openingCash?: number; closingCash?: number; variance?: number; lateVoidCount?: number; lastLateVoidAt?: string | null };
         expectedCash?: number;
         totalTransactions?: number;
         totalVoided?: number;
@@ -161,6 +163,14 @@ export default function ShiftHistoryPage() {
         <div class="sep"></div>
         ${line("Transaksi", String(report.totalTransactions ?? 0))}
         ${line("Dibatalkan", String(report.totalVoided ?? 0))}
+        ${
+          (report.shift?.lateVoidCount ?? 0) > 0
+            ? line(
+                "Koreksi susulan",
+                `${report.shift?.lateVoidCount} transaksi dibatalkan setelah laporan ditutup`
+              ) + line("Koreksi terakhir", formatDateTime(report.shift?.lastLateVoidAt ?? null))
+            : ""
+        }
         ${line("Diskon", formatCurrency(Number(report.totalDiscount ?? 0)))}
         <div class="sep"></div>
         ${line("Omzet", formatCurrency(Number(report.totalRevenue ?? 0)))}
@@ -303,6 +313,17 @@ export default function ShiftHistoryPage() {
                 <tr key={row.id} className="border-t border-slate-100">
                   <td className="px-3 py-2 font-mono text-[11px] whitespace-nowrap">
                     {row.number ?? "—"}
+                    {row.lateVoidCount > 0 && (
+                      <span
+                        className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-600"
+                        title={`${row.lateVoidCount} transaksi dibatalkan setelah laporan ditutup${
+                          row.lastLateVoidAt ? ` (terakhir ${formatDateTime(row.lastLateVoidAt)})` : ""
+                        }`}
+                      >
+                        <AlertTriangle className="h-3 w-3" />
+                        {row.lateVoidCount} koreksi susulan
+                      </span>
+                    )}
                   </td>
                   <td className="px-3 py-2 font-semibold">{row.cashier?.name ?? "—"}</td>
                   <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">

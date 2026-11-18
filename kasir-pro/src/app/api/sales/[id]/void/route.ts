@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiBusinessError, handleApiError } from "@/lib/api-response";
 import { prisma } from "@/lib/prisma";
-import { voidSaleSchema } from "@/lib/validators/sale";
+import { voidSaleSchema, voidSaleAfterCloseSchema } from "@/lib/validators/sale";
 import { restoreFIFODeductions } from "@/lib/fifo";
 import { Decimal } from "@prisma/client/runtime/library";
 import { logActivity } from "@/lib/activity-logger";
@@ -13,6 +13,7 @@ import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_MANAGER_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { verifySupervisorPin } from "@/lib/rbac/pin";
+import { evaluateVoidGuard, markShiftLateVoid, resolveShiftCoveringSale } from "@/lib/void-policy";
 
 // POST /api/sales/[id]/void — Void a sale and restore stock
 export async function POST(
@@ -77,6 +78,9 @@ export async function POST(
         items: {
           include: { batchAllocations: true },
         },
+        // Laci tempat transaksi terjadi: dipakai untuk menilai apakah ini
+        // pembatalan susulan (laci sudah ditutup) atau koreksi di depan laci.
+        shift: { select: { id: true, status: true } },
       },
     });
 
@@ -96,6 +100,44 @@ export async function POST(
         },
         { status: 409 }
       );
+    }
+
+    // Laci laporan yang mencakup transaksi ini. Kalau transaksinya belum
+    // menempel ke laci (data lama), laci dicari lewat rentang waktu yang sama
+    // dengan yang dipakai Z-Report — supaya aturan koreksi susulan tidak bisa
+    // dihindari hanya karena kolom lacinya kosong.
+    const saleShift = sale.shift ?? (await resolveShiftCoveringSale(prisma, sale));
+
+    // Pembatalan setelah laci ditutup = koreksi buku: laporan Z yang sudah
+    // dicetak tidak bisa berubah lagi. Hanya boleh lewat supervisor, dan
+    // alasannya wajib menjelaskan (bukan "salah input" satu kata).
+    const supervisorApproved = isSupervisor || Boolean(approvedSupervisorName);
+    const voidGuard = evaluateVoidGuard({
+      shiftStatus: saleShift?.status ?? null,
+      isSupervisor: supervisorApproved,
+    });
+
+    if (!voidGuard.allowed) {
+      return NextResponse.json(
+        { success: false, error: voidGuard.message, code: voidGuard.code },
+        { status: 409 }
+      );
+    }
+
+    if (voidGuard.isLateVoid) {
+      const lateReason = voidSaleAfterCloseSchema.safeParse({ reason });
+      if (!lateReason.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              lateReason.error.issues[0]?.message ??
+              "Alasan pembatalan susulan wajib diisi",
+            code: "VOID_AFTER_CLOSE_REASON_REQUIRED",
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Restore stock in transaction
@@ -191,6 +233,13 @@ export async function POST(
         },
         data: { status: "CANCELED" },
       });
+
+      // Tandai laci yang laporannya sudah ditutup: kertas Z-Report yang sudah
+      // di tangan pemilik tidak berubah, jadi koreksi ini harus terlihat di
+      // daftar riwayat shift, bukan cuma di log aktivitas.
+      if (voidGuard.isLateVoid && saleShift?.id) {
+        await markShiftLateVoid(tx, saleShift.id);
+      }
     });
 
     await logActivity({
@@ -202,10 +251,18 @@ export async function POST(
         invoiceNumber: sale.invoiceNumber,
         reason,
         approvedBy: approvedSupervisorName || `${sessionUser.name} (${sessionUser.role})`,
+        afterShiftClosed: voidGuard.isLateVoid,
+        shiftId: saleShift?.id ?? null,
       },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      afterShiftClosed: voidGuard.isLateVoid,
+      message: voidGuard.isLateVoid
+        ? "Transaksi dibatalkan sebagai koreksi susulan; laci terkait sudah ditandai"
+        : undefined,
+    });
   } catch (error) {
     // Void ganda / transaksi bukan milik tenant = aturan bisnis (4xx), bukan 500
     return handleApiError(error, "POST /api/sales/[id]/void", "Gagal void transaksi");

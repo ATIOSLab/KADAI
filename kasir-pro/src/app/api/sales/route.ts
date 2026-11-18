@@ -32,6 +32,7 @@ import {
   evaluateDiscountPolicy,
 } from "@/lib/discount-policy";
 import { getBusinessDayStart } from "@/lib/business-day";
+import { resolveDefaultOutletId } from "@/lib/outlet-resolution";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { fromZonedTime } from "date-fns-tz";
 import { ZodError } from "zod";
@@ -328,19 +329,10 @@ export async function POST(request: NextRequest) {
       let effectiveOutletId = data.outletId || null;
       let outletPricing: PricingRateSource | null = null;
       if (!effectiveOutletId) {
-        const userRec = await tx.user.findUnique({
-          where: { id: sessionUser.id },
-          select: { outletId: true },
+        effectiveOutletId = await resolveDefaultOutletId(tx, {
+          storeId: scope.storeId,
+          userId: sessionUser.id,
         });
-        if (userRec?.outletId) {
-          effectiveOutletId = userRec.outletId;
-        } else {
-          const mainOutlet = await tx.outlet.findFirst({
-            where: { isMain: true, isActive: true, storeId: scope.storeId },
-            select: { id: true },
-          });
-          effectiveOutletId = mainOutlet?.id || null;
-        }
       }
 
       const store = await tx.store.findUnique({
@@ -579,12 +571,17 @@ export async function POST(request: NextRequest) {
 
       // 4c. Shift kasir: transaksi menempel ke laci yang sedang terbuka supaya
       //     Z-Report bisa dihitung ulang dan dicetak kembali kapan pun.
+      //     Laci lama (dibuka sebelum perbaikan cabang) tidak punya outletId:
+      //     laci tingkat toko itu tetap sah untuk transaksi cabang mana pun,
+      //     jadi jangan sampai transaksi kehilangan lacinya.
       const openShift = await tx.cashShift.findFirst({
           where: {
             storeId: scope.storeId,
             cashierId: sessionUser.id,
             status: "OPEN",
-            ...(effectiveOutletId ? { outletId: effectiveOutletId } : {}),
+            ...(effectiveOutletId
+              ? { OR: [{ outletId: effectiveOutletId }, { outletId: null }] }
+              : {}),
           },
           orderBy: { openedAt: "desc" },
           select: { id: true },

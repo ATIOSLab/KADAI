@@ -70,6 +70,14 @@ export const voidSaleSchema = z.object({
   reason: z.string().min(1, "Alasan void wajib diisi").max(500),
 });
 
+/** Alasan koreksi susulan (laci sudah ditutup) wajib benar-benar menjelaskan. */
+export const voidSaleAfterCloseSchema = voidSaleSchema.extend({
+  reason: z
+    .string()
+    .min(15, "Pembatalan setelah laci ditutup wajib menyertakan alasan yang jelas (min. 15 karakter)")
+    .max(500),
+});
+
 export type CartItemInput = z.infer<typeof cartItemSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type SaleFilterInput = z.infer<typeof saleFilterSchema>;

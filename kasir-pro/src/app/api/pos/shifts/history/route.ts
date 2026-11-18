@@ -108,6 +108,8 @@ export async function GET(request: NextRequest) {
           totalRefunds: true,
           totalDiscount: true,
           shiftNumber: true,
+          lateVoidCount: true,
+          lastLateVoidAt: true,
           cashier: { select: { id: true, name: true } },
         },
       }),
@@ -131,6 +133,8 @@ export async function GET(request: NextRequest) {
       return {
         id: row.id,
         number: row.shiftNumber,
+        lateVoidCount: row.lateVoidCount,
+        lastLateVoidAt: row.lastLateVoidAt ? row.lastLateVoidAt.toISOString() : null,
         cashier: row.cashier,
         openedAt: row.openedAt,
         closedAt: row.closedAt,

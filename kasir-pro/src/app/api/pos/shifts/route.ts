@@ -9,6 +9,7 @@ import { logActivity } from "@/lib/activity-logger";
 import type { CashShift } from "@prisma/client";
 import { buildLiveShiftReport } from "@/lib/shift-service";
 import { varianceStatus } from "@/lib/shift";
+import { resolveDefaultOutletId } from "@/lib/outlet-resolution";
 
 const openShiftSchema = z.object({
   openingCash: z.coerce
@@ -141,7 +142,15 @@ export async function POST(request: NextRequest) {
       data: {
         storeId: scope.storeId,
         cashierId: sessionUser.id,
-        outletId: data.outletId || null,
+        // Laci harus berada di cabang yang sama dengan transaksi. Kalau kasir
+        // tidak menyebut cabang, pakai cabang yang sama dengan resolusi
+        // transaksi (cabang kasir, atau cabang utama toko).
+        outletId:
+          data.outletId ||
+          (await resolveDefaultOutletId(prisma, {
+            storeId: scope.storeId,
+            userId: sessionUser.id,
+          })),
         openingCash: data.openingCash,
         openingNotes: data.notes?.trim() || null,
         status: "OPEN",

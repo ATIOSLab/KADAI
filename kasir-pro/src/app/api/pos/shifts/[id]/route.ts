@@ -48,8 +48,19 @@ export async function GET(
 
     // Shift tertutup disajikan dari snapshot yang disimpan saat penutupan:
     // angka di kertas Z-Report lama harus sama persis dengan yang tampil kini.
+    // Satu-satunya hal yang boleh menempel kemudian adalah penanda koreksi
+    // susulan — kalau tidak, cetak ulang akan terlihat identik dengan kertas
+    // lama padahal sudah ada transaksi yang dibatalkan setelahnya.
     if (shift.status === "CLOSED" && shift.reportJson) {
-      return jsonOk(shift.reportJson as unknown as ShiftReport);
+      const snapshot = shift.reportJson as unknown as ShiftReport;
+      return jsonOk({
+        ...snapshot,
+        shift: {
+          ...snapshot.shift,
+          lateVoidCount: shift.lateVoidCount,
+          lastLateVoidAt: shift.lastLateVoidAt ? shift.lastLateVoidAt.toISOString() : null,
+        },
+      });
     }
 
     return jsonOk(await buildLiveShiftReport(shift));

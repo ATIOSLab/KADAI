@@ -142,6 +142,18 @@ test("laci dibuka di cabang yang sama dengan transaksi", () => {
   assert.match(saleRoute, /OR: \[\{ outletId: effectiveOutletId \}, \{ outletId: null \}\]/);
 });
 
+test("cetak ulang Z-Report tertutup tetap menampilkan koreksi susulan", () => {
+  const route = readFileSync(
+    path.join(repoRoot, "src/app/api/pos/shifts/[id]/route.ts"),
+    "utf8"
+  );
+
+  // Snapshot angka tetap dibekukan, hanya penanda koreksi yang ditempel.
+  assert.match(route, /const snapshot = shift\.reportJson as unknown as ShiftReport/);
+  assert.match(route, /lateVoidCount: shift\.lateVoidCount/);
+  assert.match(route, /lastLateVoidAt: shift\.lastLateVoidAt/);
+});
+
 test("riwayat shift dan cetak ulang Z-Report menampilkan koreksi susulan", () => {
   const history = readFileSync(
     path.join(repoRoot, "src/app/api/pos/shifts/history/route.ts"),

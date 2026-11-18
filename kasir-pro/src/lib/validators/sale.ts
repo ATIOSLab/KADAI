@@ -26,6 +26,20 @@ export const checkoutSchema = z.object({
   customerName: z.string().optional().nullable(),
   customerId: z.string().optional().nullable(),
   discountAmount: z.number().min(0).default(0),
+  /// Alasan diskon manual. Wajib bila ada diskon (item maupun nota) supaya
+  /// harga yang digeser selalu punya jejak; server menolak diskon tanpa alasannya.
+  discountReason: z
+    .string()
+    .trim()
+    .max(200, "Alasan diskon terlalu panjang")
+    .optional()
+    .nullable(),
+  /// PIN supervisor untuk diskon di atas batas kasir (atau pembatalan transaksi).
+  supervisorPin: z
+    .string()
+    .regex(/^\d{6,8}$/, "PIN supervisor harus 6-8 digit angka")
+    .optional()
+    .nullable(),
   /// Uang tunai yang diserahkan tamu. Diisi kasir untuk pembayaran CASH;
   /// server menolak nilai yang kurang dari total tagihan.
   paidAmount: z

@@ -229,7 +229,13 @@ test("toko, meja, shift, dan laundry selalu ter-scope ke tenant pemanggil", () =
   assert.match(tables, /"Cabang tidak ditemukan pada tenant Anda"/);
 
   const shift = route("pos/shift-summary");
-  assert.match(shift, /outlet: \{ storeId: scope\.storeId \}/);
+  assert.match(shift, /resolveTenantScope/);
+  assert.match(shift, /storeId: scope\.storeId/);
+  assert.doesNotMatch(
+    shift,
+    /cashShift\.findMany\(\{\s*where: \{\s*status/,
+    "rekap shift tidak boleh membaca laci lintas tenant"
+  );
 
   const laundry = route("laundry/jobs");
   assert.match(laundry, /outlet: \{ storeId: scope\.storeId \}/);

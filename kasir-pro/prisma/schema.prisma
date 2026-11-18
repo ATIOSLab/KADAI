@@ -40,9 +40,9 @@ enum SubscriptionTier {
 
 enum ProductType {
   FINISHED_GOOD // Barang Jadi (Ritel langsung jual)
-  RAW_MATERIAL  // Bahan Baku Mentah (Bahan resep F&B)
-  MANUFACTURED  // Produk Jadi Ber-Resep / BOM (Menu Masakan, Kopi Racik)
-  SERVICE       // Jasa / Layanan non-fisik
+  RAW_MATERIAL // Bahan Baku Mentah (Bahan resep F&B)
+  MANUFACTURED // Produk Jadi Ber-Resep / BOM (Menu Masakan, Kopi Racik)
+  SERVICE // Jasa / Layanan non-fisik
 }
 
 enum StationType {
@@ -62,19 +62,19 @@ enum TaxType {
 
 enum TaxStatus {
   NON_PKP // Pengusaha Non-PKP (Bebas PPN / Tanpa Pungutan Pajak)
-  PKP     // Pengusaha Kena Pajak (Wajib Pungut Pajak / PPN)
+  PKP // Pengusaha Kena Pajak (Wajib Pungut Pajak / PPN)
 }
 
 enum LegalEntityType {
-  PERORANGAN    // Usaha Perorangan / Toko Kelontong / Warung
+  PERORANGAN // Usaha Perorangan / Toko Kelontong / Warung
   PT_PERORANGAN // Perseroan Perorangan (UMK - PP No. 8/2021)
-  CV            // Commanditaire Vennootschap (Persekutuan Komanditer)
-  PT            // Perseroan Terbatas
-  UD            // Usaha Dagang
-  KOPERASI      // Koperasi Indonesia
-  FIRMA         // Firma
-  YAYASAN       // Yayasan / Lembaga Non-Profit
-  LAINNYA       // Bentuk Usaha Lainnya
+  CV // Commanditaire Vennootschap (Persekutuan Komanditer)
+  PT // Perseroan Terbatas
+  UD // Usaha Dagang
+  KOPERASI // Koperasi Indonesia
+  FIRMA // Firma
+  YAYASAN // Yayasan / Lembaga Non-Profit
+  LAINNYA // Bentuk Usaha Lainnya
 }
 
 enum OrderType {
@@ -147,6 +147,14 @@ enum KitchenWorkflow {
   HYBRID
 }
 
+/// Siklus shift kasir (buka laci -> tutup laci). Tanpa baris ini, Z-Report
+/// hanya hidup sebagai catatan aktivitas: tidak bisa dicetak ulang, tidak bisa
+/// diaudit, dan selisih kas tidak pernah tersimpan.
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
+
 enum TransferStatus {
   DRAFT
   IN_TRANSIT
@@ -159,7 +167,10 @@ enum ActionType {
   SALE_CREATED
   SALE_VOIDED
   // Shift / cash drawer
+  SHIFT_OPENED
   SHIFT_CLOSED
+  /// Diskon manual diberikan pada sebuah transaksi (siapa, berapa, alasannya).
+  SALE_DISCOUNTED
   // Product actions
   PRODUCT_CREATED
   PRODUCT_UPDATED
@@ -244,7 +255,7 @@ model User {
   name          String
   email         String    @unique
   passwordHash  String
-  supervisorPin String?   // Hash 6-digit PIN untuk otorisasi instan supervisor di POS
+  supervisorPin String? // Hash 6-digit PIN untuk otorisasi instan supervisor di POS
   role          UserRole  @default(CASHIER)
   avatar        String?
   isActive      Boolean   @default(true)
@@ -259,6 +270,7 @@ model User {
   outletId         String?
   outlet           Outlet?           @relation(fields: [outletId], references: [id])
   sales            Sale[]
+  cashShifts       CashShift[]       @relation("CashierShifts")
   activityLogs     ActivityLog[]
   stockAdjustments StockAdjustment[]
   financeEntries   FinanceEntry[]
@@ -269,35 +281,39 @@ model User {
 }
 
 model Store {
-  id                String           @id @default(cuid())
-  name              String
-  businessType      BusinessType     @default(FNB_CAFE)
-  tier              SubscriptionTier @default(PRO_BUSINESS)
-  costingMethod     CostingMethod    @default(FIFO)
-  kitchenWorkflow   KitchenWorkflow  @default(KITCHEN_DISPATCH)
-  address           String?
-  phone             String?
-  email             String?
-  logo              String?
-  isDemo            Boolean         @default(false) // Penanda tenant demonstrasi (disembunyikan dari modul platform)
-  
-  // Status Perpajakan & Legalitas Badan Usaha RI
-  taxStatus         TaxStatus        @default(NON_PKP)
-  legalEntityType   LegalEntityType  @default(PERORANGAN)
-  legalName         String?          // Nama resmi badan usaha terdaftar (PT / CV / Koperasi)
-  nib               String?          // Nomor Induk Berusaha (13 digit OSS-RBA)
-  npwp              String?          // NPWP Badan / Usaha (15 / 16 digit NIK-NPWP)
-  ownerNik          String?          // NIK KTP Pemilik (16 digit) jika usaha perorangan
+  id              String           @id @default(cuid())
+  name            String
+  businessType    BusinessType     @default(FNB_CAFE)
+  tier            SubscriptionTier @default(PRO_BUSINESS)
+  costingMethod   CostingMethod    @default(FIFO)
+  kitchenWorkflow KitchenWorkflow  @default(KITCHEN_DISPATCH)
+  address         String?
+  phone           String?
+  email           String?
+  logo            String?
+  isDemo          Boolean          @default(false) // Penanda tenant demonstrasi (disembunyikan dari modul platform)
 
-  taxType           TaxType          @default(NONE)
-  taxRate           Decimal          @default(0) @db.Decimal(5, 2)
-  taxInclusive      Boolean          @default(false)
-  serviceChargeRate Decimal          @default(0) @db.Decimal(5, 2)
-  enableRounding    Boolean          @default(true)
-  defaultMarkup     Decimal          @default(30) @db.Decimal(5, 2)
-  currency          String           @default("IDR")
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  // Status Perpajakan & Legalitas Badan Usaha RI
+  taxStatus       TaxStatus       @default(NON_PKP)
+  legalEntityType LegalEntityType @default(PERORANGAN)
+  legalName       String? // Nama resmi badan usaha terdaftar (PT / CV / Koperasi)
+  nib             String? // Nomor Induk Berusaha (13 digit OSS-RBA)
+  npwp            String? // NPWP Badan / Usaha (15 / 16 digit NIK-NPWP)
+  ownerNik        String? // NIK KTP Pemilik (16 digit) jika usaha perorangan
+
+  taxType                   TaxType  @default(NONE)
+  taxRate                   Decimal  @default(0) @db.Decimal(5, 2)
+  taxInclusive              Boolean  @default(false)
+  serviceChargeRate         Decimal  @default(0) @db.Decimal(5, 2)
+  enableRounding            Boolean  @default(true)
+  defaultMarkup             Decimal  @default(30) @db.Decimal(5, 2)
+  /// Batas diskon manual yang boleh diberikan kasir tanpa PIN supervisor,
+  /// dalam persen dari subtotal. 0 = kasir tidak boleh memberi diskon sama
+  /// sekali. Manager/Admin tidak dibatasi angka ini.
+  maxCashierDiscountPercent Decimal  @default(10) @db.Decimal(5, 2)
+  currency                  String   @default("IDR")
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   // Relations
   subscriptions     StoreSubscription[]
@@ -313,37 +329,38 @@ model Store {
   financeEntries    FinanceEntry[]
   stockAdjustments  StockAdjustment[]
   sales             Sale[]
+  cashShifts        CashShift[]
 
   @@map("stores")
 }
 
 model BotSettings {
-  id               String             @id @default(cuid())
-  enabled          Boolean            @default(false)
-  timezone         String             @default("Asia/Jakarta")
-  closingTimeLocal String             @default("22:00")
-  summaryEnabled   Boolean            @default(false)
-  openaiModel      String             @default("gpt-5.5")
-  openaiApiKeyEncrypted String?
+  id                        String             @id @default(cuid())
+  enabled                   Boolean            @default(false)
+  timezone                  String             @default("Asia/Jakarta")
+  closingTimeLocal          String             @default("22:00")
+  summaryEnabled            Boolean            @default(false)
+  openaiModel               String             @default("gpt-5.5")
+  openaiApiKeyEncrypted     String?
   telegramBotTokenEncrypted String?
-  businessDayMode  BotBusinessDayMode @default(CLOSING_CUTOFF)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  businessDayMode           BotBusinessDayMode @default(CLOSING_CUTOFF)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
 
   @@map("bot_settings")
 }
 
 model TelegramChatBinding {
-  id                String   @id @default(cuid())
-  telegramChatId    String   @unique
+  id                String    @id @default(cuid())
+  telegramChatId    String    @unique
   chatType          String
   title             String?
   username          String?
-  isAuthorized      Boolean  @default(false)
-  canReceiveSummary Boolean  @default(false)
+  isAuthorized      Boolean   @default(false)
+  canReceiveSummary Boolean   @default(false)
   lastSeenAt        DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@index([isAuthorized])
   @@index([canReceiveSummary])
@@ -370,15 +387,15 @@ model BotJob {
 }
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
   color       String?
   icon        String?
-  isActive    Boolean   @default(true)
-  isDemo      Boolean   @default(false) // Kategori dari demo-seeder
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  isActive    Boolean  @default(true)
+  isDemo      Boolean  @default(false) // Kategori dari demo-seeder
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Tenant
   storeId String?
@@ -411,14 +428,14 @@ model Unit {
 }
 
 model Supplier {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   phone     String?
   email     String?
   address   String?
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Tenant
   storeId String?
@@ -496,24 +513,24 @@ model Outlet {
 }
 
 model Product {
-  id                String       @id @default(cuid())
+  id                String      @id @default(cuid())
   name              String
   sku               String
   barcode           String?
   description       String?
-  productType       ProductType  @default(FINISHED_GOOD)
-  station           StationType  @default(GENERAL)
-  unit              String       @default("pcs")
+  productType       ProductType @default(FINISHED_GOOD)
+  station           StationType @default(GENERAL)
+  unit              String      @default("pcs")
   image             String?
-  lowStockThreshold Int          @default(10)
-  isActive          Boolean      @default(true)
-  isDemo            Boolean      @default(false) // Produk dari demo-seeder
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  lowStockThreshold Int         @default(10)
+  isActive          Boolean     @default(true)
+  isDemo            Boolean     @default(false) // Produk dari demo-seeder
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // Tenant
-  storeId             String?
-  store               Store?              @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
 
   // Relations
   categoryId          String
@@ -568,11 +585,11 @@ model ProductBatch {
 
   // Relations
   productId       String
-  product         Product        @relation(fields: [productId], references: [id])
+  product         Product         @relation(fields: [productId], references: [id])
   outletId        String?
-  outlet          Outlet?        @relation(fields: [outletId], references: [id])
+  outlet          Outlet?         @relation(fields: [outletId], references: [id])
   supplierId      String?
-  supplier        Supplier?      @relation(fields: [supplierId], references: [id])
+  supplier        Supplier?       @relation(fields: [supplierId], references: [id])
   saleItemBatches SaleItemBatch[]
   financeEntries  FinanceEntry[]
 
@@ -598,7 +615,7 @@ model RestaurantTable {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  sales      Sale[]
+  sales Sale[]
 
   @@map("restaurant_tables")
 }
@@ -608,44 +625,51 @@ model RestaurantTable {
 // ============================================================
 
 model Sale {
-  id             String           @id @default(cuid())
-  invoiceNumber  String
+  id                 String           @id @default(cuid())
+  invoiceNumber      String
   /// Kunci idempotensi checkout: satu kunci = satu transaksi. Disimpan pada
   /// barisnya (bukan di memori proses) supaya pengiriman ulang setelah proses
   /// hidup ulang atau jawaban hilang tetap mengembalikan transaksi yang sama.
-  idempotencyKey String?          @unique
-  orderType      OrderType        @default(DINE_IN)
-  outletId       String?
-  outlet         Outlet?          @relation(fields: [outletId], references: [id])
-  storeId        String?
-  store          Store?           @relation(fields: [storeId], references: [id], onDelete: SetNull)
-  tableId        String?
-  table          RestaurantTable? @relation(fields: [tableId], references: [id])
-  subtotal       Decimal          @db.Decimal(15, 2)
-  discountAmount Decimal          @default(0) @db.Decimal(15, 2)
-  serviceCharge  Decimal          @default(0) @db.Decimal(15, 2)
-  taxAmount      Decimal          @default(0) @db.Decimal(15, 2)
-  roundingAmount Decimal          @default(0) @db.Decimal(8, 2)
-  totalAmount    Decimal          @db.Decimal(15, 2)
+  idempotencyKey     String?          @unique
+  orderType          OrderType        @default(DINE_IN)
+  outletId           String?
+  outlet             Outlet?          @relation(fields: [outletId], references: [id])
+  storeId            String?
+  store              Store?           @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  tableId            String?
+  table              RestaurantTable? @relation(fields: [tableId], references: [id])
+  subtotal           Decimal          @db.Decimal(15, 2)
+  discountAmount     Decimal          @default(0) @db.Decimal(15, 2)
+  serviceCharge      Decimal          @default(0) @db.Decimal(15, 2)
+  taxAmount          Decimal          @default(0) @db.Decimal(15, 2)
+  roundingAmount     Decimal          @default(0) @db.Decimal(8, 2)
+  totalAmount        Decimal          @db.Decimal(15, 2)
   /// Uang tunai yang diserahkan tamu dan kembaliannya, disimpan pada barisnya.
   /// Sebelumnya angka ini hanya hidup di layar kasir: struk cetak ulang dan
   /// rekonsiliasi kas tidak bisa membuktikan berapa uang yang benar-benar
   /// dipegang kasir.
-  paidAmount     Decimal?         @db.Decimal(15, 2)
-  changeAmount   Decimal?         @db.Decimal(15, 2)
-  totalCost      Decimal          @db.Decimal(15, 2)
-  grossProfit    Decimal          @db.Decimal(15, 2)
-  paymentType    PaymentType
-  paymentRef     String?
-  customerId     String?
-  customer       Customer?        @relation(fields: [customerId], references: [id])
-  customerName   String?
-  notes          String?
-  isVoided       Boolean          @default(false)
-  voidedAt       DateTime?
-  voidReason     String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  paidAmount         Decimal?         @db.Decimal(15, 2)
+  changeAmount       Decimal?         @db.Decimal(15, 2)
+  totalCost          Decimal          @db.Decimal(15, 2)
+  grossProfit        Decimal          @db.Decimal(15, 2)
+  paymentType        PaymentType
+  paymentRef         String?
+  customerId         String?
+  customer           Customer?        @relation(fields: [customerId], references: [id])
+  customerName       String?
+  notes              String?
+  isVoided           Boolean          @default(false)
+  voidedAt           DateTime?
+  voidReason         String?
+  /// Alasan diskon manual (wajib bila ada diskon) dan nama supervisor yang
+  /// menyetujui bila diskon melampaui batas kasir.
+  discountReason     String?
+  discountApprovedBy String?
+  /// Shift kasir tempat transaksi ini terjadi (null untuk transaksi lama).
+  shiftId            String?
+  shift              CashShift?       @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   // Relations
   cashierId      String
@@ -659,20 +683,21 @@ model Sale {
   @@index([cashierId])
   @@index([outletId])
   @@index([storeId])
+  @@index([shiftId])
   @@index([createdAt])
   @@index([invoiceNumber])
   @@map("sales")
 }
 
 model SaleItem {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   quantity       Int
-  unitPrice      Decimal   @db.Decimal(15, 2)
-  totalPrice     Decimal   @db.Decimal(15, 2)
-  totalCost      Decimal   @db.Decimal(15, 2)
-  discountAmount Decimal   @default(0) @db.Decimal(15, 2)
+  unitPrice      Decimal  @db.Decimal(15, 2)
+  totalPrice     Decimal  @db.Decimal(15, 2)
+  totalCost      Decimal  @db.Decimal(15, 2)
+  discountAmount Decimal  @default(0) @db.Decimal(15, 2)
   notes          String?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime @default(now())
 
   // Relations
   saleId           String
@@ -705,6 +730,46 @@ model SaleItemBatch {
 }
 
 // ============================================================
+// SHIFT KASIR (CASH DRAWER)
+// ============================================================
+
+/// Satu baris = satu sesi laci kasir: modal awal saat buka, angka penjualan
+/// yang menempel, dan hasil hitung fisik saat tutup. `reportJson` menyimpan
+/// snapshot Z-Report supaya struk bisa dicetak ulang persis seperti saat tutup.
+model CashShift {
+  id             String      @id @default(cuid())
+  status         ShiftStatus @default(OPEN)
+  /// Cabang tempat laci ini dipakai; null = kasir tanpa cabang (tenant tunggal).
+  outletId       String?
+  openingCash    Decimal     @default(0) @db.Decimal(15, 2)
+  closingCash    Decimal?    @db.Decimal(15, 2)
+  expectedCash   Decimal?    @db.Decimal(15, 2)
+  variance       Decimal?    @db.Decimal(15, 2)
+  totalSales     Int         @default(0)
+  totalVoided    Int         @default(0)
+  totalRevenue   Decimal     @default(0) @db.Decimal(15, 2)
+  totalCashSales Decimal     @default(0) @db.Decimal(15, 2)
+  totalRefunds   Decimal     @default(0) @db.Decimal(15, 2)
+  totalTax       Decimal     @default(0) @db.Decimal(15, 2)
+  totalDiscount  Decimal     @default(0) @db.Decimal(15, 2)
+  openingNotes   String?
+  closingNotes   String?
+  reportJson     Json?
+  openedAt       DateTime    @default(now())
+  closedAt       DateTime?
+
+  storeId   String
+  store     Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  cashierId String
+  cashier   User   @relation("CashierShifts", fields: [cashierId], references: [id])
+  sales     Sale[]
+
+  @@index([storeId, status])
+  @@index([cashierId, openedAt])
+  @@map("cash_shifts")
+}
+
+// ============================================================
 // KITCHEN DISPLAY SYSTEM (KDS)
 // ============================================================
 
@@ -732,23 +797,23 @@ model KDSOrder {
 // ============================================================
 
 model LaundryJobOrder {
-  id              String             @id @default(cuid())
-  jobCode         String             @unique // Nomor Resi Pelacakan (e.g. LND-20261108-0042)
-  trackingToken   String             @unique @default(cuid()) // Token aman untuk scan QR link /lacak/[token]
-  serviceType     LaundryServiceType @default(KILOAN)
-  status          LaundryStatus      @default(RECEIVED)
-  paymentStatus   JobPaymentStatus   @default(UNPAID)
+  id            String             @id @default(cuid())
+  jobCode       String             @unique // Nomor Resi Pelacakan (e.g. LND-20261108-0042)
+  trackingToken String             @unique @default(cuid()) // Token aman untuk scan QR link /lacak/[token]
+  serviceType   LaundryServiceType @default(KILOAN)
+  status        LaundryStatus      @default(RECEIVED)
+  paymentStatus JobPaymentStatus   @default(UNPAID)
 
   // Rincian Bobot & Komponen Layanan
-  weightKg        Decimal?           @db.Decimal(6, 2) // Berat timbangan desimal (e.g. 4.85 kg)
-  itemCount       Int?               // Jumlah potong pakaian fisik
-  fragrance       String?            // Pilihan aroma parfum (e.g. Lavender, Sakura, Akasia)
-  rackLocation    String?            // Lokasi rak / keranjang siap ambil (e.g. Rak B-03)
-  specialNotes    String?            // Catatan noda / instruksi khusus pelanggan
+  weightKg     Decimal? @db.Decimal(6, 2) // Berat timbangan desimal (e.g. 4.85 kg)
+  itemCount    Int? // Jumlah potong pakaian fisik
+  fragrance    String? // Pilihan aroma parfum (e.g. Lavender, Sakura, Akasia)
+  rackLocation String? // Lokasi rak / keranjang siap ambil (e.g. Rak B-03)
+  specialNotes String? // Catatan noda / instruksi khusus pelanggan
 
   // Estimasi & Log Pengerjaan
-  estimatedDoneAt DateTime           // Target waktu siap ambil
-  receivedAt      DateTime           @default(now())
+  estimatedDoneAt DateTime // Target waktu siap ambil
+  receivedAt      DateTime  @default(now())
   washedAt        DateTime?
   driedAt         DateTime?
   ironedAt        DateTime?
@@ -756,30 +821,30 @@ model LaundryJobOrder {
   pickedUpAt      DateTime?
 
   // Financial Breakdown (DP & Pelunasan)
-  totalAmount     Decimal            @db.Decimal(15, 2)
-  downPayment     Decimal            @default(0) @db.Decimal(15, 2)
-  remainingAmount Decimal            @default(0) @db.Decimal(15, 2)
-  pickupPaymentMethod PaymentType?   // Metode bayar pelunasan saat ambil barang
+  totalAmount         Decimal      @db.Decimal(15, 2)
+  downPayment         Decimal      @default(0) @db.Decimal(15, 2)
+  remainingAmount     Decimal      @default(0) @db.Decimal(15, 2)
+  pickupPaymentMethod PaymentType? // Metode bayar pelunasan saat ambil barang
   pickupPaymentRef    String?
 
   // Notifikasi WhatsApp
-  whatsappNotified Boolean           @default(false)
+  whatsappNotified Boolean   @default(false)
   notifiedAt       DateTime?
 
   // Relations
-  saleId          String             @unique
-  sale            Sale               @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  outletId        String?
-  outlet          Outlet?            @relation(fields: [outletId], references: [id])
-  customerId      String?
-  customer        Customer?          @relation(fields: [customerId], references: [id])
-  customerName    String
-  customerPhone   String?
-  handledById     String
-  handledBy       User               @relation(fields: [handledById], references: [id])
+  saleId        String    @unique
+  sale          Sale      @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  outletId      String?
+  outlet        Outlet?   @relation(fields: [outletId], references: [id])
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  customerName  String
+  customerPhone String?
+  handledById   String
+  handledBy     User      @relation(fields: [handledById], references: [id])
 
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([paymentStatus])
@@ -847,14 +912,14 @@ model ActivityLog {
 }
 
 model FinanceCategory {
-  id         String           @id @default(cuid())
-  name       String
-  direction  FinanceDirection
-  isSystem   Boolean          @default(false)
-  systemKey  String?          @unique // kategori sistem platform (SALE_INCOME dll) — unik global, dipakai semua tenant
-  isActive   Boolean          @default(true)
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  id        String           @id @default(cuid())
+  name      String
+  direction FinanceDirection
+  isSystem  Boolean          @default(false)
+  systemKey String?          @unique // kategori sistem platform (SALE_INCOME dll) — unik global, dipakai semua tenant
+  isActive  Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   // Tenant (NULL = kategori sistem bawaan platform, dipakai bersama)
   storeId String?
@@ -869,29 +934,29 @@ model FinanceCategory {
 }
 
 model FinanceEntry {
-  id              String           @id @default(cuid())
-  amount          Decimal          @db.Decimal(15, 2)
-  direction       FinanceDirection
-  source          FinanceSource
-  title           String
-  notes           String?
-  entryDate       DateTime
-  isArchived      Boolean          @default(false)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id         String           @id @default(cuid())
+  amount     Decimal          @db.Decimal(15, 2)
+  direction  FinanceDirection
+  source     FinanceSource
+  title      String
+  notes      String?
+  entryDate  DateTime
+  isArchived Boolean          @default(false)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 
   // Tenant
-  storeId         String?
-  store           Store?           @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
 
   categoryId      String
-  category        FinanceCategory  @relation(fields: [categoryId], references: [id])
+  category        FinanceCategory @relation(fields: [categoryId], references: [id])
   createdByUserId String?
-  createdByUser   User?            @relation(fields: [createdByUserId], references: [id])
+  createdByUser   User?           @relation(fields: [createdByUserId], references: [id])
   saleId          String?
-  sale            Sale?            @relation(fields: [saleId], references: [id])
+  sale            Sale?           @relation(fields: [saleId], references: [id])
   productBatchId  String?
-  productBatch    ProductBatch?    @relation(fields: [productBatchId], references: [id])
+  productBatch    ProductBatch?   @relation(fields: [productBatchId], references: [id])
 
   @@index([entryDate])
   @@index([direction, entryDate])
@@ -910,22 +975,22 @@ model FinanceEntry {
 // ============================================================
 
 model StockTransfer {
-  id                  String              @id @default(cuid())
-  transferNumber      String              @unique
+  id                  String         @id @default(cuid())
+  transferNumber      String         @unique
   sourceOutletId      String
-  sourceOutlet        Outlet              @relation("SourceOutlet", fields: [sourceOutletId], references: [id])
+  sourceOutlet        Outlet         @relation("SourceOutlet", fields: [sourceOutletId], references: [id])
   destinationOutletId String
-  destinationOutlet   Outlet              @relation("DestinationOutlet", fields: [destinationOutletId], references: [id])
-  status              TransferStatus      @default(IN_TRANSIT)
+  destinationOutlet   Outlet         @relation("DestinationOutlet", fields: [destinationOutletId], references: [id])
+  status              TransferStatus @default(IN_TRANSIT)
   notes               String?
   createdById         String?
   receivedById        String?
-  shippedAt           DateTime?           @default(now())
+  shippedAt           DateTime?      @default(now())
   receivedAt          DateTime?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 
-  items               StockTransferItem[]
+  items StockTransferItem[]
 
   @@index([sourceOutletId])
   @@index([destinationOutletId])
@@ -961,30 +1026,30 @@ enum DemoRequestStatus {
 }
 
 model DemoRequest {
-  id              String            @id @default(cuid())
-  fullName        String
-  businessName    String
-  businessType    String
-  phone           String
-  email           String?
-  outletCount     Int               @default(1)
-  notes           String?
-  accessCode      String            @unique
-  referralCode    String?
-  status          DemoRequestStatus @default(PENDING)
-  approvedAt      DateTime?
-  approvedBy      String?
+  id           String            @id @default(cuid())
+  fullName     String
+  businessName String
+  businessType String
+  phone        String
+  email        String?
+  outletCount  Int               @default(1)
+  notes        String?
+  accessCode   String            @unique
+  referralCode String?
+  status       DemoRequestStatus @default(PENDING)
+  approvedAt   DateTime?
+  approvedBy   String?
 
   // Kepatuhan Pajak & Legalitas UMKM RI
-  taxStatus       String?           // NON_PKP | PKP
-  legalEntityType String?           // PERORANGAN | PT_PERORANGAN | CV | PT | UD | KOPERASI | dll
+  taxStatus       String? // NON_PKP | PKP
+  legalEntityType String? // PERORANGAN | PT_PERORANGAN | CV | PT | UD | KOPERASI | dll
   legalName       String?
-  nib             String?           // 13 digit OSS
+  nib             String? // 13 digit OSS
   npwp            String?
-  ownerNik        String?           // NIK KTP jika perorangan
+  ownerNik        String? // NIK KTP jika perorangan
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([phone])
@@ -1016,22 +1081,22 @@ enum PayoutStatus {
 }
 
 model ReferralPartner {
-  id                String          @id @default(cuid())
+  id                String        @id @default(cuid())
   fullName          String
   phone             String
   email             String
   bankName          String?
   bankAccountNumber String?
   bankAccountName   String?
-  referralCode      String          @unique
-  commissionRate    Decimal         @default(20.00) @db.Decimal(5, 2)
-  status            PartnerStatus   @default(ACTIVE)
+  referralCode      String        @unique
+  commissionRate    Decimal       @default(20.00) @db.Decimal(5, 2)
+  status            PartnerStatus @default(ACTIVE)
   notes             String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  leads             ReferralLead[]
-  payouts           ReferralPayout[]
+  leads   ReferralLead[]
+  payouts ReferralPayout[]
 
   @@index([phone])
   @@index([referralCode])
@@ -1054,17 +1119,17 @@ model ReferralLead {
   linkedStoreId      String?
 
   // Kepatuhan Pajak & Legalitas UMKM RI
-  taxStatus          String?
-  legalEntityType    String?
-  legalName          String?
-  nib                String?
-  npwp               String?
-  ownerNik           String?
+  taxStatus       String?
+  legalEntityType String?
+  legalName       String?
+  nib             String?
+  npwp            String?
+  ownerNik        String?
 
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  invoices           PaymentInvoice[]
+  invoices PaymentInvoice[]
 
   @@index([partnerId])
   @@index([phone])
@@ -1134,7 +1199,7 @@ model StoreSubscription {
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 
-  invoices  PaymentInvoice[]
+  invoices PaymentInvoice[]
 
   @@index([storeId])
   @@index([status])
@@ -1179,17 +1244,17 @@ model PaymentInvoice {
 // ============================================================
 
 model SubscriptionPlan {
-  id          String           @id @default(cuid())
-  code        String           @unique
+  id          String      @id @default(cuid())
+  code        String      @unique
   name        String
   description String?
   badge       String?
-  features    Json             @default("[]")
-  limits      Json             @default("{}")
-  isActive    Boolean          @default(true)
-  sortOrder   Int              @default(0)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  features    Json        @default("[]")
+  limits      Json        @default("{}")
+  isActive    Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   prices      PlanPrice[]
 
   @@index([isActive])
@@ -1198,16 +1263,15 @@ model SubscriptionPlan {
 }
 
 model PlanPrice {
-  id        String      @id @default(cuid())
+  id        String           @id @default(cuid())
   planId    String
-  cycle     BillingCycle @default(MONTHLY)
-  amount    Decimal     @db.Decimal(15, 2)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  cycle     BillingCycle     @default(MONTHLY)
+  amount    Decimal          @db.Decimal(15, 2)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   plan      SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@unique([planId, cycle])
   @@index([planId])
   @@map("plan_prices")
 }
-

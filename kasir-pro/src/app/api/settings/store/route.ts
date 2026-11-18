@@ -34,6 +34,13 @@ const storeUpdateSchema = z.object({
   taxInclusive: z.boolean().optional(),
   serviceChargeRate: z.coerce.number().min(0).max(100).optional(),
   enableRounding: z.boolean().optional(),
+  /// Batas diskon manual untuk kasir (persen dari subtotal). Di atas angka ini
+  /// kasir wajib meminta PIN supervisor di layar pembayaran.
+  maxCashierDiscountPercent: z.coerce
+    .number("Batas diskon kasir harus berupa angka")
+    .min(0, "Batas diskon tidak boleh negatif")
+    .max(100, "Batas diskon maksimal 100%")
+    .optional(),
   costingMethod: z.enum(["FIFO", "FEFO", "AVERAGE"]).optional(),
 });
 
@@ -115,6 +122,9 @@ export async function PUT(request: NextRequest) {
       ...(validated.taxInclusive !== undefined && { taxInclusive: validated.taxInclusive }),
       ...(validated.serviceChargeRate !== undefined && { serviceChargeRate: validated.serviceChargeRate }),
       ...(validated.enableRounding !== undefined && { enableRounding: validated.enableRounding }),
+      ...(validated.maxCashierDiscountPercent !== undefined && {
+        maxCashierDiscountPercent: validated.maxCashierDiscountPercent,
+      }),
       ...(validated.costingMethod !== undefined && { costingMethod: validated.costingMethod }),
     };
 

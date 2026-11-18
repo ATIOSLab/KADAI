@@ -16,7 +16,7 @@ test("kunci idempotensi tersimpan permanen pada baris penjualan", () => {
   // mengirim ulang pembayaran sesudah proses server hidup ulang - justru keadaan
   // yang paling mungkin terjadi saat jawaban hilang di jalan - akan membuat
   // transaksi kedua atas pembayaran yang sama.
-  assert.match(schema, /idempotencyKey String\?\s+@unique/);
+  assert.match(schema, /idempotencyKey\s+String\?\s+@unique/);
   assert.doesNotMatch(route, /salesIdempotencyMap/);
   assert.match(migration, /ALTER TABLE "sales" ADD COLUMN "idempotencyKey" TEXT;/);
   assert.match(

@@ -68,6 +68,7 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/inventory/transfers", roles: INVENTORY_ROLES },
   { path: "/inventory", roles: INVENTORY_ROLES },
   { path: "/sales", roles: ["ADMIN", "MANAGER", "CASHIER", "ACCOUNTANT"] },
+  { path: "/shifts", roles: ["ADMIN", "MANAGER", "CASHIER"] },
   { path: "/pos", roles: POS_ROLES },
   { path: "/tables", roles: ADMIN_MANAGER_ROLES },
   { path: "/kds", roles: KDS_ROLES },

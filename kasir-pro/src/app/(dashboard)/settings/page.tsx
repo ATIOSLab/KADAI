@@ -48,7 +48,8 @@ interface StoreData {
   taxType: string;
   taxRate: number;
   taxInclusive: boolean;
-  serviceChargeRate: number;
+    serviceChargeRate: number;
+    maxCashierDiscountPercent: number;
   enableRounding: boolean;
   costingMethod: "FIFO" | "FEFO" | "AVERAGE";
 }
@@ -81,8 +82,9 @@ export default function SettingsPage() {
     taxType: "NONE",
     taxRate: 0,
     taxInclusive: false,
-    serviceChargeRate: 0,
-    enableRounding: true,
+        serviceChargeRate: 0,
+        maxCashierDiscountPercent: 10,
+        enableRounding: true,
     costingMethod: "FIFO" as "FIFO" | "FEFO" | "AVERAGE",
   });
 
@@ -135,7 +137,8 @@ export default function SettingsPage() {
         taxRate: res.data.taxRate ?? 0,
         taxInclusive: Boolean(res.data.taxInclusive),
         serviceChargeRate: res.data.serviceChargeRate ?? 0,
-        enableRounding: Boolean(res.data.enableRounding),
+                maxCashierDiscountPercent: Number(res.data.maxCashierDiscountPercent ?? 10),
+                enableRounding: Boolean(res.data.enableRounding),
         costingMethod: (res.data.costingMethod as any) || "FIFO",
       });
     } catch {
@@ -190,7 +193,8 @@ export default function SettingsPage() {
           taxRate: storeForm.taxRate,
           taxInclusive: storeForm.taxInclusive,
           serviceChargeRate: storeForm.serviceChargeRate,
-          enableRounding: storeForm.enableRounding,
+                    maxCashierDiscountPercent: storeForm.maxCashierDiscountPercent,
+                    enableRounding: storeForm.enableRounding,
           costingMethod: storeForm.costingMethod,
         },
       });
@@ -564,6 +568,26 @@ export default function SettingsPage() {
                       })
                     }
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>Batas Diskon Kasir (%)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={storeForm.maxCashierDiscountPercent}
+                    onChange={(e: any) =>
+                      setStoreForm({
+                        ...storeForm,
+                        maxCashierDiscountPercent: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Diskon manual di atas angka ini memerlukan PIN Supervisor. Manager & Admin
+                    tidak dibatasi.
+                  </p>
                 </div>
                 <div className="flex flex-col justify-center space-y-2 pt-2">
                   <label className="flex items-center gap-2 cursor-pointer text-xs font-bold">

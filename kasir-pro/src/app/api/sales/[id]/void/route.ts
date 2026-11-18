@@ -55,7 +55,7 @@ export async function POST(
         request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         request.headers.get("x-real-ip") ||
         "unknown";
-      const pinCheck = await verifySupervisorPin(pin, clientIp);
+      const pinCheck = await verifySupervisorPin(pin, clientIp, scope.storeId);
       if (!pinCheck.valid) {
         return NextResponse.json(
           { error: pinCheck.error || "PIN Supervisor tidak valid" },

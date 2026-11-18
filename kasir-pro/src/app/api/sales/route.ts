@@ -25,6 +25,12 @@ import { Decimal } from "@prisma/client/runtime/library";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
+import { verifySupervisorPin } from "@/lib/rbac/pin";
+import {
+  DEFAULT_MAX_CASHIER_DISCOUNT_PERCENT,
+  discountApprovalMessage,
+  evaluateDiscountPolicy,
+} from "@/lib/discount-policy";
 import { getBusinessDayStart } from "@/lib/business-day";
 import { resolveBusinessTimezone } from "@/lib/business-timezone";
 import { fromZonedTime } from "date-fns-tz";
@@ -283,9 +289,30 @@ export async function POST(request: NextRequest) {
     }
 
     if (data.items.length > 100 || data.items.some((item) => item.quantity > 10000 ||
-        item.discountAmount > 1e12) || data.discountAmount > 1e12) {
-      return NextResponse.json({ error: "Batas transaksi terlampaui" }, { status: 400 });
-    }
+            item.discountAmount > 1e12) || data.discountAmount > 1e12) {
+          return NextResponse.json({ error: "Batas transaksi terlampaui" }, { status: 400 });
+        }
+
+        // Diskon tanpa alasan = uang hilang tanpa jejak. Alasan diperiksa sebelum
+        // transaksi dibuka supaya tidak ada stok yang sempat terpotong.
+        const adaDiskon =
+          (data.discountAmount ?? 0) > 0 ||
+          data.items.some((item) => (item.discountAmount ?? 0) > 0);
+        if (adaDiskon && !(data.discountReason ?? "").trim()) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Alasan diskon wajib diisi",
+              code: "DISCOUNT_REASON_REQUIRED",
+            },
+            { status: 400 }
+          );
+        }
+
+        const clientIp =
+          request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+          request.headers.get("x-real-ip") ||
+          "unknown";
 
     // Process sale in a transaction.
     // Nomor invoice unik PER TENANT (storeId + invoiceNumber); retry menutup balapan
@@ -515,6 +542,54 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // 4b. Kebijakan diskon manual: kasir dibatasi Store.maxCashierDiscountPercent,
+      //     di atas itu wajib PIN supervisor. `discountAmount` di sini sudah
+      //     mencakup diskon per baris + diskon nota, jadi kasir tidak bisa
+      //     menghindari batas dengan memotong harga per item.
+      const discountPolicy = evaluateDiscountPolicy({
+        role: sessionUser.role,
+        subtotal: Number(subtotal),
+        discountAmount: Number(discountAmount),
+        maxCashierDiscountPercent:
+          store?.maxCashierDiscountPercent !== undefined
+            ? Number(store.maxCashierDiscountPercent)
+            : DEFAULT_MAX_CASHIER_DISCOUNT_PERCENT,
+        supervisorApproved: false,
+      });
+
+      let discountApprovedBy: string | null = null;
+      if (discountPolicy.decision === "NEEDS_APPROVAL") {
+        if (!data.supervisorPin) {
+          throw new ApiBusinessError(
+            discountApprovalMessage(discountPolicy),
+            403,
+            "DISCOUNT_APPROVAL_REQUIRED"
+          );
+        }
+        const pinCheck = await verifySupervisorPin(data.supervisorPin, clientIp, scope.storeId);
+        if (!pinCheck.valid) {
+          throw new ApiBusinessError(
+            pinCheck.error || "PIN Supervisor tidak valid",
+            403,
+            "DISCOUNT_APPROVAL_INVALID"
+          );
+        }
+        discountApprovedBy = `${pinCheck.supervisor?.name} (${pinCheck.supervisor?.role})`;
+      }
+
+      // 4c. Shift kasir: transaksi menempel ke laci yang sedang terbuka supaya
+      //     Z-Report bisa dihitung ulang dan dicetak kembali kapan pun.
+      const openShift = await tx.cashShift.findFirst({
+          where: {
+            storeId: scope.storeId,
+            cashierId: sessionUser.id,
+            status: "OPEN",
+            ...(effectiveOutletId ? { outletId: effectiveOutletId } : {}),
+          },
+          orderBy: { openedAt: "desc" },
+          select: { id: true },
+      });
+
       // Uang yang dipegang kasir. Divalidasi terhadap total yang SUDAH dihitung
       // server, bukan terhadap angka kiriman klien, supaya tidak ada jalan
       // mencatat "kembalian" dari total yang dipalsukan.
@@ -561,6 +636,9 @@ export async function POST(request: NextRequest) {
           tableId: data.tableId || null,
           subtotal,
           discountAmount,
+          discountReason: data.discountReason?.trim() || null,
+          discountApprovedBy,
+          shiftId: openShift?.id ?? null,
           serviceCharge,
           taxAmount,
           roundingAmount,
@@ -744,8 +822,32 @@ export async function POST(request: NextRequest) {
         invoiceNumber: result.invoiceNumber,
         totalAmount: result.totalAmount.toString(),
         itemCount: result.items.length,
+        discountAmount: result.discountAmount.toString(),
+        shiftId: result.shiftId ?? null,
       },
     });
+
+        // Diskon manual punya jejak auditnya sendiri: siapa memberi, berapa persen,
+        // alasannya apa, dan siapa yang menyetujui bila melampaui batas kasir.
+        if (Number(result.discountAmount) > 0) {
+          await logActivity({
+            userId: sessionUser.id,
+            action: "SALE_DISCOUNTED",
+            entity: "Sale",
+            entityId: result.id,
+            details: {
+              invoiceNumber: result.invoiceNumber,
+              discountAmount: result.discountAmount.toString(),
+              subtotal: result.subtotal.toString(),
+              percent:
+                Number(result.subtotal) > 0
+                  ? Math.round((Number(result.discountAmount) / Number(result.subtotal)) * 10000) / 100
+                  : 0,
+              reason: result.discountReason ?? null,
+              approvedBy: result.discountApprovedBy ?? `${sessionUser.name} (${sessionUser.role})`,
+            },
+          });
+        }
 
     const finalPayload = { success: true, data: redactCosts(result, sessionUser.role) };
 

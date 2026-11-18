@@ -65,27 +65,46 @@ function sanitizeAmountInput(value: string) {
 
 export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const items = useCart((state) => state.items);
-  const getGrandTotal = useCart((state) => state.getGrandTotal);
-  const getTotals = useCart((state) => state.getTotals);
-  const clearCart = useCart((state) => state.clearCart);
-  const bumpCatalogVersion = useCart((state) => state.bumpCatalogVersion);
+    const getGrandTotal = useCart((state) => state.getGrandTotal);
+    const getTotals = useCart((state) => state.getTotals);
+    const clearCart = useCart((state) => state.clearCart);
+    const bumpCatalogVersion = useCart((state) => state.bumpCatalogVersion);
+    const discountTotal = useCart((state) => state.discountTotal);
+    const setDiscountTotal = useCart((state) => state.setDiscountTotal);
 
-  const [paymentType, setPaymentType] = useState("CASH");
-  const [orderType, setOrderType] = useState<"DINE_IN" | "TAKEAWAY">("DINE_IN");
-  const [tableId, setTableId] = useState<string>("");
-  const [tablesList, setTablesList] = useState<Array<{ id: string; tableNo: string; section: string }>>([]);
-  const [paymentRef, setPaymentRef] = useState("");
-  const [customerName, setCustomerName] = useState("");
-  const [customerId, setCustomerId] = useState<string | null>(null);
-  const [customerSearch, setCustomerSearch] = useState("");
-  const [customerResults, setCustomerResults] = useState<Array<{ id: string; name: string; phone: string | null; memberTier: string }>>([]);
-  const [cashAmount, setCashAmount] = useState("");
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [completedSale, setCompletedSale] = useState<any | null>(null);
-  const [showReceiptPreview, setShowReceiptPreview] = useState(false);
+    const [paymentType, setPaymentType] = useState("CASH");
+    const [orderType, setOrderType] = useState<"DINE_IN" | "TAKEAWAY">("DINE_IN");
+    const [tableId, setTableId] = useState<string>("");
+    const [tablesList, setTablesList] = useState<Array<{ id: string; tableNo: string; section: string }>>([]);
+    const [paymentRef, setPaymentRef] = useState("");
+    const [customerName, setCustomerName] = useState("");
+    const [customerId, setCustomerId] = useState<string | null>(null);
+    const [customerSearch, setCustomerSearch] = useState("");
+    const [customerResults, setCustomerResults] = useState<Array<{ id: string; name: string; phone: string | null; memberTier: string }>>([]);
+    const [cashAmount, setCashAmount] = useState("");
+    const [notes, setNotes] = useState("");
+    const [discountReason, setDiscountReason] = useState("");
+    // Diskon di atas batas kasir hanya bisa lanjut dengan persetujuan supervisor.
+    const [needsApproval, setNeedsApproval] = useState(false);
+    const [approvalMessage, setApprovalMessage] = useState("");
+    const [supervisorPin, setSupervisorPin] = useState("");
+    const [maxCashierDiscountPercent, setMaxCashierDiscountPercent] = useState<number | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [invoiceNumber, setInvoiceNumber] = useState("");
+    const [completedSale, setCompletedSale] = useState<any | null>(null);
+    const [showReceiptPreview, setShowReceiptPreview] = useState(false);
+
+    useEffect(() => {
+      // Batas diskon tenant dipakai untuk memberi peringatan lebih awal.
+      fetch("/api/pos/pricing", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((payload) => {
+          const limit = payload?.data?.discountPolicy?.maxCashierDiscountPercent;
+          if (typeof limit === "number") setMaxCashierDiscountPercent(limit);
+        })
+        .catch(() => {});
+    }, []);
 
   useEffect(() => {
     fetch("/api/tables")
@@ -113,7 +132,19 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   }, [customerSearch]);
 
   const grandTotal = getGrandTotal();
-  const totals = getTotals();
+    const totals = getTotals();
+    const itemDiscountTotal = items.reduce(
+      (sum, item) => sum + Number(item.discountAmount || 0),
+      0
+    );
+    const hasDiscount = discountTotal > 0 || itemDiscountTotal > 0;
+    const subtotalValue = totals.netSubtotal + discountTotal;
+    const discountPercentValue =
+      subtotalValue > 0 ? Math.round((discountTotal / subtotalValue) * 10000) / 100 : 0;
+    const diskonDiAtasBatasKasir =
+      maxCashierDiscountPercent !== null &&
+      discountTotal > 0 &&
+      discountPercentValue > maxCashierDiscountPercent;
   const changeAmount =
     paymentType === "CASH" && cashAmount
       ? Number(cashAmount) - grandTotal
@@ -153,9 +184,13 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           // di transaksinya; struk cetak ulang tidak boleh kehilangan angka ini.
           paidAmount: paymentType === "CASH" && cashAmount ? Number(cashAmount) : null,
           customerName: customerName || null,
-          customerId: customerId || null,
-          discountAmount: 0,
-          notes: notes || null,
+                    customerId: customerId || null,
+                    // Diskon nota yang benar-benar dipakai kasir ikut dikirim; server
+                    // menolak diskon tanpa alasan dan membatasi besarnya untuk kasir.
+                    discountAmount: discountTotal,
+                    discountReason: hasDiscount ? discountReason.trim() || null : null,
+                    supervisorPin: needsApproval ? supervisorPin.trim() || null : null,
+                    notes: notes || null,
           idempotencyKey: clientAttemptKey,
         },
         });
@@ -194,30 +229,46 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       clearCart();
       bumpCatalogVersion();
     } catch (error) {
-      soundEffects.playWarningBuzz();
-      const message =
-        error instanceof ApiError ? error.message : "Checkout gagal diproses";
-      toast.error(message);
-    } finally {
+          soundEffects.playWarningBuzz();
+          if (error instanceof ApiError) {
+            // Diskon di atas batas kasir: server meminta persetujuan supervisor.
+            // Layar menampilkan kolom PIN, bukan sekadar toast yang hilang.
+            if (
+              error.code === "DISCOUNT_APPROVAL_REQUIRED" ||
+              error.code === "DISCOUNT_APPROVAL_INVALID" ||
+              error.code === "DISCOUNT_REASON_REQUIRED"
+            ) {
+              setNeedsApproval(error.code !== "DISCOUNT_REASON_REQUIRED");
+              setApprovalMessage(error.message);
+            }
+          }
+          const message =
+            error instanceof ApiError ? error.message : "Checkout gagal diproses";
+          toast.error(message);
+        } finally {
       setLoading(false);
     }
   };
 
   const handleResetForm = () => {
-    setSuccess(false);
-    setCompletedSale(null);
-    setInvoiceNumber("");
-    setPaymentType("CASH");
-    setPaymentRef("");
-    setCustomerName("");
-    setCustomerId(null);
-    setCustomerSearch("");
-    setCustomerResults([]);
-    setCashAmount("");
-    setNotes("");
-    setShowReceiptPreview(false);
-    onOpenChange(false);
-  };
+      setSuccess(false);
+      setCompletedSale(null);
+      setInvoiceNumber("");
+      setPaymentType("CASH");
+      setPaymentRef("");
+      setCustomerName("");
+      setCustomerId(null);
+      setCustomerSearch("");
+      setCustomerResults([]);
+      setCashAmount("");
+      setNotes("");
+      setDiscountReason("");
+      setNeedsApproval(false);
+      setApprovalMessage("");
+      setSupervisorPin("");
+      setShowReceiptPreview(false);
+      onOpenChange(false);
+    };
 
   const handleDirectPrint = async () => {
     if (!completedSale) return;
@@ -672,8 +723,49 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Catatan (opsional)</Label>
+            {hasDiscount && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-bold">
+                              Alasan Diskon <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              placeholder="mis. member, promo mingguan, komplain"
+                              value={discountReason}
+                              onChange={(event) => setDiscountReason(event.target.value)}
+                              maxLength={200}
+                            />
+                            {diskonDiAtasBatasKasir && (
+                              <p className="text-[11px] font-semibold text-amber-700">
+                                Diskon {discountPercentValue}% melebihi batas kasir{" "}
+                                {maxCashierDiscountPercent}% — perlu PIN Supervisor.
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {needsApproval && (
+                          <div className="space-y-1.5 rounded-lg border border-amber-300 bg-amber-50 p-2.5">
+                            <Label className="text-xs font-bold text-amber-900">
+                              PIN Supervisor
+                            </Label>
+                            <Input
+                              type="password"
+                              inputMode="numeric"
+                              placeholder="6-8 digit PIN supervisor"
+                              value={supervisorPin}
+                              onChange={(event) =>
+                                setSupervisorPin(sanitizeAmountInput(event.target.value).slice(0, 8))
+                              }
+                              className="font-mono tracking-widest"
+                            />
+                            {approvalMessage && (
+                              <p className="text-[11px] font-semibold text-amber-900">{approvalMessage}</p>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="space-y-2">
+                          <Label>Catatan (opsional)</Label>
               <Textarea
                 placeholder="Catatan tambahan..."
                 value={notes}
@@ -694,12 +786,14 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
           </Button>
           <Button
             onClick={handleCheckout}
-            disabled={
-              loading ||
-              (paymentType === "CASH" &&
-                cashAmount !== "" &&
-                changeAmount < 0)
-            }
+                        disabled={
+                          loading ||
+                          (hasDiscount && !discountReason.trim()) ||
+                          (needsApproval && supervisorPin.trim().length < 6) ||
+                          (paymentType === "CASH" &&
+                            cashAmount !== "" &&
+                            changeAmount < 0)
+                        }
             size="lg"
           >
             {loading ? (

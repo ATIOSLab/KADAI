@@ -6,7 +6,8 @@ import { CartItemRow } from "@/components/pos/cart-item";
 import { CheckoutDialog } from "@/components/pos/checkout-dialog";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 
 interface CartProps {
   onClose?: () => void;
@@ -21,7 +22,10 @@ export function Cart({ onClose }: CartProps) {
   const getItemCount = useCart((state) => state.getItemCount);
   const setPricing = useCart((state) => state.setPricing);
   const discountTotal = useCart((state) => state.discountTotal);
-  const [showCheckout, setShowCheckout] = useState(false);
+    const setDiscountTotal = useCart((state) => state.setDiscountTotal);
+    const [showCheckout, setShowCheckout] = useState(false);
+    // Batas diskon tenant: dipakai untuk peringatan dini di keranjang.
+    const [maxCashierDiscountPercent, setMaxCashierDiscountPercent] = useState<number | null>(null);
 
   const subtotal = getSubtotal();
   const grandTotal = getGrandTotal();
@@ -40,13 +44,17 @@ export function Cart({ onClose }: CartProps) {
         const payload = await response.json();
         const rates = payload?.data?.rates;
         if (!cancelled && rates) {
-          setPricing({
-            taxRate: Number(rates.taxRate) || 0,
-            serviceChargeRate: Number(rates.serviceChargeRate) || 0,
-            taxInclusive: Boolean(rates.taxInclusive),
-            enableRounding: rates.enableRounding !== false,
-          });
-        }
+                  setPricing({
+                    taxRate: Number(rates.taxRate) || 0,
+                    serviceChargeRate: Number(rates.serviceChargeRate) || 0,
+                    taxInclusive: Boolean(rates.taxInclusive),
+                    enableRounding: rates.enableRounding !== false,
+                  });
+                }
+                const limit = payload?.data?.discountPolicy?.maxCashierDiscountPercent;
+                if (!cancelled && typeof limit === "number") {
+                  setMaxCashierDiscountPercent(limit);
+                }
       } catch {
         // Biarkan tarif terakhir yang diketahui; checkout tetap memakai tarif server.
       }
@@ -140,13 +148,44 @@ export function Cart({ onClose }: CartProps) {
               <span className="font-bold tabular-nums">{formatCurrency(subtotal)}</span>
             </div>
             {discountTotal > 0 && (
-              <div className="flex justify-between text-destructive">
-                <span>Diskon</span>
-                <span className="font-bold tabular-nums">
-                  -{formatCurrency(discountTotal)}
-                </span>
-              </div>
-            )}
+                          <div className="flex justify-between text-destructive">
+                            <span>Diskon</span>
+                            <span className="font-bold tabular-nums">
+                              -{formatCurrency(discountTotal)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-center gap-2">
+                          <span className="text-muted-foreground">Diskon Nota (Rp)</span>
+                          <Input
+                            inputMode="numeric"
+                            placeholder="0"
+                            value={discountTotal > 0 ? formatNumber(String(discountTotal)) : ""}
+                            onChange={(event) => {
+                              const digit = event.target.value.replace(/\D/g, "");
+                              // Diskon tidak boleh melebihi nilai belanja: nota tidak bisa
+                              // menjadi negatif, dan sisa diskon tidak bisa "dicairkan".
+                              const value = Math.min(Number(digit || 0), Math.floor(subtotal));
+                              setDiscountTotal(Number.isFinite(value) ? value : 0);
+                            }}
+                            className="h-7 w-28 text-right font-mono text-xs tabular-nums"
+                          />
+                        </div>
+                        {discountTotal > 0 && maxCashierDiscountPercent !== null && subtotal > 0 && (
+                          <p
+                            className={cn(
+                              "text-[10px] font-semibold",
+                              (discountTotal / subtotal) * 100 > maxCashierDiscountPercent
+                                ? "text-amber-600"
+                                : "text-muted-foreground"
+                            )}
+                          >
+                            {Math.round((discountTotal / subtotal) * 10000) / 100}% dari subtotal
+                            {(discountTotal / subtotal) * 100 > maxCashierDiscountPercent
+                              ? ` • di atas batas kasir ${maxCashierDiscountPercent}% (butuh PIN supervisor)`
+                              : ` • batas kasir ${maxCashierDiscountPercent}%`}
+                          </p>
+                        )}
             {totals.serviceCharge > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Service Charge</span>

@@ -54,6 +54,7 @@ export async function GET() {
         taxInclusive: true,
         enableRounding: true,
         taxType: true,
+        maxCashierDiscountPercent: true,
       },
     });
 
@@ -65,6 +66,12 @@ export async function GET() {
         outlet: outlet ?? null,
         taxType: store?.taxType ?? "NONE",
         rates,
+        // Batas diskon kasir ikut dikirim supaya layar kasir bisa memperingatkan
+        // SEBELUM checkout, bukan setelah transaksi ditolak server.
+        discountPolicy: {
+          maxCashierDiscountPercent: Number(store?.maxCashierDiscountPercent ?? 10),
+          role: sessionUser.role,
+        },
       },
     });
   } catch (error) {

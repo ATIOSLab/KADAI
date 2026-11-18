@@ -4,7 +4,9 @@ import { checkRateLimit } from "@/lib/security";
 
 export async function verifySupervisorPin(
   pin: string,
-  clientIp?: string
+  clientIp?: string,
+  /** Tenant pemanggil. Tanpa ini PIN supervisor tenant lain ikut berlaku. */
+  storeId?: string | null
 ): Promise<{
   valid: boolean;
   supervisor?: { id: string; name: string; role: string };
@@ -31,6 +33,9 @@ export async function verifySupervisorPin(
     where: {
       role: { in: ["ADMIN", "MANAGER"] },
       isActive: true,
+      // Isolasi tenant: supervisor toko lain tidak boleh mengesahkan transaksi
+      // tenant ini (PIN-nya akan lolos bila daftar supervisor global).
+      ...(storeId ? { storeId } : {}),
     },
     select: {
       id: true,

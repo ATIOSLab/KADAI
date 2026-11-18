@@ -105,7 +105,12 @@ test("restock memakai nomor batch dengan percobaan ulang, bukan 500", () => {
 
 test("penutupan shift dicatat sebagai SHIFT_CLOSED, bukan SALE_CREATED", () => {
   const shift = route("pos/shift-summary");
-  assert.match(shift, /action: "SHIFT_CLOSED"/);
+  assert.match(shift, /closeCashShift/);
+
+  // Logika tutup laci hidup di satu tempat (dipakai endpoint rekap lama dan
+  // /api/pos/shifts/[id]); aksinya tetap SHIFT_CLOSED, bukan SALE_CREATED.
+  const shiftService = lib("shift-service.ts");
+  assert.match(shiftService, /action: "SHIFT_CLOSED"/);
   assert.doesNotMatch(shift, /action: "SALE_CREATED"/);
 
   const presenter = lib("activity-log-presenter.ts");

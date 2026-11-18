@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    const verification = await verifySupervisorPin(pin, clientIp);
+    const verification = await verifySupervisorPin(pin, clientIp, sessionUser.storeId ?? null);
 
     if (!verification.valid) {
       return jsonError(verification.error || "PIN Supervisor tidak valid", 403);

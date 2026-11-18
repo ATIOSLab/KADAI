@@ -27,6 +27,16 @@ import { soundEffects } from "@/lib/audio-effects";
 interface ShiftSummaryData {
   store: { name: string; address: string | null; phone: string | null };
   cashier: { id: string; name: string; role: string } | null;
+  shift?: {
+    id: string | null;
+    status: "OPEN" | "CLOSED";
+    openedAt: string;
+    closedAt: string | null;
+    openingCash: number;
+    closingCash: number | null;
+    expectedCash: number;
+    variance: number | null;
+  };
   shiftDate: string;
   firstTransactionTime: string | null;
   lastTransactionTime: string | null;
@@ -36,6 +46,9 @@ interface ShiftSummaryData {
   totalTax: number;
   totalDiscount: number;
   totalServiceCharge: number;
+  totalCashSales?: number;
+  totalCashRefunds?: number;
+  expectedCash?: number;
   salesByPayment: {
     CASH: { count: number; total: number };
     QRIS: { count: number; total: number };
@@ -65,8 +78,34 @@ export function ShiftDialog({
       setLoading(true);
       const res = await apiFetch<{ data: ShiftSummaryData }>("/api/pos/shift-summary");
       setData(res.data);
+      // Bila laci sudah dibuka, modal awal yang BERLAKU adalah angka saat buka,
+      // bukan tebakan default di layar.
+      if (res.data.shift?.id) {
+        setStartingCash(String(res.data.shift.openingCash ?? 0));
+      }
     } catch {
       toast.error("Gagal memuat rekap shift");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenShift = async () => {
+    try {
+      setLoading(true);
+      await apiFetch("/api/pos/shifts", {
+        method: "POST",
+        body: {
+          openingCash: parseFloat(startingCash) || 0,
+          notes: notes || null,
+        },
+      });
+      soundEffects.playCashRegisterDing();
+      toast.success("Shift kasir dibuka");
+      await loadSummary();
+    } catch {
+      soundEffects.playWarningBuzz();
+      toast.error("Gagal membuka shift kasir");
     } finally {
       setLoading(false);
     }
@@ -81,9 +120,16 @@ export function ShiftDialog({
 
   const numStartingCash = parseFloat(startingCash) || 0;
   const cashSalesTotal = data?.salesByPayment.CASH.total || 0;
-  const expectedCashDrawer = numStartingCash + cashSalesTotal;
+  const cashRefunds = data?.totalCashRefunds || 0;
+  // Server yang menghitung kas diharapkan (termasuk refund tunai dari transaksi
+  // shift sebelumnya); rumus lokal hanya cadangan saat rekap belum punya shift.
+  const expectedCashDrawer =
+    typeof data?.expectedCash === "number"
+      ? data.expectedCash
+      : numStartingCash + cashSalesTotal - cashRefunds;
   const numActualCash = parseFloat(actualCash) || 0;
   const cashVariance = numActualCash - expectedCashDrawer;
+  const shiftTerbuka = Boolean(data?.shift?.id);
 
   const handlePrint = () => {
     soundEffects.playScannerBeep();
@@ -177,7 +223,30 @@ export function ShiftDialog({
                     {formatCurrency(numStartingCash)}
                   </span>
                 </div>
-                {!closingSuccess && (
+
+                {data.shift?.id ? (
+                  <p className="text-[10px] text-slate-600">
+                    Laci dibuka {new Date(data.shift.openedAt).toLocaleString("id-ID")} • modal
+                    awal terkunci pada angka saat buka.
+                  </p>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-amber-700 font-bold">
+                      Belum ada shift dibuka.
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[11px] font-bold"
+                      onClick={handleOpenShift}
+                      disabled={loading || closingSuccess}
+                    >
+                      Buka Shift
+                    </Button>
+                  </div>
+                )}
+
+                {!closingSuccess && !shiftTerbuka && (
                   <Input
                     id="startingCash"
                     type="number"
@@ -247,6 +316,12 @@ export function ShiftDialog({
                     {formatCurrency(expectedCashDrawer)}
                   </span>
                 </div>
+                {cashRefunds > 0 && (
+                  <p className="text-[10px] text-rose-700 font-semibold">
+                    Termasuk refund tunai Rp {cashRefunds.toLocaleString("id-ID")} dari transaksi
+                    shift sebelumnya yang dibatalkan pada shift ini.
+                  </p>
+                )}
               </div>
 
               {/* Z-Report Shift Closing Form */}

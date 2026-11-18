@@ -129,6 +129,17 @@ export async function PUT(req: NextRequest) {
       return jsonError("Cabang tidak ditemukan pada tenant Anda", 404);
     }
 
+    // Toko wajib punya tepat satu cabang utama: melepas statusnya tanpa
+    // mempromosikan cabang lain membuat laci & laporan kehilangan acuan.
+    if (validated.isMain === false && owned.isMain) {
+      return jsonError(
+        "Cabang utama tidak bisa dilepas. Jadikan cabang lain sebagai cabang utama lebih dahulu.",
+        409,
+        undefined,
+        "MAIN_OUTLET_REQUIRED"
+      );
+    }
+
     // Menonaktifkan lewat formulir ubah harus melewati penjagaan yang sama
     // dengan tombol hapus; kalau tidak, aturan cabang utama bisa dilewati.
     if (validated.isActive === false) {

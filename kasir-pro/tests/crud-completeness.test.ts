@@ -128,3 +128,10 @@ test("migrasi menambahkan aksi audit untuk data induk", () => {
     assert.match(migrasi, new RegExp(aksi));
   }
 });
+
+test("cabang utama tidak bisa dilepas tanpa pengganti", () => {
+  // Melepas isMain dari cabang utama lewat PUT akan meninggalkan toko tanpa
+  // acuan laci; penolakannya harus bernama, bukan 500.
+  assert.match(outlets, /MAIN_OUTLET_REQUIRED/);
+  assert.match(outlets, /validated\.isMain === false && owned\.isMain/);
+});

@@ -1,10 +1,10 @@
 # Uji end-to-end alur kas (bukan unit test)
 
-Ketiga skrip di sini menembak **HTTP sungguhan** ke server KADAI yang sedang
-berjalan, lalu memeriksa perilaku laci kas, koreksi susulan, bukti bayar, dan
-otorisasi cron. Gunanya menangkap regresi yang tidak terlihat dari unit test
-berbasis sumber (mis. urutan validasi, bentuk respons, atau pengaruh ke laci
-berikutnya).
+Skrip-skrip di sini menembak **HTTP sungguhan** ke server KADAI yang sedang
+berjalan, lalu memeriksa perilaku laci kas, koreksi susulan, bukti bayar,
+otorisasi cron, CRUD data induk, dan proteksi seluruh rute API. Gunanya
+menangkap regresi yang tidak terlihat dari unit test berbasis sumber (mis.
+urutan validasi, bentuk respons, atau pengaruh ke laci berikutnya).
 
 ## Prasyarat
 
@@ -31,14 +31,41 @@ berikutnya).
    `x-cron-secret` diambil dari `KADAI_CRON_SECRET`; tanpa itu uji cron hanya
    lulus di server lokal.
 
+Token sesi KADAI hanya berlaku **2 jam** dan mati lebih cepat bila baris user
+diubah. Untuk produksi, mint ulang sesi dengan:
+
+```bash
+bash scripts/e2e/mint-produksi.sh manager.resto@kadai.asia kasir.resto@kadai.asia
+# lalu, mis.:
+export KADAI_TOKEN_MANAGER=$(cat scripts/e2e/.token-manager.txt)
+export KADAI_TOKEN_KASIR=$(cat scripts/e2e/.token-kasir.txt)
+```
+
+Skrip itu SSH ke host produksi dan menjalankan `scripts/e2e/mint-sesi.mjs` di
+dalam container app (pemegang `BETTER_AUTH_SECRET`); file token lokal ditulis ke
+`scripts/e2e/.token-*.txt` yang sudah di-`.gitignore`.
+
 ## Menjalankan
+
+Satu perintah untuk semua (skrip berhenti dengan kode ≠0 bila ada yang gagal):
+
+```bash
+npm run test:e2e          # = bash scripts/e2e/jalankan-semua.sh
+```
+
+Atau satu per satu:
 
 ```bash
 python scripts/e2e/regresi-siklus-kas.py      # laci A/B, refund, cetak ulang Z-Report
 python scripts/e2e/regresi-bukti-bayar.py     # tempo, non-tunai >= Rp250rb, kasir vs manager
 python scripts/e2e/regresi-pin-supervisor.py  # PIN salah ditolak, PIN benar diterima
 python scripts/e2e/regresi-master-data.py     # CRUD pemasok, pelanggan, cabang, satuan
+python scripts/e2e/regresi-rute-api.py        # 73 rute API: anon ditolak, sesi tidak 5xx
 ```
+
+`regresi-rute-api.py` menemukan sendiri daftar rute dari `src/app/api/**/route.ts`
+(segmen `[id]` diganti id contoh), jadi rute baru otomatis ikut diuji. Rute yang
+memang publik hanya `/api/health` dan `/api/public/plans` (`ALLOW_ANON`).
 
 Setiap skrip mencetak `LULUS`/`GAGAL` per butir dan ringkasan di akhir. Skrip
 menutup laci yang masih terbuka di awal dan di akhir, jadi aman dijalankan

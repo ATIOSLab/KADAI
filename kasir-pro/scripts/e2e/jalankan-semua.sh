@@ -14,8 +14,22 @@
 set -uo pipefail
 
 cd "$(dirname "$0")/../.."
-BIN=python3
-command -v python3 >/dev/null 2>&1 || BIN=python
+
+# Cari interpreter Python 3 yang benar-benar jalan. Di Windows, 'python' sering
+# menunjuk alias Microsoft Store yang hanya mencetak "Python was not found".
+BIN=""
+for c in "${PYTHON:-}" python3 python py; do
+  [ -z "$c" ] && continue
+  if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)' >/dev/null 2>&1; then
+    BIN="$c"
+    break
+  fi
+done
+if [ -z "$BIN" ]; then
+  echo "Python 3 tidak ditemukan. Set PYTHON=/path/ke/python3 lalu ulangi."
+  exit 2
+fi
+echo "python: $BIN ($("$BIN" -V 2>&1))"
 
 GAGAL=0
 for s in regresi-siklus-kas regresi-bukti-bayar regresi-pin-supervisor regresi-master-data regresi-rute-api; do

@@ -42,3 +42,5 @@ next-env.d.ts
 
 # token sesi hasil scripts/e2e/mint-produksi.sh (rahasia, jangan di-commit)
 scripts/e2e/.token-*.txt
+# log regresi e2e (scripts/e2e/jalankan-semua.sh)
+scripts/e2e/.logs/

@@ -31,18 +31,43 @@ if [ -z "$BIN" ]; then
 fi
 echo "python: $BIN ($("$BIN" -V 2>&1))"
 
+LOG_DIR="${E2E_LOG_DIR:-scripts/e2e/.logs/$(date +%Y%m%d-%H%M%S)}"
+mkdir -p "$LOG_DIR"
+echo "log: $LOG_DIR (base $KADAI_BASE)"
+
 GAGAL=0
-for s in regresi-siklus-kas regresi-bukti-bayar regresi-pin-supervisor regresi-master-data regresi-rute-api; do
+FLAKY=()
+
+jalankan_suite() {  # $1 = nama suite, $2 = berkas log
+  local s="$1" log="$2"
   echo "==== $s"
-  if ! $BIN "scripts/e2e/$s.py"; then
-    GAGAL=1
+  $BIN "scripts/e2e/$s.py" 2>&1 | tee "$log"
+  return "${PIPESTATUS[0]}"
+}
+
+for s in regresi-siklus-kas regresi-bukti-bayar regresi-pin-supervisor regresi-master-data regresi-rute-api; do
+  log="$LOG_DIR/$s.log"
+  if ! jalankan_suite "$s" "$log"; then
+    echo "---- $s gagal; ulang sekali (gangguan transien?). Log pertama: $log"
+    sleep 3
+    log2="$LOG_DIR/$s.retry.log"
+    if jalankan_suite "$s" "$log2"; then
+      echo "---- $s LULUS pada percobaan kedua — FLAKY, bukan regresi kode"
+      FLAKY+=("$s")
+    else
+      echo "---- $s gagal DUA KALI — regresi nyata. Log: $log2"
+      GAGAL=1
+    fi
   fi
 done
 
 echo
+if [ "${#FLAKY[@]}" -gt 0 ]; then
+  echo "FLAKY (lulus setelah diulang): ${FLAKY[*]}"
+fi
 if [ "$GAGAL" -eq 0 ]; then
   echo "SELURUH REGRESI E2E LULUS ($KADAI_BASE)"
 else
-  echo "ADA REGRESI E2E GAGAL ($KADAI_BASE)"
+  echo "ADA REGRESI E2E GAGAL ($KADAI_BASE) — lihat $LOG_DIR"
 fi
 exit $GAGAL

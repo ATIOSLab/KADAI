@@ -59,7 +59,12 @@ ALLOW_ANON = {"/api/health", "/api/public/plans"}
 # Endpoint auth yang memang boleh dipanggil tanpa sesi (login publik, logout
 # idempoten, registrasi, kode demo kiosk).
 WRITE_ANON_ALLOW = {"/api/auth/login", "/api/auth/logout", "/api/auth/register",
-                    "/api/auth/verify-demo-code"}
+                     "/api/auth/verify-demo-code", "/api/demo-requests",
+                     "/api/referrals/register"}
+# Publik KONDISIONAL: 403-nya datang dari kondisi non-peran (env saklar
+# registrasi, secret header webhook), bukan dari gate RBAC — tidak bisa
+# ditegakkan "pasti boleh" untuk peran mana pun.
+KONDISIONAL = {"/api/auth/register", "/api/telegram/webhook"}
 # Rute webhook/cron punya autentikasi sendiri (shared secret), bukan cookie.
 SHARED_SECRET_PREFIX = ("/api/cron/", "/api/webhooks/", "/api/payments/callback",
                         "/api/admin/seed-demo", "/api/bot")
@@ -84,6 +89,11 @@ def konstanta_peran():
             for ref in re.findall(r"\.\.\.(\w+)", isi):
                 peran.extend(sets.get(ref, []))
             sets[nama] = list(dict.fromkeys(peran))
+        # Alias tanpa bracket: export const A = B; (mis. SUPER_ADMIN_ROLES = PLATFORM_ROLES)
+        for m in re.finditer(r"export const (\w+) = ([A-Z0-9_]+);", t):
+            nama, ref = m.group(1), m.group(2)
+            if ref in sets:
+                sets[nama] = sets[ref]
     return sets
 
 
@@ -107,8 +117,44 @@ def metode_di_rute(rute):
     return [m for m in METODE if re.search(rf"export async function {m}\s*\(", t)]
 
 
+def _ekstrak_gate(body):
+    """Role gate dari teks handler/helper: bentuk negasi !hasRequiredRole(...)
+    (konstanta + literal inline). Assignment non-gate TIDAK dihitung."""
+    konst = set(re.findall(r"!hasRequiredRole\([^,]+,\s*([A-Z0-9_]+)\)", body))
+    peran = set()
+    for k in konst:
+        peran.update(SETS.get(k, []))
+    for lit in re.findall(r"!hasRequiredRole\([^,]+,\s*\[([^\]]*)\]\)", body):
+        peran.update(re.findall(r'"([A-Z_]+)"', lit))
+    return peran, konst
+
+
+# Helper gate dari file lain yang dipetakan manual ke konstanta peran.
+SPECIAL_HELPER_SET = {"assertFinanceAccess": "FINANCE_ROLES"}
+
+
+def _gate_helper(f, t, body):
+    """Gate lewat helper: panggilan ke `async function NAMA(` di file yang sama
+    (mis. requireAdmin -> SUPER_ADMIN_ROLES) atau SPECIAL_HELPER_SET."""
+    peran = set()
+    for nama, kset in SPECIAL_HELPER_SET.items():
+        if re.search(rf"\b{nama}\s*\(", body):
+            peran.update(SETS.get(kset, []))
+    for hm in re.finditer(r"\basync function (\w+)\s*\(", t):
+        nama = hm.group(1)
+        if not re.search(rf"\b{nama}\s*\(", body):
+            continue
+        sisa = t[hm.end():]
+        nxt = re.search(r"\n(?:export )?(?:async function|const|function) ", sisa)
+        hb = sisa[: nxt.start() if nxt else len(sisa)]
+        hp, _ = _ekstrak_gate(hb)
+        if hp:
+            peran.update(hp)
+    return peran
+
+
 def peran_diizinkan(rute, metode="GET"):
-    """Peran yang diizinkan handler <metode> menurut kode. None = tanpa gate."""
+    """Peran yang diizinkan handler <metode> menurut kode. None = tanpa gate peran."""
     f = rute_file(rute)
     if not f.is_file():
         return None
@@ -119,18 +165,47 @@ def peran_diizinkan(rute, metode="GET"):
     sisa = t[m.end():]
     nxt = re.search(r"\nexport (?:async function|const|default) ", sisa)
     body = sisa[: nxt.start() if nxt else len(sisa)]
-    # Hanya bentuk gate `!hasRequiredRole(...)`; assignment non-gate seperti
-    # `const isSupervisor = hasRequiredRole(...)` TIDAK dihitung.
-    konst = set(re.findall(r"!hasRequiredRole\([^,]+,\s*([A-Z0-9_]+)\)", body))
-    peran = set()
-    for k in konst:
-        peran.update(SETS.get(k, []))
-    # Gate dengan literal inline: !hasRequiredRole(role, ["ADMIN","CASHIER"])
-    for lit in re.findall(r"!hasRequiredRole\([^,]+,\s*\[([^\]]*)\]\)", body):
-        peran.update(re.findall(r'"([A-Z_]+)"', lit))
+    peran, konst = _ekstrak_gate(body)
+    peran |= _gate_helper(f, t, body)
     if not konst and not peran:
         return None  # tidak ada gate peran di handler ini
     return peran
+
+
+def gate_rute(rute, metode="GET"):
+    """Klasifikasi handler: ("role", set) | ("auth", None) | ("public", None)
+    | ("deny-all", None) | None (tidak terdeteksi -> toleran)."""
+    f = rute_file(rute)
+    if not f.is_file():
+        return None
+    t = f.read_text(encoding="utf-8")
+    # deny-all: handler tanpa parameter yang langsung menolak (mis. order POST: 403 konstan).
+    # Rute yang memang boleh anon (register, login, ...) dikecualikan: 403 di sana
+    # hanyalah saklar konfigurasi, bukan gate peran.
+    if rute in KONDISIONAL:
+        return None
+    if (rute not in WRITE_ANON_ALLOW
+            and re.search(rf"export async function {metode}\s*\(\s*\)", t)):
+        m0 = re.search(rf"export async function {metode}\s*\(\s*\)", t)
+        s0 = t[m0.end():]
+        n0 = re.search(r"\nexport (?:async function|const|default) ", s0)
+        n0s = n0.start() if n0 else len(s0)
+        b0 = s0[:n0s]
+        if re.search(r"status:\s*403", b0) and len(b0) < 600:
+            return ("deny-all", None)
+    m = re.search(rf"export async function {metode}\s*\(", t)
+    if not m:
+        return None
+    sisa = t[m.end():]
+    nxt = re.search(r"\nexport (?:async function|const|default) ", sisa)
+    body = sisa[: nxt.start() if nxt else len(sisa)]
+    peran, _ = _ekstrak_gate(body)
+    peran |= _gate_helper(f, t, body)
+    if peran:
+        return ("role", peran)
+    if re.search(r"getSessionUserFromRequest|getServerSessionUser|!sessionUser\b", body):
+        return ("auth", None)  # sesi wajib, tanpa gate peran
+    return ("public", None)    # tanpa sesi sama sekali (login, webhook, track, dll)
 
 
 def peran_diizinkan_get(rute):
@@ -177,17 +252,29 @@ def panggil(rute, token=None, metode="GET", body=None):
 
 
 def sapuan_peran_get(peran_target, token, label, rute):
-    """Sapuan GET untuk satu peran. Ekspektasi diturunkan dari gate kode:
-    - gate tak terurai (None)     -> toleran: cukup tanpa 5xx/401
-    - gate memuat peran           -> peran PASTI boleh (403 = tertolak keliru)
-    - gate mengecualikan peran    -> peran PASTI dilarang (bukan 403 = bocor)
+    """Sapuan GET untuk satu peran. Ekspektasi diturunkan dari kode:
+    - ("role", set)           -> set memuat peran: PASTI boleh (403 = tertolak
+                                 keliru); set mengecualikan: PASTI 403 (selain
+                                 403 = bocor)
+    - ("auth"/"public", None) -> peran PASTI boleh (hanya butuh sesi / publik)
+    - ("deny-all", None)      -> PASTI 403 untuk semua peran
+    - None                    -> toleran (cukup tanpa 5xx/401)
     """
     galat, bocor, tolak = [], [], []
     harap403 = 0
     for r in rute:
-        peran = peran_diizinkan_get(r)
-        pasti_boleh = peran is not None and peran_target in peran
-        pasti_larang = peran is not None and peran_target not in peran
+        if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
+            continue  # autentikasi shared secret, bukan sesi peran
+        g = gate_rute(r, "GET")
+        if g is None:
+            pasti_boleh = pasti_larang = False
+        elif g[0] == "role":
+            pasti_larang = peran_target not in g[1]
+            pasti_boleh = not pasti_larang
+        elif g[0] == "deny-all":
+            pasti_boleh, pasti_larang = False, True
+        else:  # auth / public
+            pasti_boleh, pasti_larang = True, False
         if pasti_larang:
             harap403 += 1
         st, body, _ = panggil(normalisasi(r), token)
@@ -198,7 +285,7 @@ def sapuan_peran_get(peran_target, token, label, rute):
         elif pasti_larang and st != 403:
             bocor.append(f"{r} HTTP {st}")
         elif pasti_boleh and st == 403:
-            tolak.append(f"{r} HTTP 403 padahal gate-nya memuat {peran_target}")
+            tolak.append(f"{r} HTTP 403 padahal {label} boleh di sini")
     print(f"  {label}: {len(rute)} rute diuji, {len(galat)} bermasalah, "
           f"{len(bocor)} bocor RBAC, {len(tolak)} tertolak keliru, "
           f"{harap403} rute non-{label}")
@@ -288,7 +375,7 @@ def main():
         for peran_target, token, label in semua_peran:
             if not token:
                 continue
-            galat_p, bocor_p = [], []
+            galat_p, bocor_p, tolak_p = [], [], []
             n_p = 0
             for r in rute:
                 if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
@@ -296,23 +383,35 @@ def main():
                 for metode in ("POST", "PUT", "PATCH", "DELETE"):
                     if metode not in metode_di_rute(r):
                         continue
-                    peran = peran_diizinkan(r, metode)
-                    if peran is None:
-                        continue  # gate tak terurai -> toleran
+                    g = gate_rute(r, metode)
+                    if g is None:
+                        continue  # tak terurai -> toleran
                     n_p += 1
+                    if g[0] == "role":
+                        pasti_larang = peran_target not in g[1]
+                        pasti_boleh = not pasti_larang
+                    elif g[0] == "deny-all":
+                        pasti_larang, pasti_boleh = True, False
+                    else:  # auth / public
+                        pasti_larang, pasti_boleh = False, True
                     st, _, _ = panggil(normalisasi(r), token, metode, {})
                     if st >= 500:
                         galat_p.append(f"{label} {metode} {r} HTTP {st}")
                     elif st == 401:
                         galat_p.append(f"{label} {metode} {r} HTTP 401 sesi ditolak")
-                    elif peran_target not in peran and st != 403:
+                    elif pasti_larang and st != 403:
                         bocor_p.append(f"{label} {metode} {r} HTTP {st}")
-            print(f"  tulis({label}): {n_p} handler bergate diuji, "
-                  f"{len(galat_p)} 5xx/401, {len(bocor_p)} bocor peran")
+                    elif pasti_boleh and st == 403:
+                        tolak_p.append(f"{label} {metode} {r} HTTP 403 padahal boleh")
+            print(f"  tulis({label}): {n_p} handler terklasifikasi diuji, "
+                  f"{len(galat_p)} 5xx/401, {len(bocor_p)} bocor peran, "
+                  f"{len(tolak_p)} tertolak keliru")
             catat(f"tulis: {label} tanpa 5xx/401 di handler tulis", not galat_p,
                   "; ".join(galat_p[:3]))
             catat(f"tulis: {label} WAJIB 403 di gate yang mengecualikan {peran_target}",
                   not bocor_p, "; ".join(bocor_p[:3]))
+            catat(f"tulis: {label} tidak ditolak di handler auth/publik/berperan",
+                  not tolak_p, "; ".join(tolak_p[:3]))
 
     lulus = sum(1 for _, ok, _ in HASIL if ok)
     print(f"RINGKASAN: {lulus}/{len(HASIL)} lulus")

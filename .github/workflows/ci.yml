@@ -34,3 +34,85 @@ jobs:
 
       - name: Referral/billing tests
         run: npm run test:referral
+
+  # Regresi e2e penuh terhadap server lokal + Postgres throwaway, supaya tiap
+  # push ke main tidak cuma lulus unit test tetapi juga 5 suite HTTP sungguhan
+  # (siklus kas, bukti bayar, PIN supervisor, CRUD data induk, sapuan 73 rute).
+  # Recipe sama dengan lokal: migrate -> seed demo -> build -> next start ->
+  # mint sesi -> bash scripts/e2e/jalankan-semua.sh.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: kadai
+          POSTGRES_PASSWORD: kadai-ci
+          POSTGRES_DB: kadai
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U kadai"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://kadai:kadai-ci@localhost:55432/kadai
+      BETTER_AUTH_SECRET: ci-better-auth-secret-0123456789abcdef0123456789
+      CRON_SECRET: ci-cron-secret-0123456789abcdef
+      ADMIN_SUPERVISOR_PIN: "888222"
+    defaults:
+      run:
+        working-directory: kasir-pro
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kasir-pro/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Migrate
+        run: npx prisma migrate deploy
+
+      - name: Seed (inti + cluster demo Resto/barber/klinik/...)
+        run: npm run db:seed
+
+      - name: Seed cluster demo (tenant Resto dgn manager/kasir + produk & stok)
+        run: npm run db:seed:demo
+
+      - name: Build produksi
+        run: npx next build
+
+      - name: Jalankan server lokal (port 3110) & tunggu sehat
+        run: |
+          npx next start -p 3110 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl -sf http://127.0.0.1:3110/api/health >/dev/null 2>&1; then
+              echo "server sehat setelah ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "server tidak kunjung sehat — isi /tmp/next.log:"
+          tail -40 /tmp/next.log
+          exit 1
+
+      - name: Regresi e2e penuh (5 suite HTTP sungguhan)
+        run: |
+          TOK_MGR="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs manager.resto@kadai.com)"
+          TOK_KSR="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs kasir.resto@kadai.com)"
+          if [ -z "$TOK_MGR" ] || [ -z "$TOK_KSR" ]; then echo "mint sesi gagal"; exit 1; fi
+          export KADAI_BASE="http://127.0.0.1:3110"
+          export KADAI_TOKEN_MANAGER="$TOK_MGR"
+          export KADAI_TOKEN_KASIR="$TOK_KSR"
+          export KADAI_CRON_SECRET="$CRON_SECRET"
+          export KADAI_PIN="888222"
+          npm run test:e2e
+
+      - name: Dump log server bila gagal
+        if: failure()
+        run: tail -60 /tmp/next.log

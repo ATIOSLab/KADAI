@@ -6,12 +6,17 @@ GET:
 
 1. tanpa sesi  -> harus ditolak (401/403/307/404/405), tidak boleh 200 berisi data
 2. sesi manager -> tidak boleh ada 5xx dan tidak boleh 401 (sesi harus sah)
+3. sesi kasir   -> tidak boleh ada 5xx/401, DAN status harus mengikuti gate
+   peran GET aktual yang diturunkan dari kode (src/lib/rbac.ts + route.ts):
+   - rute tanpa gate peran / gate memuat CASHIER  -> kasir boleh 200
+   - gate mengecualikan CASHIER                   -> kasir WAJIB 403
 
 Rute publik yang memang boleh diakses tanpa sesi ada di ALLOW_ANON.
 
 Pemakaian:
     export KADAI_BASE=https://kadai.asia
     export KADAI_TOKEN_MANAGER="<cookie session manager>"
+    export KADAI_TOKEN_KASIR="<cookie session kasir>"
     python scripts/e2e/regresi-rute-api.py            # cari rute dari repo
     python scripts/e2e/regresi-rute-api.py daftar.txt # atau pakai daftar rute
 
@@ -32,6 +37,7 @@ UA = os.environ.get(
     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
 )
 TOK_MGR = os.environ.get("KADAI_TOKEN_MANAGER", "")
+TOK_KASIR = os.environ.get("KADAI_TOKEN_KASIR", "")
 
 # Rute yang memang publik (health check & katalog paket untuk halaman harga).
 ALLOW_ANON = {"/api/health", "/api/public/plans"}
@@ -41,8 +47,54 @@ SHARED_SECRET_PREFIX = ("/api/cron/", "/api/webhooks/", "/api/payments/callback"
 
 AKAR = Path(__file__).resolve().parents[2]
 API_DIR = AKAR / "src" / "app" / "api"
+RBAC_FILE = AKAR / "src" / "lib" / "rbac.ts"
 
 HASIL = []
+
+
+def konstanta_peran():
+    """Ekspansi konstanta peran dari src/lib/rbac.ts + src/app/api/_lib/*.ts
+    -> {NAMA: [ROLE, ...]}."""
+    sets = {}
+    berkas = [RBAC_FILE] + sorted(API_DIR.glob("_lib/*.ts"))
+    for b in berkas:
+        t = b.read_text(encoding="utf-8")
+        for m in re.finditer(r"export const (\w+) = \[([^\]]*)\]", t):
+            nama, isi = m.group(1), m.group(2)
+            peran = re.findall(r'"([A-Z_]+)"', isi)
+            for ref in re.findall(r"\.\.\.(\w+)", isi):
+                peran.extend(sets.get(ref, []))
+            sets[nama] = list(dict.fromkeys(peran))
+    return sets
+
+
+SETS = konstanta_peran()
+
+
+def rute_file(rute):
+    rel = rute.removeprefix("/api").strip("/")
+    return API_DIR / Path(rel) / "route.ts"
+
+
+def peran_diizinkan_get(rute):
+    """Peran yang diizinkan GET menurut kode. None = tanpa GET / tanpa gate."""
+    f = rute_file(rute)
+    if not f.is_file():
+        return None
+    t = f.read_text(encoding="utf-8")
+    m = re.search(r"export async function GET\s*\(", t)
+    if not m:
+        return None
+    sisa = t[m.end():]
+    nxt = re.search(r"\nexport async function (?:POST|PUT|PATCH|DELETE)\s*\(", sisa)
+    body = sisa[: nxt.start() if nxt else len(sisa)]
+    konst = set(re.findall(r"hasRequiredRole\([^,]+,\s*([A-Z0-9_]+)\)", body))
+    if not konst:
+        return None  # tidak ada gate peran di GET
+    peran = set()
+    for k in konst:
+        peran.update(SETS.get(k, []))
+    return peran
 
 
 def catat(nama, lulus, detail=""):
@@ -92,22 +144,24 @@ def main():
         raise SystemExit("KADAI_TOKEN_MANAGER wajib untuk uji rute dengan sesi")
 
     bocor, galat, tolak = [], [], 0
-    for r in statis:
-        st, body, _ = panggil(r)
+    for r in rute:
+        if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
+            continue
+        st, body, _ = panggil(normalisasi(r))
         if r in ALLOW_ANON:
             catat(f"anon {r} publik sesuai desain", st == 200, f"HTTP {st}")
-            continue
-        if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
-            tolak += 1
             continue
         if st == 200:
             bocor.append(r)
             catat(f"anon {r} TIDAK membocorkan data", False, f"HTTP 200 {body[:80]}")
+        elif st >= 500:
+            galat.append(f"{r} anon HTTP {st}")
         else:
             tolak += 1
-    print(f"  anon: {tolak} rute tertutup, {len(bocor)} bocor, {len(rute) - len(statis)} dinamis dilewati")
-    catat(f"anon ditolak di {tolak} rute non-publik (0 bocor)", not bocor,
-          "; ".join(bocor[:3]))
+    print(f"  anon: {tolak} rute tertutup, {len(bocor)} bocor, {len(galat)} 5xx "
+          f"(dinamis ikut diuji dengan ID palsu)")
+    catat(f"anon ditolak di {tolak} rute non-publik (0 bocor, 0 5xx)",
+          not bocor and not galat, "; ".join((bocor + galat)[:3]))
 
     for r in rute:
         st, body, _ = panggil(normalisasi(r), TOK_MGR)
@@ -118,6 +172,38 @@ def main():
     print(f"  manager: {len(rute)} rute diuji, {len(galat)} bermasalah")
     catat(f"sesi manager diterima di {len(rute)} rute & tanpa 5xx", not galat,
           "; ".join(galat[:3]))
+
+    if not TOK_KASIR:
+        raise SystemExit("KADAI_TOKEN_KASIR wajib untuk uji rute dengan peran kasir")
+    galat_kasir, bocor_kasir, tolak_kasir = [], [], []
+    harap403 = 0
+    for r in rute:
+        peran = peran_diizinkan_get(r)
+        # None: tanpa GET / tanpa gate yang terdeteksi -> toleran (403 diizinkan,
+        # mis. gate lewat tabel aturan yang belum diurai). Set memuat CASHIER:
+        # kasir PASTI boleh. Set tanpa CASHIER: kasir PASTI dilarang -> wajib 403.
+        pasti_boleh = peran is not None and "CASHIER" in peran
+        pasti_larang = peran is not None and "CASHIER" not in peran
+        if pasti_larang:
+            harap403 += 1
+        st, body, _ = panggil(normalisasi(r), TOK_KASIR)
+        if st >= 500:
+            galat_kasir.append(f"{r} HTTP {st}")
+        elif st == 401:
+            galat_kasir.append(f"{r} HTTP 401 sesi ditolak")
+        elif pasti_larang and st != 403:
+            bocor_kasir.append(f"{r} HTTP {st}")
+        elif pasti_boleh and st == 403:
+            tolak_kasir.append(f"{r} HTTP 403 padahal gate-nya memuat CASHIER")
+    print(f"  kasir: {len(rute)} rute diuji, {len(galat_kasir)} bermasalah, "
+          f"{len(bocor_kasir)} bocor RBAC, {len(tolak_kasir)} tertolak keliru, "
+          f"{harap403} rute non-kasir")
+    catat("sesi kasir tanpa 5xx/401 di semua rute", not galat_kasir,
+          "; ".join(galat_kasir[:3]))
+    catat("kasir WAJIB 403 di rute yang gate-nya mengecualikan kasir",
+          not bocor_kasir, "; ".join(bocor_kasir[:3]))
+    catat("kasir tidak ditolak di rute yang gate-nya memuat CASHIER", not tolak_kasir,
+          "; ".join(tolak_kasir[:3]))
 
     lulus = sum(1 for _, ok, _ in HASIL if ok)
     print(f"RINGKASAN: {lulus}/{len(HASIL)} lulus")

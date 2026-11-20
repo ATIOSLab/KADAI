@@ -43,7 +43,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

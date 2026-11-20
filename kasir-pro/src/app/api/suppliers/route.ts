@@ -11,8 +11,11 @@ import { logActivity } from "@/lib/activity-logger";
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
       return jsonError("Unauthorized", 401);
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return jsonError("Forbidden", 403);
     }
 
     const scope = await resolveTenantScope(sessionUser);
@@ -56,7 +59,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return jsonError("Unauthorized", 401);
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return jsonError("Forbidden", 403);
     }
 
@@ -88,7 +94,10 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return jsonError("Unauthorized", 401);
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return jsonError("Forbidden", 403);
     }
 
@@ -155,8 +164,11 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
       return jsonError("Unauthorized", 401);
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return jsonError("Forbidden", 403);
     }
 
     const scope = await resolveTenantScope(sessionUser);

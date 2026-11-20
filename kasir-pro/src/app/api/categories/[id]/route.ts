@@ -12,7 +12,10 @@ export async function PUT(
 ) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -50,7 +53,10 @@ export async function DELETE(
 ) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

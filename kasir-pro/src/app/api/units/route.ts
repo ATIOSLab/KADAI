@@ -102,7 +102,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -181,7 +184,10 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -273,7 +279,10 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(request);
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

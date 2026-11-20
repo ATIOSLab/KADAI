@@ -10,8 +10,11 @@ import { describeEffectiveTaxProfile } from "@/lib/tax-labels";
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = await getServerSessionUser();
-    if (!sessionUser || !hasRequiredRole(sessionUser.role, FINANCE_ROLES)) {
+    if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!hasRequiredRole(sessionUser.role, FINANCE_ROLES)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const scope = await resolveTenantScope(sessionUser);

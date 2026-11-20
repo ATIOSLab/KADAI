@@ -9,6 +9,7 @@ const seed = readFileSync(
   "utf8"
 );
 const startSh = readFileSync(path.join(root, "docker/start.sh"), "utf8");
+const simulate = readFileSync(path.join(root, "prisma/simulate-transactions.js"), "utf8");
 
 test("seed batch demo hanya membuat batch baru, tidak menimpa stok", () => {
   // Dulu upsert dengan update.remainingQty = stok seed: setiap restart
@@ -25,4 +26,20 @@ test("batch demo baru terikat cabang utama, bukan stok global", () => {
 
 test("seed demo dijalankan saat boot tanpa menggagalkan start", () => {
   assert.match(startSh, /node prisma\/seed-demo-clusters\.js \|\| echo/);
+});
+
+test("simulasi transaksi idempoten: invoice yang ada dilewati, bukan di-upsert", () => {
+  // Dulu script pakai sale.upsert({ where: { invoiceNumber } }) yang stale
+  // terhadap @@unique([storeId, invoiceNumber]) — perbaikan memakai skip
+  // eksplisit supaya stok batch tidak dipotong dua kali saat dijalankan ulang.
+  assert.doesNotMatch(simulate, /sale\.upsert/);
+  assert.match(simulate, /storeId_invoiceNumber/);
+  assert.match(simulate, /sudah ada — dilewati/);
+});
+
+test("simulasi transaksi membaca harga & stok dari ProductBatch (bukan Product)", () => {
+  // Harga jual/HPP kini tinggal di batch; Product tidak punya field price/cost.
+  assert.match(simulate, /batch\.sellingPrice/);
+  assert.match(simulate, /productBatch\.updateMany/);
+  assert.match(simulate, /rencanakanAlokasi/);
 });

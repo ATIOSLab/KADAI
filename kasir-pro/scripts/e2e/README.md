@@ -53,6 +53,13 @@ Satu perintah untuk semua (skrip berhenti dengan kode ≠0 bila ada yang gagal):
 npm run test:e2e          # = bash scripts/e2e/jalankan-semua.sh
 ```
 
+Replikasi persis job `e2e` GitHub Actions di lokal (Postgres throwaway via
+Docker + migrate + seed + build + server + 5 suite):
+
+```bash
+bash scripts/e2e/ci-lokal.sh
+```
+
 Setiap suite dicatat ke `scripts/e2e/.logs/<waktu>/` (di-`.gitignore`). Bila
 sebuah suite gagal, runner mengulangnya SEKALI dan melabeli `FLAKY` bila lolos
 pada percobaan kedua — batch pertama setelah beberapa jam idle kadang gagal

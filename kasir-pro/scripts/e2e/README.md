@@ -53,6 +53,13 @@ Satu perintah untuk semua (skrip berhenti dengan kode ≠0 bila ada yang gagal):
 npm run test:e2e          # = bash scripts/e2e/jalankan-semua.sh
 ```
 
+Setiap suite dicatat ke `scripts/e2e/.logs/<waktu>/` (di-`.gitignore`). Bila
+sebuah suite gagal, runner mengulangnya SEKALI dan melabeli `FLAKY` bila lolos
+pada percobaan kedua — batch pertama setelah beberapa jam idle kadang gagal
+oleh gangguan transport/edge Cloudflare yang tidak terlihat di log origin
+(tidak ada 5xx/429 di `docker logs`); dua kegagalan berturut-turut baru
+dianggap regresi. Override lokasi log: `E2E_LOG_DIR=/path bash scripts/e2e/...`.
+
 Atau satu per satu:
 
 ```bash

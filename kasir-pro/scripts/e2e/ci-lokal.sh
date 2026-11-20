@@ -71,6 +71,7 @@ export KADAI_TOKEN_MANAGER="$TOK_MGR"
 export KADAI_TOKEN_KASIR="$TOK_KSR"
 export KADAI_CRON_SECRET="$CRON_SECRET"
 export KADAI_PIN="888222"
+export KADAI_UJI_TULIS=1
 bash scripts/e2e/jalankan-semua.sh
 RC=$?
 

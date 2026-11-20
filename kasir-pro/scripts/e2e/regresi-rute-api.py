@@ -13,6 +13,12 @@ GET:
 
 Rute publik yang memang boleh diakses tanpa sesi ada di ALLOW_ANON.
 
+Sapuan tambahan untuk metode tulis (POST/PUT/PATCH/DELETE) hanya jalan bila
+KADAI_UJI_TULIS=1 — hanya untuk stack throwaway (ci-lokal.sh), karena body
+dikirim "{}" dan handler yang lupa memvalidasi bisa menulis baris sampah:
+   - anon  -> handler tidak boleh memberi 2xx (celah sesi) atau 5xx
+   - kasir -> gate yang mengecualikan kasir WAJIB 403; tanpa 5xx/401
+
 Pemakaian:
     export KADAI_BASE=https://kadai.asia
     export KADAI_TOKEN_MANAGER="<cookie session manager>"
@@ -41,6 +47,10 @@ TOK_KASIR = os.environ.get("KADAI_TOKEN_KASIR", "")
 
 # Rute yang memang publik (health check & katalog paket untuk halaman harga).
 ALLOW_ANON = {"/api/health", "/api/public/plans"}
+# Endpoint auth yang memang boleh dipanggil tanpa sesi (login publik, logout
+# idempoten, registrasi, kode demo kiosk).
+WRITE_ANON_ALLOW = {"/api/auth/login", "/api/auth/logout", "/api/auth/register",
+                    "/api/auth/verify-demo-code"}
 # Rute webhook/cron punya autentikasi sendiri (shared secret), bukan cookie.
 SHARED_SECRET_PREFIX = ("/api/cron/", "/api/webhooks/", "/api/payments/callback",
                         "/api/admin/seed-demo", "/api/bot")
@@ -76,25 +86,46 @@ def rute_file(rute):
     return API_DIR / Path(rel) / "route.ts"
 
 
-def peran_diizinkan_get(rute):
-    """Peran yang diizinkan GET menurut kode. None = tanpa GET / tanpa gate."""
+METODE = ("GET", "POST", "PUT", "PATCH", "DELETE")
+
+
+def metode_di_rute(rute):
+    """Metode HTTP yang punya handler di file route."""
+    f = rute_file(rute)
+    if not f.is_file():
+        return []
+    t = f.read_text(encoding="utf-8")
+    return [m for m in METODE if re.search(rf"export async function {m}\s*\(", t)]
+
+
+def peran_diizinkan(rute, metode="GET"):
+    """Peran yang diizinkan handler <metode> menurut kode. None = tanpa gate."""
     f = rute_file(rute)
     if not f.is_file():
         return None
     t = f.read_text(encoding="utf-8")
-    m = re.search(r"export async function GET\s*\(", t)
+    m = re.search(rf"export async function {metode}\s*\(", t)
     if not m:
         return None
     sisa = t[m.end():]
-    nxt = re.search(r"\nexport async function (?:POST|PUT|PATCH|DELETE)\s*\(", sisa)
+    nxt = re.search(r"\nexport (?:async function|const|default) ", sisa)
     body = sisa[: nxt.start() if nxt else len(sisa)]
-    konst = set(re.findall(r"hasRequiredRole\([^,]+,\s*([A-Z0-9_]+)\)", body))
-    if not konst:
-        return None  # tidak ada gate peran di GET
+    # Hanya bentuk gate `!hasRequiredRole(...)`; assignment non-gate seperti
+    # `const isSupervisor = hasRequiredRole(...)` TIDAK dihitung.
+    konst = set(re.findall(r"!hasRequiredRole\([^,]+,\s*([A-Z0-9_]+)\)", body))
     peran = set()
     for k in konst:
         peran.update(SETS.get(k, []))
+    # Gate dengan literal inline: !hasRequiredRole(role, ["ADMIN","CASHIER"])
+    for lit in re.findall(r"!hasRequiredRole\([^,]+,\s*\[([^\]]*)\]\)", body):
+        peran.update(re.findall(r'"([A-Z_]+)"', lit))
+    if not konst and not peran:
+        return None  # tidak ada gate peran di handler ini
     return peran
+
+
+def peran_diizinkan_get(rute):
+    return peran_diizinkan(rute, "GET")
 
 
 def catat(nama, lulus, detail=""):
@@ -119,11 +150,14 @@ def normalisasi(rute):
     return re.sub(r"\[[^\]]+\]", "cm0000000000000000000000", rute)
 
 
-def panggil(rute, token=None):
+def panggil(rute, token=None, metode="GET", body=None):
     h = {"User-Agent": UA, "Accept": "application/json", "Origin": BASE}
     if token:
         h["Cookie"] = f"session={token}"
-    req = urllib.request.Request(BASE + rute, headers=h, method="GET")
+    if body is not None:
+        h["Content-Type"] = "application/json"
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(BASE + rute, headers=h, method=metode, data=data)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return r.status, r.read(4000).decode("utf-8", "replace"), r.url
@@ -204,6 +238,45 @@ def main():
           not bocor_kasir, "; ".join(bocor_kasir[:3]))
     catat("kasir tidak ditolak di rute yang gate-nya memuat CASHIER", not tolak_kasir,
           "; ".join(tolak_kasir[:3]))
+
+    if os.environ.get("KADAI_UJI_TULIS") == "1":
+        if not (BASE.startswith("http://127.0.0.1") or BASE.startswith("http://localhost")):
+            raise SystemExit(
+                "KADAI_UJI_TULIS=1 HANYA untuk stack lokal; BASE=%s. "
+                "Sapuan tulis menembak POST/PUT/PATCH/DELETE dan dilarang "
+                "menyentuh apa pun selain 127.0.0.1/localhost." % BASE)
+        print("  -- sapuan metode tulis (anon + kasir, body {}) --")
+        galat_tulis, terbuka_tulis, bocor_tulis = [], [], []
+        n_tulis = 0
+        for r in rute:
+            if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
+                continue
+            for metode in ("POST", "PUT", "PATCH", "DELETE"):
+                if metode not in metode_di_rute(r):
+                    continue
+                n_tulis += 1
+                peran = peran_diizinkan(r, metode)
+                pasti_larang = peran is not None and "CASHIER" not in peran
+                st_a, _, _ = panggil(normalisasi(r), None, metode, {})
+                st_k, _, _ = panggil(normalisasi(r), TOK_KASIR, metode, {})
+                if st_a >= 500:
+                    galat_tulis.append(f"anon {metode} {r} HTTP {st_a}")
+                elif 200 <= st_a < 300 and r not in WRITE_ANON_ALLOW:
+                    terbuka_tulis.append(f"anon {metode} {r} HTTP {st_a}")
+                if st_k >= 500:
+                    galat_tulis.append(f"kasir {metode} {r} HTTP {st_k}")
+                elif st_k == 401:
+                    galat_tulis.append(f"kasir {metode} {r} HTTP 401 sesi ditolak")
+                elif pasti_larang and st_k != 403:
+                    bocor_tulis.append(f"kasir {metode} {r} HTTP {st_k}")
+        print(f"  tulis: {n_tulis} handler diuji, {len(galat_tulis)} 5xx/401, "
+              f"{len(terbuka_tulis)} terbuka anon, {len(bocor_tulis)} bocor peran")
+        catat("tulis: anon tidak menembus handler (tanpa 2xx/5xx)",
+              not terbuka_tulis and not galat_tulis,
+              "; ".join((terbuka_tulis + galat_tulis)[:3]))
+        catat("tulis: kasir WAJIB 403 di gate non-kasir & tanpa 5xx/401",
+              not bocor_tulis and not galat_tulis,
+              "; ".join((bocor_tulis + galat_tulis)[:3]))
 
     lulus = sum(1 for _, ok, _ in HASIL if ok)
     print(f"RINGKASAN: {lulus}/{len(HASIL)} lulus")

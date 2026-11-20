@@ -65,10 +65,21 @@ if [ -z "$ok" ]; then echo "server tidak sehat:"; tail -40 /tmp/kadai-next.log; 
 echo "== 7/7 regresi e2e penuh (5 suite HTTP nyata)"
 TOK_MGR="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs manager.resto@kadai.com)"
 TOK_KSR="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs kasir.resto@kadai.com)"
+TOK_INV="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs gudang.resto@kadai.com)"
+TOK_AKN="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs akuntan.resto@kadai.com)"
+TOK_DAP="$(node --experimental-strip-types scripts/e2e/mint-sesi.mjs dapur.resto@kadai.com)"
 [ -n "$TOK_MGR" ] && [ -n "$TOK_KSR" ] || { echo "mint sesi gagal — lihat /tmp/kadai-next.log"; exit 2; }
+# Peran tambahan opsional: bila seed tak punya akunnya, sapuan peran itu dilewati.
+for V in TOK_INV TOK_AKN TOK_DAP; do
+  if [ -z "$(eval echo \$$V)" ]; then echo "catatan: $V kosong — peran itu dilewati"; fi
+done
+
 export KADAI_BASE="http://127.0.0.1:3110"
 export KADAI_TOKEN_MANAGER="$TOK_MGR"
 export KADAI_TOKEN_KASIR="$TOK_KSR"
+export KADAI_TOKEN_INVENTORY="$TOK_INV"
+export KADAI_TOKEN_ACCOUNTANT="$TOK_AKN"
+export KADAI_TOKEN_KITCHEN="$TOK_DAP"
 export KADAI_CRON_SECRET="$CRON_SECRET"
 export KADAI_PIN="888222"
 export KADAI_UJI_TULIS=1

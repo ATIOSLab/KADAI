@@ -44,6 +44,15 @@ UA = os.environ.get(
 )
 TOK_MGR = os.environ.get("KADAI_TOKEN_MANAGER", "")
 TOK_KASIR = os.environ.get("KADAI_TOKEN_KASIR", "")
+TOK_INVENTORY = os.environ.get("KADAI_TOKEN_INVENTORY", "")
+TOK_ACCOUNTANT = os.environ.get("KADAI_TOKEN_ACCOUNTANT", "")
+TOK_KITCHEN = os.environ.get("KADAI_TOKEN_KITCHEN", "")
+# Peran tambahan yang ikut disapu bila tokennya ada: (peran, token, label).
+PERAN_TAMBAHAN = [
+    ("INVENTORY", TOK_INVENTORY, "inventory"),
+    ("ACCOUNTANT", TOK_ACCOUNTANT, "akuntan"),
+    ("KITCHEN", TOK_KITCHEN, "dapur"),
+]
 
 # Rute yang memang publik (health check & katalog paket untuk halaman harga).
 ALLOW_ANON = {"/api/health", "/api/public/plans"}
@@ -167,6 +176,40 @@ def panggil(rute, token=None, metode="GET", body=None):
         return 0, str(e), ""
 
 
+def sapuan_peran_get(peran_target, token, label, rute):
+    """Sapuan GET untuk satu peran. Ekspektasi diturunkan dari gate kode:
+    - gate tak terurai (None)     -> toleran: cukup tanpa 5xx/401
+    - gate memuat peran           -> peran PASTI boleh (403 = tertolak keliru)
+    - gate mengecualikan peran    -> peran PASTI dilarang (bukan 403 = bocor)
+    """
+    galat, bocor, tolak = [], [], []
+    harap403 = 0
+    for r in rute:
+        peran = peran_diizinkan_get(r)
+        pasti_boleh = peran is not None and peran_target in peran
+        pasti_larang = peran is not None and peran_target not in peran
+        if pasti_larang:
+            harap403 += 1
+        st, body, _ = panggil(normalisasi(r), token)
+        if st >= 500:
+            galat.append(f"{r} HTTP {st}")
+        elif st == 401:
+            galat.append(f"{r} HTTP 401 sesi ditolak")
+        elif pasti_larang and st != 403:
+            bocor.append(f"{r} HTTP {st}")
+        elif pasti_boleh and st == 403:
+            tolak.append(f"{r} HTTP 403 padahal gate-nya memuat {peran_target}")
+    print(f"  {label}: {len(rute)} rute diuji, {len(galat)} bermasalah, "
+          f"{len(bocor)} bocor RBAC, {len(tolak)} tertolak keliru, "
+          f"{harap403} rute non-{label}")
+    catat(f"sesi {label} tanpa 5xx/401 di semua rute", not galat,
+          "; ".join(galat[:3]))
+    catat(f"{label} WAJIB 403 di rute yang gate-nya mengecualikan {peran_target}",
+          not bocor, "; ".join(bocor[:3]))
+    catat(f"{label} tidak ditolak di rute yang gate-nya memuat {peran_target}",
+          not tolak, "; ".join(tolak[:3]))
+
+
 def main():
     rute = temukan_rute()
     if not rute:
@@ -209,35 +252,10 @@ def main():
 
     if not TOK_KASIR:
         raise SystemExit("KADAI_TOKEN_KASIR wajib untuk uji rute dengan peran kasir")
-    galat_kasir, bocor_kasir, tolak_kasir = [], [], []
-    harap403 = 0
-    for r in rute:
-        peran = peran_diizinkan_get(r)
-        # None: tanpa GET / tanpa gate yang terdeteksi -> toleran (403 diizinkan,
-        # mis. gate lewat tabel aturan yang belum diurai). Set memuat CASHIER:
-        # kasir PASTI boleh. Set tanpa CASHIER: kasir PASTI dilarang -> wajib 403.
-        pasti_boleh = peran is not None and "CASHIER" in peran
-        pasti_larang = peran is not None and "CASHIER" not in peran
-        if pasti_larang:
-            harap403 += 1
-        st, body, _ = panggil(normalisasi(r), TOK_KASIR)
-        if st >= 500:
-            galat_kasir.append(f"{r} HTTP {st}")
-        elif st == 401:
-            galat_kasir.append(f"{r} HTTP 401 sesi ditolak")
-        elif pasti_larang and st != 403:
-            bocor_kasir.append(f"{r} HTTP {st}")
-        elif pasti_boleh and st == 403:
-            tolak_kasir.append(f"{r} HTTP 403 padahal gate-nya memuat CASHIER")
-    print(f"  kasir: {len(rute)} rute diuji, {len(galat_kasir)} bermasalah, "
-          f"{len(bocor_kasir)} bocor RBAC, {len(tolak_kasir)} tertolak keliru, "
-          f"{harap403} rute non-kasir")
-    catat("sesi kasir tanpa 5xx/401 di semua rute", not galat_kasir,
-          "; ".join(galat_kasir[:3]))
-    catat("kasir WAJIB 403 di rute yang gate-nya mengecualikan kasir",
-          not bocor_kasir, "; ".join(bocor_kasir[:3]))
-    catat("kasir tidak ditolak di rute yang gate-nya memuat CASHIER", not tolak_kasir,
-          "; ".join(tolak_kasir[:3]))
+    sapuan_peran_get("CASHIER", TOK_KASIR, "kasir", rute)
+    for peran_target, token, label in PERAN_TAMBAHAN:
+        if token:
+            sapuan_peran_get(peran_target, token, label, rute)
 
     if os.environ.get("KADAI_UJI_TULIS") == "1":
         if not (BASE.startswith("http://127.0.0.1") or BASE.startswith("http://localhost")):
@@ -245,8 +263,8 @@ def main():
                 "KADAI_UJI_TULIS=1 HANYA untuk stack lokal; BASE=%s. "
                 "Sapuan tulis menembak POST/PUT/PATCH/DELETE dan dilarang "
                 "menyentuh apa pun selain 127.0.0.1/localhost." % BASE)
-        print("  -- sapuan metode tulis (anon + kasir, body {}) --")
-        galat_tulis, terbuka_tulis, bocor_tulis = [], [], []
+        print("  -- sapuan metode tulis (anon + tiap peran, body {}) --")
+        galat_tulis, terbuka_tulis = [], []
         n_tulis = 0
         for r in rute:
             if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
@@ -255,28 +273,46 @@ def main():
                 if metode not in metode_di_rute(r):
                     continue
                 n_tulis += 1
-                peran = peran_diizinkan(r, metode)
-                pasti_larang = peran is not None and "CASHIER" not in peran
                 st_a, _, _ = panggil(normalisasi(r), None, metode, {})
-                st_k, _, _ = panggil(normalisasi(r), TOK_KASIR, metode, {})
                 if st_a >= 500:
                     galat_tulis.append(f"anon {metode} {r} HTTP {st_a}")
                 elif 200 <= st_a < 300 and r not in WRITE_ANON_ALLOW:
                     terbuka_tulis.append(f"anon {metode} {r} HTTP {st_a}")
-                if st_k >= 500:
-                    galat_tulis.append(f"kasir {metode} {r} HTTP {st_k}")
-                elif st_k == 401:
-                    galat_tulis.append(f"kasir {metode} {r} HTTP 401 sesi ditolak")
-                elif pasti_larang and st_k != 403:
-                    bocor_tulis.append(f"kasir {metode} {r} HTTP {st_k}")
-        print(f"  tulis: {n_tulis} handler diuji, {len(galat_tulis)} 5xx/401, "
-              f"{len(terbuka_tulis)} terbuka anon, {len(bocor_tulis)} bocor peran")
+        print(f"  tulis(anon): {n_tulis} handler diuji, {len(galat_tulis)} 5xx, "
+              f"{len(terbuka_tulis)} terbuka")
         catat("tulis: anon tidak menembus handler (tanpa 2xx/5xx)",
               not terbuka_tulis and not galat_tulis,
               "; ".join((terbuka_tulis + galat_tulis)[:3]))
-        catat("tulis: kasir WAJIB 403 di gate non-kasir & tanpa 5xx/401",
-              not bocor_tulis and not galat_tulis,
-              "; ".join((bocor_tulis + galat_tulis)[:3]))
+
+        semua_peran = [("CASHIER", TOK_KASIR, "kasir")] + PERAN_TAMBAHAN
+        for peran_target, token, label in semua_peran:
+            if not token:
+                continue
+            galat_p, bocor_p = [], []
+            n_p = 0
+            for r in rute:
+                if any(r.startswith(p) for p in SHARED_SECRET_PREFIX):
+                    continue
+                for metode in ("POST", "PUT", "PATCH", "DELETE"):
+                    if metode not in metode_di_rute(r):
+                        continue
+                    peran = peran_diizinkan(r, metode)
+                    if peran is None:
+                        continue  # gate tak terurai -> toleran
+                    n_p += 1
+                    st, _, _ = panggil(normalisasi(r), token, metode, {})
+                    if st >= 500:
+                        galat_p.append(f"{label} {metode} {r} HTTP {st}")
+                    elif st == 401:
+                        galat_p.append(f"{label} {metode} {r} HTTP 401 sesi ditolak")
+                    elif peran_target not in peran and st != 403:
+                        bocor_p.append(f"{label} {metode} {r} HTTP {st}")
+            print(f"  tulis({label}): {n_p} handler bergate diuji, "
+                  f"{len(galat_p)} 5xx/401, {len(bocor_p)} bocor peran")
+            catat(f"tulis: {label} tanpa 5xx/401 di handler tulis", not galat_p,
+                  "; ".join(galat_p[:3]))
+            catat(f"tulis: {label} WAJIB 403 di gate yang mengecualikan {peran_target}",
+                  not bocor_p, "; ".join(bocor_p[:3]))
 
     lulus = sum(1 for _, ok, _ in HASIL if ok)
     print(f"RINGKASAN: {lulus}/{len(HASIL)} lulus")

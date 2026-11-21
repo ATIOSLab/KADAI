@@ -171,25 +171,31 @@ export async function POST(
         },
       });
 
-      const saleVoidCategoryId = await getSystemFinanceCategoryId(
-        tx,
-        FINANCE_SYSTEM_CATEGORY_KEYS.SALE_VOID_OUTFLOW
-      );
+      // Hanya pembatalan TUNAI yang mengembalikan uang fisik dari laci, jadi
+      // hanya itu yang boleh dicatat sebagai arus kas keluar. Pembatalan
+      // non-tunai (transfer/QRIS/e-wallet/tempo) tidak menyentuh kas fisik;
+      // mencatatnya sebagai OUT mencemari buku kas dan varians laci.
+      if (sale.paymentType === "CASH") {
+        const saleVoidCategoryId = await getSystemFinanceCategoryId(
+          tx,
+          FINANCE_SYSTEM_CATEGORY_KEYS.SALE_VOID_OUTFLOW
+        );
 
-      await tx.financeEntry.create({
-        data: {
-          amount: voidedSale.totalAmount,
-          direction: "OUT",
-          source: "SALE_VOID",
-          title: `Void ${sale.invoiceNumber}`,
-          notes: reason,
-          entryDate: voidedSale.voidedAt ?? new Date(),
-          categoryId: saleVoidCategoryId,
-          createdByUserId: sessionUser.id,
-          saleId: id,
-          storeId: scope.storeId,
-        },
-      });
+        await tx.financeEntry.create({
+          data: {
+            amount: voidedSale.totalAmount,
+            direction: "OUT",
+            source: "SALE_VOID",
+            title: `Void ${sale.invoiceNumber}`,
+            notes: reason,
+            entryDate: voidedSale.voidedAt ?? new Date(),
+            categoryId: saleVoidCategoryId,
+            createdByUserId: sessionUser.id,
+            saleId: id,
+            storeId: scope.storeId,
+          },
+        });
+      }
 
       // Restore batch quantities
       const allocations = sale.items.flatMap((item) =>

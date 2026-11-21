@@ -54,6 +54,28 @@ test("rute void menegakkan aturan koreksi susulan di dalam transaksi", () => {
   assert.match(route, /shift: \{ select: \{ id: true, status: true \} \}/);
 });
 
+test("void non-tunai tidak mencatat arus kas keluar (hanya tunai menyentuh laci)", () => {
+  const route = readFileSync(
+    path.join(repoRoot, "src/app/api/sales/[id]/void/route.ts"),
+    "utf8"
+  );
+
+  // Entri SALE_VOID_OUTFLOW wajib berada di dalam guard paymentType === "CASH":
+  // pembatalan QRIS/transfer/e-wallet/tempo tidak mengembalikan uang fisik laci,
+  // jadi tidak boleh menulis kas keluar (mencemari buku kas & varians laci).
+  const create = route.indexOf("tx.financeEntry.create");
+  const guard = route.lastIndexOf('sale.paymentType === "CASH"', create);
+
+  assert.ok(guard !== -1, "guard CASH wajib ada sebelum financeEntry.create");
+  const between = route.slice(guard, create);
+  assert.match(between, /SALE_VOID_OUTFLOW/);
+  // Tidak boleh ada pemanggilan financeEntry lain di luar guard tunai
+  assert.ok(
+    create < route.indexOf("// Restore batch quantities"),
+    "financeEntry hanya untuk pembatalan tunai"
+  );
+});
+
 test("laci menyimpan jejak koreksi susulan di skema dan migrasi", () => {
   const schema = readFileSync(path.join(repoRoot, "prisma/schema.prisma"), "utf8");
   const migration = path.join(

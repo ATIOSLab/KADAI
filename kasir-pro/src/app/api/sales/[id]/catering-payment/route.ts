@@ -55,10 +55,17 @@ export async function POST(
         cateringStatus: true,
         cateringPaidAmount: true,
         customerName: true,
+        isVoided: true,
       },
     });
     if (!sale) {
       return NextResponse.json({ error: "Transaksi tidak ditemukan" }, { status: 404 });
+    }
+    if (sale.isVoided) {
+      return NextResponse.json(
+        { error: "Transaksi sudah dibatalkan (void), pembayaran ditolak" },
+        { status: 409 }
+      );
     }
     if (!sale.cateringStatus) {
       return NextResponse.json(

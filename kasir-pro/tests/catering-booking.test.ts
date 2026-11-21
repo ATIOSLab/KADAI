@@ -189,6 +189,9 @@ test("endpoint pembayaran memakai guard optimistik (dua kasir tidak bisa menagih
   assert.match(route, /cateringPaidAmount: paid/);
   assert.match(route, /CATERING_PAYMENT_CONFLICT/);
   assert.match(route, /CATERING_PAYMENT_RECORDED/);
+  // Transaksi yang sudah di-void tidak boleh menerima pembayaran susulan.
+  assert.match(route, /sale\.isVoided/);
+  assert.match(route, /void\), pembayaran ditolak/);
 });
 
 test("endpoint status menolak lompatan ilegal dan Selesai tanpa lunas", () => {
@@ -201,6 +204,9 @@ test("endpoint status menolak lompatan ilegal dan Selesai tanpa lunas", () => {
   assert.match(route, /CATERING_STATUS_CONFLICT/);
   assert.match(route, /Booking belum lunas/);
   assert.match(route, /CATERING_STATUS_CHANGED/);
+  // Transaksi yang sudah di-void tidak bisa lanjut/batal lewat API.
+  assert.match(route, /sale\.isVoided/);
+  assert.match(route, /void\), status tidak bisa diubah/);
 });
 
 test("tidak ada stub/TODO tertinggal di modul catering", () => {

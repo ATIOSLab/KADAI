@@ -1,8 +1,9 @@
+import { randomBytes } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { parseSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { canAccessPath, getDefaultPathForRole } from "@/lib/rbac";
-import { isCsrfSafe, SECURITY_HEADERS, CSP_HEADER } from "@/lib/security";
+import { isCsrfSafe, SECURITY_HEADERS, buildCspHeader } from "@/lib/security";
 
 const publicPages = [
   "/",
@@ -49,9 +50,11 @@ const publicPages = [
 // signature (never browser cookies), so they are exempt from both the browser
 // CSRF origin check and the session gate. Every one of these verifies its own
 // secret BEFORE any database read.
+// Catatan: /api/admin/seed-demo SENGAJA TIDAK ada di daftar ini supaya request
+// berbasis cookie admin tetap melewati pemeriksaan CSRF Origin. Pemanggil
+// server-to-server memakai header X-Seed-Key + Origin yang cocok.
 const serverToServerApis = [
   "/api/telegram/webhook",
-  "/api/admin/seed-demo",
   "/api/cron/billing-referral",
   "/api/cron/daily-summary",
   "/api/webhooks/payment/midtrans",
@@ -74,17 +77,27 @@ const matches = (path: string, base: string) => path === base || path.startsWith
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Nonce per-request: dipakai CSP script-src dan diteruskan ke Next.js lewat
+  // header x-nonce agar inline script framework memakai nonce yang sama.
+  const nonce = randomBytes(16).toString("base64");
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  const passThrough = () => NextResponse.next({ request: { headers: requestHeaders } });
   const secure = (response: NextResponse) => {
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(key, value);
-    response.headers.set("Content-Security-Policy", CSP_HEADER);
+    response.headers.set("Content-Security-Policy", buildCspHeader(nonce));
     if (pathname.startsWith("/api/")) response.headers.set("Cache-Control", "no-store");
     return response;
   };
   const isApi = pathname.startsWith("/api/");
   const refParam = request.nextUrl.searchParams.get("ref");
+  // Kode referral hanya boleh berupa token pendek yang aman: mencegah nilai
+  // sembarang (payload/header injection) masuk ke cookie attribution.
+  const REF_PATTERN = /^[A-Z0-9][A-Z0-9-]{0,31}$/;
+  const cleanRef = refParam ? refParam.trim().toUpperCase() : null;
   const attachRef = (res: NextResponse) => {
-    if (refParam && !request.cookies.has("kadai_ref")) {
-      res.cookies.set("kadai_ref", refParam.trim().toUpperCase(), {
+    if (cleanRef && REF_PATTERN.test(cleanRef) && !request.cookies.has("kadai_ref")) {
+      res.cookies.set("kadai_ref", cleanRef, {
         path: "/",
         maxAge: 60 * 60 * 24 * 30, // 30 hari attribution window
         sameSite: "lax",
@@ -100,7 +113,7 @@ export async function proxy(request: NextRequest) {
   }
   if ((!isApi && publicPages.some(p => pathname === p || (p !== "/" && matches(pathname, p)))) ||
       (isApi && publicApis.some(p => matches(pathname, p)))) {
-    return secure(attachRef(NextResponse.next()));
+    return secure(attachRef(passThrough()));
   }
   // Never bypass authentication merely because a path contains a dot.
   const user = parseSessionUser(request.cookies.get("session")?.value);
@@ -127,7 +140,7 @@ export async function proxy(request: NextRequest) {
   if (!isApi && !canAccessPath(pathname, user.role)) {
     return secure(NextResponse.redirect(new URL(getDefaultPathForRole(user.role), request.url)));
   }
-  return secure(NextResponse.next());
+  return secure(passThrough());
 }
 
 export const config = {

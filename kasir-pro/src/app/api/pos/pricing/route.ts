@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSessionUser } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
 import { resolvePricingRates } from "@/lib/pricing-rates";
+import { POS_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 /**
  * GET /api/pos/pricing
@@ -17,6 +18,14 @@ export async function GET() {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Gerbang role: tarif & batas diskon hanya relevan untuk peran kasir POS.
+    if (!hasRequiredRole(sessionUser.role, POS_ROLES)) {
+      return NextResponse.json(
+        { error: "Forbidden: peran Anda tidak diizinkan mengakses tarif POS" },
+        { status: 403 }
+      );
     }
 
     const scope = await resolveTenantScope(sessionUser);

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { SUPER_ADMIN_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError } from "@/lib/api-response";
+import { checkRateLimit } from "@/lib/security";
+import { randomBytes } from "crypto";
 
 const createDemoRequestSchema = z.object({
   fullName: z.string().min(2, "Nama minimal 2 karakter"),
@@ -27,12 +29,33 @@ const createDemoRequestSchema = z.object({
 // POST /api/demo-requests - Publik untuk calon klien request demo
 export async function POST(request: NextRequest) {
   try {
+    // Endpoint publik tanpa sesi: batasi agar tidak bisa dibanjiri bot
+    // (setiap request menulis baris baru ke tabel demo_requests).
+    const clientKey =
+      request.headers.get("cf-connecting-ip")?.trim() ||
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "unknown";
+    const limit = checkRateLimit(
+      `demo-request:${clientKey}`,
+      5,
+      10 * 60 * 1000,
+      30 * 60 * 1000
+    );
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          error: `Terlalu banyak permintaan demo dari jaringan ini. Coba lagi dalam ${limit.retryAfterSeconds} detik.`,
+        },
+        { status: 429 }
+      );
+    }
+
     const rawBody = await request.json();
     const validated = createDemoRequestSchema.parse(rawBody);
 
-    // Generate kode akses unik misal DEMO-9A2F3
-    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const accessCode = `DEMO-${randomSuffix}`;
+    // Kode akses demo: CSPRNG (crypto.randomBytes), bukan Math.random yang
+    // dapat diprediksi dari keluaran sebelumnya.
+    const accessCode = `DEMO-${randomBytes(3).toString("hex").toUpperCase()}`;
 
     const cleanRefCode = validated.referralCode?.trim().toUpperCase() || null;
 

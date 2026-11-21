@@ -255,6 +255,14 @@ export const navigationSections: NavigationSection[] = [
         roles: ["SUPER_ADMIN"],
       },
       {
+        href: "/platform/subscriptions",
+        label: "Langganan & Billing",
+        shortLabel: "Langganan",
+        description: "Siklus langganan tenant, invoice, dan status pembayaran platform.",
+        icon: CircleDollarSign,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
         href: "/platform/bot",
         label: "Pengaturan Bot Platform",
         shortLabel: "Bot",
@@ -452,6 +460,13 @@ const pageMetaMap: Record<string, PageMeta> = {
     section: "Platform KADAI",
     eyebrow: "Manajemen Paket",
   },
+  "/platform/subscriptions": {
+    title: "Langganan & Billing",
+    description: "Tagihan, invoice, dan siklus langganan tenant KADAI.",
+    section: "Platform KADAI",
+    eyebrow: "Super Admin",
+  },
+
 };
 
 const allNavigationItems = navigationSections.flatMap((section) => section.items);

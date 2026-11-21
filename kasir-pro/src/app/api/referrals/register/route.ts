@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/api-response";
 import { checkRateLimit } from "@/lib/security";
 import { Prisma } from "@prisma/client";
+import { randomBytes } from "crypto";
 
 const registerPartnerSchema = z.object({
   fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
@@ -83,7 +84,8 @@ export async function POST(request: NextRequest) {
     // menggagalkan pendaftaran mitra.
     const createPartner = async () => {
       for (let attempt = 0; attempt < 5; attempt += 1) {
-        const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+        // CSPRNG: kode referral tidak boleh dapat diprediksi/diiterasi pihak lain.
+        const randomSuffix = randomBytes(4).toString("hex").toUpperCase().slice(0, 5);
         const referralCode = `REF-${randomSuffix}`;
 
         try {

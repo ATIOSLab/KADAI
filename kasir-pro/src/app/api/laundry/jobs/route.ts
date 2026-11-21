@@ -3,12 +3,22 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { LaundryStatus, JobPaymentStatus, PaymentType } from "@prisma/client";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { z } from "zod";
+import { ADMIN_CASHIER_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {
   try {
     const sessionUser = getSessionUserFromRequest(req);
     if (!sessionUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Gerbang role: antrean laundry = operasional kasir, bukan seluruh staf.
+    if (!hasRequiredRole(sessionUser.role, ADMIN_CASHIER_ROLES)) {
+      return NextResponse.json(
+        { error: "Forbidden: peran Anda tidak diizinkan mengakses antrean laundry" },
+        { status: 403 }
+      );
     }
 
     // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
@@ -61,18 +71,32 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Gerbang role: hanya kasir/manajer/ADMIN yang boleh mengubah status job.
+    if (!hasRequiredRole(sessionUser.role, ADMIN_CASHIER_ROLES)) {
+      return NextResponse.json(
+        { error: "Forbidden: peran Anda tidak diizinkan mengubah status laundry" },
+        { status: 403 }
+      );
+    }
+
     // Isolasi tenant: SUPER_ADMIN (operator platform) ditolak 403, akun tanpa store 403.
     const scope = await resolveTenantScope(sessionUser);
     if (!scope.ok) {
       return NextResponse.json({ error: scope.message }, { status: scope.status });
     }
 
-    const body = await req.json();
-    const { id, status, rackLocation, pickupPaymentMethod, pickupPaymentRef } = body;
+    // Input tak terpercaya divalidasi di boundary: status & metode bayar wajib
+    // berasal dari enum resmi, bukan string bebas.
+    const updateJobSchema = z.object({
+      id: z.string().min(1, "Job ID diperlukan"),
+      status: z.nativeEnum(LaundryStatus).optional(),
+      rackLocation: z.string().max(120).nullable().optional(),
+      pickupPaymentMethod: z.nativeEnum(PaymentType).nullable().optional(),
+      pickupPaymentRef: z.string().max(120).nullable().optional(),
+    });
 
-    if (!id) {
-      return NextResponse.json({ error: "Job ID diperlukan" }, { status: 400 });
-    }
+    const body = updateJobSchema.parse(await req.json());
+    const { id, status, rackLocation, pickupPaymentMethod, pickupPaymentRef } = body;
 
     // Guard kepemilikan: job hanya boleh disentuh bila outlet-nya milik tenant pemanggil.
     const existing = await prisma.laundryJobOrder.findFirst({

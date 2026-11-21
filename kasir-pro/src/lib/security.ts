@@ -178,24 +178,38 @@ export function isCsrfSafe(
 export const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
-  "X-XSS-Protection": "1; mode=block",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
   "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
   "X-DNS-Prefetch-Control": "off",
 };
 
-export const CSP_HEADER =
-  "default-src 'self'; " +
-  "script-src 'self' 'unsafe-inline'; " +
-  "style-src 'self' 'unsafe-inline'; " +
-  "img-src 'self' data: blob: https:; " +
-  "font-src 'self' data:; " +
-  "connect-src 'self'; " +
-  "frame-ancestors 'none'; " +
-  "form-action 'self'; " +
-  "base-uri 'self'; " +
-  "object-src 'none';";
+function cspDirectives(scriptSrc: string): string {
+  return (
+    "default-src 'self'; " +
+    `script-src ${scriptSrc}; ` +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: blob: https:; " +
+    "font-src 'self' data:; " +
+    "connect-src 'self'; " +
+    "frame-ancestors 'none'; " +
+    "form-action 'self'; " +
+    "base-uri 'self'; " +
+    "object-src 'none';"
+  );
+}
+
+/**
+ * CSP dengan nonce per-request: 'unsafe-inline' untuk script dihapus sehingga
+ * XSS yang menyuntikkan <script>/onerror tidak lagi dieksekusi browser.
+ * 'strict-dynamic' menjaga script loader Next.js tetap berjalan.
+ */
+export function buildCspHeader(nonce: string): string {
+  return cspDirectives(`'self' 'nonce-${nonce}' 'strict-dynamic'`);
+}
+
+/** Fallback CSP (tanpa nonce) untuk respons yang tidak bisa membawa nonce. */
+export const CSP_HEADER = cspDirectives("'self' 'unsafe-inline'");
 
 // ============================================================
 // A05 — Error message sanitization

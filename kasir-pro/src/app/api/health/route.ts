@@ -26,7 +26,6 @@ export async function GET() {
   const body = {
     status: db === "up" ? "ok" : "degraded",
     service: "kadai-web",
-    version: process.env.APP_VERSION || "prod",
     db: { status: db, latencyMs: dbLatencyMs },
     uptimeSec: Math.round(process.uptime()),
     timestamp: new Date().toISOString(),

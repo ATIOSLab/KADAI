@@ -15,8 +15,15 @@ else
   npx prisma db push --skip-generate
 fi
 
-echo "Running multi-vertical demo clusters seed..."
-node prisma/seed-demo-clusters.js || echo "Demo seed completed with warnings/skipped"
+# Seed klaster demo HANYA bila diminta eksplisit (SEED_DEMO_ON_START=true).
+# Sebelumnya blok ini berjalan tanpa syarat di setiap start container sehingga
+# tenant/produk/user demo masuk ke database PRODUKSI setiap deploy/restart.
+if [ "${SEED_DEMO_ON_START:-false}" = "true" ]; then
+  echo "SEED_DEMO_ON_START=true -> running multi-vertical demo clusters seed..."
+  node prisma/seed-demo-clusters.js || echo "Demo seed completed with warnings/skipped"
+else
+  echo "Demo clusters seed skipped (SEED_DEMO_ON_START != true)."
+fi
 
 if [ "${RUN_SEED_ON_START:-false}" = "true" ] || [ "${SEED_ON_START:-false}" = "true" ]; then
   echo "RUN_SEED_ON_START=true -> running minimal seed"

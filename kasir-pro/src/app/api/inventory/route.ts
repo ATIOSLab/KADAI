@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { getServerSessionUser } from "@/lib/session";
 import { resolveTenantScope } from "@/lib/tenant-scope";
+import { INVENTORY_ROLES, hasRequiredRole } from "@/lib/rbac";
 
 // GET /api/inventory — Stock overview
 export async function GET(request: NextRequest) {
@@ -10,6 +11,11 @@ export async function GET(request: NextRequest) {
     const sessionUser = await getServerSessionUser();
     if (!sessionUser) {
       return jsonError("Unauthorized", 401);
+    }
+
+    // Gerbang role: data stok adalah ranah inventori, bukan seluruh staf.
+    if (!hasRequiredRole(sessionUser.role, INVENTORY_ROLES)) {
+      return jsonError("Forbidden: peran Anda tidak diizinkan mengakses data inventori", 403);
     }
 
     const scope = await resolveTenantScope(sessionUser);

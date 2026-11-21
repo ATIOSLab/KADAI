@@ -72,6 +72,10 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/pos", roles: POS_ROLES },
   { path: "/tables", roles: ADMIN_MANAGER_ROLES },
   { path: "/kds", roles: KDS_ROLES },
+  // Modul laundry: kasir mengantar-terima order, manajer/ADMIN mengawasi.
+  { path: "/laundry", roles: ADMIN_CASHIER_ROLES },
+  // Satuan (unit) adalah master data inventori.
+  { path: "/units", roles: INVENTORY_ROLES },
 ];
 
 export type SessionPayload = {
@@ -123,7 +127,9 @@ export function canAccessPath(pathname: string, role: string | null | undefined)
   const allowedRoles = getAllowedRolesForPath(pathname);
 
   if (!allowedRoles) {
-    return true;
+    // Fail-closed: path dashboard tanpa aturan eksplisit TIDAK boleh diakses.
+    // (Sebelumnya fail-open sehingga halaman baru otomatis terbuka untuk semua role.)
+    return false;
   }
 
   return hasRequiredRole(role, allowedRoles);

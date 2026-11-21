@@ -7,7 +7,16 @@ const verifyCodeSchema = z.object({
   code: z.string().min(3, "Kode demo minimal 3 karakter"),
 });
 
-const MASTER_CODES = ["KADAI2026", "DEMO-KADAI", "NEWASIATECH", "KADAI-DEMO"];
+// Kode master demo tidak lagi di-hardcode di source (bocor ke repo publik).
+// Isi DEMO_MASTER_CODES="KODE1,KODE2" di environment bila master access dibutuhkan;
+// tanpa env tersebut tidak ada kode master yang berlaku.
+function getMasterCodes(): string[] {
+  const raw = process.env.DEMO_MASTER_CODES || "";
+  return raw
+    .split(",")
+    .map((code) => code.trim().toUpperCase())
+    .filter(Boolean);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +41,7 @@ export async function POST(request: NextRequest) {
     const cleanCode = validated.code.trim().toUpperCase();
 
     // 1. Cek apakah master code
-    if (MASTER_CODES.includes(cleanCode)) {
+    if (getMasterCodes().includes(cleanCode)) {
       return NextResponse.json({
         valid: true,
         businessName: "Toko Demo KADAI (Master Access)",

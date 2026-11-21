@@ -10,6 +10,7 @@ import {
   Hammer,
   Pill,
   Scissors,
+  PartyPopper,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -176,6 +177,20 @@ export default function RegisterPage() {
                   <Scissors className="size-4 text-purple-600 mb-1" />
                   <p className="font-black text-xs leading-tight">Jasa & Salon</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">Komisi & Work Order</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBusinessType("CATERING")}
+                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
+                    businessType === "CATERING"
+                      ? "bg-orange-500/10 border-orange-600 neo-shadow-sm ring-1 ring-orange-500"
+                      : "bg-muted/40 hover:bg-muted"
+                  }`}
+                >
+                  <PartyPopper className="size-4 text-orange-600 mb-1" />
+                  <p className="font-black text-xs leading-tight">Katering & Event</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Resep Porsi, KDS & Delivery</p>
                 </button>
               </div>
             </div>

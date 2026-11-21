@@ -28,6 +28,7 @@ export const ownerCreateSchema = z.object({
           "FNB_CAFE",
           "FNB_RESTAURANT",
           "FNB_WARUNG",
+          "CATERING",
           "BUILDING_SUPPLY",
           "PHARMACY",
           "SERVICE",

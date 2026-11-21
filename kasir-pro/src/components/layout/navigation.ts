@@ -73,7 +73,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Manajemen tata letak meja dan tautan menu QR mandiri.",
         icon: QrCode,
         roles: ["ADMIN", "MANAGER"],
-        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG"],
+        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG", "CATERING"],
       },
       {
         href: "/kds",
@@ -82,7 +82,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Layar monitor antrean tiket dapur dan bar real-time.",
         icon: ChefHat,
         roles: ["ADMIN", "MANAGER", "KITCHEN"],
-        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG"],
+        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG", "CATERING"],
       },
       {
         href: "/laundry",

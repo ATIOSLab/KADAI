@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redactCosts, SALES_READ_ROLES } from "@/app/api/_lib/access";
-import { Prisma } from "@prisma/client";
+import { Prisma, CateringStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { checkoutSchema } from "@/lib/validators/sale";
+import { checkoutSchema, CATERING_STATUSES } from "@/lib/validators/sale";
 import {
   processFIFODeduction,
   processSelectedBatchDeduction,
@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("endDate");
     const paymentType = searchParams.get("paymentType");
     const outletId = searchParams.get("outletId");
+    const catering = searchParams.get("catering");
+    const cateringStatus = searchParams.get("cateringStatus");
     const page = Number(searchParams.get("page") || "1");
     const limit = Number(searchParams.get("limit") || "20");
     if (!Number.isSafeInteger(page) || page < 1 || page > 100000 ||
@@ -72,6 +74,8 @@ export async function GET(request: NextRequest) {
     }
 
     if ((paymentType && !["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"].includes(paymentType)) ||
+        (catering && catering !== "true") ||
+        (cateringStatus && !(CATERING_STATUSES as readonly string[]).includes(cateringStatus)) ||
         [startDate, endDate].some((d) => d !== null &&
           (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !Number.isFinite(Date.parse(d))))) {
       return NextResponse.json({ error: "Filter tidak valid" }, { status: 400 });
@@ -112,6 +116,10 @@ export async function GET(request: NextRequest) {
           },
         }),
       ...(paymentType && { paymentType: paymentType as "CASH" | "BANK_TRANSFER" | "QRIS" | "E_WALLET" | "TEMPO" }),
+      // Filter booking catering: `catering=true` hanya menampilkan transaksi
+      // yang bertanda catering; `cateringStatus` mempersempit per tahap.
+      ...(catering === "true" && { cateringStatus: { not: null } }),
+      ...(cateringStatus && { cateringStatus: cateringStatus as CateringStatus }),
     };
 
     const [sales, total] = await Promise.all([
@@ -156,6 +164,17 @@ const SALE_RESPONSE_INCLUDE = {
   },
   cashier: { select: { id: true, name: true } },
   table: true,
+  cateringPayments: {
+    orderBy: { paidAt: "asc" as const },
+    select: {
+      id: true,
+      amount: true,
+      method: true,
+      paidAt: true,
+      note: true,
+      createdBy: { select: { id: true, name: true } },
+    },
+  },
 } as const;
 
 /**
@@ -660,6 +679,72 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Booking catering (katering & event): transaksi bertanggal acara.
+      // Aturan yang ditegakkan di server, bukan di layar:
+      //  - pemesan wajib bernama (yang menanggung sisa tagihan harus jelas),
+      //  - selalu dicatat sebagai TEMPO (tagihan) supaya sisa tagihan punya satu
+      //    arti: total - akumulasi uang yang benar-benar diterima,
+      //  - DP tidak boleh melebihi total, dan bila ada DP metodenya wajib jelas.
+      const isCateringBooking =
+        data.cateringEventDate !== undefined && data.cateringEventDate !== null;
+      if (isCateringBooking) {
+        // Vertikal usaha: hanya toko bertipe CATERING yang boleh mencatat
+        // booking acara. Toko lain yang mengirim kolom catering ditolak, supaya
+        // modul ini tidak bisa dipakai diam-diam di luar tipe usahanya.
+        const cateringStore = await prisma.store.findFirst({
+          where: { id: scope.storeId },
+          select: { businessType: true },
+        });
+        if (cateringStore?.businessType !== "CATERING") {
+          throw new ApiBusinessError(
+            "Tipe usaha toko ini tidak mendukung booking catering",
+            400,
+            "CATERING_BUSINESS_TYPE_REQUIRED"
+          );
+        }
+      }
+      let cateringDeposit = new Decimal(0);
+      let cateringPaidAmount: Decimal | null = null;
+      let cateringEventDate: Date | null = null;
+      let cateringDeliveryAt: Date | null = null;
+      if (isCateringBooking) {
+        cateringEventDate = new Date(data.cateringEventDate as string);
+        const namaPemesan = (data.customerName ?? "").trim();
+        if (namaPemesan.length < 2) {
+          throw new ApiBusinessError(
+            "Nama pemesan wajib diisi untuk booking catering",
+            400,
+            "CATERING_CUSTOMER_REQUIRED"
+          );
+        }
+        if (data.paymentType !== "TEMPO") {
+          throw new ApiBusinessError(
+            "Booking catering dicatat sebagai tagihan (TEMPO) dengan uang muka",
+            400,
+            "CATERING_MUST_BE_TEMPO"
+          );
+        }
+        cateringDeposit = new Decimal(data.cateringDeposit ?? 0).toDecimalPlaces(2);
+        if (cateringDeposit.greaterThan(totalAmount)) {
+          throw new ApiBusinessError(
+            "Uang muka tidak boleh melebihi total tagihan",
+            400,
+            "CATERING_DEPOSIT_EXCEEDS_TOTAL"
+          );
+        }
+        if (cateringDeposit.greaterThan(0) && !data.cateringDepositMethod) {
+          throw new ApiBusinessError(
+            "Metode pembayaran uang muka wajib diisi",
+            400,
+            "CATERING_DEPOSIT_METHOD_REQUIRED"
+          );
+        }
+        if (data.cateringDeliveryAt) {
+          cateringDeliveryAt = new Date(data.cateringDeliveryAt);
+        }
+        cateringPaidAmount = cateringDeposit;
+      }
+
       // Laba kotor = pendapatan usaha dikurangi HPP. Service charge adalah
       // pendapatan jasa milik usaha, jadi ikut dihitung; PB1 tidak, karena
       // uang itu titipan negara dan hanya lewat di kas.
@@ -698,6 +783,13 @@ export async function POST(request: NextRequest) {
           customerName: data.customerName,
           customerId: data.customerId || null,
           notes: data.notes,
+          // Booking catering
+          cateringEventDate,
+          cateringDeliveryAt,
+          cateringDeposit: isCateringBooking ? cateringDeposit : null,
+          cateringPaidAmount,
+          cateringStatus: isCateringBooking ? "BOOKED" : null,
+          cateringNote: isCateringBooking ? (data.cateringNote ?? "").trim() || null : null,
           cashierId: sessionUser.id,
           items: {
             create: processedItems.map((item) => ({
@@ -720,6 +812,25 @@ export async function POST(request: NextRequest) {
         },
         include: SALE_RESPONSE_INCLUDE,
       });
+
+      // 5b. Buku kas catering: DP pertama (bila ada) tercatat sebagai baris kas
+      // tersendiri, supaya setiap rupiah yang diterima punya jejak kejadiannya.
+      if (isCateringBooking && cateringDeposit.greaterThan(0)) {
+        await tx.cateringPayment.create({
+          data: {
+            saleId: sale.id,
+            amount: cateringDeposit,
+            method: data.cateringDepositMethod as
+              | "CASH"
+              | "BANK_TRANSFER"
+              | "QRIS"
+              | "E_WALLET",
+            paidAt: new Date(),
+            note: "Uang muka (DP) saat booking",
+            createdById: sessionUser.id,
+          },
+        });
+      }
 
       // 6. Update table occupancy if dine-in
       if (data.tableId) {

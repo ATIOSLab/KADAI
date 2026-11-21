@@ -84,6 +84,18 @@ enum OrderType {
   DELIVERY
 }
 
+/// Alur booking katering: BOOKED (dipesan) → CONFIRMED (disetujui) →
+/// IN_PRODUCTION (diproduksi) → DELIVERED (dikirim/pasang) → COMPLETED (selesai
+/// & lunas). Pembatalan sah dari BOOKED/CONFIRMED/IN_PRODUCTION saja.
+enum CateringStatus {
+  BOOKED
+  CONFIRMED
+  IN_PRODUCTION
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
 enum KDSStatus {
   QUEUED
   COOKING
@@ -191,6 +203,9 @@ enum ActionType {
   LAUNDRY_JOB_CREATED
   LAUNDRY_STATUS_CHANGED
   LAUNDRY_PICKED_UP
+  // Booking catering actions
+  CATERING_PAYMENT_RECORDED
+  CATERING_STATUS_CHANGED
   // Recipe & KDS
   RECIPE_UPDATED
   KDS_STATUS_CHANGED
@@ -288,6 +303,7 @@ model User {
   stockAdjustments StockAdjustment[]
   financeEntries   FinanceEntry[]
   laundryJobs      LaundryJobOrder[]
+  cateringPayments CateringPayment[]
 
   @@index([storeId])
   @@map("users")
@@ -681,6 +697,23 @@ model Sale {
   /// Shift kasir tempat transaksi ini terjadi (null untuk transaksi lama).
   shiftId            String?
   shift              CashShift?       @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  /// === BOOKING CATERING (katering & event) ===
+  /// Satu transaksi katering = satu baris penjualan bertanda `cateringStatus`.
+  /// Harga, bahan (FIFO), struk, dan laporan tetap memakai jalur penjualan yang
+  /// sudah ada; kolom di bawah hanya menambah jadwal acara, jadwal kirim, dan
+  /// jejak uang muka (DP) beserta sisanya.
+  /// Tanggal & jam acara berlangsung (UTC; input pengguna memakai offset zona bisnis).
+  cateringEventDate   DateTime?
+  /// Jadwal kirim/pasang ke lokasi acara. Boleh lebih awal atau sama dengan acara.
+  cateringDeliveryAt  DateTime?
+  /// Uang muka yang disepakati/diterima saat pesanan dicatat.
+  cateringDeposit     Decimal?         @db.Decimal(15, 2)
+  /// Akumulasi uang yang benar-benar sudah diterima (DP + cicilan pelunasan).
+  /// Sisa tagihan selalu dihitung total - akumulasi ini, tidak pernah ditebak.
+  cateringPaidAmount  Decimal?         @db.Decimal(15, 2)
+  cateringStatus      CateringStatus?
+  /// Catatan acara: jumlah porsi/tamu, lokasi, permintaan khusus.
+  cateringNote        String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
 
@@ -691,6 +724,7 @@ model Sale {
   financeEntries FinanceEntry[]
   kdsOrders      KDSOrder[]
   laundryJob     LaundryJobOrder?
+  cateringPayments CateringPayment[]
 
   @@unique([storeId, invoiceNumber])
   @@index([cashierId])
@@ -699,7 +733,30 @@ model Sale {
   @@index([shiftId])
   @@index([createdAt])
   @@index([invoiceNumber])
+  @@index([cateringStatus])
+  @@index([cateringEventDate])
   @@map("sales")
+}
+
+/// Buku kas booking catering: setiap penerimaan uang (DP pertama maupun cicilan
+/// pelunasan) tercatat sebagai baris tersendiri, sehingga sisa tagihan bisa
+/// ditelusuri per kejadian - bukan angka tunggal yang bisa hilang jejaknya.
+model CateringPayment {
+  id            String      @id @default(cuid())
+  saleId        String
+  sale          Sale        @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  amount        Decimal     @db.Decimal(15, 2)
+  /// Metode uang masuk. TEMPO tidak pernah sah di sini: piutang bukan pembayaran.
+  method        PaymentType
+  paidAt        DateTime    @default(now())
+  note          String?
+  createdById   String?
+  createdBy     User?       @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+
+  @@index([saleId])
+  @@index([paidAt])
+  @@map("catering_payments")
 }
 
 model SaleItem {

@@ -11,6 +11,13 @@ export const cartItemSchema = z.object({
 
 export const PAYMENT_TYPES = ["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET", "TEMPO"] as const;
 export const ORDER_TYPES = ["DINE_IN", "TAKEAWAY", "DELIVERY"] as const;
+export const CATERING_STATUSES = ["BOOKED", "CONFIRMED", "IN_PRODUCTION", "DELIVERED", "COMPLETED", "CANCELLED"] as const;
+
+/// Wajib memakai offset zona bisnis (mis. `2026-12-01T10:00:00+07:00`) supaya
+/// jam acara yang tampil kembali identik dengan jam yang dipilih pemesan.
+export const cateringInstantSchema = z
+  .string()
+  .refine((v) => Number.isFinite(Date.parse(v)), "Tanggal/jam acara tidak valid");
 
 export const checkoutSchema = z.object({
   items: z.array(cartItemSchema).min(1, "Keranjang tidak boleh kosong"),
@@ -50,6 +57,26 @@ export const checkoutSchema = z.object({
     .nullable(),
   notes: z.string().max(500).optional().nullable(),
   idempotencyKey: z.string().max(128).optional().nullable(),
+  // === BOOKING CATERING ===
+  // Kehadiran `cateringEventDate` menjadikan transaksi ini booking katering.
+  // Server memaksa paymentType=TEMPO (tagihan/piutang) dan mencatat DP pertama
+  // ke buku kas catering; sisa tagihan dihitung dari total - akumulasi.
+  cateringEventDate: cateringInstantSchema.optional().nullable(),
+  cateringDeliveryAt: cateringInstantSchema.optional().nullable(),
+  cateringDeposit: z
+    .number("Uang muka harus berupa angka")
+    .min(0, "Uang muka tidak boleh negatif")
+    .max(1e12, "Batas uang muka terlampaui")
+    .optional()
+    .nullable(),
+  /// Metode pembayaran DP. Wajib bila DP > 0 (CASH/BANK_TRANSFER/QRIS/E_WALLET).
+  cateringDepositMethod: z
+    .enum(["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET"], {
+      message: "Metode uang muka tidak dikenal",
+    })
+    .optional()
+    .nullable(),
+  cateringNote: z.string().max(500, "Catatan acara terlalu panjang").optional().nullable(),
 });
 
 export const saleFilterSchema = z.object({
@@ -62,8 +89,33 @@ export const saleFilterSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   isVoided: z.boolean().optional(),
+  /// Filter daftar booking catering (katering & event).
+  catering: z.literal("true").optional(),
+  cateringStatus: z
+    .enum(CATERING_STATUSES, { message: "Status catering tidak dikenal" })
+    .optional(),
   page: z.number().int().min(1).default(1),
   limit: z.number().int().min(1).max(100).default(20),
+});
+
+/// Penerimaan uang booking catering (DP pertama dicatat saat booking dibuat;
+/// endpoint ini untuk cicilan berikutnya dan pelunasan).
+export const cateringPaymentSchema = z.object({
+  amount: z
+    .number("Nominal pembayaran harus berupa angka")
+    .positive("Nominal pembayaran harus lebih dari 0")
+    .max(1e12, "Batas transaksi terlampaui"),
+  method: z.enum(["CASH", "BANK_TRANSFER", "QRIS", "E_WALLET"], {
+    message: "Metode pembayaran tidak dikenal",
+  }),
+  note: z.string().trim().max(200, "Catatan terlalu panjang").optional().nullable(),
+  idempotencyKey: z.string().max(128).optional().nullable(),
+});
+
+/// Perpindahan status booking: maju satu tahap, atau pembatalan.
+export const cateringStatusSchema = z.object({
+  status: z.enum(CATERING_STATUSES, { message: "Status catering tidak dikenal" }),
+  note: z.string().trim().max(200, "Catatan terlalu panjang").optional().nullable(),
 });
 
 export const voidSaleSchema = z.object({
@@ -82,3 +134,5 @@ export type CartItemInput = z.infer<typeof cartItemSchema>;
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type SaleFilterInput = z.infer<typeof saleFilterSchema>;
 export type VoidSaleInput = z.infer<typeof voidSaleSchema>;
+export type CateringPaymentInput = z.infer<typeof cateringPaymentSchema>;
+export type CateringStatusInput = z.infer<typeof cateringStatusSchema>;

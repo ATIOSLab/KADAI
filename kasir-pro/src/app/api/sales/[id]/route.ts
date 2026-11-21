@@ -53,6 +53,17 @@ export async function GET(
             },
           },
         },
+        cateringPayments: {
+          orderBy: { paidAt: "asc" },
+          select: {
+            id: true,
+            amount: true,
+            method: true,
+            paidAt: true,
+            note: true,
+            createdBy: { select: { id: true, name: true } },
+          },
+        },
       },
     });
 

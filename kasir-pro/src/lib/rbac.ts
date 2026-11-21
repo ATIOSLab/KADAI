@@ -73,6 +73,8 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/kds", roles: KDS_ROLES },
   // Modul laundry: kasir mengantar-terima order, manajer/ADMIN mengawasi.
   { path: "/laundry", roles: ADMIN_CASHIER_ROLES },
+  // Modul booking catering: kasir mencatat DP & tahap, manajer/ADMIN mengawasi.
+  { path: "/catering", roles: ADMIN_CASHIER_ROLES },
   // Satuan (unit) adalah master data inventori.
   { path: "/units", roles: INVENTORY_ROLES },
 ];

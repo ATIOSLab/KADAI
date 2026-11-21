@@ -12,6 +12,7 @@ import {
     Wallet,
     ChefHat,
   QrCode,
+  CalendarClock,
   Scale,
   Ruler,
   Truck,
@@ -74,6 +75,15 @@ export const navigationSections: NavigationSection[] = [
         icon: QrCode,
         roles: ["ADMIN", "MANAGER"],
         businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG", "CATERING"],
+      },
+      {
+        href: "/catering",
+        label: "Pesanan Catering",
+        shortLabel: "Catering",
+        description: "Booking acara: jadwal, uang muka, sisa tagihan, dan tahap produksi.",
+        icon: CalendarClock,
+        roles: ["ADMIN", "MANAGER", "CASHIER"],
+        businessTypes: ["CATERING"],
       },
       {
         href: "/kds",

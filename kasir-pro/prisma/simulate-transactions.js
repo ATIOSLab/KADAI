@@ -2,6 +2,17 @@ const { PrismaClient, PaymentType, OrderType } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+// Script ini menulis transaksi penjualan FIKTIF (nomor invoice nyata, stok ikut
+// terpotong). HANYA boleh dijalankan di lingkungan demo — guard ganda:
+// non-produksi DAN SEED_DEMO_ON_START=true (produksi kini selalu false).
+if (process.env.NODE_ENV === "production" || process.env.SEED_DEMO_ON_START !== "true") {
+  console.error(
+    "Ditolak: simulate-transactions.js hanya untuk demo. " +
+      "Set SEED_DEMO_ON_START=true dan pastikan NODE_ENV != production."
+  );
+  process.exit(1);
+}
+
 /**
  * Alokasikan qty dari batch yang tersedia (FIFO: kadaluarsa terdekat dulu).
  * Bisa menghasilkan total < qtyMinta bila stok tinggal sedikit — pemanggil

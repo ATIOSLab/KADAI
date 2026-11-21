@@ -429,6 +429,21 @@ export async function POST(request: NextRequest) {
               "PRICE_UNAVAILABLE"
             );
           }
+
+          // Stok PRODUK JADI ikut berkurang (FIFO). Sebelumnya hanya bahan baku
+          // yang terpotong sehingga angka inventori produk manufaktur tidak pernah
+          // turun walau terjual berkali-kali (stok fisik != sistem).
+          const finishedFifo = await processFIFODeduction(tx, product.id, item.quantity, {
+            outletId: effectiveOutletId,
+            method: effectiveCostingMethod,
+          });
+          if (finishedFifo.allocations.length > 0) {
+            await applyFIFODeductions(tx, finishedFifo.allocations);
+            // Alokasi produk jadi ikut disimpan ke saleItem.batchAllocations agar
+            // void memulihkan stok bahan baku DAN produk jadi secara konsisten.
+            rawAllocations.push(...finishedFifo.allocations);
+          }
+
           const unitSellingPrice = priceBatch.sellingPrice;
           const lineRevenue = unitSellingPrice.mul(item.quantity);
           const itemDiscount = new Decimal(item.discountAmount || 0);

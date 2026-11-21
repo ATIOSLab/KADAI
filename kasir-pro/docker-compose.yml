@@ -29,7 +29,6 @@ services:
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.5}
       RUN_SEED_ON_START: ${RUN_SEED_ON_START:-false}
       SEED_DEMO_ON_START: ${SEED_DEMO_ON_START:-false}
-      RESET_DB_ON_START: ${RESET_DB_ON_START:-false}
       DB_WAIT_MAX_ATTEMPTS: ${DB_WAIT_MAX_ATTEMPTS:-30}
       DB_WAIT_DELAY_MS: ${DB_WAIT_DELAY_MS:-2000}
     healthcheck:
@@ -83,7 +82,6 @@ services:
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.5}
       RUN_SEED_ON_START: false
       SEED_DEMO_ON_START: false
-      RESET_DB_ON_START: false
       DB_WAIT_MAX_ATTEMPTS: ${DB_WAIT_MAX_ATTEMPTS:-30}
       DB_WAIT_DELAY_MS: ${DB_WAIT_DELAY_MS:-2000}
     volumes:

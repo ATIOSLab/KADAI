@@ -119,8 +119,11 @@ export async function settleInvoice(opts: {
   }
 
   const result = await prisma.$transaction(async (tx) => {
-    const settled = await tx.paymentInvoice.update({
-      where: { id: invoice.id },
+    // Klaim atomik: hanya satu pemicu yang boleh melunasi tagihan. Retry webhook
+    // atau admin yang menekan tombol lunas bersamaan tidak boleh memperpanjang
+    // langganan dua kali (sebelumnya: cek-then-act di luar transaksi -> race).
+    const claimed = await tx.paymentInvoice.updateMany({
+      where: { id: invoice.id, status: "PENDING" },
       data: {
         status: "SETTLED",
         paidAt: new Date(),
@@ -130,6 +133,10 @@ export async function settleInvoice(opts: {
         providerRef: opts.providerRef ?? invoice.providerRef,
       },
     });
+    if (claimed.count !== 1) {
+      // Sudah lunas oleh pemicu lain: anggap idempotent, jangan ekstensi 2x.
+      return { alreadyClaimed: true };
+    }
 
     const now = new Date();
     const existing = await tx.storeSubscription.findFirst({
@@ -182,9 +189,12 @@ export async function settleInvoice(opts: {
       storePhone: invoice.store.phone,
     });
 
-    return { invoiceId: settled.id, invoiceNumber: settled.invoiceNumber, subscriptionId };
+    return { invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber, subscriptionId };
   });
 
+  if (result && "alreadyClaimed" in result) {
+    return { invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber, alreadySettled: true };
+  }
   return { ...result, alreadySettled: false };
 }
 

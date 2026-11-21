@@ -1,37 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { getSessionUserFromRequest } from "@/lib/session";
 import { ADMIN_ONLY_ROLES, hasRequiredRole } from "@/lib/rbac";
 import { runDemoSeeding } from "@/lib/demo-seeder";
 
 // POST /api/admin/seed-demo
-// Secured endpoint: Only authenticated ADMIN or valid setup secret can trigger cluster seeding
+// Endpoint bootstrap seeding klaster demo.
+//
+// Otorisasi (TIDAK ada rahasia hardcoded — nilai literal di kode sama dengan
+// nilai yang bisa dibaca siapa pun di repo publik, sehingga tidak pernah boleh
+// menjadi kredensial yang valid):
+//   1. Sesi ADMIN yang login, ATAU
+//   2. Header X-Seed-Key yang cocok dengan env SEED_ADMIN_SECRET
+//      (perbandingan timing-safe; tanpa env tersebut jalur ini fail-closed).
+function samaPersis(a: string, b: string): boolean {
+  const ba = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ba.length !== bb.length) return false;
+  return timingSafeEqual(ba, bb);
+}
+
+function hasValidSeedSecret(request: NextRequest): boolean {
+  const secret = (process.env.SEED_ADMIN_SECRET || "").trim();
+  if (!secret) return false; // fail-closed
+  const provided = (request.headers.get("x-seed-key") || "").trim();
+  return provided.length > 0 && samaPersis(provided, secret);
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("x-seed-key");
-    const cronHeader = request.headers.get("x-cron-secret");
-    const validSecret = process.env.BETTER_AUTH_SECRET || "kadai-seed-secret";
-    const validCronSecret = process.env.CRON_SECRET || "kadai-cron-secret";
-    
-    let isAuthorized = false;
-    if (authHeader && (authHeader === validSecret || authHeader === "kadai-seed-secret" || authHeader === "kadai-prod-seed-2026")) {
-      isAuthorized = true;
-    } else if (cronHeader && (cronHeader === validCronSecret || cronHeader === "kadai-cron-secret")) {
-      isAuthorized = true;
-    } else {
-      const sessionUser = getSessionUserFromRequest(request);
-      if (sessionUser && hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES)) {
-        isAuthorized = true;
-      }
-    }
+    const sessionUser = getSessionUserFromRequest(request);
+    const viaAdminSession =
+      !!sessionUser && hasRequiredRole(sessionUser.role, ADMIN_ONLY_ROLES);
 
-    if (!isAuthorized) {
-      return NextResponse.json({ error: "Unauthorized: Admin access required" }, { status: 401 });
+    if (!viaAdminSession && !hasValidSeedSecret(request)) {
+      return NextResponse.json(
+        { error: "Unauthorized: sesi ADMIN atau header X-Seed-Key yang sah diperlukan" },
+        { status: 401 }
+      );
     }
 
     const result = await runDemoSeeding();
-    return NextResponse.json({ success: true, message: "Demo clusters seeded successfully!", data: result });
-  } catch (error: any) {
+    return NextResponse.json({
+      success: true,
+      message: "Demo clusters seeded successfully!",
+      data: result,
+    });
+  } catch (error) {
     console.error("POST /api/admin/seed-demo error:", error);
-    return NextResponse.json({ error: error.message || "Failed to seed demo clusters" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Gagal menjalankan seeding demo clusters" },
+      { status: 500 }
+    );
   }
 }

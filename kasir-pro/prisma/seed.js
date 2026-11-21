@@ -477,15 +477,22 @@ async function main() {
     console.log("Super Admin platform: tidak dikonfigurasi (atur SUPERADMIN_EMAIL/SUPERADMIN_PASSWORD untuk bootstrap).");
   }
 
-  // Auto seed multi-vertical client demo clusters
-  try {
-    console.log("Memulai integrasi demo clusters...");
-    const demoModule = require("./seed-demo-clusters.js");
-    if (typeof demoModule === "function") {
-      await demoModule();
+  // Auto seed multi-vertical client demo clusters — HANYA bila diminta eksplisit.
+  // `db:seed` juga dipakai untuk bootstrap PRODUKSI (admin, plan, store): tanpa
+  // guard ini, menyalakan RUN_SEED_ON_START akan menyuntik tenant/produk/user
+  // demo (beserta PIN) ke database produksi pada setiap start container.
+  if (process.env.SEED_DEMO_ON_START === "true") {
+    try {
+      console.log("Memulai integrasi demo clusters...");
+      const demoModule = require("./seed-demo-clusters.js");
+      if (typeof demoModule === "function") {
+        await demoModule();
+      }
+    } catch (err) {
+      console.warn("Demo clusters auto-seed notice:", err.message);
     }
-  } catch (err) {
-    console.warn("Demo clusters auto-seed notice:", err.message);
+  } else {
+    console.log("Seed klaster demo dilewati (SEED_DEMO_ON_START != true).");
   }
 }
 

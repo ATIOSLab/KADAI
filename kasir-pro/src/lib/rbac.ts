@@ -53,7 +53,6 @@ const dashboardRouteRules: RouteAccessRule[] = [
   { path: "/platform/bot", roles: SUPER_ADMIN_ROLES },
   { path: "/platform/owners", roles: SUPER_ADMIN_ROLES },
   { path: "/platform/subscriptions", roles: SUPER_ADMIN_ROLES },
-  { path: "/platform/tenants", roles: SUPER_ADMIN_ROLES },
   { path: "/finance/tax", roles: FINANCE_ROLES },
   { path: "/finance", roles: FINANCE_ROLES },
   { path: "/reports", roles: FINANCE_ROLES },

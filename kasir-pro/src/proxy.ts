@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { canAccessPath, getDefaultPathForRole } from "@/lib/rbac";
+import { isRouteAvailableForBusinessType } from "@/lib/business-catalog";
 import { isCsrfSafe, SECURITY_HEADERS, buildCspHeader } from "@/lib/security";
 
 const publicPages = [
@@ -123,10 +124,18 @@ export async function proxy(request: NextRequest) {
   }
   // Revalidate authoritative identity on every protected request: a role change,
   // password update or deactivation immediately invalidates the signed cookie.
+  // businessType diambil dari DB (authoritative), bukan cookie, agar perubahan
+  // jenis usaha oleh platform langsung berefek tanpa menunggu login ulang.
+  let businessType: string | null = null;
   try {
     const current = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { isActive: true, role: true, updatedAt: true },
+      select: {
+        isActive: true,
+        role: true,
+        updatedAt: true,
+        store: { select: { businessType: true } },
+      },
     });
     if (!current?.isActive || current.role !== user.role || current.updatedAt.toISOString() !== user.version) {
       const denied = isApi ? NextResponse.json({ error: "Session expired" }, { status: 401 }) :
@@ -134,11 +143,24 @@ export async function proxy(request: NextRequest) {
       denied.cookies.delete("session");
       return secure(denied);
     }
+    businessType = current.store?.businessType ?? null;
   } catch {
     return secure(NextResponse.json({ error: "Authentication service unavailable" }, { status: 503 }));
   }
   if (!isApi && !canAccessPath(pathname, user.role)) {
     return secure(NextResponse.redirect(new URL(getDefaultPathForRole(user.role), request.url)));
+  }
+  // Gerbang vertikal (fail-closed): halaman & API modul spesifik-vertikal
+  // (meja/QR, KDS, katering, laundry) hanya untuk toko dengan jenis usaha yang
+  // memilikinya — menu yang disembunyikan tidak bisa dibuka lewat URL langsung.
+  if (!isRouteAvailableForBusinessType(pathname, businessType)) {
+    const denied = isApi
+      ? NextResponse.json(
+          { error: "Modul ini tidak tersedia untuk jenis usaha toko Anda" },
+          { status: 403 }
+        )
+      : NextResponse.redirect(new URL("/dashboard?modul=tidak-tersedia", request.url));
+    return secure(denied);
   }
   return secure(passThrough());
 }

@@ -12,9 +12,11 @@ import {
   getBusinessProfile,
   getBusinessTypeLabel,
   getCategoryForType,
+  getGatingModulesForRoute,
   getModulesForType,
   getRolesForType,
   isBusinessType,
+  isRouteAvailableForBusinessType,
   typesWithModule,
 } from "../src/lib/business-catalog";
 import { APP_ROLES, getAllowedRolesForPath } from "../src/lib/rbac";
@@ -224,4 +226,78 @@ test("katalog bersih dari stub dan memuat seluruh tipe schema", () => {
   const src = readSrc("src/lib/business-catalog.ts");
   assert.ok(!/TODO|FIXME|stub/i.test(src), "katalog masih memuat TODO/FIXME/stub");
   assert.equal(Object.keys(BUSINESS_PROFILES).length, BUSINESS_TYPE_KEYS.length);
+});
+
+test("gerbang vertikal mengenali rute halaman & API modul spesifik-vertikal", () => {
+  const keysFor = (p: string) => getGatingModulesForRoute(p).map((m) => m.key);
+  assert.deepEqual(keysFor("/catering"), ["catering"]);
+  assert.deepEqual(keysFor("/catering/abc"), ["catering"]);
+  assert.deepEqual(keysFor("/tables"), ["tables"]);
+  assert.deepEqual(keysFor("/kds"), ["kds"]);
+  assert.deepEqual(keysFor("/laundry"), ["laundry"]);
+  assert.deepEqual(keysFor("/api/tables"), ["tables"]);
+  assert.deepEqual(keysFor("/api/kds"), ["kds"]);
+  assert.deepEqual(keysFor("/api/laundry/jobs"), ["laundry"]);
+  assert.deepEqual(keysFor("/api/sales/abc123/catering-status"), ["catering"]);
+  assert.deepEqual(keysFor("/api/sales/abc123/catering-payment"), ["catering"]);
+  // Rute universal & rute asing tidak pernah menjadi gerbang vertikal.
+  for (const p of ["/dashboard", "/pos", "/products", "/reports", "/api/products", "/api/sales", "/api/health", "/x"]) {
+    assert.deepEqual(keysFor(p), [], `${p} seharusnya tanpa gerbang vertikal`);
+  }
+});
+
+test("setiap modul vertikal mengklaim permukaan API-nya (halaman + API sama-sama dijaga)", () => {
+  for (const key of MODULE_KEYS) {
+    const m = MODULES[key];
+    if (m.universal) continue;
+    assert.ok(
+      (m.apiPaths && m.apiPaths.length > 0) || m.routePattern,
+      `modul ${key} tidak mengklaim rute API (apiPaths/routePattern)`
+    );
+    for (const apiPath of m.apiPaths ?? []) {
+      assert.ok(apiPath.startsWith("/api/"), `modul ${key}: apiPath ${apiPath} tidak diawali /api/`);
+    }
+  }
+});
+
+test("keputusan akses vertikal: tolak modul yang tidak dimiliki toko, izinkan selebihnya", () => {
+  // CATERING: punya katering & KDS, tidak punya meja QR / laundry.
+  assert.equal(isRouteAvailableForBusinessType("/catering", "CATERING"), true);
+  assert.equal(isRouteAvailableForBusinessType("/kds", "CATERING"), true);
+  assert.equal(isRouteAvailableForBusinessType("/tables", "CATERING"), false);
+  assert.equal(isRouteAvailableForBusinessType("/laundry", "CATERING"), false);
+  // SERVICE (jasa/laundry): hanya laundry di antara modul vertikal.
+  assert.equal(isRouteAvailableForBusinessType("/laundry", "SERVICE"), true);
+  assert.equal(isRouteAvailableForBusinessType("/api/laundry/jobs", "SERVICE"), true);
+  assert.equal(isRouteAvailableForBusinessType("/tables", "SERVICE"), false);
+  assert.equal(isRouteAvailableForBusinessType("/catering", "SERVICE"), false);
+  assert.equal(isRouteAvailableForBusinessType("/api/sales/s1/catering-status", "SERVICE"), false);
+  // Ritel: seluruh modul vertikal tertutup, modul universal tetap terbuka.
+  for (const p of ["/tables", "/kds", "/catering", "/laundry"]) {
+    assert.equal(isRouteAvailableForBusinessType(p, "RETAIL"), false, `RETAIL masih bisa ${p}`);
+  }
+  assert.equal(isRouteAvailableForBusinessType("/pos", "RETAIL"), true);
+  // Tanpa info vertikal (SUPER_ADMIN / cookie lama) → jangan mengunci (gerbang peran tetap ada).
+  for (const p of ["/tables", "/catering", "/laundry"]) {
+    assert.equal(isRouteAvailableForBusinessType(p, null), true);
+    assert.equal(isRouteAvailableForBusinessType(p, undefined), true);
+    assert.equal(isRouteAvailableForBusinessType(p, "LEGACY_UNKNOWN"), true);
+  }
+});
+
+test("middleware (proxy.ts) menegakkan gerbang vertikal dari katalog, bukan daftar hardcode", () => {
+  const proxy = readSrc("src/proxy.ts");
+  assert.ok(
+    proxy.includes("isRouteAvailableForBusinessType"),
+    "proxy.ts tidak memakai gerbang vertikal katalog"
+  );
+  assert.ok(
+    proxy.includes("store: { select: { businessType: true } }"),
+    "businessType harus diambil authoritative dari DB, bukan cookie"
+  );
+  assert.ok(!/businessType === "/.test(proxy), "proxy.ts masih membandingkan businessType literal");
+  assert.ok(
+    !proxy.includes('"CATERING"') && !proxy.includes('"SERVICE"'),
+    "proxy.ts masih memuat tipe usaha hardcode"
+  );
 });

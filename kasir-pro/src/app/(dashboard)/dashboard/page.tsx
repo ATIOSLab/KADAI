@@ -26,7 +26,7 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TopProductsChart } from "@/components/dashboard/top-products-chart";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
-import { PackagePlus, ScanLine, Warehouse } from "lucide-react";
+import { PackagePlus, ScanLine, Warehouse, Info } from "lucide-react";
 import type { DashboardOverview, DashboardSummary } from "@/types";
 
 type OverviewCharts = DashboardOverview["charts"];
@@ -93,6 +93,16 @@ function useDashboardChart<K extends ChartKey>(
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
+  // Banner saat middleware mengarahkan ke sini karena modul tidak tersedia
+  // untuk jenis usaha toko (?modul=tidak-tersedia). Tanpa useSearchParams agar
+  // halaman tetap bebas dari kewajiban Suspense boundary.
+  const [modulBlocked, setModulBlocked] = useState(false);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("modul") === "tidak-tersedia") {
+      setModulBlocked(true);
+    }
+  }, []);
 
   const [revenueRange, setRevenueRange] = useState<DashboardDateRange>(
     getCurrentWeekRange()
@@ -212,6 +222,29 @@ export default function DashboardPage() {
           </Button>
         </div>
       </PageHeader>
+
+      {modulBlocked && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+          <Info className="mt-0.5 size-4 shrink-0" />
+          <div className="flex-1">
+            <p className="font-bold">Modul tidak tersedia</p>
+            <p className="mt-0.5 leading-snug">
+              Menu yang Anda buka bukan bagian dari paket jenis usaha toko ini.
+              Modul otomatis menyesuaikan jenis usaha saat pendaftaran — ubah lewat{" "}
+              <Link href="/settings" className="font-semibold underline">Pengaturan</Link>{" "}
+              atau hubungi platform bila perlu penyesuaian paket.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setModulBlocked(false)}
+            aria-label="Tutup notifikasi"
+            className="ml-2 rounded-md px-1.5 py-0.5 font-bold text-amber-700 hover:bg-amber-100"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <SummaryCards data={summary ?? undefined} loading={summaryLoading} />
 

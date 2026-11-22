@@ -73,6 +73,10 @@ export type BusinessModule = {
   description: string;
   /** universal = tersedia untuk SEMUA vertikal (tanpa filter businessTypes di menu) */
   universal: boolean;
+  /** Rute API milik modul ini (untuk gating vertikal di middleware). */
+  apiPaths?: readonly string[];
+  /** Pola rute tambahan (mis. rute dinamis /api/sales/[id]/catering-payment). */
+  routePattern?: RegExp;
 };
 
 export const MODULES: Record<ModuleKey, BusinessModule> = {
@@ -99,6 +103,7 @@ export const MODULES: Record<ModuleKey, BusinessModule> = {
     section: "Operasional & Transaksi",
     description: "Tata letak meja dan menu QR mandiri untuk dine-in.",
     universal: false,
+    apiPaths: ["/api/tables"],
   },
   kds: {
     key: "kds",
@@ -107,6 +112,7 @@ export const MODULES: Record<ModuleKey, BusinessModule> = {
     section: "Operasional & Transaksi",
     description: "Antrean tiket dapur & bar real-time.",
     universal: false,
+    apiPaths: ["/api/kds"],
   },
   catering: {
     key: "catering",
@@ -115,6 +121,7 @@ export const MODULES: Record<ModuleKey, BusinessModule> = {
     section: "Operasional & Transaksi",
     description: "Booking acara, uang muka, sisa tagihan, tahap produksi.",
     universal: false,
+    routePattern: /^\/api\/sales\/[^/]+\/catering-(payment|status)(\/|$)/,
   },
   laundry: {
     key: "laundry",
@@ -123,6 +130,7 @@ export const MODULES: Record<ModuleKey, BusinessModule> = {
     section: "Operasional & Transaksi",
     description: "Order pencucian satuan & kiloan dengan pelacakan proses.",
     universal: false,
+    apiPaths: ["/api/laundry", "/api/laundry/jobs"],
   },
   products: {
     key: "products",
@@ -592,6 +600,40 @@ export function getRolesForType(key: BusinessTypeKey): AppRole[] {
 /** Label manusiawi; fallback ke kunci mentah bila tipe tak dikenal (data lama). */
 export function getBusinessTypeLabel(key: string): string {
   return isBusinessType(key) ? BUSINESS_PROFILES[key].label : key;
+}
+
+const routeMatches = (pathname: string, base: string) =>
+  pathname === base || pathname.startsWith(`${base}/`);
+
+/**
+ * Modul yang MENGKLAIM rute ini dan bersifat spesifik-vertikal.
+ * Modul universal (dashboard, pos, produk, ...) tidak pernah menjadi gerbang.
+ */
+export function getGatingModulesForRoute(pathname: string): BusinessModule[] {
+  return MODULE_KEYS.map((key) => MODULES[key]).filter((module) => {
+    if (module.universal) return false;
+    if (routeMatches(pathname, module.path)) return true;
+    if (module.apiPaths?.some((apiPath) => routeMatches(pathname, apiPath))) return true;
+    return module.routePattern?.test(pathname) ?? false;
+  });
+}
+
+/**
+ * Apakah rute ini boleh diakses oleh toko dengan jenis usaha tsb?
+ *  - Rute tanpa modul spesifik-vertikal → selalu boleh (peran tetap dijaga RBAC).
+ *  - Tanpa info vertikal (mis. SUPER_ADMIN / cookie lama) → boleh; gerbang peran
+ *    dan pemeriksaan di route handler tetap berlaku (anti lock-out).
+ *  - Info vertikal diketahui tapi modul tidak dimiliki → DITOLAK (fail-closed),
+ *    supaya menu yang disembunyikan juga tidak bisa dibuka lewat URL langsung.
+ */
+export function isRouteAvailableForBusinessType(
+  pathname: string,
+  businessType: string | null | undefined
+): boolean {
+  const gating = getGatingModulesForRoute(pathname);
+  if (gating.length === 0) return true;
+  if (!businessType || !isBusinessType(businessType)) return true;
+  return gating.every((module) => typesWithModule(module.key).includes(businessType));
 }
 
 export const ALL_APP_ROLES = APP_ROLES;

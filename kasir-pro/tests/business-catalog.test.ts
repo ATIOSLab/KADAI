@@ -198,6 +198,19 @@ test("validator platform mengambil enum dari katalog (anti drift)", () => {
   assert.ok(!validator.includes('enum([\n          "RETAIL"'));
 });
 
+test("jalur demo self-serve (form + API) memakai katalog, tanpa tipe legacy", () => {
+  const page = readSrc("src/app/demo/page.tsx");
+  assert.ok(page.includes("BUSINESS_CATEGORIES"), "form demo harus iterasi katalog");
+  assert.ok(page.includes("DEFAULT_BUSINESS_TYPE"));
+  for (const legacy of ["FNB_RESTO", "CENTRAL_KITCHEN", '"OTHER"']) {
+    assert.ok(!page.includes(legacy), `form demo masih memakai tipe legacy ${legacy}`);
+  }
+  const route = readSrc("src/app/api/demo-requests/route.ts");
+  assert.ok(route.includes("BUSINESS_TYPE_KEYS"), "API demo-requests harus memvalidasi enum katalog");
+  assert.ok(route.includes("getBusinessTypeLabel"));
+  assert.ok(!route.includes("typeLabelMap"), "typeLabelMap lama harus diganti katalog");
+});
+
 test("isBusinessType & getBusinessTypeLabel aman untuk data lama/tak dikenal", () => {
   for (const key of BUSINESS_TYPE_KEYS) assert.ok(isBusinessType(key));
   for (const bad of ["LAUNDRY", "", "fnb_cafe", null, undefined, 42, {}]) {

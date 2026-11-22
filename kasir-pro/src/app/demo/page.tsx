@@ -24,12 +24,19 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getStoredReferralCode } from "@/lib/referral-client";
+import {
+  BUSINESS_CATEGORIES,
+  DEFAULT_BUSINESS_TYPE,
+  getBusinessProfile,
+  getModulesForType,
+  type BusinessTypeKey,
+} from "@/lib/business-catalog";
 
 function RequestDemoForm() {
   const searchParams = useSearchParams();
   const [fullName, setFullName] = useState("");
   const [businessName, setBusinessName] = useState("");
-  const [businessType, setBusinessType] = useState("FNB_RESTO");
+  const [businessType, setBusinessType] = useState<BusinessTypeKey>(DEFAULT_BUSINESS_TYPE);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [outletCount, setOutletCount] = useState(1);
@@ -265,17 +272,23 @@ function RequestDemoForm() {
                       </label>
                       <select
                         value={businessType}
-                        onChange={(e) => setBusinessType(e.target.value)}
+                        onChange={(e) => setBusinessType(e.target.value as BusinessTypeKey)}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       >
-                        <option value="BUILDING_SUPPLY">Toko Bangunan & Alat Teknik</option>
-                        <option value="RETAIL">Toko Ritel & Minimarket Sembako</option>
-                        <option value="PHARMACY">Apotek & Alat Kesehatan</option>
-                        <option value="FNB_RESTO">Kafe, Resto & Kuliner (F&B)</option>
-                        <option value="CENTRAL_KITCHEN">Dapur Pusat & Multi-Gudang</option>
-                        <option value="SERVICE">Jasa, Barbershop & Laundry</option>
-                        <option value="OTHER">Sektor Lainnya</option>
+                        {BUSINESS_CATEGORIES.map((category) => (
+                          <optgroup key={category.key} label={category.label}>
+                            {category.types.map((typeKey) => (
+                              <option key={typeKey} value={typeKey}>
+                                {getBusinessProfile(typeKey).label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                       </select>
+                      <p className="text-[10px] text-slate-500 leading-snug">
+                        {getModulesForType(businessType).length} modul aktif otomatis ·{" "}
+                        {getBusinessProfile(businessType).description}
+                      </p>
                     </div>
 
                     <div className="space-y-1.5">

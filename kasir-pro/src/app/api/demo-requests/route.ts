@@ -6,11 +6,12 @@ import { getSessionUserFromRequest } from "@/lib/session";
 import { handleApiError } from "@/lib/api-response";
 import { checkRateLimit } from "@/lib/security";
 import { randomBytes } from "crypto";
+import { BUSINESS_TYPE_KEYS, getBusinessTypeLabel } from "@/lib/business-catalog";
 
 const createDemoRequestSchema = z.object({
   fullName: z.string().min(2, "Nama minimal 2 karakter"),
   businessName: z.string().min(2, "Nama usaha minimal 2 karakter"),
-  businessType: z.string().min(1, "Pilih jenis usaha"),
+  businessType: z.enum(BUSINESS_TYPE_KEYS, { error: "Pilih jenis usaha yang valid" }),
   phone: z.string().min(9, "Nomor WhatsApp minimal 9 digit"),
   email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
   outletCount: z.number().int().min(1).default(1),
@@ -112,17 +113,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (recipients.length > 0) {
-        const typeLabelMap: Record<string, string> = {
-          FNB_CAFE: "Kafe & Kedai Minuman",
-          FNB_RESTO: "Restoran / Rumah Makan",
-          FNB_WARUNG: "Warung Makan & Booth",
-          RETAIL_SHOP: "Toko Ritel & Grosir",
-          MINIMARKET: "Minimarket Sembako",
-          BUILDING_SUPPLY: "Toko Bangunan & Alat Teknik",
-          PHARMACY: "Apotek & Alat Kesehatan",
-          SERVICE: "Jasa, Barbershop & Laundry",
-        };
-        const displayType = typeLabelMap[validated.businessType] || validated.businessType;
+        const displayType = getBusinessTypeLabel(validated.businessType);
         const alertMessage =
           `🔔 *LEAD PERMOHONAN DEMO KADAI*\n\n` +
           `👤 *Nama:* ${validated.fullName}\n` +

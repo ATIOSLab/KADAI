@@ -248,6 +248,22 @@ test("gerbang vertikal mengenali rute halaman & API modul spesifik-vertikal", ()
   }
 });
 
+test("gerbang halaman mengarahkan ke ?modul=tidak-tersedia dan dashboard menampilkan banner pemulihan", () => {
+  // Banner dirender client-side (useEffect + window.location.search), jadi tidak
+  // bisa dibuktikan lewat HTML statis — dikunci di sini secara deterministik.
+  const proxy = readSrc("src/proxy.ts");
+  assert.ok(
+    proxy.includes("/dashboard?modul=tidak-tersedia"),
+    "proxy harus mengarahkan halaman terblokir ke /dashboard?modul=tidak-tersedia"
+  );
+  const dash = readSrc("src/app/(dashboard)/dashboard/page.tsx");
+  assert.ok(
+    dash.includes("window.location.search") && dash.includes('"tidak-tersedia"'),
+    "dashboard harus membaca param modul dari URL"
+  );
+  assert.ok(/Modul tidak tersedia/.test(dash), "dashboard harus menampilkan banner 'Modul tidak tersedia'");
+});
+
 test("setiap modul vertikal mengklaim permukaan API-nya (halaman + API sama-sama dijaga)", () => {
   for (const key of MODULE_KEYS) {
     const m = MODULES[key];

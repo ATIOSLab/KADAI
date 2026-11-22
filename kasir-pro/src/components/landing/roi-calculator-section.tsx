@@ -112,7 +112,7 @@ export function RoiCalculatorSection() {
             {/* Selector: Jumlah Cabang / Gerai */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-700">Jumlah Gerai (Outlet)</span>
+                <span className="font-bold text-slate-700">Jumlah Gerai</span>
                 <span className="font-extrabold text-slate-900 tabular-nums">
                   {outletCount} Gerai
                 </span>
@@ -129,7 +129,7 @@ export function RoiCalculatorSection() {
                         : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
-                    {cnt} {cnt >= 5 ? "Outlet+" : "Outlet"}
+                    {cnt} {cnt >= 5 ? "Gerai+" : "Gerai"}
                   </button>
                 ))}
               </div>

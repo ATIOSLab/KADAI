@@ -104,7 +104,7 @@ for x in sorted(LAYAK, key=lambda y: float(y.get("currentSellingPrice") or 0), r
         break
 if not GERINDA:
     raise SystemExit("tidak ada produk berstok cukup untuk uji ambang 250rb")
-CRON = os.environ.get("KADAI_CRON_SECRET", "uji-cron-9f3a71")
+CRON = os.environ["KADAI_CRON_SECRET"]  # wajib di-set, tiada fallback literal
 
 # tutup laci yang masih terbuka
 for tok, siapa in ((TOK_MGR, "manager"), (TOK_KSR, "kasir")):
@@ -200,9 +200,9 @@ st, t4 = jual(TOK_MGR, "QRIS", bayar=0, ref="QR-123456", jumlah=GERINDA_QTY, pro
 catat("non-tunai >= 250rb dengan referensi diterima", st in (200, 201), f"HTTP {st}")
 st, a1 = req("POST", "/api/inventory/adjustment", {"productId": PID, "quantityChange": 0, "reason": "OTHER"})
 catat("penyesuaian stok 0 ditolak", st == 400, f"HTTP {st}")
-st, _ = req("POST", "/api/cron/billing-referral", {"task": "renewals"}, extra={"x-cron-secret": "kadai-internal-cron-token"})
+st, _ = req("POST", "/api/cron/billing-referral", {"task": "renewals"}, extra={"x-cron-secret": "token-lama-contoh-tidak-berlaku"})
 catat("cron menolak rahasia cadangan lama", st == 403, f"HTTP {st}")
-st, _ = req("POST", "/api/cron/billing-referral?secret=uji-cron-9f3a71", {"task": "renewals"})
+st, _ = req("POST", "/api/cron/billing-referral?secret=uji-salah-query-tidak-berlaku", {"task": "renewals"})
 catat("cron menolak rahasia dari query string", st == 403, f"HTTP {st}")
 st, _ = req("POST", "/api/cron/daily-summary", {}, extra={"x-cron-secret": CRON})
 catat("cron menerima rahasia benar", st == 200, f"HTTP {st}")

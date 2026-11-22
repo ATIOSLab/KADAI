@@ -11,9 +11,7 @@ const publicPages = [
   "/login",
   "/register",
   "/demo",
-  "/request-demo",
   "/referral",
-  "/mitra",
   "/harga",
   "/hardware",
   "/fitur",
@@ -21,7 +19,6 @@ const publicPages = [
   "/solusi/fnb",
   "/solusi/ritel",
   "/blog",
-  "/pricing",
   "/kebijakan-privasi",
   "/syarat-ketentuan",
   "/.well-known",
@@ -42,7 +39,6 @@ const publicPages = [
   "/site.webmanifest",
   "/manifest.json",
   "/og-image.png",
-  "/brand",
   "/sw.js",
   "/images",
   "/uploads",
@@ -76,6 +72,16 @@ const publicApis = [
 ];
 const matches = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 
+// URL marketing lama (pra-peluncuran) → halaman live penggantinya. Dialihkan
+// permanen (308) sebelum gerbang sesi, supaya tautan/share lama tidak berakhir
+// 404 maupun terlempar ke /login.
+const legacyRedirects: Record<string, string> = {
+  "/pricing": "/harga",
+  "/request-demo": "/demo",
+  "/mitra": "/referral",
+  "/brand": "/",
+};
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // Nonce per-request: dipakai CSP script-src dan diteruskan ke Next.js lewat
@@ -91,6 +97,11 @@ export async function proxy(request: NextRequest) {
     return response;
   };
   const isApi = pathname.startsWith("/api/");
+  // Redirect URL marketing lama sebelum pemeriksaan sesi/CSRF apa pun.
+  const legacyTarget = legacyRedirects[pathname];
+  if (legacyTarget) {
+    return secure(NextResponse.redirect(new URL(legacyTarget, request.url), 308));
+  }
   const refParam = request.nextUrl.searchParams.get("ref");
   // Kode referral hanya boleh berupa token pendek yang aman: mencegah nilai
   // sembarang (payload/header injection) masuk ke cookie attribution.

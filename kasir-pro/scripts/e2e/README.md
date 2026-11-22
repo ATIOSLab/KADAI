@@ -26,9 +26,10 @@ urutan validasi, bentuk respons, atau pengaruh ke laci berikutnya).
    export KADAI_TOKEN_KASIR="<token sesi kasir>"
    ```
 
-   PIN supervisor yang dipakai uji PIN diambil dari `KADAI_PIN` (default
-   `888222`, PIN manager tenant demo Resto). Rahasia cron untuk uji
-   `x-cron-secret` diambil dari `KADAI_CRON_SECRET`; tanpa itu uji cron hanya
+   PIN supervisor yang dipakai uji PIN diambil dari `KADAI_PIN` — hitung
+   deterministik: `node scripts/e2e/pin-demo.mjs manager.resto@kadai.com`
+   (PIN per akun dari `KADAI_DEMO_PIN_SECRET`; tiada default literal).
+   Rahasia cron untuk uji `x-cron-secret` diambil dari `KADAI_CRON_SECRET`; tanpa itu uji cron hanya
    lulus di server lokal.
 
 Token sesi KADAI hanya berlaku **2 jam** dan mati lebih cepat bila baris user

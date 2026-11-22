@@ -57,7 +57,6 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 12
     env:
       DATABASE_URL: postgresql://kadai:kadai-ci@localhost:55432/kadai
-      ADMIN_SUPERVISOR_PIN: "888222"
       SUPERADMIN_EMAIL: superadmin.ci@kadai.asia
     defaults:
       run:
@@ -80,6 +79,9 @@ jobs:
           echo "CRON_SECRET=ci-$(openssl rand -hex 16)" >> "$GITHUB_ENV"
           echo "ADMIN_PASSWORD=Kadai-CI-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
           echo "SUPERADMIN_PASSWORD=Kadai-CI-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
+          echo "ADMIN_SUPERVISOR_PIN=$(printf '%06d' $((RANDOM % 900000 + 100000)))" >> "$GITHUB_ENV"
+          echo "KADAI_DEMO_PASSWORD=Kadai-CI-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
+          echo "KADAI_DEMO_PIN_SECRET=ci-$(openssl rand -hex 24)" >> "$GITHUB_ENV"
 
       - name: Migrate
         run: npx prisma migrate deploy
@@ -116,7 +118,7 @@ jobs:
           export KADAI_TOKEN_MANAGER="$TOK_MGR"
           export KADAI_TOKEN_KASIR="$TOK_KSR"
           export KADAI_CRON_SECRET="$CRON_SECRET"
-          export KADAI_PIN="888222"
+          export KADAI_PIN="$(node scripts/e2e/pin-demo.mjs manager.resto@kadai.com)"
           npm run test:e2e
 
       - name: Dump log server bila gagal

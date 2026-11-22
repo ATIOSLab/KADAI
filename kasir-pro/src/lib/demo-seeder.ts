@@ -9,7 +9,10 @@ function demoPin(key: string): string {
   return String(parseInt(createHmac("sha256", secret).update(key).digest("hex").slice(0, 12), 16) % 1000000).padStart(6, "0");
 }
 
-export const CLUSTERS = [
+// Lazy: PIN demo dihitung saat seeding dijalankan (bukan saat module load),
+// supaya `next build` tidak gagal walau KADAI_DEMO_PIN_SECRET belum ada di env build.
+function buildClusters() {
+  return [
   // 1. TOKO BANGUNAN, MATERIAL & ALAT TEKNIK (HARDWARE & BUILDING SUPPLIES)
   {
     vertical: "BUILDING_SUPPLY",
@@ -223,12 +226,14 @@ export const CLUSTERS = [
     ]
   }
 ];
+}
 
 export async function runDemoSeeding() {
   console.log("=== Memulai Eksekusi Langsung Seeding Demo Clusters ===");
   const defaultPassword = process.env.KADAI_DEMO_PASSWORD;
   if (!defaultPassword) throw new Error("KADAI_DEMO_PASSWORD wajib di-set - dilarang hardcode password demo di source code");
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
+  const CLUSTERS = buildClusters();
 
   for (const cluster of CLUSTERS) {
     // Tenant demo per klaster: data demo tidak lagi global (isolasi tenant)

@@ -10,7 +10,7 @@ BASE = os.environ.get("KADAI_BASE", "http://127.0.0.1:3110")
 TOK_MGR = os.environ["KADAI_TOKEN_MANAGER"]
 TOK_KSR = os.environ["KADAI_TOKEN_KASIR"]
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-PIN = "999222"
+PIN = os.environ.get("KADAI_PIN", "")  # tak dipakai skrip ini (void tanpa PIN) — dipertahankan demi konsistensi env
 hasil = []
 
 

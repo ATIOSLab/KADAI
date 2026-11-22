@@ -15,7 +15,9 @@ export DATABASE_URL="postgresql://kadai:kadai-ci@localhost:55432/kadai"
 # bahkan yang "cuma CI": repo ini publik dan scanner memicu alert.
 export BETTER_AUTH_SECRET="ci-$(openssl rand -hex 24)"
 export CRON_SECRET="ci-$(openssl rand -hex 16)"
-export ADMIN_SUPERVISOR_PIN="888222"
+export ADMIN_SUPERVISOR_PIN="$(printf '%06d' $((RANDOM % 900000 + 100000)))" # nonce per-run
+export KADAI_DEMO_PASSWORD="Kadai-CI-$(openssl rand -hex 12)"
+export KADAI_DEMO_PIN_SECRET="ci-$(openssl rand -hex 24)"
 export ADMIN_PASSWORD="Kadai-CI-$(openssl rand -hex 12)"
 export SUPERADMIN_EMAIL="superadmin.ci@kadai.asia"
 export SUPERADMIN_PASSWORD="Kadai-CI-$(openssl rand -hex 12)"
@@ -83,7 +85,7 @@ export KADAI_TOKEN_INVENTORY="$TOK_INV"
 export KADAI_TOKEN_ACCOUNTANT="$TOK_AKN"
 export KADAI_TOKEN_KITCHEN="$TOK_DAP"
 export KADAI_CRON_SECRET="$CRON_SECRET"
-export KADAI_PIN="888222"
+export KADAI_PIN="$(node scripts/e2e/pin-demo.mjs manager.resto@kadai.com)"
 export KADAI_UJI_TULIS=1
 bash scripts/e2e/jalankan-semua.sh
 RC=$?

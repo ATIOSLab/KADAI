@@ -9,7 +9,9 @@ function demoPin(key) {
   return String(parseInt(require("crypto").createHmac("sha256", secret).update(key).digest("hex").slice(0, 12), 16) % 1000000).padStart(6, "0");
 }
 
-const CLUSTERS = [
+// Lazy: PIN demo dihitung saat seeding dijalankan (bukan saat module load).
+function buildClusters() {
+  return [
   // 1. TOKO BANGUNAN, MATERIAL & ALAT TEKNIK (HARDWARE & BUILDING SUPPLIES)
   {
     vertical: "BUILDING_SUPPLY",
@@ -238,20 +240,22 @@ const CLUSTERS = [
       { name: "Tepung Terigu Segitiga Cakra 25 kg", sku: "GSR-TPG-04", barcode: "899700100004", category: "Tepung Terigu & Bumbu Masak", price: 235000, cost: 212000, stock: 65, unit: "karung", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "Haji Usman (Owner Grosir)", email: "owner.grosir@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.cafe@kadai.com") },
-      { name: "Mulyadi (Kepala Gudang Grosir)", email: "manager.grosir@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.cafe@kadai.com") },
+      { name: "Haji Usman (Owner Grosir)", email: "owner.grosir@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.grosir@kadai.com") },
+      { name: "Mulyadi (Kepala Gudang Grosir)", email: "manager.grosir@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.grosir@kadai.com") },
       { name: "Nanda (Kasir Transaksi Grosir)", email: "kasir.grosir@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Bambang (Staf Checker Muat Barang)", email: "gudang.grosir@kadai.com", role: UserRole.INVENTORY, pin: null },
       { name: "Suryani (Akuntan Piutang Toko)", email: "akuntan.grosir@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
     ]
   }
 ];
+}
 
 async function seedDemoClusters() {
   console.log("=== Memulai Seeding Klaster Akun Demo KADAI Multi-Vertikal ===");
   const defaultPassword = process.env.KADAI_DEMO_PASSWORD;
   if (!defaultPassword) throw new Error("KADAI_DEMO_PASSWORD wajib di-set - dilarang hardcode password demo di source code");
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
+  const CLUSTERS = buildClusters();
 
   // 1. Seed Outlets
   for (const cluster of CLUSTERS) {

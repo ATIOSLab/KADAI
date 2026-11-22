@@ -11,7 +11,7 @@ TOK_KSR = os.environ["KADAI_TOKEN_KASIR"]
 TOK_MGR = os.environ["KADAI_TOKEN_MANAGER"]
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 MODAL = 200000
-PIN_BENAR = os.environ.get("KADAI_PIN", "888222")  # PIN supervisor (manager/ADMIN) tenant
+PIN_BENAR = os.environ["KADAI_PIN"]  # PIN supervisor tenant uji — wajib di-set, tiada default literal
 PIN_SALAH = "111111"
 
 

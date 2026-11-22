@@ -6,7 +6,7 @@
 #   export KADAI_TOKEN_MANAGER="<cookie sesi manager>"
 #   export KADAI_TOKEN_KASIR="<cookie sesi kasir>"
 #   export KADAI_CRON_SECRET="<rahasia cron produksi>"
-#   export KADAI_PIN=888222            # PIN supervisor tenant uji
+#   export KADAI_PIN="$(node scripts/e2e/pin-demo.mjs manager.resto@kadai.com)"
 #   bash scripts/e2e/jalankan-semua.sh
 #
 # Tanpa KADAI_CRON_SECRET uji cron hanya relevan untuk server lokal; tanpa

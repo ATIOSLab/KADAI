@@ -28,6 +28,9 @@ const publicPages = [
   "/sitemap.xml",
   "/llms.txt",
   "/icon.svg",
+  "/opengraph-image.png",
+  "/twitter-image.png",
+  "/apple-icon.png",
   "/favicon.ico",
   "/favicon.svg",
   "/favicon-16x16.png",
@@ -177,6 +180,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|favicon.svg|favicon-.*\\.png|apple-touch-icon.png|android-chrome-.*\\.png|site.webmanifest|manifest.json|og-image.png|brand/|window.svg|vercel.svg|next.svg|globe.svg|file.svg|uploads/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|favicon.svg|favicon-.*\\.png|apple-touch-icon.png|android-chrome-.*\\.png|site.webmanifest|manifest.json|og-image.png|opengraph-image.png|twitter-image.png|apple-icon.png|brand/|window.svg|vercel.svg|next.svg|globe.svg|file.svg|uploads/).*)"],
 };
 

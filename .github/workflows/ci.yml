@@ -57,12 +57,8 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 12
     env:
       DATABASE_URL: postgresql://kadai:kadai-ci@localhost:55432/kadai
-      BETTER_AUTH_SECRET: ci-better-auth-secret-0123456789abcdef0123456789
-      CRON_SECRET: ci-cron-secret-0123456789abcdef
       ADMIN_SUPERVISOR_PIN: "888222"
-      ADMIN_PASSWORD: Kadai-CI-2026-seed-admin
       SUPERADMIN_EMAIL: superadmin.ci@kadai.asia
-      SUPERADMIN_PASSWORD: Kadai-CI-2026-superadmin
     defaults:
       run:
         working-directory: kasir-pro
@@ -77,6 +73,13 @@ jobs:
 
       - name: Install
         run: npm ci
+
+      - name: Generate CI secrets (nonce per run — tidak ada literal rahasia di repo)
+        run: |
+          echo "BETTER_AUTH_SECRET=ci-$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "CRON_SECRET=ci-$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+          echo "ADMIN_PASSWORD=Kadai-CI-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
+          echo "SUPERADMIN_PASSWORD=Kadai-CI-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
 
       - name: Migrate
         run: npx prisma migrate deploy

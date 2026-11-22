@@ -11,12 +11,14 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT" || exit 2
 
 export DATABASE_URL="postgresql://kadai:kadai-ci@localhost:55432/kadai"
-export BETTER_AUTH_SECRET="ci-better-auth-secret-0123456789abcdef0123456789"
-export CRON_SECRET="ci-cron-secret-0123456789abcdef"
+# Rahasia CI digenerate per-jalan (nonce) — jangan pernah hardcode kredensial,
+# bahkan yang "cuma CI": repo ini publik dan scanner memicu alert.
+export BETTER_AUTH_SECRET="ci-$(openssl rand -hex 24)"
+export CRON_SECRET="ci-$(openssl rand -hex 16)"
 export ADMIN_SUPERVISOR_PIN="888222"
-export ADMIN_PASSWORD="Kadai-CI-2026-seed-admin"
+export ADMIN_PASSWORD="Kadai-CI-$(openssl rand -hex 12)"
 export SUPERADMIN_EMAIL="superadmin.ci@kadai.asia"
-export SUPERADMIN_PASSWORD="Kadai-CI-2026-superadmin"
+export SUPERADMIN_PASSWORD="Kadai-CI-$(openssl rand -hex 12)"
 
 LOG="${E2E_CI_LOG:-scripts/e2e/.logs/ci-lokal-$(date +%Y%m%d-%H%M%S).log}"
 mkdir -p "$(dirname "$LOG")"

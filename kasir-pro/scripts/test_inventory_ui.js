@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer-core');
   await page.goto('https://kadai.asia/login', { waitUntil: 'networkidle2' });
   
   await page.type('input[type="email"], input[name="email"]', 'gudang.sembako@kadai.com');
-  await page.type('input[type="password"], input[name="password"]', 'password123');
+  await page.type('input[type="password"], input[name="password"]', (process.env.KADAI_TEST_PASSWORD || ''));
   
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 20000 }),

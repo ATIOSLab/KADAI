@@ -10,9 +10,9 @@
 Akun master yang terdaftar di database VPS:
 - **URL Login**: `https://kadai.asia/login`
 - **Email**: `admin@kadai.com`
-- **Password**: `admin123` *(jika belum pernah diganti di pengaturan profil)*
+- **Password**: ``(di-set-via-env)`` *(jika belum pernah diganti di pengaturan profil)*
 - **Role**: `ADMIN` (Owner)
-- **PIN Supervisor**: `123456`
+- **PIN Supervisor**: ``(di-set-via-env)``
 
 ---
 
@@ -22,8 +22,8 @@ Karena endpoint registrasi publik telah ditutup demi keamanan (mencegah pendafta
 
 | No | Role | Rekomendasi Email Uji | Password Uji | PIN Supervisor | Default Landing Page |
 |:---|:---|:---|:---|:---|:---|
-| 1 | **ADMIN** | `admin@kadai.com` | `admin123` | `123456` | `/dashboard` |
-| 2 | **MANAGER** | `manager@kadai.com` | `manager123` | `123456` | `/dashboard` |
+| 1 | **ADMIN** | `admin@kadai.com` | ``(di-set-via-env)`` | ``(di-set-via-env)`` | `/dashboard` |
+| 2 | **MANAGER** | `manager@kadai.com` | ``(di-set-via-env)`` | ``(di-set-via-env)`` | `/dashboard` |
 | 3 | **CASHIER** | `kasir@kadai.com` | `kasir123` | *(Kosongkan)* | `/pos` |
 | 4 | **KITCHEN** | `dapur@kadai.com` | `dapur123` | *(Kosongkan)* | `/kds` |
 | 5 | **INVENTORY** | `gudang@kadai.com` | `gudang123` | *(Kosongkan)* | `/inventory` |
@@ -71,7 +71,7 @@ Karena endpoint registrasi publik telah ditutup demi keamanan (mencegah pendafta
 4. **Uji Rate Limiting PIN**:
    - Masukkan PIN sembarang secara salah berturut-turut.
    - Setelah 10 kali percobaan gagal, sistem akan mengunci verifikasi PIN selama 30 menit.
-5. Masukkan PIN yang benar (`123456`):
+5. Masukkan PIN yang benar (``(di-set-via-env)``):
    - Transaksi sukses dibatalkan secara atomik (mencegah double-void race).
    - Stok dikembalikan otomatis ke batch persediaan asalnya.
 

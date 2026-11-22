@@ -2,6 +2,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { ProductType, StationType, UserRole } from "@prisma/client";
 
+import { createHmac } from "crypto";
+function demoPin(key: string): string {
+  const secret = process.env.KADAI_DEMO_PIN_SECRET;
+  if (!secret) throw new Error("KADAI_DEMO_PIN_SECRET wajib di-set - dilarang hardcode PIN demo");
+  return String(parseInt(createHmac("sha256", secret).update(key).digest("hex").slice(0, 12), 16) % 1000000).padStart(6, "0");
+}
+
 export const CLUSTERS = [
   // 1. TOKO BANGUNAN, MATERIAL & ALAT TEKNIK (HARDWARE & BUILDING SUPPLIES)
   {
@@ -33,8 +40,8 @@ export const CLUSTERS = [
       { name: "Kran Tembok Onda 1/2 Inch Stainless", sku: "TKB-KRN-10", barcode: "899800100010", category: "Perkakas & Alat Teknik", price: 45000, cost: 32000, stock: 75, unit: "pcs", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "Hendra Wijaya (Owner TB Surya Abadi)", email: "owner.bangunan@kadai.asia", role: UserRole.ADMIN, pin: "999111" },
-      { name: "Rudi Hartono (Kepala Toko Bangunan)", email: "manager.bangunan@kadai.asia", role: UserRole.MANAGER, pin: "999222" },
+      { name: "Hendra Wijaya (Owner TB Surya Abadi)", email: "owner.bangunan@kadai.asia", role: UserRole.ADMIN, pin: demoPin("owner.bangunan@kadai.asia") },
+      { name: "Rudi Hartono (Kepala Toko Bangunan)", email: "manager.bangunan@kadai.asia", role: UserRole.MANAGER, pin: demoPin("manager.bangunan@kadai.asia") },
       { name: "Eko Prasetyo (Kasir Kas & Barcode Toko)", email: "kasir.bangunan@kadai.asia", role: UserRole.CASHIER, pin: null },
       { name: "Surya Kencana (Staf Gudang Material & Semen)", email: "gudang.bangunan@kadai.asia", role: UserRole.INVENTORY, pin: null },
       { name: "Lestari (Akuntan Piutang Mandor)", email: "akuntan.bangunan@kadai.asia", role: UserRole.ACCOUNTANT, pin: null },
@@ -66,8 +73,8 @@ export const CLUSTERS = [
       { name: "Masker Medis 3-Ply Earloop Surgical (Box 50pcs)", sku: "APT-ALK-07", barcode: "899900100007", category: "Alat Kesehatan & Diagnostik", price: 35000, cost: 22000, stock: 140, unit: "box", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "apt. Fitri Rahmawati, S.Farm (Owner Apotek)", email: "owner.apotek@kadai.asia", role: UserRole.ADMIN, pin: "222111" },
-      { name: "apt. Bayu Pratama (Apoteker Pengelola Apotek)", email: "manager.apotek@kadai.asia", role: UserRole.MANAGER, pin: "222222" },
+      { name: "apt. Fitri Rahmawati, S.Farm (Owner Apotek)", email: "owner.apotek@kadai.asia", role: UserRole.ADMIN, pin: demoPin("owner.apotek@kadai.asia") },
+      { name: "apt. Bayu Pratama (Apoteker Pengelola Apotek)", email: "manager.apotek@kadai.asia", role: UserRole.MANAGER, pin: demoPin("manager.apotek@kadai.asia") },
       { name: "Siti Rahayu (Asisten Apoteker / Kasir)", email: "kasir.apotek@kadai.asia", role: UserRole.CASHIER, pin: null },
       { name: "Indra Gunawan (Gudang Farmasi & FEFO Batch)", email: "gudang.apotek@kadai.asia", role: UserRole.INVENTORY, pin: null },
       { name: "Citra Melati (Akuntan Pajak & Faktur Farmasi)", email: "akuntan.apotek@kadai.asia", role: UserRole.ACCOUNTANT, pin: null },
@@ -93,8 +100,8 @@ export const CLUSTERS = [
       { name: "Udang Kupas Frozen Pilihan", sku: "RAW-UDG-02", barcode: "899100100092", category: "Bahan Mentah Dapur", price: 95000, cost: 72000, stock: 80, unit: "kg", type: ProductType.RAW_MATERIAL, station: StationType.KITCHEN },
     ],
     users: [
-      { name: "Hendro Wijaya (Owner Resto)", email: "owner.resto@kadai.com", role: UserRole.ADMIN, pin: "888111" },
-      { name: "Linda Tan (Manager Resto Menteng)", email: "manager.resto@kadai.com", role: UserRole.MANAGER, pin: "888222" },
+      { name: "Hendro Wijaya (Owner Resto)", email: "owner.resto@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.resto@kadai.com") },
+      { name: "Linda Tan (Manager Resto Menteng)", email: "manager.resto@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.resto@kadai.com") },
       { name: "Rian Kasir (Kasir Menteng)", email: "kasir.resto@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Chef A-Kiong (Kepala Dapur)", email: "dapur.resto@kadai.com", role: UserRole.KITCHEN, pin: null },
       { name: "Bambang Gudang (Inventory Resto)", email: "gudang.resto@kadai.com", role: UserRole.INVENTORY, pin: null },
@@ -117,8 +124,8 @@ export const CLUSTERS = [
       { name: "Organic Hair Clay Matte Finish 80g", sku: "BRB-RTL-04", barcode: "899200100004", category: "Retail Pomade & Perawatan", price: 135000, cost: 68000, stock: 30, unit: "tube", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "Bramantyo (Owner Barber)", email: "owner.barber@kadai.com", role: UserRole.ADMIN, pin: "777111" },
-      { name: "Fajar (Manager Operasional Barber)", email: "manager.barber@kadai.com", role: UserRole.MANAGER, pin: "777222" },
+      { name: "Bramantyo (Owner Barber)", email: "owner.barber@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.barber@kadai.com") },
+      { name: "Fajar (Manager Operasional Barber)", email: "manager.barber@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.barber@kadai.com") },
       { name: "Doni (Kasir Frontdesk Barber)", email: "kasir.barber@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Eko (Akuntan Keuangan Barber)", email: "akuntan.barber@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
     ]
@@ -139,8 +146,8 @@ export const CLUSTERS = [
       { name: "UV Barrier Sunscreen SPF 50 PA++++", sku: "KLN-SKN-04", barcode: "899300100004", category: "Skincare Resep & Serum", price: 195000, cost: 78000, stock: 80, unit: "tube", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "dr. Amanda Sp.KK (Owner Klinik)", email: "owner.klinik@kadai.com", role: UserRole.ADMIN, pin: "666111" },
-      { name: "dr. Kevin (Manager Medis Klinik)", email: "manager.klinik@kadai.com", role: UserRole.MANAGER, pin: "666222" },
+      { name: "dr. Amanda Sp.KK (Owner Klinik)", email: "owner.klinik@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.klinik@kadai.com") },
+      { name: "dr. Kevin (Manager Medis Klinik)", email: "manager.klinik@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.klinik@kadai.com") },
       { name: "Nisa (Kasir Apotek & Frontdesk)", email: "kasir.klinik@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Apoteker Dewi (Gudang Farmasi & Serum)", email: "gudang.klinik@kadai.com", role: UserRole.INVENTORY, pin: null },
       { name: "Yulia (Finance & Pajak PPh Klinik)", email: "akuntan.klinik@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
@@ -162,8 +169,8 @@ export const CLUSTERS = [
       { name: "Kecap Manis Botol 600ml", sku: "SBK-KCP-04", barcode: "899400100004", category: "Minyak Goreng & Bumbu", price: 23000, cost: 18500, stock: 95, unit: "botol", type: ProductType.FINISHED_GOOD, station: StationType.GENERAL },
     ],
     users: [
-      { name: "Haji Mansur (Owner Sembako)", email: "owner.sembako@kadai.com", role: UserRole.ADMIN, pin: "555111" },
-      { name: "Zainal (Kepala Toko Sembako)", email: "manager.sembako@kadai.com", role: UserRole.MANAGER, pin: "555222" },
+      { name: "Haji Mansur (Owner Sembako)", email: "owner.sembako@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.sembako@kadai.com") },
+      { name: "Zainal (Kepala Toko Sembako)", email: "manager.sembako@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.sembako@kadai.com") },
       { name: "Asep (Kasir Barcode Sembako)", email: "kasir.sembako@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Wahyu (Staf Gudang & Bongkar Muat)", email: "gudang.sembako@kadai.com", role: UserRole.INVENTORY, pin: null },
       { name: "Budi Santoso (Pembukuan Toko)", email: "akuntan.sembako@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
@@ -185,8 +192,8 @@ export const CLUSTERS = [
       { name: "Es Jeruk Peras Murni Gula Asli", sku: "BKS-MNM-04", barcode: "899500100004", category: "Es & Minuman Tradisional", price: 10000, cost: 3500, stock: 250, unit: "gelas", type: ProductType.FINISHED_GOOD, station: StationType.BAR },
     ],
     users: [
-      { name: "Mas Sigit (Owner Bakso Solo)", email: "owner.bakso@kadai.com", role: UserRole.ADMIN, pin: "444111" },
-      { name: "Suratno (Manager Warung Bakso)", email: "manager.bakso@kadai.com", role: UserRole.MANAGER, pin: "444222" },
+      { name: "Mas Sigit (Owner Bakso Solo)", email: "owner.bakso@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.bakso@kadai.com") },
+      { name: "Suratno (Manager Warung Bakso)", email: "manager.bakso@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.bakso@kadai.com") },
       { name: "Agus (Kasir Depan Bakso)", email: "kasir.bakso@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Wawan (Dapur Rebus & Racik Bakso)", email: "dapur.bakso@kadai.com", role: UserRole.KITCHEN, pin: null },
     ]
@@ -207,8 +214,8 @@ export const CLUSTERS = [
       { name: "Sparkling Yuzu Cold Brew", sku: "CFE-MCK-04", barcode: "899600100004", category: "Mocktail Segar", price: 36000, cost: 12500, stock: 80, unit: "glass", type: ProductType.MANUFACTURED, station: StationType.BAR },
     ],
     users: [
-      { name: "Dimas Aditya (Founder Ruang Temu)", email: "owner.cafe@kadai.com", role: UserRole.ADMIN, pin: "333111" },
-      { name: "Nadia (Head Store Manager Cafe)", email: "manager.cafe@kadai.com", role: UserRole.MANAGER, pin: "333222" },
+      { name: "Dimas Aditya (Founder Ruang Temu)", email: "owner.cafe@kadai.com", role: UserRole.ADMIN, pin: demoPin("owner.cafe@kadai.com") },
+      { name: "Nadia (Head Store Manager Cafe)", email: "manager.cafe@kadai.com", role: UserRole.MANAGER, pin: demoPin("manager.cafe@kadai.com") },
       { name: "Farhan (Head Barista / Kasir)", email: "kasir.cafe@kadai.com", role: UserRole.CASHIER, pin: null },
       { name: "Kiki (Station Barista Bar)", email: "barista.cafe@kadai.com", role: UserRole.KITCHEN, pin: null },
       { name: "Dewi (Pastry Chef Dapur)", email: "dapur.cafe@kadai.com", role: UserRole.KITCHEN, pin: null },
@@ -219,7 +226,8 @@ export const CLUSTERS = [
 
 export async function runDemoSeeding() {
   console.log("=== Memulai Eksekusi Langsung Seeding Demo Clusters ===");
-  const defaultPassword = "password123";
+  const defaultPassword = process.env.KADAI_DEMO_PASSWORD;
+  if (!defaultPassword) throw new Error("KADAI_DEMO_PASSWORD wajib di-set - dilarang hardcode password demo di source code");
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
   for (const cluster of CLUSTERS) {

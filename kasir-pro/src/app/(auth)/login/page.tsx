@@ -393,7 +393,7 @@ function LoginForm() {
                               type="button"
                               onClick={() => {
                                 setEmail(r.email);
-                                setPassword("password123");
+                                setPassword(""); // password TIDAK di-autofill: literal publik dihapus (security)
                                 setSelectedAccountInfo(`${r.label} • ${r.email}`);
                               }}
                               className={`p-2 text-left rounded-xl border transition-all cursor-pointer group ${

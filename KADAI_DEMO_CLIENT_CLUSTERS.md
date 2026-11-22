@@ -1,8 +1,8 @@
 # KADAI Demo Client Clusters & Master Test Credentials
 
 **URL Akses Aplikasi**: [https://kadai.asia](https://kadai.asia)  
-**Standard Password Default Semua Akun Demo**: `password123`  
-**Master Admin VPS**: `admin@kadai.com` / `admin123` (PIN: `123456`)
+**Standard Password Default Semua Akun Demo**: ``(di-set-via-env)``  
+**Master Admin VPS**: `admin@kadai.com` / ``(di-set-via-env)`` (PIN: ``(di-set-via-env)``)
 
 Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertikal usaha Indonesia, mencakup:
 1. **Dimsum Imperial Heritage** (Restoran Dimsum Otentik - Multi Cabang 3 Outlet)
@@ -25,12 +25,12 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | Hendro Wijaya (Owner Resto) | `owner.dimsum@kadai.com` | `password123` | `888111` | `/dashboard` |
-| **MANAGER** | Linda Tan (Store Manager) | `manager.dimsum@kadai.com` | `password123` | `888222` | `/dashboard` |
-| **CASHIER** | Rian Kasir (Kasir Menteng) | `kasir.dimsum@kadai.com` | `password123` | *(None)* | `/pos` |
-| **KITCHEN** | Chef A-Kiong (Dapur Kukus) | `dapur.dimsum@kadai.com` | `password123` | *(None)* | `/kds` |
-| **INVENTORY** | Bambang (Gudang Central) | `gudang.dimsum@kadai.com` | `password123` | *(None)* | `/inventory` |
-| **ACCOUNTANT** | Siti Rahma (Akuntan PB1) | `akuntan.dimsum@kadai.com` | `password123` | *(None)* | `/finance` |
+| **ADMIN** | Hendro Wijaya (Owner Resto) | `owner.dimsum@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | Linda Tan (Store Manager) | `manager.dimsum@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Rian Kasir (Kasir Menteng) | `kasir.dimsum@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **KITCHEN** | Chef A-Kiong (Dapur Kukus) | `dapur.dimsum@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/kds` |
+| **INVENTORY** | Bambang (Gudang Central) | `gudang.dimsum@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/inventory` |
+| **ACCOUNTANT** | Siti Rahma (Akuntan PB1) | `akuntan.dimsum@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/finance` |
 
 ### Sampel Menu & Batch FIFO:
 - `DIM-HKU-01` Siomay Hakau Udang (4 pcs) — Rp 38.000 (HPP Rp 14.000)
@@ -50,10 +50,10 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | Bramantyo (Owner Barber) | `owner.barber@kadai.com` | `password123` | `777111` | `/dashboard` |
-| **MANAGER** | Fajar (Manager Operasional) | `manager.barber@kadai.com` | `password123` | `777222` | `/dashboard` |
-| **CASHIER** | Doni (Kasir Frontdesk) | `kasir.barber@kadai.com` | `password123` | *(None)* | `/pos` |
-| **ACCOUNTANT** | Eko (Akuntan Bisnis Jasa) | `akuntan.barber@kadai.com` | `password123` | *(None)* | `/finance` |
+| **ADMIN** | Bramantyo (Owner Barber) | `owner.barber@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | Fajar (Manager Operasional) | `manager.barber@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Doni (Kasir Frontdesk) | `kasir.barber@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **ACCOUNTANT** | Eko (Akuntan Bisnis Jasa) | `akuntan.barber@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/finance` |
 
 ### Sampel Layanan Jasa & Ritel:
 - `BRB-SRV-01` Signature Haircut & Hot Towel Shave — Rp 120.000 (Jasa / Service)
@@ -72,11 +72,11 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | dr. Amanda Sp.KK (Owner) | `owner.klinik@kadai.com` | `password123` | `666111` | `/dashboard` |
-| **MANAGER** | dr. Kevin (Manager Medis) | `manager.klinik@kadai.com` | `password123` | `666222` | `/dashboard` |
-| **CASHIER** | Nisa (Kasir Apotek & Front) | `kasir.klinik@kadai.com` | `password123` | *(None)* | `/pos` |
-| **INVENTORY** | Apoteker Dewi (Farmasi) | `gudang.klinik@kadai.com` | `password123` | *(None)* | `/inventory` |
-| **ACCOUNTANT** | Yulia (Finance & Pajak PPh) | `akuntan.klinik@kadai.com` | `password123` | *(None)* | `/finance` |
+| **ADMIN** | dr. Amanda Sp.KK (Owner) | `owner.klinik@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | dr. Kevin (Manager Medis) | `manager.klinik@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Nisa (Kasir Apotek & Front) | `kasir.klinik@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **INVENTORY** | Apoteker Dewi (Farmasi) | `gudang.klinik@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/inventory` |
+| **ACCOUNTANT** | Yulia (Finance & Pajak PPh) | `akuntan.klinik@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/finance` |
 
 ### Sampel Treatment & Skincare:
 - `KLN-LSR-01` Pico Laser Glow Rejuvenation — Rp 1.250.000 (Tindakan Medis)
@@ -95,11 +95,11 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | Haji Mansur (Owner Toko) | `owner.sembako@kadai.com` | `password123` | `555111` | `/dashboard` |
-| **MANAGER** | Zainal (Kepala Toko) | `manager.sembako@kadai.com` | `password123` | `555222` | `/dashboard` |
-| **CASHIER** | Asep (Kasir Barcode Cepat) | `kasir.sembako@kadai.com` | `password123` | *(None)* | `/pos` |
-| **INVENTORY** | Wahyu (Staf Gudang & Bongkar) | `gudang.sembako@kadai.com` | `password123` | *(None)* | `/inventory` |
-| **ACCOUNTANT** | Budi Santoso (Pembukuan) | `akuntan.sembako@kadai.com` | `password123` | *(None)* | `/finance` |
+| **ADMIN** | Haji Mansur (Owner Toko) | `owner.sembako@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | Zainal (Kepala Toko) | `manager.sembako@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Asep (Kasir Barcode Cepat) | `kasir.sembako@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **INVENTORY** | Wahyu (Staf Gudang & Bongkar) | `gudang.sembako@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/inventory` |
+| **ACCOUNTANT** | Budi Santoso (Pembukuan) | `akuntan.sembako@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/finance` |
 
 ### Sampel Produk Sembako:
 - `SBK-BRS-01` Beras Pandan Wangi Premium 5kg — Rp 78.000 (HPP Rp 68.000)
@@ -118,10 +118,10 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | Mas Sigit (Owner Warung) | `owner.bakso@kadai.com` | `password123` | `444111` | `/dashboard` |
-| **MANAGER** | Suratno (Manager Warung) | `manager.bakso@kadai.com` | `password123` | `444222` | `/dashboard` |
-| **CASHIER** | Agus (Kasir Depan) | `kasir.bakso@kadai.com` | `password123` | *(None)* | `/pos` |
-| **KITCHEN** | Wawan (Dapur Kuah & Rebus) | `dapur.bakso@kadai.com` | `password123` | *(None)* | `/kds` |
+| **ADMIN** | Mas Sigit (Owner Warung) | `owner.bakso@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | Suratno (Manager Warung) | `manager.bakso@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Agus (Kasir Depan) | `kasir.bakso@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **KITCHEN** | Wawan (Dapur Kuah & Rebus) | `dapur.bakso@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/kds` |
 
 ### Sampel Menu Bakso & Mie Ayam:
 - `BKS-URT-01` Bakso Urat Jumbo Komplit + Tetelan — Rp 32.000 (HPP Rp 13.500)
@@ -140,12 +140,12 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 ### Akun Pengguna & Role:
 | Role | Nama Pengguna | Email Login | Password | PIN Supervisor | Default Page |
 |:---|:---|:---|:---|:---|:---|
-| **ADMIN** | Dimas Aditya (Founder) | `owner.cafe@kadai.com` | `password123` | `333111` | `/dashboard` |
-| **MANAGER** | Nadia (Head Store Manager) | `manager.cafe@kadai.com` | `password123` | `333222` | `/dashboard` |
-| **CASHIER** | Farhan (Head Barista / Kasir) | `kasir.cafe@kadai.com` | `password123` | *(None)* | `/pos` |
-| **KITCHEN** | Kiki (Barista Bar Station) | `barista.cafe@kadai.com` | `password123` | *(None)* | `/kds` |
-| **KITCHEN** | Dewi (Dapur Pastry Bakery) | `dapur.cafe@kadai.com` | `password123` | *(None)* | `/kds` |
-| **ACCOUNTANT** | Anita (Akuntan F&B) | `akuntan.cafe@kadai.com` | `password123` | *(None)* | `/finance` |
+| **ADMIN** | Dimas Aditya (Founder) | `owner.cafe@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **MANAGER** | Nadia (Head Store Manager) | `manager.cafe@kadai.com` | ``(di-set-via-env)`` | ``(pin-set-via-env)`` | `/dashboard` |
+| **CASHIER** | Farhan (Head Barista / Kasir) | `kasir.cafe@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/pos` |
+| **KITCHEN** | Kiki (Barista Bar Station) | `barista.cafe@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/kds` |
+| **KITCHEN** | Dewi (Dapur Pastry Bakery) | `dapur.cafe@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/kds` |
+| **ACCOUNTANT** | Anita (Akuntan F&B) | `akuntan.cafe@kadai.com` | ``(di-set-via-env)`` | *(None)* | `/finance` |
 
 ### Sampel Menu Kopi & Pastry:
 - `CFE-LAT-01` Iced Creamy Aren Latte (BOM Espresso + Aren) — Rp 28.000 (HPP Rp 8.500)
@@ -157,10 +157,10 @@ Dokumen ini memuat daftar lengkap klaster akun demo klien untuk berbagai vertika
 
 ## Ringkasan Petunjuk Uji Coba Lapangan
 1. **Buka Aplikasi**: Akses [https://kadai.asia/login](https://kadai.asia/login).
-2. **Login dengan Akun Kasir**: Contoh `kasir.dimsum@kadai.com` / `password123`.
+2. **Login dengan Akun Kasir**: Contoh `kasir.dimsum@kadai.com` / ``(di-set-via-env)``.
    - Coba selesaikan transaksi penjualan pesanan Siomay Hakau & Lumpia.
    - Perhatikan bahwa kasir tidak bisa melihat margin dan modal HPP bahan udang.
-3. **Login dengan Akun Dapur (KDS)**: Contoh `dapur.dimsum@kadai.com` / `password123` atau `barista.cafe@kadai.com`.
+3. **Login dengan Akun Dapur (KDS)**: Contoh `dapur.dimsum@kadai.com` / ``(di-set-via-env)`` atau `barista.cafe@kadai.com`.
    - Amati pesanan otomatis masuk ke stasiun Kitchen atau Bar secara real-time.
-4. **Login dengan Akun Akuntan**: Contoh `akuntan.cafe@kadai.com` / `password123`.
+4. **Login dengan Akun Akuntan**: Contoh `akuntan.cafe@kadai.com` / ``(di-set-via-env)``.
    - Akses `/finance/tax` dan `/reports` untuk meninjau pembukuan dan perhitungan pajak resmi.

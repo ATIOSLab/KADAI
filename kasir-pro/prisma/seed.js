@@ -314,7 +314,7 @@ const PLAN_SEEDS = [
     features: [
       "1 Gerai & 1 Akun Kasir",
       "Maksimal 50 Produk SKU",
-      "Kasir POS Cepat & Cetak Struk",
+      "Kasir POS Cepat & Cetak Struk Thermal",
       "Laporan Penjualan Harian",
     ],
     limits: {
@@ -340,6 +340,7 @@ const PLAN_SEEDS = [
       "F&B: QR Meja & Pemesanan Mandiri",
       "Ritel: Barcode Scanner & Peringatan Kadaluwarsa",
       "Pembukuan Kas & Pajak SAK EMKM",
+      "Ekspor Laporan Excel / CSV",
     ],
     limits: {
       maxOutlets: 1,
@@ -356,7 +357,7 @@ const PLAN_SEEDS = [
     code: "PRO_BUSINESS",
     name: "Business Pro",
     description: "Kafe, resto & ritel modern dengan manajemen resep, dapur & multi-cabang.",
-    badge: "Paling Banyak Dipilih",
+    badge: "Paling Populer",
     sortOrder: 30,
     features: [
       "Hingga 3 Gerai / Cabang Usaha",
@@ -388,6 +389,8 @@ const PLAN_SEEDS = [
       "Sentra Dapur Pusat (Central Kitchen)",
       "Routing Pesanan Antar-Sentra Produksi",
       "Laporan Konsolidasi Multi-Entitas",
+      "Rekonsiliasi Pajak Konsolidasi Grup",
+      "Akses API Integrasi Kustom",
       "Dedicated Account Manager & SLA 99.9%",
     ],
     limits: {

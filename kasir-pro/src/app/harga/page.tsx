@@ -100,7 +100,7 @@ const STATIC_PLANS: DisplayPlan[] = [
       "F&B: Resep BOM Bahan Baku & Layar Dapur KDS",
       "Ritel: Inventori Multi-Batch (FIFO & FEFO Asli)",
       "Transfer Stok Antar-Cabang (Surat Jalan)",
-      "Rekap PB1/PPN & PPh Final PP 55/2022",
+      "Rekap PB1/PPN & PPh Final 0.5% PP 55/2022",
       "Dukungan WhatsApp Prioritas",
     ],
     limits: { maxOutlets: 3, maxUsers: 10 },
@@ -117,6 +117,7 @@ const STATIC_PLANS: DisplayPlan[] = [
       "Gerai & Gudang Tak Terbatas",
       "Sentra Dapur Pusat (Central Kitchen)",
       "Routing Pesanan Antar-Sentra Produksi",
+      "Laporan Konsolidasi Multi-Entitas",
       "Rekonsiliasi Pajak Konsolidasi Grup",
       "Akses API Integrasi Kustom",
       "Dedicated Account Manager & SLA 99.9%",
@@ -172,10 +173,10 @@ export default async function HargaPage() {
   const matrixRows: { label: string; cells: string[] }[] = [
     {
       label: "Batas Jumlah Gerai",
-      cells: plans.map((p) => limitCell(p, "maxOutlets", "Outlet")),
+      cells: plans.map((p) => limitCell(p, "maxOutlets", "Gerai")),
     },
     {
-      label: "Batas Akun Kasir (User)",
+      label: "Batas Akun Kasir",
       cells: plans.map((p) => limitCell(p, "maxUsers", "Akun Kasir")),
     },
     ...allFeatures.map((feature) => ({

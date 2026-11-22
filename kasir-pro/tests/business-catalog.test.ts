@@ -109,7 +109,7 @@ test("modul universal aktif untuk SEMUA tipe usaha", () => {
 
 test("pemetaan modul per vertikal tepat (catering/laundry/kds/tables)", () => {
   assert.deepEqual(typesWithModule("catering"), ["CATERING"]);
-  assert.deepEqual(typesWithModule("laundry"), ["SERVICE"]);
+  assert.deepEqual(typesWithModule("laundry"), ["LAUNDRY"]);
   assert.deepEqual(typesWithModule("kds"), [
     "FNB_CAFE",
     "FNB_RESTAURANT",
@@ -123,7 +123,9 @@ test("pemetaan modul per vertikal tepat (catering/laundry/kds/tables)", () => {
     "FNB_WARUNG",
   ]);
   assert.ok(!getModulesForType("CATERING").some((m) => m.key === "tables"));
-  assert.ok(getModulesForType("SERVICE").some((m) => m.key === "laundry"));
+  // Laundry punya tipenya sendiri; salon/bengkel (SERVICE) tidak lagi dapat menu Cuci.
+  assert.ok(getModulesForType("LAUNDRY").some((m) => m.key === "laundry"));
+  assert.ok(!getModulesForType("SERVICE").some((m) => m.key === "laundry"));
 });
 
 test("setiap peran staf vertikal valid, unik, dan selalu menyertakan ADMIN", () => {
@@ -215,7 +217,7 @@ test("jalur demo self-serve (form + API) memakai katalog, tanpa tipe legacy", ()
 
 test("isBusinessType & getBusinessTypeLabel aman untuk data lama/tak dikenal", () => {
   for (const key of BUSINESS_TYPE_KEYS) assert.ok(isBusinessType(key));
-  for (const bad of ["LAUNDRY", "", "fnb_cafe", null, undefined, 42, {}]) {
+  for (const bad of ["FNB_RESTO", "CENTRAL_KITCHEN", "", "fnb_cafe", null, undefined, 42, {}]) {
     assert.equal(isBusinessType(bad), false);
   }
   assert.equal(getBusinessTypeLabel("FNB_CAFE"), "Kafe & Coffee Shop");
@@ -266,9 +268,14 @@ test("keputusan akses vertikal: tolak modul yang tidak dimiliki toko, izinkan se
   assert.equal(isRouteAvailableForBusinessType("/kds", "CATERING"), true);
   assert.equal(isRouteAvailableForBusinessType("/tables", "CATERING"), false);
   assert.equal(isRouteAvailableForBusinessType("/laundry", "CATERING"), false);
-  // SERVICE (jasa/laundry): hanya laundry di antara modul vertikal.
-  assert.equal(isRouteAvailableForBusinessType("/laundry", "SERVICE"), true);
-  assert.equal(isRouteAvailableForBusinessType("/api/laundry/jobs", "SERVICE"), true);
+  // LAUNDRY (jasa cuci): hanya laundry di antara modul vertikal.
+  assert.equal(isRouteAvailableForBusinessType("/laundry", "LAUNDRY"), true);
+  assert.equal(isRouteAvailableForBusinessType("/api/laundry/jobs", "LAUNDRY"), true);
+  assert.equal(isRouteAvailableForBusinessType("/tables", "LAUNDRY"), false);
+  assert.equal(isRouteAvailableForBusinessType("/catering", "LAUNDRY"), false);
+  // SERVICE (salon/bengkel) tidak lagi memakai modul cuci.
+  assert.equal(isRouteAvailableForBusinessType("/laundry", "SERVICE"), false);
+  assert.equal(isRouteAvailableForBusinessType("/api/laundry/jobs", "SERVICE"), false);
   assert.equal(isRouteAvailableForBusinessType("/tables", "SERVICE"), false);
   assert.equal(isRouteAvailableForBusinessType("/catering", "SERVICE"), false);
   assert.equal(isRouteAvailableForBusinessType("/api/sales/s1/catering-status", "SERVICE"), false);

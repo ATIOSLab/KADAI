@@ -3,6 +3,7 @@ import {
   Hammer,
   PartyPopper,
   Pill,
+  Shirt,
   Scissors,
   ShoppingBag,
   Soup,
@@ -32,6 +33,7 @@ export const BUSINESS_TYPE_KEYS = [
   "FNB_WARUNG",
   "CATERING",
   "SERVICE",
+  "LAUNDRY",
   "BUILDING_SUPPLY",
   "PHARMACY",
 ] as const;
@@ -306,7 +308,6 @@ const RETAIL_MODULES: ModuleKey[] = [
 const SERVICE_MODULES: ModuleKey[] = [
   "dashboard",
   "pos",
-  "laundry",
   "products",
   "units",
   "inventory",
@@ -319,6 +320,13 @@ const SERVICE_MODULES: ModuleKey[] = [
   "outlets",
   "activityLog",
   "settings",
+];
+
+/** Laundry = SERVICE + modul laundry (work order cuci berproses). */
+const LAUNDRY_MODULES: ModuleKey[] = [
+  ...SERVICE_MODULES.slice(0, 2),
+  "laundry",
+  ...SERVICE_MODULES.slice(2),
 ];
 
 const HEALTH_MODULES: ModuleKey[] = [
@@ -469,8 +477,8 @@ export const BUSINESS_PROFILES: Record<BusinessTypeKey, BusinessProfile> = {
     category: "SERVICE",
     tagline: "Work Order & Komisi",
     description:
-      "Barbershop, salon, bengkel, laundry, dan jasa lainnya: work order berproses, layanan satuan, dan komisi staf.",
-    examples: ["Barbershop & salon", "Bengkel & cuci motor", "Laundry kiloan", "Studio & jasa kreatif"],
+      "Barbershop, salon, bengkel, dan jasa lainnya: work order berproses, layanan satuan & paket, dan komisi staf.",
+    examples: ["Barbershop & salon", "Bengkel & cuci motor", "Studio & jasa kreatif"],
     icon: Scissors,
     accent: {
       chip: "bg-purple-500/10",
@@ -481,7 +489,27 @@ export const BUSINESS_PROFILES: Record<BusinessTypeKey, BusinessProfile> = {
     taxMode: "PPN",
     modules: SERVICE_MODULES,
     roles: ["ADMIN", "MANAGER", "CASHIER", "INVENTORY"],
-    features: ["Work order laundry berproses", "Layanan satuan & paket", "Komisi staf"],
+    features: ["Work order berproses", "Layanan satuan & paket", "Komisi staf"],
+  },
+  LAUNDRY: {
+    key: "LAUNDRY",
+    label: "Laundry & Cuci",
+    category: "SERVICE",
+    tagline: "Order Berproses",
+    description:
+      "Laundry kiloan & satuan: order berproses, pelacakan status per item, dan tarif per satuan atau kilo.",
+    examples: ["Laundry kiloan", "Laundry satuan (kemeja, jas)", "Dry cleaning", "Layanan setrika"],
+    icon: Shirt,
+    accent: {
+      chip: "bg-violet-500/10",
+      ring: "ring-violet-600",
+      text: "text-violet-600",
+      border: "border-violet-600",
+    },
+    taxMode: "PPN",
+    modules: LAUNDRY_MODULES,
+    roles: ["ADMIN", "MANAGER", "CASHIER", "INVENTORY"],
+    features: ["Order kiloan & satuan", "Pelacakan status per order", "Komisi staf"],
   },
   BUILDING_SUPPLY: {
     key: "BUILDING_SUPPLY",
@@ -545,7 +573,7 @@ export const BUSINESS_CATEGORIES: BusinessCategory[] = [
     label: "Jasa & Layanan",
     tagline: "Salon, bengkel, laundry",
     description: "Work order berproses, layanan satuan & paket, komisi staf.",
-    types: ["SERVICE"],
+    types: ["SERVICE", "LAUNDRY"],
   },
   {
     key: "HEALTH",

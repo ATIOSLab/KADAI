@@ -20,10 +20,20 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge, ownerStatusTone } from "@/components/shared/status-badge";
 import { SearchableSelect } from "@/components/shared/searchable-select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogBody } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { TIER_LABELS } from "@/lib/pricing";
+import {
+  BUSINESS_CATEGORIES,
+  DEFAULT_BUSINESS_TYPE,
+  getBusinessProfile,
+  getBusinessTypeLabel,
+  getModulesForType,
+  getRolesForType,
+  isBusinessType,
+  type BusinessTypeKey,
+} from "@/lib/business-catalog";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface OwnerItem {
@@ -47,16 +57,6 @@ interface StoreOption {
 
 const TIER_OPTIONS = ["FREE", "STARTER", "PRO_BUSINESS", "ENTERPRISE"];
 const CYCLE_OPTIONS = ["MONTHLY", "QUARTERLY", "ANNUAL"];
-const BIZ_OPTIONS = [
-  "RETAIL",
-  "FNB_CAFE",
-  "FNB_RESTAURANT",
-  "FNB_WARUNG",
-  "CATERING",
-  "BUILDING_SUPPLY",
-  "PHARMACY",
-  "SERVICE",
-];
 
 const emptyForm = {
   name: "",
@@ -66,7 +66,7 @@ const emptyForm = {
   mode: "new" as "new" | "existing",
   storeId: "",
   storeName: "",
-  businessType: "FNB_CAFE",
+  businessType: DEFAULT_BUSINESS_TYPE as string,
   tier: "PRO_BUSINESS",
   cycle: "MONTHLY",
 };
@@ -122,7 +122,7 @@ export default function PlatformOwnersPage() {
       mode: "existing",
       storeId: owner.storeId ?? "",
       storeName: owner.store?.name ?? "",
-      businessType: owner.store?.businessType ?? "FNB_CAFE",
+      businessType: owner.store?.businessType ?? DEFAULT_BUSINESS_TYPE,
       tier: owner.store?.tier ?? "PRO_BUSINESS",
       cycle: "MONTHLY",
     });
@@ -284,7 +284,7 @@ export default function PlatformOwnersPage() {
                             <p className="flex items-center gap-1.5 text-xs text-text-muted">
                               <Store className="h-3 w-3" />
                               <StatusBadge tone="muted">{owner.storeCount} tenant</StatusBadge>
-                              <span>{owner.store.businessType}</span>
+                              <span>{getBusinessTypeLabel(owner.store.businessType)}</span>
                             </p>
                           </div>
                         ) : (
@@ -351,7 +351,7 @@ export default function PlatformOwnersPage() {
                       </p>
                       <p className="text-xs text-text-muted">
                         {editTarget.store
-                          ? `${editTarget.store.businessType} · ${TIER_LABELS[editTarget.store.tier as keyof typeof TIER_LABELS] ?? editTarget.store.tier}`
+                          ? `${getBusinessTypeLabel(editTarget.store.businessType)} · ${TIER_LABELS[editTarget.store.tier as keyof typeof TIER_LABELS] ?? editTarget.store.tier}`
                           : "Owner ini belum memiliki tenant"}
                       </p>
                     </div>
@@ -408,11 +408,25 @@ export default function PlatformOwnersPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {BIZ_OPTIONS.map((b) => (
-                            <SelectItem key={b} value={b}>{b}</SelectItem>
+                          {BUSINESS_CATEGORIES.map((category) => (
+                            <SelectGroup key={category.key}>
+                              <SelectLabel>{category.label}</SelectLabel>
+                              {category.types.map((typeKey) => (
+                                <SelectItem key={typeKey} value={typeKey}>
+                                  {getBusinessProfile(typeKey).label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
                           ))}
                         </SelectContent>
                       </Select>
+                      {isBusinessType(form.businessType) ? (
+                        <p className="text-[10px] text-muted-foreground leading-snug">
+                          {getModulesForType(form.businessType).length} modul aktif ·{" "}
+                          {getRolesForType(form.businessType).join(" · ")} · pajak{" "}
+                          {getBusinessProfile(form.businessType).taxMode}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="space-y-2">
                       <Label>Tier Langganan Awal</Label>

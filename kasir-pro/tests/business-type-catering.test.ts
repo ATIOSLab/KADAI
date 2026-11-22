@@ -55,15 +55,22 @@ test("validator provisioning menerima CATERING dan menolak tipe asing", () => {
   assert.equal(bad.success, false, "tipe usaha asing seharusnya ditolak");
 });
 
-test("menu F&B membuka diri untuk store CATERING (gating konsisten)", () => {
-  const fnbItems = navigationSections
-    .flatMap((s) => s.items)
-    .filter((i) => (i.businessTypes ?? []).includes("FNB_CAFE"));
-  assert.ok(fnbItems.length > 0, "tidak ada menu F&B yang terdeteksi");
-  for (const item of fnbItems) {
-    assert.ok(
-      item.businessTypes!.includes("CATERING"),
-      `menu ${item.href} terkunci untuk CATERING padahal sefamily F&B`,
-    );
-  }
+test("gating menu F&B mengikuti katalog vertikal: KDS sefamily F&B, meja khusus dine-in", () => {
+  const items = navigationSections.flatMap((s) => s.items);
+  const byHref = new Map(items.map((i) => [i.href, i.businessTypes ?? []]));
+
+  const fnbSiblings = items.filter((i) => (i.businessTypes ?? []).includes("FNB_CAFE"));
+  assert.ok(fnbSiblings.length > 0, "tidak ada menu F&B yang terdeteksi");
+
+  // Produksi katering tetap butuh Kitchen Display.
+  const kds = byHref.get("/kds");
+  assert.ok(kds && kds.includes("CATERING"), "menu /kds terkunci untuk CATERING padahal sefamily F&B");
+
+  // Meja & QR self-order adalah modul dine-in; katering memakai modul booking /catering.
+  const tables = byHref.get("/tables");
+  assert.ok(tables && tables.length > 0, "menu /tables tidak terdeteksi");
+  assert.ok(!tables.includes("CATERING"), "menu /tables harus khusus vertikal dine-in");
+
+  // Modul katering hanya milik katering.
+  assert.deepEqual(byHref.get("/catering"), ["CATERING"]);
 });

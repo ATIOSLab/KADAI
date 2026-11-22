@@ -24,6 +24,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
+import { typesWithModule } from "@/lib/business-catalog";
 
 export interface NavigationItem {
   href: string;
@@ -46,7 +47,6 @@ export interface PageMeta {
   section: string;
   eyebrow: string;
 }
-
 export const navigationSections: NavigationSection[] = [
   {
     label: "Operasional & Transaksi",
@@ -74,7 +74,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Manajemen tata letak meja dan tautan menu QR mandiri.",
         icon: QrCode,
         roles: ["ADMIN", "MANAGER"],
-        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG", "CATERING"],
+        businessTypes: typesWithModule("tables"),
       },
       {
         href: "/catering",
@@ -83,7 +83,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Booking acara: jadwal, uang muka, sisa tagihan, dan tahap produksi.",
         icon: CalendarClock,
         roles: ["ADMIN", "MANAGER", "CASHIER"],
-        businessTypes: ["CATERING"],
+        businessTypes: typesWithModule("catering"),
       },
       {
         href: "/kds",
@@ -92,7 +92,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Layar monitor antrean tiket dapur dan bar real-time.",
         icon: ChefHat,
         roles: ["ADMIN", "MANAGER", "KITCHEN"],
-        businessTypes: ["FNB_CAFE", "FNB_RESTAURANT", "FNB_WARUNG", "CATERING"],
+        businessTypes: typesWithModule("kds"),
       },
       {
         href: "/laundry",
@@ -101,7 +101,7 @@ export const navigationSections: NavigationSection[] = [
         description: "Work order pencucian satuan & kiloan dengan proses pelacakan.",
         icon: Shirt,
         roles: ["ADMIN", "MANAGER", "CASHIER"],
-        businessTypes: ["SERVICE"],
+        businessTypes: typesWithModule("laundry"),
       },
     ],
   },

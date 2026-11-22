@@ -4,17 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Store,
-  UtensilsCrossed,
-  ShoppingBag,
-  Hammer,
-  Pill,
-  Scissors,
-  PartyPopper,
   Eye,
   EyeOff,
+  Sparkles,
 } from "lucide-react";
 import { KadaiLockup } from "@/components/shared/kadai-logo";
+import {
+  BUSINESS_CATEGORIES,
+  DEFAULT_BUSINESS_TYPE,
+  getBusinessProfile,
+  getModulesForType,
+  getRolesForType,
+  type BusinessTypeKey,
+} from "@/lib/business-catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +28,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [storeName, setStoreName] = useState("");
-  const [businessType, setBusinessType] = useState("FNB_CAFE");
+  const [businessType, setBusinessType] = useState<BusinessTypeKey>(DEFAULT_BUSINESS_TYPE);
   const [tier, setTier] = useState("PRO_BUSINESS");
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
@@ -108,90 +110,65 @@ export default function RegisterPage() {
             {/* Tipe Usaha Selector */}
             <div className="space-y-2">
               <Label className="font-bold text-xs">Pilih Kategori Usaha Anda</Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("FNB_CAFE")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "FNB_CAFE"
-                      ? "bg-primary/10 border-primary neo-shadow-sm ring-1 ring-primary"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <UtensilsCrossed className="size-4 text-primary mb-1" />
-                  <p className="font-black text-xs leading-tight">Kafe & Resto</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">BOM & KDS Dapur</p>
-                </button>
+              <div className="space-y-3">
+                {BUSINESS_CATEGORIES.map((category) => (
+                  <div key={category.key} className="space-y-1.5">
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-[11px] font-black uppercase tracking-wide text-foreground">
+                        {category.label}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground truncate">{category.tagline}</p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {category.types.map((typeKey) => {
+                        const profile = getBusinessProfile(typeKey);
+                        const Icon = profile.icon;
+                        const active = businessType === typeKey;
+                        return (
+                          <button
+                            key={typeKey}
+                            type="button"
+                            onClick={() => setBusinessType(typeKey)}
+                            aria-pressed={active}
+                            className={`p-2.5 rounded-xl neo-border text-left transition-all ${
+                              active
+                                ? `${profile.accent.chip} ${profile.accent.border} neo-shadow-sm ring-1 ${profile.accent.ring}`
+                                : "bg-muted/40 hover:bg-muted"
+                            }`}
+                          >
+                            <Icon className={`size-4 ${profile.accent.text} mb-1`} />
+                            <p className="font-black text-xs leading-tight">{profile.label}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{profile.tagline}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("BUILDING_SUPPLY")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "BUILDING_SUPPLY"
-                      ? "bg-amber-500/10 border-amber-600 neo-shadow-sm ring-1 ring-amber-500"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <Hammer className="size-4 text-amber-600 mb-1" />
-                  <p className="font-black text-xs leading-tight">Toko Bangunan</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Multi-Gudang & Material</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("RETAIL")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "RETAIL"
-                      ? "bg-primary/10 border-primary neo-shadow-sm ring-1 ring-primary"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <ShoppingBag className="size-4 text-accent-secondary mb-1" />
-                  <p className="font-black text-xs leading-tight">Ritel & Sembako</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Barcode Scan & Expired</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("PHARMACY")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "PHARMACY"
-                      ? "bg-emerald-500/10 border-emerald-600 neo-shadow-sm ring-1 ring-emerald-500"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <Pill className="size-4 text-emerald-600 mb-1" />
-                  <p className="font-black text-xs leading-tight">Apotek & Alkes</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">FEFO Batch & Resep</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("SERVICE")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "SERVICE"
-                      ? "bg-purple-500/10 border-purple-600 neo-shadow-sm ring-1 ring-purple-500"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <Scissors className="size-4 text-purple-600 mb-1" />
-                  <p className="font-black text-xs leading-tight">Jasa & Salon</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Komisi & Work Order</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBusinessType("CATERING")}
-                  className={`p-2.5 rounded-xl neo-border text-left transition-all ${
-                    businessType === "CATERING"
-                      ? "bg-orange-500/10 border-orange-600 neo-shadow-sm ring-1 ring-orange-500"
-                      : "bg-muted/40 hover:bg-muted"
-                  }`}
-                >
-                  <PartyPopper className="size-4 text-orange-600 mb-1" />
-                  <p className="font-black text-xs leading-tight">Katering & Event</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Resep Porsi, KDS & Delivery</p>
-                </button>
+              {/* Preview: modul & peran yang langsung aktif untuk vertikal terpilih */}
+              <div className="rounded-xl neo-border bg-muted/30 p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="size-3.5 text-primary shrink-0" />
+                  <p className="text-[11px] font-black">
+                    Modul otomatis aktif: {getBusinessProfile(businessType).label}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {getModulesForType(businessType).map((m) => (
+                    <span
+                      key={m.key}
+                      className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium"
+                    >
+                      {m.label}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Peran staf relevan: {getRolesForType(businessType).join(" · ")} — pajak usaha:{" "}
+                  {getBusinessProfile(businessType).taxMode}
+                </p>
               </div>
             </div>
 

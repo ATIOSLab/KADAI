@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BUSINESS_TYPE_KEYS, DEFAULT_BUSINESS_TYPE } from "@/lib/business-catalog";
 
 /**
  * Validator khusus platform KADAI (diperuntukkan endpoint SUPER_ADMIN).
@@ -22,18 +23,7 @@ export const ownerCreateSchema = z.object({
   newStore: z
     .object({
       name: z.string().min(1, "Nama tenant wajib diisi").max(120),
-      businessType: z
-        .enum([
-          "RETAIL",
-          "FNB_CAFE",
-          "FNB_RESTAURANT",
-          "FNB_WARUNG",
-          "CATERING",
-          "BUILDING_SUPPLY",
-          "PHARMACY",
-          "SERVICE",
-        ])
-        .default("FNB_CAFE"),
+      businessType: z.enum(BUSINESS_TYPE_KEYS).default(DEFAULT_BUSINESS_TYPE),
       tier: z
         .enum(["FREE", "STARTER", "PRO_BUSINESS", "ENTERPRISE"])
         .default("PRO_BUSINESS"),

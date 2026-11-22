@@ -149,6 +149,14 @@ const articleDatabase: Record<string, ArticleDetail> = {
   },
 };
 
+// Anti soft-404 (Next 16 + root loading.tsx): slug di luar daftar artikel ditolak
+// di level routing sehingga status 404 asli tidak bisa dikunci jadi 200 oleh shell streaming.
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return Object.keys(articleDatabase).map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {

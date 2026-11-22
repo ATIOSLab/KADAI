@@ -130,7 +130,7 @@ function RequestDemoForm() {
             Coba Langsung KADAI untuk Bisnis Anda
           </h1>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance">
-            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim spesialis NEW ASIA TECH.
+            Isi formulir singkat berikut untuk mendapatkan kode akses demo instan dan pendampingan implementasi dari tim spesialis KADAI.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ function RequestDemoForm() {
                     >
                       <a
                         href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                          `Halo Tim KADAI (NEW ASIA TECH), saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
+                          `Halo Tim KADAI, saya baru saja mengajukan demo untuk ${successData.businessName} dengan Kode Akses: ${successData.accessCode}. Mohon panduannya.`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -300,7 +300,7 @@ function RequestDemoForm() {
                         onChange={(e) => setOutletCount(Number(e.target.value))}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       >
-                        <option value={1}>1 Gerai (Outlet Baru/Rintisan)</option>
+                        <option value={1}>1 Gerai (Baru / Rintisan)</option>
                         <option value={2}>2 - 3 Gerai (Bisnis Berkembang)</option>
                         <option value={5}>4 - 10 Gerai (Multi-Cabang)</option>
                         <option value={15}>Lebih dari 10 Gerai (Franchise/Grup)</option>
@@ -473,14 +473,14 @@ function RequestDemoForm() {
               >
                 <a
                   href={`https://wa.me/6285159081119?text=${encodeURIComponent(
-                    "Halo Tim KADAI (NEW ASIA TECH), saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
+                    "Halo Tim KADAI, saya ingin konsultasi dan melihat demo langsung sistem operasional KADAI."
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="size-4" />
-                  <span>Chat WhatsApp Tim NEW ASIA TECH</span>
+                  <span>Chat WhatsApp Tim KADAI</span>
                 </a>
               </Button>
             </div>

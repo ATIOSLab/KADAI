@@ -15,14 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Solusi Industri: F&B, Ritel, & Dapur Pusat",
+  title: "Solusi Industri: F&B, Ritel & Jaringan Multi-Cabang",
   description:
-    "Solusi sistem operasional kasir dan rantai pasok terarah untuk kafe, restoran, toko ritel, minimarket, serta sentra dapur pusat dan gudang distribusi.",
+    "Solusi sistem operasional kasir dan rantai pasok terarah untuk kafe, restoran, toko ritel, minimarket, apotek, laundry & jasa, hingga sentra dapur pusat dan gudang distribusi.",
   alternates: {
     canonical: "https://kadai.asia/solusi",
   },
   openGraph: {
-    title: "Solusi Industri: F&B, Ritel, & Dapur Pusat | KADAI",
+    title: "Solusi Industri: F&B, Ritel & Jaringan Multi-Cabang | KADAI",
     description:
       "Arsitektur operasional kasir, stok multi-batch, dan alur dapur terpadu untuk kafe, ritel minimarket, hingga multi-cabang distribusi.",
     url: "https://kadai.asia/solusi",
@@ -51,7 +51,7 @@ const solutions = [
   },
   {
     slug: "ritel-minimarket",
-    title: "Toko Ritel, Minimarket & Fashion",
+    title: "Toko Ritel, Minimarket, Apotek & Fashion",
     category: "Retail & Commerce",
     desc: "Kecepatan transaksi kasir tinggi untuk gerai dengan ribuan SKU. Scan barcode USB kilat, kontrol varian warna/ukuran, dan deteksi barang kadaluwarsa.",
     icon: Store,
@@ -71,7 +71,7 @@ const solutions = [
     slug: "dapur-pusat-gudang",
     title: "Dapur Pusat & Multi-Gudang",
     category: "Central Kitchen & Logistics",
-    desc: "Standarisasi resep porsi massal dan distribusi bahan baku antar cabang. Terbitkan surat jalan digital dan pantau persediaan antar outlet tanpa kebocoran.",
+    desc: "Standarisasi resep porsi massal dan distribusi bahan baku antar cabang. Terbitkan surat jalan digital dan pantau persediaan antar cabang tanpa kebocoran.",
     icon: Warehouse,
     painPoints: [
       "Cabang mengeluh rasa dan kualitas menu tidak konsisten",
@@ -81,7 +81,7 @@ const solutions = [
     features: [
       "Pencatatan produksi porsi massal (batching) dapur pusat",
       "Surat jalan mutasi stok cabang dengan persetujuan penerimaan",
-      "Laporan konsolidasian omzet dan persediaan seluruh outlet",
+      "Laporan konsolidasian omzet dan persediaan seluruh cabang",
       "Otorisasi bertingkat (RBAC) untuk melindungi data finansial pusat",
     ],
   },
@@ -90,7 +90,7 @@ const solutions = [
 export default function SolusiIndexPage() {
   return (
     <LandingPageShell
-      badgeText="SOLUSI INDUSTRI KADAI"
+      badgeText="SOLUSI LINTAS SEKTOR"
       title="Disesuaikan dengan Alur Kerja Sektor Usaha Anda"
       description="Setiap industri memiliki tantangan operasional unik. KADAI menyediakan alur konfigurasi khusus agar kasir, dapur, dan gudang berjalan selaras tanpa gesekan."
     >

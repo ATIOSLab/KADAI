@@ -76,7 +76,7 @@ export function CapabilityBentoGrid() {
       highlights: [
         "Surat jalan digital tercatat dengan status kirim dan terima",
         "Pemisahan hak akses staf kasir, manajer cabang, dan akuntan",
-        "Konsolidasi laporan keuangan multi-outlet tanpa rekap manual",
+        "Konsolidasi laporan keuangan multi-gerai tanpa rekap manual",
       ],
     },
   ];

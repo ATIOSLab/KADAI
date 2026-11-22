@@ -80,7 +80,7 @@ export default function SolutionRetailPage() {
     >
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 -mt-8 pb-4">
         <Button asChild size="lg" className="rounded-xl font-bold text-sm h-11 px-7 bg-primary text-white shadow-xs">
-          <Link href="/register">Coba Gratis 14 Hari</Link>
+          <Link href="/register">Mulai Uji Coba Gratis 14 Hari</Link>
         </Button>
         <Button asChild size="lg" variant="outline" className="rounded-xl font-semibold text-sm h-11 px-6 bg-white border-slate-300">
           <Link href="/demo">Jadwalkan Demo Ritel</Link>
@@ -154,7 +154,7 @@ export default function SolutionRetailPage() {
           </p>
           <div className="pt-2">
             <Button asChild size="lg" className="rounded-lg font-bold text-sm h-11 px-8 bg-primary text-white shadow-xs">
-              <Link href="/register">Mulai Uji Coba Gratis</Link>
+              <Link href="/register">Mulai Uji Coba Gratis 14 Hari</Link>
             </Button>
           </div>
         </div>

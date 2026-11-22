@@ -87,7 +87,7 @@ function buildClusters() {
     vertical: "FNB_RESTAURANT",
     name: "Resto Rasa Nusantara Multi-Cabang",
     slug: "fnb-resto",
-    description: "Restoran Kuliner Nusantara dengan 3 Cabang Outlet & Multi-Station KDS (Kitchen & Bar)",
+    description: "Restoran Kuliner Nusantara dengan 3 Cabang & Multi-Station KDS (Kitchen & Bar)",
     outlets: [
       { name: "Resto Nusantara - Pusat Menteng", code: "RSN-01", address: "Jl. HOS Cokroaminoto No. 12, Menteng, Jakpus", phone: "08121111001", isMain: true },
       { name: "Resto Nusantara - Cabang Senopati", code: "RSN-02", address: "Jl. Senopati No. 45, Kebayoran Baru, Jaksel", phone: "08121111002", isMain: false },

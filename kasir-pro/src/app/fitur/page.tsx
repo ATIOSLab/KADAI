@@ -42,7 +42,7 @@ const featureList = [
     desc: "Transaksi kasir berkecepatan tinggi dengan pencarian produk instan, dukungan barcode scanner fisik, tombol pembayaran uang pas, dan cetak struk thermal 58mm/80mm.",
     icon: ShoppingBag,
     badge: "Kecepatan Kasir",
-    metrics: "< 0.2 detik per transaksi",
+    metrics: "Sub-detik per transaksi",
     specs: [
       "Tombol cepat pencarian (F2) & bayar langsung (F4)",
       "Pilihan nominal pecahan rupiah kilat & uang pas",
@@ -57,7 +57,7 @@ const featureList = [
     desc: "Sistem melacak setiap batch stok barang masuk lengkap dengan tanggal kadaluwarsa, vendor asal, dan harga perolehan historis. Mendukung metode First-In First-Out, First-Expired First-Out, maupun Moving Average.",
     icon: Layers,
     badge: "PSAK 14 / IAS 2",
-    metrics: "100% Lacak Batch & Kadaluwarsa",
+    metrics: "Pelacakan Batch & Kadaluwarsa Penuh",
     specs: [
       "Penilaian persediaan First-In, First-Out otomatis",
       "Radar peringatan batch stok mendekati kadaluwarsa",
@@ -72,7 +72,7 @@ const featureList = [
     desc: "Pesanan dari kasir atau scan QR pelanggan langsung terkirim ke layar stasiun dapur dan bar minuman secara real-time dengan sinyal audio lonceng bel pesanan baru.",
     icon: ChefHat,
     badge: "Operasional F&B",
-    metrics: "Zero Kertas Tiket Hilang",
+    metrics: "Tanpa Kertas, Tanpa Tiket Hilang",
     specs: [
       "Routing cerdas: stasiun makanan panas, dingin, dan bar",
       "Pengatur waktu durasi pengerjaan pesanan antrean",
@@ -117,7 +117,7 @@ const featureList = [
     desc: "Sistem dual-kantong kas memisahkan uang kembalian kasir dari dana belanja harian koki/staf (pasar, es batu, bumbu). Suntikan modal kerja owner tercatat rapi dan rekonsiliasi kas harian otomatis presisi.",
     icon: ShoppingBag,
     badge: "Arus Kas Rapi",
-    metrics: "Zero Selisih Laci Kas",
+    metrics: "Tanpa Selisih Laci Kas",
     specs: [
       "Pemisahan Kantong Kas Kasir vs Kas Belanja Tim Dapur",
       "Pencatatan kas masuk modal kerja & kas keluar operasional",
@@ -147,7 +147,7 @@ const featureList = [
     desc: "Kelola puluhan gerai atau gudang cabang. Terbitkan surat jalan mutasi stok antar gerai, kunci hak akses staf kasir (RBAC), dan pantau grafik omzet konsolidasian di smartphone.",
     icon: Warehouse,
     badge: "Skala Bisnis",
-    metrics: "Multi-Outlet Terpadu",
+    metrics: "Multi-Gerai Terpadu",
     specs: [
       "Transfer stok antar-cabang dengan approval dua arah",
       "Surat jalan digital dan pelacakan barang dalam perjalanan",

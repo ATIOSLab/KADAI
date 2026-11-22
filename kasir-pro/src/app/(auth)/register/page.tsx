@@ -177,7 +177,7 @@ export default function RegisterPage() {
               <div className="space-y-1">
                 <Label className="font-bold text-xs">Nama Usaha / Toko</Label>
                 <Input
-                  placeholder="Contoh: Kopi Kadai / Resto Nusantara"
+                  placeholder="Contoh: Kopi Senja / Resto Nusantara"
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
                   required

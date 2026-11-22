@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | KADAI",
   },
   description:
-    "Aplikasi kasir POS dan sistem operasi bisnis terlengkap di Indonesia. Cocok untuk usaha Non-PKP (bebas pajak 0%) maupun PKP (PB1 10%, PPN 11%). Kelola penjualan kilat, inventori multi-batch FIFO, resep dapur BOM, multi-cabang, dan legalitas NIB OSS.",
+    "Aplikasi kasir POS dan sistem operasi bisnis terlengkap di Indonesia. Cocok untuk usaha Non-PKP (tanpa pungutan pajak) maupun PKP (PB1 10%, PPN 11%). Kelola penjualan kilat, inventori multi-batch FIFO, resep dapur BOM, multi-cabang, dan legalitas NIB OSS.",
   keywords: [
     "POS",
     "aplikasi kasir online",
@@ -56,6 +56,10 @@ export const metadata: Metadata = {
     "SAK EMKM",
     "PPh Final PP 55/2022",
     "multi-cabang",
+    "aplikasi kasir apotek",
+    "aplikasi laundry",
+    "software toko bangunan",
+    "aplikasi katering",
   ],
   manifest: "/site.webmanifest",
   icons: {
@@ -77,7 +81,7 @@ export const metadata: Metadata = {
     description:
       "Satu sistem operasi bisnis & kasir POS terpadu untuk gerai, dapur/stasiun produksi, dan pembukuan. Mendukung Non-PKP (0%) & PKP (PB1 10%, PPN), inventori multi-batch (FIFO, FEFO, Average), dan rekap laba bersih.",
     url: "https://kadai.asia",
-    siteName: "KADAI Operating System",
+    siteName: "KADAI — Sistem Operasi Bisnis",
     locale: "id_ID",
     type: "website",
     images: [

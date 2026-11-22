@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Panduan Hardware & Kompatibilitas Printer | KADAI",
     description:
-      "Bebas perangkat (hardware-agnostic). Mendukung 99% printer struk thermal ESC/POS 58mm/80mm, barcode scanner, dan tablet Android/iPad tanpa sewa paksa.",
+      "Bebas perangkat (hardware-agnostic). Mendukung mayoritas printer struk thermal ESC/POS 58mm/80mm, barcode scanner, dan tablet Android/iPad tanpa sewa paksa.",
     url: "https://kadai.asia/hardware",
     images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 const hardwareCategories = [
   {
     title: "Printer Struk Thermal (58mm & 80mm)",
-    desc: "KADAI mendukung protokol standar industri ESC/POS. Kompatibel dengan 99% printer kasir yang beredar di pasaran Indonesia, baik nirkabel (Bluetooth) maupun kabel (USB / LAN).",
+    desc: "KADAI mendukung protokol standar industri ESC/POS. Kompatibel dengan mayoritas printer kasir yang beredar di pasaran Indonesia, baik nirkabel (Bluetooth) maupun kabel (USB / LAN).",
     icon: Printer,
     badge: "Fleksibel ESC/POS",
     supportedBrands: ["Epson TM-T82 / TM-T20", "Panda PRJ-58 / PRJ-80", "VSC / Iware / Eppos", "Xprinter / Zjiang / Kassen"],
@@ -177,7 +177,7 @@ export default function HardwarePage() {
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="rounded-xl font-bold bg-primary hover:bg-primary/90 text-white px-8">
-              <Link href="/register">Coba Gratis 14 Hari</Link>
+              <Link href="/register">Mulai Uji Coba Gratis 14 Hari</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-xl font-semibold bg-white/10 text-white border-white/20 hover:bg-white/20 px-8">
               <Link href="/harga">Lihat Pilihan Paket</Link>

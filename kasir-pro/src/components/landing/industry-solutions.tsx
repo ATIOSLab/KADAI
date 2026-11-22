@@ -8,7 +8,7 @@ export function IndustrySolutions() {
     {
       title: "Kuliner, Kafe & Restoran (F&B)",
       icon: UtensilsCrossed,
-      subtitle: "Kedai kopi, kafe modern, restoran dine-in, bakery, fast food, hingga cloud kitchen.",
+      subtitle: "Kedai kopi, kafe modern, restoran dine-in, bakery, fast food, hingga cloud kitchen & katering.",
       features: [
         "Takaran resep bahan baku terpotong otomatis saat pesanan dibuat.",
         "Layar monitor dapur (KDS) memisahkan tiket stasiun koki dan barista.",
@@ -19,7 +19,7 @@ export function IndustrySolutions() {
     {
       title: "Toko Ritel & Minimarket",
       icon: ShoppingCart,
-      subtitle: "Minimarket, toko kelontong sembako, apotek, butik fashion, dan grosir.",
+      subtitle: "Minimarket, toko kelontong sembako, apotek, butik fashion, toko bangunan, dan grosir.",
       features: [
         "Scan barcode cepat dengan scanner USB, Bluetooth, atau kamera HP.",
         "Metode fleksibel FIFO, FEFO (First Expired First Out), atau Rata-rata (Average) memastikan barang dagangan batch lama dan tanggal kadaluwarsa terjaga rapi.",
@@ -28,9 +28,9 @@ export function IndustrySolutions() {
       ],
     },
     {
-      title: "Grosir & Jaringan Multi-Cabang",
+      title: "Grosir, Jasa & Jaringan Multi-Cabang",
       icon: Building2,
-      subtitle: "Distribusi logistik, transfer antar cabang, booth waralaba, dan multi-outlet.",
+      subtitle: "Distribusi logistik, transfer antar cabang, booth waralaba, gerai jasa/laundry, dan katering pesanan.",
       features: [
         "Transfer persediaan dari gudang/dapur pusat ke seluruh gerai cabang.",
         "Pantau performa penjualan seluruh gerai secara konsolidasi realtime.",

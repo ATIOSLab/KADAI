@@ -31,19 +31,19 @@ export function EnterpriseSection() {
       accent: "text-primary bg-orange-500/10 border-orange-500/20",
     },
     {
-      title: "Immutable Activity Audit Trail",
+      title: "Jejak Audit Aktivitas Tak Terubah",
       desc: "Setiap mutasi inventori, transfer antar-cabang, dan penutupan shift kasir dicatat permanen lengkap dengan identitas aktor, waktu, dan riwayat perubahan.",
       icon: Layers,
       accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
-      title: "Cloud Infrastructure & Edge Proxy",
+      title: "Infrastruktur Cloud & Edge Proxy",
       desc: "Didukung infrastruktur container terisolasi, enkripsi transmisi TLS 1.3, proteksi header keamanan OWASP ketat, dan jaringan Cloudflare.",
       icon: Cloud,
       accent: "text-slate-200 bg-white/5 border-white/10",
     },
     {
-      title: "Resiliensi Kasir & PWA Ready",
+      title: "Resiliensi Kasir & Siap PWA",
       desc: "Aplikasi dapat diinstal langsung di layar desktop atau tablet kasir (PWA) dengan service worker offline shell caching untuk kelancaran operasional.",
       icon: ShieldCheck,
       accent: "text-slate-200 bg-white/5 border-white/10",

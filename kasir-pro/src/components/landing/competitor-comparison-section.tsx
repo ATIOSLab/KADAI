@@ -9,7 +9,7 @@ import { FadeIn } from "./fade-in";
 const COMPARISON_ROWS = [
   {
     feature: "Biaya Langganan Bulanan",
-    traditional: "Mulai Rp 299.000 / bln per outlet",
+    traditional: "Mulai Rp 299.000 / bln per gerai",
     kadai: "Mulai Rp 0 (Gratis) s/d Rp 99.000 / bln",
     highlight: true,
   },
@@ -26,7 +26,7 @@ const COMPARISON_ROWS = [
     highlight: true,
   },
   {
-    feature: "Resep Bahan Pokok (Bill of Materials)",
+    feature: "Resep Bahan Baku (Bill of Materials)",
     traditional: "Tersedia di paket add-on berbayar mahal",
     kadai: "Termasuk di Business Pro dengan potong stok otomatis",
     highlight: false,
@@ -40,7 +40,7 @@ const COMPARISON_ROWS = [
   {
     feature: "Hardware Bebas (Tanpa Sewa Paksa)",
     traditional: "Dianjurkan bundel hardware resmi vendor",
-    kadai: "100% Bebas: Printer ESC/POS 58/80mm & Scanner apapun",
+    kadai: "Bebas Perangkat: Printer ESC/POS 58/80mm & Scanner Apa Pun",
     highlight: false,
   },
 ];

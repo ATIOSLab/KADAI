@@ -142,7 +142,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
 
           {/* Subtitle */}
           <p className="text-xs sm:text-base md:text-lg text-slate-600 font-normal max-w-3xl mx-auto leading-relaxed text-balance px-3 sm:px-0">
-            KADAI mencatat transaksi kasir dalam hitungan detik, memotong stok resep bahan baku otomatis saat pesanan dibuat, dan menyusun laporan pembukuan rapi setiap hari. Spesialis bisnis Kuliner (F&B) dan Ritel Multi-Cabang.
+            KADAI mencatat transaksi kasir dalam hitungan detik, memotong stok resep bahan baku otomatis saat pesanan dibuat, dan menyusun laporan pembukuan rapi setiap hari. Satu sistem untuk sembilan jenis usaha — kafe & restoran, warung & kedai, katering, ritel & minimarket, grosir, apotek, laundry, jasa/salon, hingga jaringan multi-cabang.
           </p>
 
           {/* CTA Buttons (Clean Focused Action) */}
@@ -166,7 +166,7 @@ export function HeroSection({ dashboardPath }: HeroSectionProps) {
                     size="lg"
                     className="w-full sm:w-auto font-bold text-sm sm:text-base h-12 px-8 rounded-lg bg-primary hover:bg-primary/90 text-white shadow-md transition-all active:scale-95"
                   >
-                    <Link href="/register">Coba Gratis 14 Hari</Link>
+                    <Link href="/register">Mulai Uji Coba Gratis 14 Hari</Link>
                   </Button>
 
                   <Button

@@ -43,6 +43,7 @@ type CardPlan = {
 const STATIC_PLANS: CardPlan[] = [
   {
     name: "Starter",
+    badge: "UMKM Pemula",
     subtitle: "Untuk warung mikro dan perintis usaha yang baru memulai.",
     monthlyPrice: 0,
     yearlyPrice: 0,
@@ -51,7 +52,7 @@ const STATIC_PLANS: CardPlan[] = [
     features: [
       "1 Gerai & 1 Akun Kasir",
       "Maksimal 50 Produk SKU",
-      "Kasir POS Cepat & Cetak Struk",
+      "Kasir POS Cepat & Cetak Struk Thermal",
       "Laporan Penjualan Harian",
     ],
     cta: "Mulai Gratis",
@@ -59,6 +60,7 @@ const STATIC_PLANS: CardPlan[] = [
   },
   {
     name: "Professional",
+    badge: "Paling Fleksibel",
     subtitle: "Operasional tuntas 1 gerai untuk kedai kafe atau toko ritel aktif.",
     monthlyPrice: 99000,
     yearlyPrice: 79200,
@@ -70,13 +72,14 @@ const STATIC_PLANS: CardPlan[] = [
       "F&B: QR Meja & Pemesanan Mandiri",
       "Ritel: Barcode Scanner & Peringatan Kadaluwarsa",
       "Pembukuan Kas & Pajak SAK EMKM",
+      "Ekspor Laporan Excel / CSV",
     ],
     cta: "Pilih Professional",
     featured: false,
   },
   {
     name: "Business Pro",
-    badge: "Paling Banyak Dipilih",
+    badge: "Paling Populer",
     subtitle: "Kafe, resto & ritel modern dengan manajemen resep, dapur & multi-cabang.",
     monthlyPrice: 249000,
     yearlyPrice: 199200,
@@ -95,6 +98,7 @@ const STATIC_PLANS: CardPlan[] = [
   },
   {
     name: "Enterprise",
+    badge: "Skala Besar",
     subtitle: "Waralaba berjejaring, sentra dapur pusat, dan multi-gudang.",
     monthlyPrice: 599000,
     yearlyPrice: 479200,
@@ -105,6 +109,8 @@ const STATIC_PLANS: CardPlan[] = [
       "Sentra Dapur Pusat (Central Kitchen)",
       "Routing Pesanan Antar-Sentra Produksi",
       "Laporan Konsolidasi Multi-Entitas",
+      "Rekonsiliasi Pajak Konsolidasi Grup",
+      "Akses API Integrasi Kustom",
       "Dedicated Account Manager & SLA 99.9%",
     ],
     cta: "Hubungi Tim Kami",

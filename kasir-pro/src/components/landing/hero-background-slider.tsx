@@ -17,7 +17,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     id: "finance",
     image: "/images/hero/slide-1.jpg",
     alt: "Pembukuan, Laba Rugi & Dashboard Keuangan KADAI",
-    title: "Executive Cockpit & Pembukuan Finansial",
+    title: "Kokpit Eksekutif & Pembukuan Finansial",
     subtitle: "Otomasi laporan laba rugi, rekonsiliasi kasir harian, dan kepatuhan pajak daerah PB1 & PPh Final.",
     badge: "Pembukuan & SAK EMKM",
   },
@@ -27,7 +27,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     alt: "Gerai Kafe, Restoran & Kitchen Display KADAI POS",
     title: "Gerai Kafe & Restoran Terpadu",
     subtitle: "Pemesanan meja kilat, split bill, Kitchen Display System (KDS), dan sinkronisasi resep BOM bahan baku.",
-    badge: "F&B POS & Kitchen Display",
+    badge: "POS F&B & Layar Dapur",
   },
   {
     id: "retail",

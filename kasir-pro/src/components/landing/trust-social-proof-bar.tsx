@@ -14,10 +14,10 @@ import {
 import { FadeIn } from "./fade-in";
 
 const LIVE_EVENTS = [
-  { text: "Pesanan Meja 03 lunas via QRIS", time: "Baru saja", badge: "Kopi Gayo & Toast" },
-  { text: "Stok Batch #04 dipotong otomatis (FIFO)", time: "1 mnt lalu", badge: "Restock Biji Kopi" },
-  { text: "KDS Dapur: 2 Tiket Masak Selesai", time: "2 mnt lalu", badge: "Stasiun Barista" },
-  { text: "Transfer Stok Cabang Senopati Diterima", time: "4 mnt lalu", badge: "Surat Jalan #SJ-089" },
+  { text: "Pesanan Meja 03 lunas via QRIS", time: "Ilustrasi", badge: "Kopi Gayo & Toast" },
+  { text: "Stok Batch #04 dipotong otomatis (FIFO)", time: "Ilustrasi", badge: "Restock Biji Kopi" },
+  { text: "KDS Dapur: 2 Tiket Masak Selesai", time: "Ilustrasi", badge: "Stasiun Barista" },
+  { text: "Transfer Stok Cabang Senopati Diterima", time: "Ilustrasi", badge: "Surat Jalan #SJ-089" },
 ];
 
 const ECOSYSTEM_PARTNERS = [
@@ -37,7 +37,7 @@ export function TrustSocialProofBar() {
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-28 bg-amber-500/5 blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        {/* 1. Live Operational Telemetry Ticker (Alur Nyata Sistem) */}
+        {/* 1. Live Operational Telemetry Ticker (Ilustrasi Alur Sistem) */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2.5 w-2.5">
@@ -45,10 +45,10 @@ export function TrustSocialProofBar() {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
             </span>
             <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-              Alur Operasional Sistem KADAI
+              Contoh Alur Operasional di KADAI
             </span>
             <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
-              • Telemetri Engine Kasir, Dapur & Arus Kas Realtime (WIB)
+              • Ilustrasi notifikasi: kasir, dapur & arus kas
             </span>
           </div>
 

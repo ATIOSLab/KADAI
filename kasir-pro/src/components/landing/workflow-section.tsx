@@ -105,7 +105,7 @@ export function WorkflowSection() {
             Sinkronisasi data real-time: tidak ada lagi selisih antara uang kasir fisik, catatan gudang, dan laporan laba rugi.
           </span>
         </div>
-        <span className="font-mono font-bold text-slate-900 shrink-0">Zero Reconciliation Friction</span>
+        <span className="font-mono font-bold text-slate-900 shrink-0">Tanpa Friksi Rekonsiliasi</span>
       </div>
     </section>
   );

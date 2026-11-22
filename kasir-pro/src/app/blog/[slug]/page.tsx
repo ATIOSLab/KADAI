@@ -267,7 +267,7 @@ export default async function BlogDetailPage({
             </p>
           </div>
           <Button asChild className="rounded-xl font-bold bg-primary hover:bg-primary/90 text-white shrink-0">
-            <Link href="/register">Mulai Uji Coba</Link>
+            <Link href="/register">Mulai Uji Coba Gratis 14 Hari</Link>
           </Button>
         </div>
       </main>

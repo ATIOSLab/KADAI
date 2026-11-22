@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Paket Langganan & Harga Resmi | KADAI",
     description:
-      "Struktur paket langganan transparan: Starter Rp 0, Professional Rp 99rb (QR Meja F&B / Barcode & Alert Expired Ritel), Business Pro Rp 249rb (Resep BOM + KDS Dapur / Multi-Batch FIFO), dan Enterprise Rp 599rb.",
+      "Struktur paket langganan transparan: Starter Rp 0 (permanen), Professional Rp 99.000/bln (QR Meja F&B / Barcode & Alert Kedaluwarsa Ritel), Business Pro Rp 249.000/bln (Resep BOM + KDS Dapur / Multi-Batch FIFO), dan Enterprise Rp 599.000/bln.",
     url: "https://kadai.asia/harga",
     images: [{ url: "https://kadai.asia/og-image.png", width: 1200, height: 630 }],
   },
@@ -49,8 +49,9 @@ const DEFAULT_BADGES: Record<SubscriptionTier, string> = {
 
 function ctaForCode(code: SubscriptionTier): string {
   if (code === "FREE") return "Mulai Gratis";
-  if (code === "ENTERPRISE") return "Hubungi Enterprise";
-  return "Coba Gratis 14 Hari";
+  if (code === "STARTER") return "Pilih Professional";
+  if (code === "PRO_BUSINESS") return "Pilih Business Pro";
+  return "Hubungi Tim Kami";
 }
 
 const STATIC_PLANS: DisplayPlan[] = [
@@ -58,13 +59,12 @@ const STATIC_PLANS: DisplayPlan[] = [
     code: "FREE",
     name: "Starter",
     badge: DEFAULT_BADGES.FREE,
-    desc: "Untuk usaha mikro atau rintisan yang baru memulai pencatatan kasir digital.",
+    desc: "Untuk warung mikro dan perintis usaha yang baru memulai.",
     monthlyPrice: TIER_PRICES.FREE.MONTHLY,
     features: [
-      "1 Gerai (Outlet) & 1 Akun Kasir",
-      "Hingga 50 Produk SKU",
-      "Pencatatan Penjualan Kasir Kilat",
-      "Cetak Struk Thermal Bluetooth/USB",
+      "1 Gerai & 1 Akun Kasir",
+      "Maksimal 50 Produk SKU",
+      "Kasir POS Cepat & Cetak Struk Thermal",
       "Laporan Penjualan Harian",
     ],
     limits: { maxOutlets: 1, maxUsers: 1, maxProducts: 50 },
@@ -75,7 +75,7 @@ const STATIC_PLANS: DisplayPlan[] = [
     code: "STARTER",
     name: "Professional",
     badge: DEFAULT_BADGES.STARTER,
-    desc: "Untuk kedai kafe atau toko ritel aktif yang membutuhkan operasional 1 gerai tuntas.",
+    desc: "Operasional tuntas 1 gerai untuk kedai kafe atau toko ritel aktif.",
     monthlyPrice: TIER_PRICES.STARTER.MONTHLY,
     features: [
       "1 Gerai & Hingga 3 Akun Kasir",
@@ -86,35 +86,35 @@ const STATIC_PLANS: DisplayPlan[] = [
       "Ekspor Laporan Excel / CSV",
     ],
     limits: { maxOutlets: 1, maxUsers: 3 },
-    cta: "Coba Gratis 14 Hari",
+    cta: "Pilih Professional",
     popular: false,
   },
   {
     code: "PRO_BUSINESS",
     name: "Business Pro",
     badge: DEFAULT_BADGES.PRO_BUSINESS,
-    desc: "Solusi lengkap bisnis berkembang dengan manajemen bahan baku resep, dapur, dan multi-cabang.",
+    desc: "Kafe, resto & ritel modern dengan manajemen resep, dapur & multi-cabang.",
     monthlyPrice: TIER_PRICES.PRO_BUSINESS.MONTHLY,
     features: [
-      "Hingga 3 Gerai (Outlet)",
-      "F&B: Resep Bahan Baku (BOM) & Layar Dapur KDS",
+      "Hingga 3 Gerai / Cabang Usaha",
+      "F&B: Resep BOM Bahan Baku & Layar Dapur KDS",
       "Ritel: Inventori Multi-Batch (FIFO & FEFO Asli)",
-      "Transfer Stok Antar Outlet (Surat Jalan)",
+      "Transfer Stok Antar-Cabang (Surat Jalan)",
       "Rekap PB1/PPN & PPh Final PP 55/2022",
       "Dukungan WhatsApp Prioritas",
     ],
     limits: { maxOutlets: 3, maxUsers: 10 },
-    cta: "Coba Gratis 14 Hari",
+    cta: "Pilih Business Pro",
     popular: true,
   },
   {
     code: "ENTERPRISE",
     name: "Enterprise",
     badge: DEFAULT_BADGES.ENTERPRISE,
-    desc: "Untuk waralaba, grup resto, jaringan minimarket, atau sentra dapur pusat dengan multi-gudang.",
+    desc: "Waralaba berjejaring, sentra dapur pusat, dan multi-gudang.",
     monthlyPrice: TIER_PRICES.ENTERPRISE.MONTHLY,
     features: [
-      "Outlet & Gudang Tak Terbatas",
+      "Gerai & Gudang Tak Terbatas",
       "Sentra Dapur Pusat (Central Kitchen)",
       "Routing Pesanan Antar-Sentra Produksi",
       "Rekonsiliasi Pajak Konsolidasi Grup",
@@ -122,7 +122,7 @@ const STATIC_PLANS: DisplayPlan[] = [
       "Dedicated Account Manager & SLA 99.9%",
     ],
     limits: { maxOutlets: -1, maxUsers: -1 },
-    cta: "Hubungi Enterprise",
+    cta: "Hubungi Tim Kami",
     popular: false,
   },
 ];
@@ -171,7 +171,7 @@ export default async function HargaPage() {
 
   const matrixRows: { label: string; cells: string[] }[] = [
     {
-      label: "Batas Jumlah Gerai (Outlet)",
+      label: "Batas Jumlah Gerai",
       cells: plans.map((p) => limitCell(p, "maxOutlets", "Outlet")),
     },
     {

@@ -61,7 +61,7 @@ const TABS: TabItem[] = [
     metrics: [
       { label: "Metode Penilaian", value: "FIFO / FEFO / Average" },
       { label: "Radar Expired", value: "Alert < 30 Hari" },
-      { label: "Akurasi Opname", value: "100% Tercatat" },
+      { label: "Akurasi Opname", value: "Terlacak Penuh" },
     ],
     content: {
       meta: { ref: "SKU: BMF-ARABICA-01 • GUDANG PUSAT", status: "FIFO AKTIF", statusClass: "bg-slate-100 text-slate-800 border-slate-300" },
@@ -125,7 +125,7 @@ const TABS: TabItem[] = [
     name: "Multi-Cabang",
     icon: Building2,
     badge: "Rantai Pasok",
-    title: "Manajemen Multi-Outlet & Transfer Stok",
+    title: "Manajemen Multi-Gerai & Transfer Stok",
     subtitle: "Distribusi bahan baku dari Gudang Pusat ke gerai cabang/booth dengan surat jalan digital terenkripsi dan konfirmasi penerimaan 1-klik.",
     metrics: [
       { label: "Topologi Jaringan", value: "Hub & Spoke" },

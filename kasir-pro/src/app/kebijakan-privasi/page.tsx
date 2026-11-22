@@ -59,7 +59,7 @@ const sections: PrivacySection[] = [
     title: "3. Data Pribadi yang Kami Kumpulkan",
     items: [
       "Identitas akun: nama, email, nomor telepon, peran pengguna, dan kata sandi — kata sandi hanya disimpan dalam bentuk hash satu arah dan tidak pernah dapat dibaca kembali.",
-      "Data bisnis: nama outlet, daftar produk, stok dan batch, transaksi penjualan, serta data pelanggan/supplier yang Anda input ke dalam sistem.",
+      "Data bisnis: nama gerai, daftar produk, stok dan batch, transaksi penjualan, serta data pelanggan/supplier yang Anda input ke dalam sistem.",
       "Data pembayaran: nominal, status, dan referensi transaksi dari penyedia pembayaran. Kami tidak menyimpan nomor kartu, kode CVV, atau kredensial pembayaran apa pun.",
       "Data teknis: alamat IP, jenis perangkat dan browser, serta log akses dan aktivitas (audit trail) untuk keamanan dan forensik.",
       "Data kemitraan: kode referral, profil mitra, dan pencatatan komisi bagi hasil.",

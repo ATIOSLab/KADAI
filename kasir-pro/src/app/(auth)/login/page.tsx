@@ -62,7 +62,7 @@ const DEMO_VERTICALS = [
     tagline: "3 Cabang Terpadu, Denah Meja & Multi-Station Dapur",
     roles: [
       { label: "Owner (Admin)", desc: "Konsolidasi 3 Cabang", email: "owner.resto@kadai.asia" },
-      { label: "Manager Outlet", desc: "Denah Meja & Split Bill", email: "manager.resto@kadai.asia" },
+      { label: "Manager Gerai", desc: "Denah Meja & Split Bill", email: "manager.resto@kadai.asia" },
       { label: "Kasir Frontdesk", desc: "Terminal Kasir Resto", email: "kasir.resto@kadai.asia" },
       { label: "Chef Dapur (KDS)", desc: "Layar Dapur Masak", email: "dapur.resto@kadai.asia" },
     ],

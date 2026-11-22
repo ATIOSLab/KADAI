@@ -10,7 +10,7 @@ export const LANDING_FAQS: FAQItem[] = [
   },
   {
     q: "Model bisnis apa saja yang dapat menggunakan KADAI?",
-    a: "KADAI dirancang fleksibel untuk tiga vertikal utama: (1) Kuliner & F&B (kafe, restoran dine-in, cloud kitchen, bakery), (2) Ritel & Perdagangan (minimarket, apotek, butik, toko kelontong), dan (3) Layanan Jasa (barbershop, salon, bengkel, laundry).",
+    a: "KADAI mendukung sembilan jenis usaha dalam empat kategori: (1) Kuliner & F&B — kafe/coffee shop, restoran dine-in, warung & kedai, serta katering; (2) Ritel & Perdagangan — toko ritel & sembako, minimarket, dan toko bangunan; (3) Jasa & Layanan — jasa/salon dan laundry; (4) Kesehatan & Farmasi — apotek & alat kesehatan.",
   },
   {
     q: "Apakah KADAI mendukung pengelolaan banyak cabang dan transfer stok?",
@@ -30,7 +30,7 @@ export const LANDING_FAQS: FAQItem[] = [
   },
   {
     q: "Apakah tersedia masa uji coba sebelum berlangganan berbayar?",
-    a: "Ya, Anda dapat memulai dengan paket Starter gratis tanpa biaya bulanan, atau mencoba fitur lengkap KADAI untuk merasakan kemudahan operasional multi-cabang secara langsung.",
+    a: "Ya. Paket Starter gratis selamanya tanpa biaya bulanan, dan paket berbayar (Professional, Business Pro, Enterprise) dapat dicoba lewat Uji Coba Gratis 14 Hari. Setelah masa uji coba berakhir, Anda bebas memilih paket yang paling sesuai skala usaha.",
   },
   {
     q: "Alat apa saja yang bisa dipakai untuk menjalankan KADAI?",

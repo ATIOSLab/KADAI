@@ -1,0 +1,4 @@
+# harness UAT lokal (berisi fixture kredensial) — jangan di-commit
+kasir-pro/scripts/uat-bootstrap.js
+kasir-pro/scripts/uat-rbac.js
+kasir-pro/scripts/uat-verify.js

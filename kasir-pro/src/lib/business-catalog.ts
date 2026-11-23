@@ -442,7 +442,7 @@ export const BUSINESS_PROFILES: Record<BusinessTypeKey, BusinessProfile> = {
       border: "border-primary",
     },
     taxMode: "PB1",
-    modules: FNB_MODULES,
+    modules: FNB_MODULES.filter((m) => m !== "tables"),
     roles: ["ADMIN", "MANAGER", "CASHIER", "KITCHEN"],
     features: ["POS ringan & cepat", "Kitchen Display (KDS)", "Laporan harian sederhana"],
   },

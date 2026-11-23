@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Eye,
-  EyeOff,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { KadaiLockup } from "@/components/shared/kadai-logo";
 import {
@@ -25,7 +23,6 @@ import { toast } from "sonner";
 import { getStoredReferralCode } from "@/lib/referral-client";
 
 export default function RegisterPage() {
-  const router = useRouter();
 
   const [storeName, setStoreName] = useState("");
   const [businessType, setBusinessType] = useState<BusinessTypeKey>(DEFAULT_BUSINESS_TYPE);
@@ -33,9 +30,8 @@ export default function RegisterPage() {
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState<{ code: string; businessName: string } | null>(null);
 
   // Status Pajak & Legalitas Usaha
   const [taxStatus, setTaxStatus] = useState("NON_PKP");
@@ -47,49 +43,106 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!storeName.trim() || !ownerName.trim() || !email.trim() || !password) {
-      toast.error("Mohon lengkapi semua field yang wajib diisi");
+    if (!storeName.trim() || !ownerName.trim() || phone.trim().length < 9) {
+      toast.error("Mohon lengkapi nama usaha, nama pemilik, dan WhatsApp (min. 9 digit)");
       return;
     }
 
     try {
       setLoading(true);
       const activeRef = getStoredReferralCode() || undefined;
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/demo-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          storeName,
+          fullName: ownerName.trim(),
+          businessName: storeName.trim(),
           businessType,
-          tier,
-          ownerName,
-          phone,
-          email,
-          password,
+          phone: phone.trim(),
+          email: email.trim() || "",
+          outletCount: 1,
+          notes: `[Minat paket: ${tier}]`,
           referralCode: activeRef,
           taxStatus,
           legalEntityType,
-          legalName: legalName.trim() || undefined,
-          nib: nib.trim() || undefined,
-          npwp: npwp.trim() || undefined,
-          ownerNik: ownerNik.trim() || undefined,
+          legalName: legalName.trim() || "",
+          nib: nib.trim() || "",
+          npwp: npwp.trim() || "",
+          ownerNik: ownerNik.trim() || "",
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Gagal mendaftarkan akun");
+        toast.error(data.error || "Gagal mengajukan uji coba");
         return;
       }
 
-      toast.success("Pendaftaran UMKM berhasil! Silakan login.");
-      router.push("/login");
+      setSubmitted({
+        code: data.data?.accessCode || "",
+        businessName: data.data?.businessName || storeName.trim(),
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       toast.error("Terjadi kesalahan sistem");
     } finally {
       setLoading(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <div className="w-full max-w-lg my-8 animate-slide-up">
+        <div className="text-center mb-6">
+          <Link href="/" className="inline-flex items-center justify-center mb-3 hover:opacity-90 transition-opacity">
+            <KadaiLockup variant="on-light" height={40} />
+          </Link>
+        </div>
+        <Card className="neo-border neo-shadow bg-card">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-success/15 neo-border">
+                <Sparkles className="size-5 text-accent-success" />
+              </span>
+              <div>
+                <h1 className="text-lg font-black tracking-tight text-slate-950">Permohonan diterima</h1>
+                <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+                  Tim KADAI akan menghubungi Anda via WhatsApp untuk aktivasi akun <span className="font-bold text-foreground">{submitted.businessName}</span>.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl neo-border bg-muted/40 p-4 text-center">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Kode Akses Demo Anda</p>
+              <p className="font-mono text-2xl font-black tracking-[0.2em] text-primary mt-1">{submitted.code || "—"}</p>
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Simpan kode ini — masukkan di halaman demo untuk menjelajah aplikasi sekarang juga.
+              </p>
+            </div>
+
+            <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside font-medium">
+              <li>Buka halaman demo, lalu masukkan kode akses di atas.</li>
+              <li>Jelajahi POS, inventori, dan laporan dengan data contoh.</li>
+              <li>Tim kami menghubungi Anda untuk mengaktifkan uji coba 14 hari penuh.</li>
+            </ol>
+
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <Link href="/demo" className="flex-1">
+                <Button className="w-full neo-border neo-shadow font-black bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-sm">
+                  Buka Halaman Demo <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+              <Link href="/login" className="flex-1">
+                <Button variant="outline" className="w-full neo-border font-black h-11 text-sm">
+                  Masuk ke Aplikasi
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg my-8 animate-slide-up">
@@ -98,9 +151,9 @@ export default function RegisterPage() {
         <Link href="/" className="inline-flex items-center justify-center mb-3 hover:opacity-90 transition-opacity">
           <KadaiLockup variant="on-light" height={40} />
         </Link>
-        <h1 className="text-2xl font-black tracking-tight text-slate-950">Daftarkan Bisnis Anda di KADAI</h1>
+        <h1 className="text-2xl font-black tracking-tight text-slate-950">Mulai Uji Coba Gratis 14 Hari</h1>
         <p className="text-xs text-muted-foreground mt-1 font-medium">
-          Mulai operasikan POS cerdas, inventori bahan baku, meja QR, dan pembukuan resmi Indonesia.
+          Isi data usaha Anda — kode akses demo terbit instan, dan tim KADAI menghubungi via WhatsApp untuk aktivasi akun.
         </p>
       </div>
 
@@ -291,34 +344,15 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Password */}
-            <div className="space-y-1">
-              <Label className="font-bold text-xs">Password Akun</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Minimal 6 karakter"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="neo-border text-xs pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Paket Langganan Options */}
+            {/* Paket yang diminati (opsional) */}
             <div className="space-y-2 pt-1">
               <Label className="font-bold text-xs flex items-center justify-between">
-                <span>Pilih Paket Langganan</span>
+                <span>Paket yang diminati</span>
                 <span className="text-accent-success font-black text-[11px]">Uji Coba Gratis 14 Hari</span>
               </Label>
+              <p className="text-[10px] text-muted-foreground -mt-1">
+                Dipilih saat aktivasi akun — bisa diubah kapan saja setelah tim menghubungi Anda.
+              </p>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <button
                   type="button"
@@ -363,7 +397,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full neo-border neo-shadow font-black bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-sm mt-3"
             >
-              {loading ? "Mendaftarkan Usaha..." : "Daftar & Mulai Operasi KADAI"}
+              {loading ? "Mengirim Permohonan..." : "Ajukan Uji Coba Gratis 14 Hari"}
             </Button>
           </form>
 

@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, KeyRound, CheckCircle2, Sparkles, Building2 } from "lucide-react";
+import { Eye, EyeOff, KeyRound, CheckCircle2, Building2 } from "lucide-react";
+
 import { KadaiLockup } from "@/components/shared/kadai-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -375,17 +376,9 @@ function LoginForm() {
                     <p className="text-[10px] text-red-600 font-semibold">{demoCodeError}</p>
                   )}
                   <div className="pt-0.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDemoCodeInput("KADAI2026");
-                        verifyCode("KADAI2026");
-                      }}
-                      className="text-[10px] text-primary/80 hover:text-primary font-medium hover:underline flex items-center gap-1"
-                    >
-                      <Sparkles className="size-3 text-amber-500" />
-                      Uji coba instan dengan kode: <strong className="font-mono text-slate-800">KADAI2026</strong>
-                    </button>
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      Belum punya kode akses? Ajukan demo gratis — kode dikirim tim KADAI setelah verifikasi.
+                    </p>
                   </div>
                 </div>
               ) : (

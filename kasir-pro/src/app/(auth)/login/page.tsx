@@ -125,7 +125,18 @@ function LoginForm() {
   const [verifyingCode, setVerifyingCode] = useState(false);
   const [demoCodeError, setDemoCodeError] = useState("");
   const [selectedVertical, setSelectedVertical] = useState("bangunan");
-  const [selectedAccountInfo, setSelectedAccountInfo] = useState<string | null>(null);
+  const [demoLoginEmail, setDemoLoginEmail] = useState<string | null>(null);
+
+  const homePathByRole = (role?: string) =>
+    role === "CASHIER"
+      ? "/pos"
+      : role === "KITCHEN"
+        ? "/kds"
+        : role === "INVENTORY"
+          ? "/inventory"
+          : role === "ACCOUNTANT"
+            ? "/finance"
+            : "/dashboard";
 
   const verifyCode = async (codeToVerify: string) => {
     if (!codeToVerify.trim()) return;
@@ -149,6 +160,36 @@ function LoginForm() {
       setDemoCodeError("Gagal memeriksa kode demo.");
     } finally {
       setVerifyingCode(false);
+    }
+  };
+
+  const handleDemoLogin = async (demoEmail: string) => {
+    if (demoLoginEmail) return;
+    if (!demoUnlocked || !demoCodeInput.trim()) {
+      setDemoCodeError("Masukkan kode akses demo terlebih dahulu, lalu klik peran yang ingin dicoba.");
+      return;
+    }
+    setDemoLoginEmail(demoEmail);
+    setDemoCodeError("");
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/demo-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: demoCodeInput, email: demoEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Gagal masuk ke demo. Coba lagi.");
+        return;
+      }
+      router.push(homePathByRole(data.data?.role));
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setDemoLoginEmail(null);
     }
   };
 
@@ -180,18 +221,7 @@ function LoginForm() {
         return;
       }
 
-      const role = data.data?.role;
-      const homePath =
-        role === "CASHIER"
-          ? "/pos"
-          : role === "KITCHEN"
-            ? "/kds"
-            : role === "INVENTORY"
-              ? "/inventory"
-              : role === "ACCOUNTANT"
-                ? "/finance"
-                : "/dashboard";
-      router.push(homePath);
+      router.push(homePathByRole(data.data?.role));
       router.refresh();
     } catch {
       setError("Terjadi kesalahan. Silakan coba lagi.");
@@ -354,7 +384,7 @@ function LoginForm() {
                         type="button"
                         onClick={() => {
                           setSelectedVertical(v.id);
-                          setSelectedAccountInfo(null);
+                          setDemoCodeError("");
                         }}
                         className={`px-2.5 py-1.5 rounded-xl text-[10px] font-bold whitespace-nowrap transition-all border flex items-center gap-1 ${
                           selectedVertical === v.id
@@ -391,11 +421,8 @@ function LoginForm() {
                             <button
                               key={idx}
                               type="button"
-                              onClick={() => {
-                                setEmail(r.email);
-                                setPassword(""); // password TIDAK di-autofill: literal publik dihapus (security)
-                                setSelectedAccountInfo(`${r.label} • ${r.email}`);
-                              }}
+                              disabled={demoLoginEmail !== null}
+                              onClick={() => handleDemoLogin(r.email)}
                               className={`p-2 text-left rounded-xl border transition-all cursor-pointer group ${
                                 email === r.email
                                   ? "bg-primary/10 border-primary ring-1 ring-primary/40 shadow-xs"
@@ -409,18 +436,16 @@ function LoginForm() {
                                 )}
                               </div>
                               <div className="text-[9px] text-slate-500 leading-tight truncate mt-0.5">{r.desc}</div>
+                              <div className="text-[9px] font-semibold text-primary/90 mt-1 truncate">
+                                {demoLoginEmail === r.email ? "⚡ Membuka demo…" : "Masuk demo tanpa password →"}
+                              </div>
                             </button>
                           ))}
                         </div>
 
-                        {selectedAccountInfo && (
-                          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-between text-[10px]">
-                            <span className="font-semibold text-emerald-800 truncate">
-                              ✓ {selectedAccountInfo}
-                            </span>
-                            <span className="text-[9px] text-emerald-600 font-bold shrink-0 ml-1">
-                              Password siap
-                            </span>
+                        {demoLoginEmail && (
+                          <div className="p-2 rounded-xl bg-orange-50 border border-orange-200/60 text-[10px] font-semibold text-orange-800 truncate">
+                            ⚡ Membuka demo sebagai {demoLoginEmail}… (kode akses = tiket, tanpa password)
                           </div>
                         )}
                       </div>

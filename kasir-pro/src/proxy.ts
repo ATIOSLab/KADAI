@@ -50,21 +50,26 @@ const publicPages = [
 // signature (never browser cookies), so they are exempt from both the browser
 // CSRF origin check and the session gate. Every one of these verifies its own
 // secret BEFORE any database read.
-// Catatan: /api/admin/seed-demo SENGAJA TIDAK ada di daftar ini supaya request
-// berbasis cookie admin tetap melewati pemeriksaan CSRF Origin. Pemanggil
-// server-to-server memakai header X-Seed-Key + Origin yang cocok.
+// Catatan: /api/admin/seed-demo ada di daftar ini karena pemanggil server-to-server
+// memakai header X-Seed-Key (+ Origin yang cocok); route-nya sendiri fail-closed
+// (menolak 401 bila X-Seed-Key salah/kosong), sehingga sesi cookie admin tidak wajib.
 const serverToServerApis = [
   "/api/telegram/webhook",
   "/api/cron/billing-referral",
   "/api/cron/daily-summary",
   "/api/webhooks/payment/midtrans",
   "/api/webhooks/payment/xendit",
+  "/api/admin/seed-demo",
 ];
 const publicApis = [
   "/api/auth/login",
   "/api/auth/logout",
   "/api/auth/register",
   "/api/auth/verify-demo-code",
+  // Login demo passwordless: pengunjung membawa kode akses (hasil permohonan demo)
+  // tanpa akun/sesi, jadi harus lolos gerbang sesi; route-nya memvalidasi kode
+  // ke DB dan menolak akun non-demo.
+  "/api/auth/demo-login",
   "/api/order",
   "/api/laundry/track",
   "/api/demo-requests",

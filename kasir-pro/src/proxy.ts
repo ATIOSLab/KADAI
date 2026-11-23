@@ -97,6 +97,12 @@ export async function proxy(request: NextRequest) {
   const nonce = randomBytes(16).toString("base64");
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  // PENTING (Next.js 16 + Turbopack + standalone, vercel/next.js#96063):
+  // Next mengekstrak nonce dari request-side header `Content-Security-Policy`
+  // (getScriptNonceFromHeader di app-render), BUKAN dari response header.
+  // Tanpa CSP di request header, framework inline scripts lahir tanpa nonce
+  // → seluruhnya diblokir → hydration mati → halaman stuck di "Memuat...".
+  requestHeaders.set("Content-Security-Policy", buildCspHeader(nonce));
   const passThrough = () => NextResponse.next({ request: { headers: requestHeaders } });
   const secure = (response: NextResponse) => {
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(key, value);

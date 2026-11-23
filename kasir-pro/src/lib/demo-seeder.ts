@@ -336,29 +336,38 @@ export async function runDemoSeeding() {
         isDemo: true,
         storeId: tenantId,
       };
-      // Klaim per tenant: baris legacy global (storeId NULL) dulu, lalu baris tenant ini —
-      // mencegah produk tenant lain ikut ter-claim (isolasi tenant).
-      const legacyProduct =
-        (await prisma.product.findFirst({
-          where: { sku: prod.sku, storeId: null },
-          select: { id: true },
-        })) ??
-        (await prisma.product.findFirst({
-          where: { sku: prod.sku, storeId: tenantId },
-          select: { id: true },
-        }));
+      // Klaim per tenant: baris legacy global (storeId NULL) dulu, lalu baris tenant yang
+      // sudah memakai barcode ini (sku bisa berbeda antar versi seeder) — mencegah crash
+      // Unique constraint (storeId,barcode) saat seeding diulang (isolasi tenant tetap aman).
+      const legacyProduct = await prisma.product.findFirst({
+        where: { sku: prod.sku, storeId: null },
+        select: { id: true },
+      });
+      const barcodeOwner = legacyProduct
+        ? null
+        : await prisma.product.findFirst({
+            where: { storeId: tenantId, barcode: prod.barcode },
+            select: { id: true },
+          });
       const p = legacyProduct
         ? await prisma.product.update({
             where: { id: legacyProduct.id },
             data: productData,
           })
-        : await prisma.product.create({
-            data: {
-              ...productData,
-              sku: prod.sku,
-              description: `Katalog demo untuk ${cluster.name}`,
-            },
-          });
+        : barcodeOwner
+          ? await prisma.product.update({
+              where: { id: barcodeOwner.id },
+              data: { ...productData, sku: prod.sku },
+            })
+          : await prisma.product.upsert({
+              where: { storeId_sku: { storeId: tenantId, sku: prod.sku } },
+              update: productData,
+              create: {
+                ...productData,
+                sku: prod.sku,
+                description: `Katalog demo untuk ${cluster.name}`,
+              },
+            });
 
       const batchNo = `BATCH-${prod.sku}-202611`;
       await prisma.productBatch.upsert({

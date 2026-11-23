@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import { Plus_Jakarta_Sans, Geist_Mono, Saira } from "next/font/google";
 import { Toaster } from "sonner";
 import { ConfirmProvider } from "@/components/shared/confirm-dialog";
@@ -220,11 +221,16 @@ const schemaGraph = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Paksa rendering per-request agar proxy bisa menempelkan nonce CSP ke seluruh
+  // framework script (vercel/next.js#96063). Tanpa ini, HTML halaman statis
+  // dibangun saat build tanpa nonce → diblokir CSP `'strict-dynamic'` → hydration
+  // mati dan halaman berhenti di fallback "Memuat...".
+  await connection();
   return (
     <html
       lang="id"

@@ -95,6 +95,20 @@ const DEMO_VERTICALS = [
     ],
   },
   {
+    id: "klinik",
+    label: "Klinik & Estetika",
+    brand: "GlowAura Aesthetic & Dermatology Clinic",
+    icon: "🏥",
+    badge: "Medical Aesthetic",
+    tagline: "Treatment Dokter & Skincare Resep Dermatologi",
+    roles: [
+      { label: "Owner (Admin)", desc: "Audit Treatment & Omzet", email: "owner.klinik@kadai.asia" },
+      { label: "Kasir Frontdesk", desc: "Kasir Apotek & Treatment", email: "kasir.klinik@kadai.asia" },
+      { label: "Gudang Farmasi", desc: "Serum & Skincare Stok", email: "gudang.klinik@kadai.asia" },
+      { label: "Akuntan Pajak", desc: "PPh & Pembukuan Medis", email: "akuntan.klinik@kadai.asia" },
+    ],
+  },
+  {
     id: "laundry",
     label: "Laundry Engine",
     brand: "KADAI Clean & Fresh Laundry",
@@ -105,6 +119,20 @@ const DEMO_VERTICALS = [
       { label: "Owner (Admin)", desc: "Laporan Berat & Omzet", email: "owner.laundry@kadai.asia" },
       { label: "Kasir Penerimaan", desc: "Timbangan & Cetak Bon", email: "kasir.laundry@kadai.asia" },
       { label: "Operator Mesin", desc: "Update Status Cuci/Setrika", email: "operator.laundry@kadai.asia" },
+    ],
+  },
+  {
+    id: "bakso",
+    label: "Bakso & Mie Ayam",
+    brand: "Bakso & Mie Ayam Mas Sigit Solo",
+    icon: "🍜",
+    badge: "Warung Kuliner",
+    tagline: "Kasir Cepat, Dapur Kuah & QR Self-Order",
+    roles: [
+      { label: "Owner (Admin)", desc: "Laba Rugi & HPP Porsi", email: "owner.bakso@kadai.asia" },
+      { label: "Manager Gerai", desc: "Shift Buka Tutup Toko", email: "manager.bakso@kadai.asia" },
+      { label: "Kasir Cepat", desc: "Struk Thermal 58mm", email: "kasir.bakso@kadai.asia" },
+      { label: "Dapur (KDS)", desc: "Layar Rebus & Racik", email: "dapur.bakso@kadai.asia" },
     ],
   },
 ];

@@ -224,6 +224,32 @@ function buildClusters() {
       { name: "Dewi (Pastry Chef Dapur)", email: "dapur.cafe@kadai.com", role: UserRole.KITCHEN, pin: null },
       { name: "Anita (Akuntan Kafe & FnB)", email: "akuntan.cafe@kadai.com", role: UserRole.ACCOUNTANT, pin: null },
     ]
+  },
+  {
+    vertical: "LAUNDRY",
+    name: "KADAI Clean & Fresh Laundry",
+    slug: "laundry",
+    description: "Laundry Kiloan & Satuan: Timbangan Kasir, Work Order Cuci-Setrika & Rak Simpan Siap Ambil",
+    outlets: [
+      { name: "Clean & Fresh - Front Counter & Timbangan", code: "LND-01", address: "Jl. Cikajang No. 21, Jakarta Selatan", phone: "08127777001", isMain: true },
+      { name: "Clean & Fresh - Area Produksi Cuci & Setrika", code: "LND-PRD", address: "Jl. Cikajang No. 21 (Belakang), Jakarta Selatan", phone: "08127777002", isMain: false },
+    ],
+    categories: ["Cuci Kiloan & Kering", "Cuci Express & Same Day", "Dry Clean & Setrika Premium", "Cuci Sepatu & Aksesoris"],
+    products: [
+      { name: "Cuci Kiloan Standar (Kering Lipat)", sku: "LND-KLN-01", barcode: "899700100001", category: "Cuci Kiloan & Kering", price: 8000, cost: 3500, stock: 99999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Express 24 Jam", sku: "LND-EXP-02", barcode: "899700100002", category: "Cuci Express & Same Day", price: 15000, cost: 6000, stock: 99999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Dry Clean Jas / Kebaya Premium", sku: "LND-DRC-03", barcode: "899700100003", category: "Dry Clean & Setrika Premium", price: 55000, cost: 18000, stock: 99999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Setrika Saja / Press Per Pcs", sku: "LND-STK-04", barcode: "899700100004", category: "Dry Clean & Setrika Premium", price: 8000, cost: 2500, stock: 99999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Bed Cover & Selimut Tebal", sku: "LND-BDC-05", barcode: "899700100005", category: "Cuci Kiloan & Kering", price: 35000, cost: 12000, stock: 99999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Sepatu Sneakers & Shoes Care", sku: "LND-STU-06", barcode: "899700100006", category: "Cuci Sepatu & Aksesoris", price: 60000, cost: 25000, stock: 99999, unit: "pair", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Cuci Bantal & Boneka Besar", sku: "LND-BNL-07", barcode: "899700100007", category: "Cuci Kiloan & Kering", price: 25000, cost: 8000, stock: 99999, unit: "pcs", type: ProductType.SERVICE, station: StationType.GENERAL },
+      { name: "Laundry Handuk Hotel & Kain", sku: "LND-HTL-08", barcode: "899700100008", category: "Cuci Kiloan & Kering", price: 12000, cost: 5000, stock: 99999, unit: "kg", type: ProductType.SERVICE, station: StationType.GENERAL },
+    ],
+    users: [
+      { name: "Ibu Rina Astuti (Owner Clean & Fresh)", email: "owner.laundry@kadai.asia", role: UserRole.ADMIN, pin: demoPin("owner.laundry@kadai.asia") },
+      { name: "Sari Wulandari (Kasir Penerimaan & Timbangan)", email: "kasir.laundry@kadai.asia", role: UserRole.CASHIER, pin: null },
+      { name: "Pak Joko (Operator Mesin Cuci & Setrika)", email: "operator.laundry@kadai.asia", role: UserRole.INVENTORY, pin: null },
+    ]
   }
 ];
 }
